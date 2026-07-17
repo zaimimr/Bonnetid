@@ -1,56 +1,43 @@
-# Welcome to your Expo app 👋
+# Bønnetid
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Prayer times app for Muslims in Norway. Built with Expo, React Native and TypeScript. Data from [api.bonnetid.no](https://api.bonnetid.no).
 
-## Get started
+## Features
 
-1. Install dependencies
+- Next prayer countdown and today's prayer times for any Norwegian kommune
+- Nearby mosques with jamat and jummah times, list and map view
+- Hijri calendar with upcoming Islamic events
+- Qibla compass with distance to Mekka
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Getting started
 
 ```bash
-npm run reset-project
+cp .env.example .env
+npm install
+npm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Add your API token to `.env`:
 
-### Other setup steps
+```
+EXPO_PUBLIC_API_TOKEN=<your token>
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Run on device with Expo Go, or `npm run ios` / `npm run android`.
 
-## Learn more
+## Architecture
 
-To learn more about developing your project with Expo, look at the following resources:
+```
+src/
+  app/          expo-router routes (tabs, modals, detail screens)
+  theme/        design tokens, semantic light/dark themes, ThemeProvider
+  api/          typed client, endpoint functions, react-query hooks
+  components/   ui/ primitives + feature components (prayer, mosque, calendar, qibla)
+  hooks/        useNow, usePrayerDay, useUserCoords, useCompassHeading
+  lib/          pure helpers: time, prayer schedule, geo/qibla, hijri formatting
+  store/        zustand settings store persisted to AsyncStorage
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Design tokens
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+All colors, spacing, radii and type sizes live in `src/theme/tokens.ts`. Semantic roles (background, surface, textPrimary, ...) map tokens per scheme in `src/theme/theme.ts`. Components only read semantic roles via `useTheme()`, so restyling the app means editing two files.
