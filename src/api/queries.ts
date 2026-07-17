@@ -38,11 +38,12 @@ export function useMosquesNearby(lat: number, lon: number) {
   });
 }
 
-export function useMosque(orgNr: string) {
+export function useMosque(orgNr: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['mosque', orgNr],
     queryFn: () => fetchMosque(orgNr),
     staleTime: 6 * HOUR,
+    enabled: options?.enabled ?? true,
   });
 }
 

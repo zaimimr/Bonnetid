@@ -9,9 +9,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import { formatHijri, monthName } from '@/lib/hijri';
-import { isoDateKey } from '@/lib/time';
-
-const UPCOMING_WINDOW_DAYS = 30;
 
 export default function CalendarScreen() {
   const theme = useTheme();
@@ -30,8 +27,7 @@ export default function CalendarScreen() {
     cursor.year === today.getFullYear() && cursor.monthIndex === today.getMonth();
 
   const month = useHijriMonth(cursor.year, cursor.monthIndex + 1);
-  const specialsThisYear = useSpecialDates(cursor.year);
-  const specialsNextYear = useSpecialDates(cursor.year + 1);
+  const specials = useSpecialDates(cursor.year);
 
   const shiftMonth = (delta: number) => {
     setSelectedIso(null);
@@ -49,24 +45,10 @@ export default function CalendarScreen() {
     return `${first.hijri_month_text} – ${last.hijri_month_text}`;
   }, [month.data]);
 
-  const allSpecials = useMemo(
-    () => [...(specialsThisYear.data ?? []), ...(specialsNextYear.data ?? [])],
-    [specialsThisYear.data, specialsNextYear.data],
-  );
-
   const events = useMemo(() => {
-    if (isCurrentMonth) {
-      const windowEnd = new Date(today);
-      windowEnd.setDate(windowEnd.getDate() + UPCOMING_WINDOW_DAYS);
-      const fromIso = isoDateKey(today);
-      const toIso = isoDateKey(windowEnd);
-      return allSpecials.filter(
-        (event) => event.gregorian_date >= fromIso && event.gregorian_date <= toIso,
-      );
-    }
     const monthPrefix = `${cursor.year}-${String(cursor.monthIndex + 1).padStart(2, '0')}`;
-    return allSpecials.filter((event) => event.gregorian_date.startsWith(monthPrefix));
-  }, [allSpecials, isCurrentMonth, cursor.year, cursor.monthIndex, today]);
+    return (specials.data ?? []).filter((event) => event.gregorian_date.startsWith(monthPrefix));
+  }, [specials.data, cursor.year, cursor.monthIndex]);
 
   const jumpToEvent = (event: HijriDay) => {
     const date = new Date(event.gregorian_date);
@@ -90,7 +72,7 @@ export default function CalendarScreen() {
     }
   };
 
-  const eventsLoading = specialsThisYear.isLoading || specialsNextYear.isLoading;
+  const eventsLoading = specials.isLoading;
 
   return (
     <ScrollView
@@ -161,20 +143,12 @@ export default function CalendarScreen() {
 
         <View>
           <SectionHeader
-            title={isCurrentMonth ? 'Kommende merkedager' : `Merkedager i ${monthName(cursor.monthIndex).toLowerCase()}`}
-            subtitle={isCurrentMonth ? `Neste ${UPCOMING_WINDOW_DAYS} dager` : undefined}
+            title={`Merkedager i ${monthName(cursor.monthIndex).toLowerCase()}`}
           />
           {eventsLoading && <Skeleton height={180} rounded="xl" />}
-          {specialsThisYear.isError && <ErrorState onRetry={specialsThisYear.refetch} />}
+          {specials.isError && <ErrorState onRetry={specials.refetch} />}
           {!eventsLoading && events.length === 0 && (
-            <EmptyState
-              message={
-                isCurrentMonth
-                  ? `Ingen merkedager de neste ${UPCOMING_WINDOW_DAYS} dagene`
-                  : 'Ingen merkedager denne måneden'
-              }
-              icon="calendar-clear-outline"
-            />
+            <EmptyState message="Ingen merkedager denne måneden" icon="calendar-clear-outline" />
           )}
           <View style={{ gap: spacing.md }}>
             {events.map((event) => {

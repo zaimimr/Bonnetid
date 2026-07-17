@@ -10,6 +10,10 @@ import { useTheme } from '@/theme';
 import { fontSize, opacity, radius, spacing } from '@/theme/tokens';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
+function fylkeName(fylke: string): string {
+  return fylke.replace(/^\d+\s*-\s*/, '');
+}
+
 export default function LocationPickerScreen() {
   const router = useRouter();
   const theme = useTheme();
@@ -26,7 +30,7 @@ export default function LocationPickerScreen() {
     return locations.filter(
       (location) =>
         location.name.toLowerCase().includes(normalized) ||
-        location.fylke.toLowerCase().includes(normalized),
+        fylkeName(location.fylke).toLowerCase().includes(normalized),
     );
   }, [locations, query]);
 
@@ -132,7 +136,7 @@ export default function LocationPickerScreen() {
           renderItem={({ item }) => (
             <ListRow
               title={item.name}
-              subtitle={item.fylke}
+              subtitle={fylkeName(item.fylke)}
               trailing={
                 item.pk === active.pk ? (
                   <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
