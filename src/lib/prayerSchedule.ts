@@ -51,6 +51,31 @@ export function buildDaySchedule(
     }));
 }
 
+export type JamatTimes = Partial<Record<PrayerName, string>>;
+
+type JamatSource = {
+  start_date: string | null;
+  end_date: string | null;
+  fajr: string | null;
+  duhr: string | null;
+  asr: string | null;
+  maghrib: string | null;
+  isha: string | null;
+};
+
+export function jamatTimesForDate(jamat: JamatSource | null | undefined, isoDate: string): JamatTimes {
+  if (!jamat) return {};
+  if (jamat.start_date && isoDate < jamat.start_date) return {};
+  if (jamat.end_date && isoDate > jamat.end_date) return {};
+  return {
+    fajr: jamat.fajr ?? undefined,
+    duhr: jamat.duhr ?? undefined,
+    asr: jamat.asr ?? undefined,
+    maghrib: jamat.maghrib ?? undefined,
+    isha: jamat.isha ?? undefined,
+  };
+}
+
 export type NextPrayerResult = {
   next: PrayerEntry;
   current: PrayerEntry | null;

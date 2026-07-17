@@ -1,0 +1,106 @@
+import { Pressable, View } from 'react-native';
+import { AppText, Card } from '@/components/ui';
+import { useTheme } from '@/theme';
+import { opacity, radius, spacing } from '@/theme/tokens';
+import type { PrayerDay } from '@/api/types';
+import type { AsrMethodPreference } from '@/store/settings';
+import { parseDayKey, todayKey } from '@/lib/time';
+
+const COLUMNS = ['Fajr', 'Sol', 'Duhr', 'Asr', 'Maghrib', 'Isha'];
+const WEEKDAY_LETTERS = ['S', 'M', 'T', 'O', 'T', 'F', 'L'];
+const FRIDAY = 5;
+
+export type MonthPrayerTableProps = {
+  days: PrayerDay[];
+  asrMethod: AsrMethodPreference;
+  onDayPress?: (day: PrayerDay) => void;
+};
+
+export function MonthPrayerTable({ days, asrMethod, onDayPress }: MonthPrayerTableProps) {
+  const theme = useTheme();
+  const today = todayKey();
+
+  const timesFor = (day: PrayerDay): (string | null)[] => [
+    day.fajr,
+    day.shuruq_sunrise,
+    day.duhr,
+    (asrMethod === 'shadow_2x' ? day.shadow_2x : day.shadow_1x) ?? day.asr,
+    day.maghrib,
+    day.isha,
+  ];
+
+  return (
+    <Card padding="sm" rounded="xl">
+      <View
+        style={{
+          flexDirection: 'row',
+          paddingVertical: spacing.sm,
+          paddingHorizontal: spacing.sm,
+          gap: spacing.xs,
+        }}>
+        <AppText size="xs" weight="medium" tone="textMuted" style={{ width: 40 }}>
+          Dato
+        </AppText>
+        {COLUMNS.map((column) => (
+          <AppText
+            key={column}
+            size="xs"
+            weight="medium"
+            tone="textMuted"
+            align="center"
+            style={{ flex: 1 }}>
+            {column}
+          </AppText>
+        ))}
+      </View>
+
+      {days.map((day) => {
+        const date = parseDayKey(day.date);
+        const isToday = day.date === today;
+        const isFriday = date.getDay() === FRIDAY;
+        return (
+          <Pressable
+            key={day.date}
+            onPress={onDayPress ? () => onDayPress(day) : undefined}
+            style={({ pressed }) => [
+              {
+                flexDirection: 'row',
+                alignItems: 'center',
+                paddingVertical: spacing.sm,
+                paddingHorizontal: spacing.sm,
+                gap: spacing.xs,
+                borderRadius: radius.md,
+                backgroundColor: isToday ? theme.colors.primarySoft : 'transparent',
+              },
+              pressed && { opacity: opacity.pressed },
+            ]}>
+            <View style={{ width: 40, flexDirection: 'row', alignItems: 'baseline', gap: spacing.xxs }}>
+              <AppText
+                size="sm"
+                weight={isToday || isFriday ? 'bold' : 'medium'}
+                tone={isToday ? 'onPrimarySoft' : isFriday ? 'primary' : 'textPrimary'}
+                tabular>
+                {date.getDate()}
+              </AppText>
+              <AppText size="xs" tone={isFriday ? 'primary' : 'textMuted'}>
+                {WEEKDAY_LETTERS[date.getDay()]}
+              </AppText>
+            </View>
+            {timesFor(day).map((time, index) => (
+              <AppText
+                key={COLUMNS[index]}
+                size="xs"
+                weight={isToday ? 'semibold' : 'regular'}
+                tone={isToday ? 'onPrimarySoft' : index === 1 ? 'textMuted' : 'textSecondary'}
+                align="center"
+                tabular
+                style={{ flex: 1 }}>
+                {time ?? '–'}
+              </AppText>
+            ))}
+          </Pressable>
+        );
+      })}
+    </Card>
+  );
+}

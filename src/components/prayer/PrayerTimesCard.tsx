@@ -3,8 +3,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppText, Badge, Card } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
-import type { PrayerEntry, PrayerName } from '@/lib/prayerSchedule';
+import type { JamatTimes, PrayerEntry, PrayerName } from '@/lib/prayerSchedule';
 import type { MosqueJummah } from '@/api/types';
+
+export type { JamatTimes };
 
 const PRAYER_ICONS: Record<PrayerName, keyof typeof Ionicons.glyphMap> = {
   fajr: 'cloudy-night-outline',
@@ -16,8 +18,6 @@ const PRAYER_ICONS: Record<PrayerName, keyof typeof Ionicons.glyphMap> = {
 };
 
 const TIME_COLUMN_WIDTH = 64;
-
-export type JamatTimes = Partial<Record<PrayerName, string>>;
 
 export type PrayerTimesCardProps = {
   schedule: PrayerEntry[];

@@ -4,11 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useHijriMonth, useSpecialDates } from '@/api/queries';
 import type { HijriDay } from '@/api/types';
 import { MonthGrid } from '@/components/calendar/MonthGrid';
-import { AppText, Card, EmptyState, ErrorState, SectionHeader, Skeleton } from '@/components/ui';
+import { EventCard } from '@/components/calendar/EventCard';
+import { AppText, EmptyState, ErrorState, SectionHeader, Skeleton } from '@/components/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
-import { formatHijri, monthName } from '@/lib/hijri';
+import { monthName } from '@/lib/hijri';
 
 export default function CalendarScreen() {
   const theme = useTheme();
@@ -151,63 +152,19 @@ export default function CalendarScreen() {
             <EmptyState message="Ingen merkedager denne måneden" icon="calendar-clear-outline" />
           )}
           <View style={{ gap: spacing.md }}>
-            {events.map((event) => {
-              const isSelected = event.gregorian_date === selectedIso;
-              const date = new Date(event.gregorian_date);
-              return (
-                <View
-                  key={event.gregorian_date + event.special_date_name}
-                  ref={(node) => {
-                    eventCardRefs.current.set(event.gregorian_date, node);
-                  }}>
-                  <Card
-                    rounded="xl"
-                    onPress={() => jumpToEvent(event)}
-                    style={
-                      isSelected
-                        ? {
-                            borderColor: theme.colors.accent,
-                            borderWidth: 2,
-                            backgroundColor: theme.colors.primarySoft,
-                          }
-                        : undefined
-                    }>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-                      <View
-                        style={{
-                          width: 48,
-                          borderRadius: radius.md,
-                          backgroundColor: isSelected
-                            ? theme.colors.surface
-                            : theme.colors.primarySoft,
-                          paddingVertical: spacing.sm,
-                          alignItems: 'center',
-                        }}>
-                        <AppText size="lg" weight="bold" tone="onPrimarySoft">
-                          {date.getDate()}
-                        </AppText>
-                        <AppText size="xs" tone="onPrimarySoft">
-                          {monthName(date.getMonth()).slice(0, 3)}
-                        </AppText>
-                      </View>
-                      <View style={{ flex: 1, gap: spacing.xxs }}>
-                        <AppText size="sm" weight="semibold" numberOfLines={2}>
-                          {event.special_date_name}
-                        </AppText>
-                        <AppText size="xs" tone="textMuted">
-                          {formatHijri(event.hijri_date, event.hijri_month_text)}
-                        </AppText>
-                      </View>
-                      <Ionicons
-                        name="calendar-outline"
-                        size={18}
-                        color={isSelected ? theme.colors.accent : theme.colors.textMuted}
-                      />
-                    </View>
-                  </Card>
-                </View>
-              );
-            })}
+            {events.map((event) => (
+              <View
+                key={event.gregorian_date + event.special_date_name}
+                ref={(node) => {
+                  eventCardRefs.current.set(event.gregorian_date, node);
+                }}>
+                <EventCard
+                  event={event}
+                  selected={event.gregorian_date === selectedIso}
+                  onPress={() => jumpToEvent(event)}
+                />
+              </View>
+            ))}
           </View>
         </View>
       </View>

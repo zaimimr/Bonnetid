@@ -53,6 +53,17 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="day/[date]"
+          options={{
+            headerShown: true,
+            title: '',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
           name="mosque/[orgNr]"
           options={{
             headerShown: true,
