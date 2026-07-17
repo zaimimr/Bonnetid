@@ -19,8 +19,7 @@ export type TextTone = keyof Pick<
   | 'primary'
   | 'accent'
   | 'danger'
-  | 'onHero'
-  | 'onHeroMuted'
+  | 'success'
   | 'onPrimary'
   | 'onPrimarySoft'
 >;

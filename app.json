@@ -39,7 +39,8 @@
         {
           "locationWhenInUsePermission": "Bønnetid bruker posisjonen din til å finne moskeer i nærheten og retningen mot Qibla."
         }
-      ]
+      ],
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,

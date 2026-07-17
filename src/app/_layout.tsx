@@ -3,6 +3,8 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useTheme } from '@/theme';
+import { configureNotificationHandler } from '@/lib/notifications';
+import { useNotificationScheduler } from '@/hooks/useNotificationScheduler';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -13,8 +15,11 @@ const queryClient = new QueryClient({
   },
 });
 
+configureNotificationHandler();
+
 function RootNavigator() {
   const theme = useTheme();
+  useNotificationScheduler();
 
   return (
     <>
@@ -31,6 +36,17 @@ function RootNavigator() {
             presentation: 'modal',
             headerShown: true,
             title: 'Velg sted',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="mosque-picker"
+          options={{
+            presentation: 'modal',
+            headerShown: true,
+            title: 'Velg moské',
             headerStyle: { backgroundColor: theme.colors.surface },
             headerTitleStyle: { color: theme.colors.textPrimary },
             headerTintColor: theme.colors.primary,

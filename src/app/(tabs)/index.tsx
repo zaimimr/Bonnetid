@@ -3,18 +3,20 @@ import { useRouter } from 'expo-router';
 import { useHijriMonth } from '@/api/queries';
 import { NextPrayerHero } from '@/components/prayer/NextPrayerHero';
 import { PrayerList } from '@/components/prayer/PrayerList';
+import { MyMosqueCard } from '@/components/mosque/MyMosqueCard';
 import { ErrorState, Screen, SectionHeader, Skeleton } from '@/components/ui';
 import { useNow } from '@/hooks/useNow';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { isoDateKey } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
-import { useActiveLocation } from '@/store/settings';
+import { useActiveLocation, useSettings } from '@/store/settings';
 
 export default function HomeScreen() {
   const router = useRouter();
   const now = useNow();
   const location = useActiveLocation();
+  const mosque = useSettings((state) => state.mosque);
   const { todaySchedule, nextPrayer, isLoading, isError, refetch } = usePrayerDay(now);
   const hijriMonth = useHijriMonth(now.getFullYear(), now.getMonth() + 1);
 
@@ -40,6 +42,12 @@ export default function HomeScreen() {
             onPressLocation={() => router.push('/location-picker')}
           />
         )}
+
+        <MyMosqueCard
+          mosque={mosque}
+          onSelectMosque={() => router.push('/mosque-picker')}
+          onOpenMosque={(orgNr) => router.push({ pathname: '/mosque/[orgNr]', params: { orgNr } })}
+        />
 
         {todaySchedule.length > 0 && (
           <View>

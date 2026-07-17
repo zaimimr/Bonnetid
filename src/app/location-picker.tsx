@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react';
-import { FlatList, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocations } from '@/api/queries';
+import type { ApiLocation } from '@/api/types';
 import { AppText, ErrorState, ListRow, Screen, Skeleton } from '@/components/ui';
+import { useNearestLocation } from '@/hooks/useNearestLocation';
 import { useTheme } from '@/theme';
-import { fontSize, radius, spacing } from '@/theme/tokens';
+import { fontSize, opacity, radius, spacing } from '@/theme/tokens';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
 export default function LocationPickerScreen() {
@@ -15,6 +17,7 @@ export default function LocationPickerScreen() {
   const setLocation = useSettings((state) => state.setLocation);
   const active = useActiveLocation();
   const [query, setQuery] = useState('');
+  const { status: gpsStatus, locate } = useNearestLocation();
 
   const filtered = useMemo(() => {
     if (!locations) return [];
@@ -27,9 +30,66 @@ export default function LocationPickerScreen() {
     );
   }, [locations, query]);
 
+  const choose = (location: ApiLocation) => {
+    setLocation({
+      pk: location.pk,
+      name: location.name,
+      lat: Number(location.lat),
+      lon: Number(location.lon),
+    });
+    router.back();
+  };
+
+  const useMyPosition = async () => {
+    if (!locations) return;
+    const nearest = await locate(locations);
+    if (nearest) choose(nearest);
+  };
+
   return (
     <Screen edges={[]} padded={false}>
       <View style={{ padding: spacing.lg, gap: spacing.md, flex: 1 }}>
+        <Pressable
+          onPress={useMyPosition}
+          disabled={gpsStatus === 'locating' || !locations}
+          style={({ pressed }) => [
+            {
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing.sm,
+              backgroundColor: theme.colors.primarySoft,
+              borderRadius: radius.md,
+              padding: spacing.md,
+              minHeight: 48,
+            },
+            pressed && { opacity: opacity.pressed },
+          ]}>
+          {gpsStatus === 'locating' ? (
+            <ActivityIndicator size="small" color={theme.colors.onPrimarySoft} />
+          ) : (
+            <Ionicons name="navigate" size={18} color={theme.colors.onPrimarySoft} />
+          )}
+          <View style={{ flex: 1 }}>
+            <AppText weight="semibold" tone="onPrimarySoft">
+              Bruk min posisjon
+            </AppText>
+            <AppText size="xs" tone="onPrimarySoft">
+              Finner kommunen nærmest deg for nøyaktige bønnetider
+            </AppText>
+          </View>
+        </Pressable>
+
+        {gpsStatus === 'denied' && (
+          <AppText size="sm" tone="danger">
+            Posisjonstilgang avslått. Gi tilgang i systeminnstillinger, eller velg kommune manuelt.
+          </AppText>
+        )}
+        {gpsStatus === 'error' && (
+          <AppText size="sm" tone="danger">
+            Fant ikke posisjonen din. Velg kommune manuelt.
+          </AppText>
+        )}
+
         <View
           style={{
             flexDirection: 'row',
@@ -78,15 +138,7 @@ export default function LocationPickerScreen() {
                   <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
                 ) : undefined
               }
-              onPress={() => {
-                setLocation({
-                  pk: item.pk,
-                  name: item.name,
-                  lat: Number(item.lat),
-                  lon: Number(item.lon),
-                });
-                router.back();
-              }}
+              onPress={() => choose(item)}
             />
           )}
           ItemSeparatorComponent={() => (

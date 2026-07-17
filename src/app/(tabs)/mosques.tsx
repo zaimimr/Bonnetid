@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { FlatList, Pressable, View } from 'react-native';
+import { FlatList, Pressable, TextInput, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,9 +10,10 @@ import { AppText, EmptyState, ErrorState, Screen, Skeleton } from '@/components/
 import { useUserCoords } from '@/hooks/useUserCoords';
 import { distanceKm } from '@/lib/geo';
 import { useTheme } from '@/theme';
-import { opacity, radius, spacing } from '@/theme/tokens';
+import { fontSize, opacity, radius, spacing } from '@/theme/tokens';
 
 type ViewMode = 'list' | 'map';
+type SortMode = 'distance' | 'name';
 
 type MosqueWithDistance = {
   mosque: Mosque;
@@ -25,10 +26,13 @@ export default function MosquesScreen() {
   const coords = useUserCoords();
   const { data: mosques, isLoading, isError, refetch } = useMosquesNearby(coords.lat, coords.lon);
   const [mode, setMode] = useState<ViewMode>('list');
+  const [sort, setSort] = useState<SortMode>('distance');
+  const [query, setQuery] = useState('');
 
-  const sorted: MosqueWithDistance[] = useMemo(() => {
+  const visible: MosqueWithDistance[] = useMemo(() => {
     if (!mosques) return [];
-    return mosques
+    const normalized = query.trim().toLowerCase();
+    const withDistance = mosques
       .map((mosque) => ({
         mosque,
         distance:
@@ -36,27 +40,81 @@ export default function MosquesScreen() {
             ? distanceKm(coords.lat, coords.lon, Number(mosque.lat), Number(mosque.lon))
             : null,
       }))
-      .sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
-  }, [mosques, coords.lat, coords.lon]);
+      .filter(
+        ({ mosque }) =>
+          !normalized ||
+          mosque.name.toLowerCase().includes(normalized) ||
+          (mosque.post?.city.toLowerCase().includes(normalized) ?? false),
+      );
+
+    if (sort === 'name') {
+      return withDistance.sort((a, b) => a.mosque.name.localeCompare(b.mosque.name, 'nb'));
+    }
+    return withDistance.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
+  }, [mosques, query, sort, coords.lat, coords.lon]);
 
   const openMosque = (mosque: Mosque) =>
     router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.org_nr } });
 
   return (
     <Screen padded={false}>
-      <View
-        style={{
-          paddingHorizontal: spacing.lg,
-          paddingTop: spacing.lg,
-          paddingBottom: spacing.md,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-        <AppText size="xxl" weight="bold" heading>
-          Moskeer
-        </AppText>
-        <ModeToggle mode={mode} onChange={setMode} />
+      <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.lg, gap: spacing.md }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <AppText size="xxl" weight="bold" heading>
+            Moskeer
+          </AppText>
+          <ModeToggle mode={mode} onChange={setMode} />
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing.sm,
+            backgroundColor: theme.colors.surfaceSunken,
+            borderRadius: radius.md,
+            paddingHorizontal: spacing.md,
+          }}>
+          <Ionicons name="search" size={18} color={theme.colors.textMuted} />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Søk etter moské eller by"
+            placeholderTextColor={theme.colors.textMuted}
+            autoCorrect={false}
+            style={{
+              flex: 1,
+              paddingVertical: spacing.md,
+              fontSize: fontSize.md,
+              color: theme.colors.textPrimary,
+            }}
+          />
+          {query.length > 0 && (
+            <Pressable onPress={() => setQuery('')} hitSlop={8}>
+              <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
+            </Pressable>
+          )}
+        </View>
+
+        <View style={{ flexDirection: 'row', gap: spacing.sm, paddingBottom: spacing.md }}>
+          <SortChip
+            label="Nærmest meg"
+            icon="navigate-outline"
+            active={sort === 'distance'}
+            onPress={() => setSort('distance')}
+          />
+          <SortChip
+            label="Navn A–Å"
+            icon="text-outline"
+            active={sort === 'name'}
+            onPress={() => setSort('name')}
+          />
+        </View>
       </View>
 
       {isLoading && (
@@ -71,7 +129,7 @@ export default function MosquesScreen() {
 
       {!isLoading && !isError && mode === 'list' && (
         <FlatList
-          data={sorted}
+          data={visible}
           keyExtractor={(item) => item.mosque.org_nr}
           contentContainerStyle={{
             paddingHorizontal: spacing.lg,
@@ -85,7 +143,11 @@ export default function MosquesScreen() {
               onPress={() => openMosque(item.mosque)}
             />
           )}
-          ListEmptyComponent={<EmptyState message="Ingen moskeer funnet i nærheten" />}
+          ListEmptyComponent={
+            <EmptyState
+              message={query ? `Ingen moskeer matcher «${query}»` : 'Ingen moskeer funnet i nærheten'}
+            />
+          }
         />
       )}
 
@@ -99,7 +161,7 @@ export default function MosquesScreen() {
             longitudeDelta: 0.08,
           }}
           showsUserLocation>
-          {sorted
+          {visible
             .filter((item) => item.mosque.lat && item.mosque.lon)
             .map((item) => (
               <Marker
@@ -117,6 +179,51 @@ export default function MosquesScreen() {
         </MapView>
       )}
     </Screen>
+  );
+}
+
+function SortChip({
+  label,
+  icon,
+  active,
+  onPress,
+}: {
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  active: boolean;
+  onPress: () => void;
+}) {
+  const theme = useTheme();
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: spacing.xs,
+          paddingVertical: spacing.sm,
+          paddingHorizontal: spacing.md,
+          borderRadius: radius.full,
+          backgroundColor: active ? theme.colors.primarySoft : theme.colors.surfaceSunken,
+          borderWidth: 1,
+          borderColor: active ? theme.colors.primary : 'transparent',
+          minHeight: 40,
+        },
+        pressed && { opacity: opacity.pressed },
+      ]}>
+      <Ionicons
+        name={icon}
+        size={15}
+        color={active ? theme.colors.onPrimarySoft : theme.colors.textMuted}
+      />
+      <AppText
+        size="sm"
+        weight={active ? 'semibold' : 'regular'}
+        tone={active ? 'onPrimarySoft' : 'textSecondary'}>
+        {label}
+      </AppText>
+    </Pressable>
   );
 }
 

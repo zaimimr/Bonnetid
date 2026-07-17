@@ -19,10 +19,7 @@ export type ThemeColors = {
   borderStrong: string;
   danger: string;
   info: string;
-  heroGradientStart: string;
-  heroGradientEnd: string;
-  onHero: string;
-  onHeroMuted: string;
+  success: string;
   tabBarBackground: string;
   tabBarActive: string;
   tabBarInactive: string;
@@ -38,33 +35,30 @@ export type Theme = {
 export const lightTheme: Theme = {
   scheme: 'light',
   colors: {
-    background: palette.sand50,
-    surface: palette.white,
-    surfaceElevated: palette.white,
-    surfaceSunken: palette.sand100,
+    background: palette.neutral50,
+    surface: palette.neutral0,
+    surfaceElevated: palette.neutral0,
+    surfaceSunken: palette.neutral100,
     primary: palette.emerald600,
-    onPrimary: palette.white,
+    onPrimary: palette.neutral0,
     primarySoft: palette.emerald50,
     onPrimarySoft: palette.emerald700,
-    accent: palette.gold500,
-    onAccent: palette.ink900,
-    textPrimary: palette.ink900,
-    textSecondary: palette.ink700,
-    textMuted: palette.ink500,
-    textInverse: palette.white,
-    border: palette.sand200,
-    borderStrong: palette.sand300,
-    danger: palette.red500,
-    info: palette.blue500,
-    heroGradientStart: palette.emerald700,
-    heroGradientEnd: palette.emerald900,
-    onHero: palette.white,
-    onHeroMuted: palette.emerald200,
-    tabBarBackground: palette.white,
+    accent: palette.gold600,
+    onAccent: palette.neutral0,
+    textPrimary: palette.neutral900,
+    textSecondary: palette.neutral700,
+    textMuted: palette.neutral500,
+    textInverse: palette.neutral0,
+    border: palette.neutral200,
+    borderStrong: palette.neutral300,
+    danger: palette.red600,
+    info: palette.blue600,
+    success: palette.emerald500,
+    tabBarBackground: palette.neutral0,
     tabBarActive: palette.emerald600,
-    tabBarInactive: palette.ink300,
-    skeleton: palette.sand200,
-    overlay: 'rgba(20, 32, 27, 0.5)',
+    tabBarInactive: palette.neutral500,
+    skeleton: palette.neutral200,
+    overlay: 'rgba(24, 36, 32, 0.5)',
   },
 };
 
@@ -84,15 +78,12 @@ export const darkTheme: Theme = {
     textPrimary: palette.mist100,
     textSecondary: palette.mist300,
     textMuted: palette.mist500,
-    textInverse: palette.ink900,
+    textInverse: palette.neutral900,
     border: palette.night700,
     borderStrong: palette.night600,
     danger: palette.red400,
-    info: palette.blue500,
-    heroGradientStart: palette.emerald800,
-    heroGradientEnd: palette.night950,
-    onHero: palette.mist100,
-    onHeroMuted: palette.emerald300,
+    info: palette.blue600,
+    success: palette.emerald400,
     tabBarBackground: palette.night900,
     tabBarActive: palette.emerald400,
     tabBarInactive: palette.mist500,

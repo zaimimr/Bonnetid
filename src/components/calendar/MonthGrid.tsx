@@ -1,7 +1,7 @@
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { AppText, Card } from '@/components/ui';
 import { useTheme } from '@/theme';
-import { radius, spacing } from '@/theme/tokens';
+import { opacity, radius, spacing } from '@/theme/tokens';
 import type { HijriDay } from '@/api/types';
 import { parseHijriDate } from '@/lib/hijri';
 import { isoDateKey } from '@/lib/time';
@@ -12,9 +12,11 @@ export type MonthGridProps = {
   year: number;
   monthIndex: number;
   days: HijriDay[];
+  selectedIso?: string | null;
+  onDayPress?: (iso: string, day: HijriDay | undefined) => void;
 };
 
-export function MonthGrid({ year, monthIndex, days }: MonthGridProps) {
+export function MonthGrid({ year, monthIndex, days, selectedIso, onDayPress }: MonthGridProps) {
   const theme = useTheme();
   const todayIso = isoDateKey();
   const byDate = new Map(days.map((day) => [day.gregorian_date, day]));
@@ -53,18 +55,29 @@ export function MonthGrid({ year, monthIndex, days }: MonthGridProps) {
           if (!cell) return <View key={`blank-${index}`} style={{ width: '14.28%', height: 52 }} />;
 
           const isToday = cell.iso === todayIso;
+          const isSelected = cell.iso === selectedIso;
           const isSpecial = Boolean(cell.hijri?.special_date_name);
           const hijriDay = cell.hijri ? parseHijriDate(cell.hijri.hijri_date)?.day : undefined;
 
+          const textColor = isToday
+            ? theme.colors.onPrimary
+            : isSpecial
+              ? theme.colors.onPrimarySoft
+              : theme.colors.textPrimary;
+
           return (
-            <View
+            <Pressable
               key={cell.iso}
-              style={{
-                width: '14.28%',
-                height: 52,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
+              onPress={onDayPress ? () => onDayPress(cell.iso, cell.hijri) : undefined}
+              style={({ pressed }) => [
+                {
+                  width: '14.28%',
+                  height: 52,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                },
+                pressed && { opacity: opacity.pressed },
+              ]}>
               <View
                 style={{
                   width: 40,
@@ -77,35 +90,22 @@ export function MonthGrid({ year, monthIndex, days }: MonthGridProps) {
                     : isSpecial
                       ? theme.colors.primarySoft
                       : 'transparent',
+                  borderWidth: isSelected ? 2 : 0,
+                  borderColor: theme.colors.accent,
                   gap: 1,
                 }}>
-                <AppText
-                  size="sm"
-                  weight={isToday ? 'bold' : 'medium'}
-                  color={
-                    isToday
-                      ? theme.colors.onPrimary
-                      : isSpecial
-                        ? theme.colors.onPrimarySoft
-                        : theme.colors.textPrimary
-                  }>
+                <AppText size="sm" weight={isToday || isSelected ? 'bold' : 'medium'} color={textColor}>
                   {cell.dayOfMonth}
                 </AppText>
                 {hijriDay != null && (
                   <AppText
                     size="xs"
-                    color={
-                      isToday
-                        ? theme.colors.onPrimary
-                        : isSpecial
-                          ? theme.colors.onPrimarySoft
-                          : theme.colors.textMuted
-                    }>
+                    color={isToday ? theme.colors.onPrimary : isSpecial ? theme.colors.onPrimarySoft : theme.colors.textMuted}>
                     {hijriDay}
                   </AppText>
                 )}
               </View>
-            </View>
+            </Pressable>
           );
         })}
       </View>
