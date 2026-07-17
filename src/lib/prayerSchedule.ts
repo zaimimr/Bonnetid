@@ -63,6 +63,20 @@ type JamatSource = {
   isha: string | null;
 };
 
+export function findJamatPeriod<T extends JamatSource>(
+  periods: T[] | undefined,
+  isoDate: string,
+): T | null {
+  if (!periods) return null;
+  return (
+    periods.find(
+      (period) =>
+        (!period.start_date || isoDate >= period.start_date) &&
+        (!period.end_date || isoDate <= period.end_date),
+    ) ?? null
+  );
+}
+
 export function jamatTimesForDate(jamat: JamatSource | null | undefined, isoDate: string): JamatTimes {
   if (!jamat) return {};
   if (jamat.start_date && isoDate < jamat.start_date) return {};

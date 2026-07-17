@@ -35,7 +35,7 @@ export default function TimetableScreen() {
   };
 
   return (
-    <Screen scroll>
+    <Screen scroll edges={[]}>
       <View
         style={{
           marginTop: spacing.lg,
@@ -44,11 +44,11 @@ export default function TimetableScreen() {
           justifyContent: 'space-between',
         }}>
         <View style={{ gap: spacing.xxs }}>
-          <AppText size="xxl" weight="bold" heading>
-            Bønnetider
+          <AppText size="lg" weight="bold" heading>
+            {monthName(cursor.monthIndex)} {cursor.year}
           </AppText>
           <AppText size="sm" tone="textMuted">
-            {monthName(cursor.monthIndex)} {cursor.year} · {location.name}
+            {location.name}
           </AppText>
         </View>
 

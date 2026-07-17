@@ -1,5 +1,5 @@
-import { apiGet } from './client';
-import type { ApiLocation, HijriDay, Mosque, PrayerDay } from './types';
+import { ApiError, apiGet } from './client';
+import type { ApiLocation, HijriDay, Mosque, MosqueJamat, PrayerDay } from './types';
 
 export function fetchLocations() {
   return apiGet<ApiLocation[]>('/locations/');
@@ -15,6 +15,15 @@ export function fetchMosquesNearby(lat: number, lon: number) {
 
 export function fetchMosque(orgNr: string) {
   return apiGet<Mosque>(`/mosques/${orgNr}/`);
+}
+
+export async function fetchMosqueJamatPeriods(orgNr: string): Promise<MosqueJamat[]> {
+  try {
+    return await apiGet<MosqueJamat[]>(`/mosques/${orgNr}/jamat-times/`);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return [];
+    throw error;
+  }
 }
 
 export function fetchHijriMonth(year: number, month: number) {

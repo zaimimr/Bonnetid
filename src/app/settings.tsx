@@ -30,13 +30,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <Screen scroll>
-      <View style={{ marginTop: spacing.lg }}>
-        <AppText size="xxl" weight="bold" heading>
-          Innstillinger
-        </AppText>
-      </View>
-
+    <Screen scroll edges={[]}>
       <SectionHeader
         title="Sted og moské"
         subtitle="Bønnetidene beregnes for kommunen du velger"

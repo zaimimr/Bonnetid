@@ -3,6 +3,7 @@ import {
   fetchHijriMonth,
   fetchLocations,
   fetchMosque,
+  fetchMosqueJamatPeriods,
   fetchMosquesNearby,
   fetchPrayerTimes,
   fetchSpecialDates,
@@ -42,6 +43,15 @@ export function useMosque(orgNr: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['mosque', orgNr],
     queryFn: () => fetchMosque(orgNr),
+    staleTime: 6 * HOUR,
+    enabled: options?.enabled ?? true,
+  });
+}
+
+export function useMosqueJamatPeriods(orgNr: string, options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: ['mosque-jamat-periods', orgNr],
+    queryFn: () => fetchMosqueJamatPeriods(orgNr),
     staleTime: 6 * HOUR,
     enabled: options?.enabled ?? true,
   });

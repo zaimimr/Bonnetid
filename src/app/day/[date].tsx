@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 import { Pressable, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useHijriMonth, useMosque, usePrayerTimes } from '@/api/queries';
+import { useHijriMonth, useMosque, useMosqueJamatPeriods, usePrayerTimes } from '@/api/queries';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { AppText, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
-import { buildDaySchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
+import { buildDaySchedule, findJamatPeriod, jamatTimesForDate } from '@/lib/prayerSchedule';
 import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { isoDateKey, todayKey } from '@/lib/time';
 import { useActiveLocation, useSettings } from '@/store/settings';
@@ -27,6 +27,7 @@ export default function DayScreen() {
   const month = usePrayerTimes(location.pk, date.getFullYear(), date.getMonth() + 1);
   const hijriMonth = useHijriMonth(date.getFullYear(), date.getMonth() + 1);
   const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
+  const jamatPeriods = useMosqueJamatPeriods(mosque?.orgNr ?? '', { enabled: mosque != null });
 
   const day = month.data?.find((row) => row.date === todayKey(date));
   const hijriDay = hijriMonth.data?.find((row) => row.gregorian_date === isoDate);
@@ -37,7 +38,13 @@ export default function DayScreen() {
   );
 
   const isFriday = date.getDay() === FRIDAY;
-  const jamatTimes = jamatTimesForDate(mosqueDetails.data?.jamat, isoDate ?? '');
+  const jamatPeriod =
+    findJamatPeriod(jamatPeriods.data, isoDate ?? '') ?? mosqueDetails.data?.jamat;
+  const jamatTimes = jamatTimesForDate(jamatPeriod, isoDate ?? '');
+  const jummahTimes =
+    jamatPeriod && 'jummah' in jamatPeriod && jamatPeriod.jummah && jamatPeriod.jummah.length > 0
+      ? jamatPeriod.jummah
+      : (mosqueDetails.data?.jummah ?? []);
 
   const goToDay = (delta: number) => {
     const next = new Date(date);
@@ -95,7 +102,7 @@ export default function DayScreen() {
             schedule={schedule}
             mosqueName={mosque?.name}
             jamatTimes={jamatTimes}
-            jummah={isFriday ? (mosqueDetails.data?.jummah ?? []) : []}
+            jummah={isFriday ? jummahTimes : []}
             onPressMosque={() =>
               mosque &&
               router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } })

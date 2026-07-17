@@ -57,48 +57,40 @@ export default function MosquesScreen() {
     router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.org_nr } });
 
   return (
-    <Screen padded={false}>
+    <Screen padded={false} edges={[]}>
       <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.lg, gap: spacing.md }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <AppText size="xxl" weight="bold" heading>
-            Moskeer
-          </AppText>
-          <ModeToggle mode={mode} onChange={setMode} />
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: spacing.sm,
-            backgroundColor: theme.colors.surfaceSunken,
-            borderRadius: radius.md,
-            paddingHorizontal: spacing.md,
-          }}>
-          <Ionicons name="search" size={18} color={theme.colors.textMuted} />
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Søk etter moské eller by"
-            placeholderTextColor={theme.colors.textMuted}
-            autoCorrect={false}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+          <View
             style={{
               flex: 1,
-              paddingVertical: spacing.md,
-              fontSize: fontSize.md,
-              color: theme.colors.textPrimary,
-            }}
-          />
-          {query.length > 0 && (
-            <Pressable onPress={() => setQuery('')} hitSlop={8}>
-              <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
-            </Pressable>
-          )}
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing.sm,
+              backgroundColor: theme.colors.surfaceSunken,
+              borderRadius: radius.md,
+              paddingHorizontal: spacing.md,
+            }}>
+            <Ionicons name="search" size={18} color={theme.colors.textMuted} />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Søk etter moské eller by"
+              placeholderTextColor={theme.colors.textMuted}
+              autoCorrect={false}
+              style={{
+                flex: 1,
+                paddingVertical: spacing.md,
+                fontSize: fontSize.md,
+                color: theme.colors.textPrimary,
+              }}
+            />
+            {query.length > 0 && (
+              <Pressable onPress={() => setQuery('')} hitSlop={8}>
+                <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
+              </Pressable>
+            )}
+          </View>
+          <ModeToggle mode={mode} onChange={setMode} />
         </View>
 
         <View style={{ flexDirection: 'row', gap: spacing.sm, paddingBottom: spacing.md }}>

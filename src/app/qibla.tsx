@@ -22,12 +22,9 @@ export default function QiblaScreen() {
   const kaabaDistance = distanceKm(coords.lat, coords.lon, KAABA.lat, KAABA.lon);
 
   return (
-    <Screen>
+    <Screen edges={[]}>
       <View style={{ marginTop: spacing.lg, gap: spacing.lg, flex: 1 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <AppText size="xxl" weight="bold" heading>
-            Qibla
-          </AppText>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
           <AppText size="sm" tone="textMuted">
             {formatDistance(kaabaDistance)} til Mekka
           </AppText>
