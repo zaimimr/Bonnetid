@@ -1,6 +1,6 @@
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText, Badge, Card } from '@/components/ui';
+import { AppText, Card } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import type { NextPrayerResult } from '@/lib/prayerSchedule';
@@ -51,25 +51,24 @@ export function NextPrayerHero({
           </AppText>
           <Ionicons name="chevron-down" size={13} color={theme.colors.textMuted} />
         </Pressable>
-        {current && (
-          <Badge label={`${current.label} startet ${current.time}`} variant="primary" />
-        )}
       </View>
 
       <View style={{ marginTop: spacing.xl, gap: spacing.xxs }}>
         <AppText size="sm" weight="medium" tone="textMuted">
-          {nextPrayer.isTomorrow ? 'Neste bønn i morgen' : 'Neste bønn'}
+          {current ? 'Nåværende bønn' : nextPrayer.isTomorrow ? 'Neste bønn i morgen' : 'Neste bønn'}
         </AppText>
         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.md }}>
           <AppText size="display" weight="bold" tone="primary" heading>
-            {nextPrayer.next.label}
+            {current ? current.label : nextPrayer.next.label}
           </AppText>
           <AppText size="xxl" weight="semibold" tabular>
-            {nextPrayer.next.time}
+            {current ? current.time : nextPrayer.next.time}
           </AppText>
         </View>
-        <AppText size="lg" weight="medium" tone="textSecondary" tabular>
-          om {formatCountdown(remaining)}
+        <AppText size="sm" weight="medium" tone="textSecondary" tabular>
+          {current
+            ? `${nextPrayer.next.label} om ${formatCountdown(remaining)}`
+            : `om ${formatCountdown(remaining)}`}
         </AppText>
       </View>
 

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, type RefObject } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useHijriMonth, useSpecialDates } from '@/api/queries';
@@ -15,6 +15,7 @@ export default function CalendarScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const scrollRef = useRef<ScrollView>(null);
+  const innerViewRef = useRef<View>(null) as RefObject<View>;
   const eventCardRefs = useRef(new Map<string, View | null>());
 
   const today = useMemo(() => new Date(), []);
@@ -65,7 +66,7 @@ export default function CalendarScreen() {
     }
     setSelectedIso(iso);
     const card = eventCardRefs.current.get(iso);
-    const scrollNode = scrollRef.current?.getInnerViewNode();
+    const scrollNode = innerViewRef.current;
     if (card && scrollNode) {
       card.measureLayout(scrollNode, (_x, y) => {
         scrollRef.current?.scrollTo({ y: Math.max(0, y - spacing.xxl), animated: true });
@@ -78,6 +79,7 @@ export default function CalendarScreen() {
   return (
     <ScrollView
       ref={scrollRef}
+      innerViewRef={innerViewRef}
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       contentContainerStyle={{
         paddingTop: insets.top + spacing.lg,

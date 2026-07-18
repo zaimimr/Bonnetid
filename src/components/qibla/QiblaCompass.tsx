@@ -7,18 +7,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/components/ui';
+import { isQiblaAligned, normalizeAngleDelta } from '@/lib/geo';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
 
 const COMPASS_SIZE = 280;
-const ALIGNED_THRESHOLD_DEGREES = 5;
-
-function normalizeDelta(degrees: number): number {
-  return ((degrees % 360) + 540) % 360 - 180;
-}
 
 function shortestRotation(from: number, to: number): number {
-  return from + normalizeDelta(to - from);
+  return from + normalizeAngleDelta(to - from);
 }
 
 const CARDINALS = [
@@ -37,7 +33,7 @@ export function QiblaCompass({ heading, qiblaBearing }: QiblaCompassProps) {
   const theme = useTheme();
   const roseRotation = useSharedValue(0);
 
-  const isAligned = Math.abs(normalizeDelta(qiblaBearing - heading)) <= ALIGNED_THRESHOLD_DEGREES;
+  const isAligned = isQiblaAligned(heading, qiblaBearing);
 
   useEffect(() => {
     roseRotation.value = withTiming(shortestRotation(roseRotation.value, -heading), {

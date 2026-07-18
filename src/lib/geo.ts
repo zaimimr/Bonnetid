@@ -24,6 +24,16 @@ export function qiblaBearing(lat: number, lon: number): number {
   return bearingBetween(lat, lon, KAABA.lat, KAABA.lon);
 }
 
+export const QIBLA_ALIGNED_THRESHOLD_DEGREES = 5;
+
+export function normalizeAngleDelta(degrees: number): number {
+  return (((degrees % 360) + 540) % 360) - 180;
+}
+
+export function isQiblaAligned(heading: number, bearing: number): boolean {
+  return Math.abs(normalizeAngleDelta(bearing - heading)) <= QIBLA_ALIGNED_THRESHOLD_DEGREES;
+}
+
 export function distanceKm(
   fromLat: number,
   fromLon: number,

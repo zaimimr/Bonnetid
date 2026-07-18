@@ -43,3 +43,6 @@ example
 /android
 
 .env
+.secrets/
+.playwright-cli/
+credentials.json

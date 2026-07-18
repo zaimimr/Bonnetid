@@ -1,5 +1,7 @@
 import { Pressable, Switch, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import Constants from 'expo-constants';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText, Card, ListRow, Screen, SectionHeader } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -109,6 +111,18 @@ export default function SettingsScreen() {
           style={{ paddingHorizontal: spacing.md }}
         />
       </Card>
+
+      <View style={{ alignItems: 'center', gap: spacing.xs, marginTop: spacing.xl }}>
+        <Image
+          source={require('../../assets/images/logo.png')}
+          style={{ width: 56, height: 56, borderRadius: radius.lg }}
+          contentFit="contain"
+        />
+        <AppText weight="semibold">Bønnetid</AppText>
+        <AppText size="xs" tone="textMuted">
+          Versjon {Constants.expoConfig?.version ?? '1.0.0'}
+        </AppText>
+      </View>
     </Screen>
   );
 }
