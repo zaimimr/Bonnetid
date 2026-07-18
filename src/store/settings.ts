@@ -1,6 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import type { NotificationSoundKey } from '@/lib/notificationSounds';
+import type { PrayerName } from '@/lib/prayerSchedule';
 
 export type SavedLocation = {
   iso: string;
@@ -17,17 +19,33 @@ export type SavedMosque = {
 export type AsrMethodPreference = 'shadow_1x' | 'shadow_2x';
 type ThemePreference = 'system' | 'light' | 'dark';
 
+export type NotifiablePrayer = Exclude<PrayerName, 'shuruq'>;
+
+export const NOTIFIABLE_PRAYERS: NotifiablePrayer[] = ['fajr', 'duhr', 'asr', 'maghrib', 'isha'];
+
+const ALL_PRAYERS_ENABLED: Record<NotifiablePrayer, boolean> = {
+  fajr: true,
+  duhr: true,
+  asr: true,
+  maghrib: true,
+  isha: true,
+};
+
 type SettingsState = {
   location: SavedLocation | null;
   mosque: SavedMosque | null;
   asrMethod: AsrMethodPreference | null;
   themePreference: ThemePreference;
   notificationsEnabled: boolean;
+  notificationSound: NotificationSoundKey;
+  notificationPrayers: Record<NotifiablePrayer, boolean>;
   setLocation: (location: SavedLocation) => void;
   setMosque: (mosque: SavedMosque | null) => void;
   setAsrMethod: (method: AsrMethodPreference) => void;
   setThemePreference: (preference: ThemePreference) => void;
   setNotificationsEnabled: (enabled: boolean) => void;
+  setNotificationSound: (sound: NotificationSoundKey) => void;
+  toggleNotificationPrayer: (prayer: NotifiablePrayer) => void;
 };
 
 export const DEFAULT_LOCATION: SavedLocation = {
@@ -45,6 +63,8 @@ export const useSettings = create<SettingsState>()(
       asrMethod: null,
       themePreference: 'system',
       notificationsEnabled: false,
+      notificationSound: 'default',
+      notificationPrayers: ALL_PRAYERS_ENABLED,
       setLocation: (location) =>
         set((state) =>
           state.location?.iso === location.iso ? { location } : { location, asrMethod: null },
@@ -53,6 +73,14 @@ export const useSettings = create<SettingsState>()(
       setAsrMethod: (asrMethod) => set({ asrMethod }),
       setThemePreference: (themePreference) => set({ themePreference }),
       setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),
+      setNotificationSound: (notificationSound) => set({ notificationSound }),
+      toggleNotificationPrayer: (prayer) =>
+        set((state) => ({
+          notificationPrayers: {
+            ...state.notificationPrayers,
+            [prayer]: !state.notificationPrayers[prayer],
+          },
+        })),
     }),
     {
       name: 'bonnetid-settings',

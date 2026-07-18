@@ -1,6 +1,7 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
 import type { PrayerEntry } from './prayerSchedule';
+import { getNotificationSound, type NotificationSoundKey } from './notificationSounds';
 
 const MAX_SCHEDULED = 40;
 
@@ -48,13 +49,32 @@ export async function cancelAllPrayerNotifications() {
   await Notifications.cancelAllScheduledNotificationsAsync();
 }
 
+async function ensureAndroidChannel(
+  Notifications: NotificationsModule,
+  soundKey: NotificationSoundKey,
+): Promise<string | undefined> {
+  if (Platform.OS !== 'android') return undefined;
+  const sound = getNotificationSound(soundKey);
+  const channelId = `prayer-${sound.key}`;
+  await Notifications.setNotificationChannelAsync(channelId, {
+    name: `Bønnetid (${sound.label})`,
+    importance: Notifications.AndroidImportance.HIGH,
+    sound: sound.fileName ?? undefined,
+  });
+  return channelId;
+}
+
 export async function schedulePrayerNotifications(
   entries: PrayerEntry[],
   locationName: string,
+  soundKey: NotificationSoundKey,
 ): Promise<number> {
   if (!notificationsSupported) return 0;
   const Notifications = await getNotifications();
   await cancelAllPrayerNotifications();
+
+  const sound = getNotificationSound(soundKey);
+  const channelId = await ensureAndroidChannel(Notifications, soundKey);
 
   const now = Date.now();
   const upcoming = entries
@@ -67,11 +87,12 @@ export async function schedulePrayerNotifications(
       content: {
         title: `${entry.label} ${entry.time}`,
         body: `Det er tid for ${entry.label} i ${locationName}.`,
-        sound: true,
+        sound: sound.fileName ?? true,
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DATE,
         date: entry.date,
+        channelId,
       },
     });
   }

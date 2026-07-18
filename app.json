@@ -7,12 +7,20 @@
     "icon": "./assets/images/icon.png",
     "scheme": "bonnetid",
     "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F1714"
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "no.irn.bonnetid",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "LSApplicationQueriesSchemes": ["comgooglemaps", "waze"]
+        "LSApplicationQueriesSchemes": [
+          "comgooglemaps",
+          "waze"
+        ]
       }
     },
     "android": {
@@ -55,9 +63,15 @@
           "cameraPermission": "Bønnetid bruker kameraet til å vise retningen mot Qibla i AR-visning."
         }
       ],
-      "expo-notifications",
+      [
+        "expo-notifications",
+        {
+          "sounds": ["./assets/sounds/adhan.wav", "./assets/sounds/adhan_kort.wav"]
+        }
+      ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true,
