@@ -11,7 +11,8 @@
       "supportsTablet": false,
       "bundleIdentifier": "no.irn.bonnetid",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSApplicationQueriesSchemes": ["comgooglemaps", "waze"]
       }
     },
     "android": {
@@ -48,7 +49,9 @@
           "locationWhenInUsePermission": "Bønnetid bruker posisjonen din til å finne moskeer i nærheten og retningen mot Qibla."
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

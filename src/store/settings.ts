@@ -20,7 +20,7 @@ type ThemePreference = 'system' | 'light' | 'dark';
 type SettingsState = {
   location: SavedLocation | null;
   mosque: SavedMosque | null;
-  asrMethod: AsrMethodPreference;
+  asrMethod: AsrMethodPreference | null;
   themePreference: ThemePreference;
   notificationsEnabled: boolean;
   setLocation: (location: SavedLocation) => void;
@@ -42,10 +42,13 @@ export const useSettings = create<SettingsState>()(
     (set) => ({
       location: null,
       mosque: null,
-      asrMethod: 'shadow_1x',
+      asrMethod: null,
       themePreference: 'system',
       notificationsEnabled: false,
-      setLocation: (location) => set({ location }),
+      setLocation: (location) =>
+        set((state) =>
+          state.location?.iso === location.iso ? { location } : { location, asrMethod: null },
+        ),
       setMosque: (mosque) => set({ mosque }),
       setAsrMethod: (asrMethod) => set({ asrMethod }),
       setThemePreference: (themePreference) => set({ themePreference }),

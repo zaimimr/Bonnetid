@@ -7,9 +7,16 @@ import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { AppText, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
-import { buildDaySchedule, findJamatPeriod, jamatTimesForDate } from '@/lib/prayerSchedule';
+import {
+  adhanTimesFromSchedule,
+  buildDaySchedule,
+  findJamatPeriod,
+  jamatTimesForDate,
+} from '@/lib/prayerSchedule';
 import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { isoDateKey, todayKey } from '@/lib/time';
+import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
+import { useRefresh } from '@/hooks/useRefresh';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
 const FRIDAY = 5;
@@ -18,8 +25,9 @@ export default function DayScreen() {
   const { date: isoDate } = useLocalSearchParams<{ date: string }>();
   const router = useRouter();
   const location = useActiveLocation();
-  const asrMethod = useSettings((state) => state.asrMethod);
+  const asrMethod = useEffectiveAsrMethod();
   const mosque = useSettings((state) => state.mosque);
+  const { refreshing, onRefresh } = useRefresh();
 
   const date = useMemo(() => new Date(`${isoDate}T12:00:00`), [isoDate]);
   const valid = !Number.isNaN(date.getTime());
@@ -38,9 +46,13 @@ export default function DayScreen() {
   );
 
   const isFriday = date.getDay() === FRIDAY;
+  const mosqueIso = mosqueDetails.data?.location_iso;
+  const mosqueInLocation = mosqueIso == null || mosqueIso === location.iso;
   const jamatPeriod =
     findJamatPeriod(jamatPeriods.data, isoDate ?? '') ?? mosqueDetails.data?.jamat;
-  const jamatTimes = jamatTimesForDate(jamatPeriod, isoDate ?? '');
+  const jamatTimes = mosqueInLocation
+    ? jamatTimesForDate(jamatPeriod, isoDate ?? '', adhanTimesFromSchedule(schedule))
+    : {};
   const jummahTimes =
     jamatPeriod && 'jummah' in jamatPeriod && jamatPeriod.jummah && jamatPeriod.jummah.length > 0
       ? jamatPeriod.jummah
@@ -61,7 +73,7 @@ export default function DayScreen() {
   }
 
   return (
-    <Screen scroll edges={[]}>
+    <Screen scroll edges={[]} refreshing={refreshing} onRefresh={onRefresh}>
       <Stack.Screen options={{ title: location.name }} />
 
       <View
@@ -101,8 +113,9 @@ export default function DayScreen() {
           <PrayerTimesCard
             schedule={schedule}
             mosqueName={mosque?.name}
+            mosqueNote={mosqueInLocation ? undefined : 'Moskeen er i en annen kommune'}
             jamatTimes={jamatTimes}
-            jummah={isFriday ? jummahTimes : []}
+            jummah={mosqueInLocation && isFriday ? jummahTimes : []}
             onPressMosque={() =>
               mosque &&
               router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } })

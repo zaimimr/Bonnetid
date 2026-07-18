@@ -21,12 +21,18 @@ export function useLocations() {
   });
 }
 
-export function usePrayerTimes(locationIso: string, year: number, month: number) {
+export function usePrayerTimes(
+  locationIso: string,
+  year: number,
+  month: number,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: ['prayertimes', locationIso, year, month],
     queryFn: () => fetchPrayerTimes(locationIso, year, month),
     staleTime: 3 * DAY,
     gcTime: 60 * DAY,
+    enabled: options?.enabled ?? true,
   });
 }
 

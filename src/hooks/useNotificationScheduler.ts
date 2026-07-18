@@ -6,11 +6,12 @@ import {
   schedulePrayerNotifications,
 } from '@/lib/notifications';
 import { parseDayKey } from '@/lib/time';
+import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
 export function useNotificationScheduler() {
   const enabled = useSettings((state) => state.notificationsEnabled);
-  const asrMethod = useSettings((state) => state.asrMethod);
+  const asrMethod = useEffectiveAsrMethod();
   const location = useActiveLocation();
 
   const today = new Date();

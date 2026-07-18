@@ -1,5 +1,5 @@
 import { Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { AppText, Badge, Card } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
@@ -23,6 +23,7 @@ export type PrayerTimesCardProps = {
   schedule: PrayerEntry[];
   highlightedName?: PrayerName;
   mosqueName?: string;
+  mosqueNote?: string;
   jamatTimes?: JamatTimes;
   jummah?: MosqueJummah[];
   onPressMosque?: () => void;
@@ -33,6 +34,7 @@ export function PrayerTimesCard({
   schedule,
   highlightedName,
   mosqueName,
+  mosqueNote,
   jamatTimes = {},
   jummah = [],
   onPressMosque,
@@ -91,17 +93,23 @@ export function PrayerTimesCard({
               borderBottomWidth: index === schedule.length - 1 || isHighlighted ? 0 : 1,
               borderBottomColor: theme.colors.border,
             }}>
-            <Ionicons
-              name={PRAYER_ICONS[entry.name]}
-              size={20}
-              color={isHighlighted ? theme.colors.primary : theme.colors.textMuted}
-            />
+            {entry.name === 'shuruq' ? (
+              <Feather name="sunrise" size={20} color={theme.colors.textMuted} />
+            ) : (
+              <Ionicons
+                name={PRAYER_ICONS[entry.name]}
+                size={20}
+                color={isHighlighted ? theme.colors.primary : theme.colors.textMuted}
+              />
+            )}
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-              <AppText
-                weight={isHighlighted ? 'bold' : entry.isPrayer ? 'medium' : 'regular'}
-                tone={entry.isPrayer ? 'textPrimary' : 'textMuted'}>
-                {entry.label}
-              </AppText>
+              {entry.name !== 'shuruq' && (
+                <AppText
+                  weight={isHighlighted ? 'bold' : entry.isPrayer ? 'medium' : 'regular'}
+                  tone={entry.isPrayer ? 'textPrimary' : 'textMuted'}>
+                  {entry.label}
+                </AppText>
+              )}
               {isHighlighted && <Badge label="Nå" variant="primary" />}
             </View>
             <AppText
@@ -178,7 +186,7 @@ export function PrayerTimesCard({
           ]}>
           <Ionicons name="business-outline" size={15} color={theme.colors.textMuted} />
           <AppText size="xs" tone="textMuted" style={{ flex: 1 }} numberOfLines={1}>
-            Jamat-tider fra {mosqueName}
+            {mosqueNote ?? `Jamat-tider fra ${mosqueName}`}
           </AppText>
           <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} />
         </Pressable>

@@ -85,10 +85,19 @@ function toHijriDay(row: HijriDateRow, meta: HijriMeta): HijriDay {
   };
 }
 
+function toLocationAsrMethod(value: string | number | null): ApiLocation['asr_method'] {
+  const parsed = value == null ? null : Number(value);
+  if (parsed === 1) return 'SHADOW_1X';
+  if (parsed === 2) return 'SHADOW_2X';
+  return null;
+}
+
 export async function fetchLocations(): Promise<ApiLocation[]> {
   const { data, error } = await supabase
     .from('location_t')
-    .select('location_iso, location_name, lat_n_s, long_e_w, fylke_name, kommune_name, location_info')
+    .select(
+      'location_iso, location_name, lat_n_s, long_e_w, fylke_name, kommune_name, location_info, asr_method',
+    )
     .order('location_name');
   if (error) throw error;
 
@@ -100,6 +109,7 @@ export async function fetchLocations(): Promise<ApiLocation[]> {
     fylke: row.fylke_name ?? '',
     kommune: row.kommune_name ?? '',
     info: row.location_info,
+    asr_method: toLocationAsrMethod(row.asr_method),
   }));
 }
 
@@ -178,10 +188,11 @@ type MosqueRow = {
   contact_name: string | null;
   contact_phone: string | null;
   contact_email: string | null;
+  reg_hjemmeside: string | null;
 };
 
 const MOSQUE_COLUMNS =
-  'organisasjonsnummer, reg_navn, org_name2, org_info, address, post_no, lat, lon, map_only, asr_method, contact_name, contact_phone, contact_email';
+  'organisasjonsnummer, reg_navn, org_name2, org_info, address, post_no, lat, lon, map_only, asr_method, contact_name, contact_phone, contact_email, reg_hjemmeside';
 
 type JamatPeriodRow = {
   id: number;
@@ -193,9 +204,21 @@ type JamatPeriodRow = {
   asr: string | null;
   maghrib: string | null;
   isha: string | null;
+  fajr_offset: number | null;
+  dhuhr_offset: number | null;
+  asr_offset: number | null;
+  maghrib_offset: number | null;
+  isha_offset: number | null;
 };
 
-const JAMAT_COLUMNS = 'id, mosque_id, start_date, end_date, fajr, dhuhr, asr, maghrib, isha';
+const JAMAT_COLUMNS =
+  'id, mosque_id, start_date, end_date, fajr, dhuhr, asr, maghrib, isha, fajr_offset, dhuhr_offset, asr_offset, maghrib_offset, isha_offset';
+
+function toHomepage(value: string | null): string | null {
+  const trimmed = value?.trim();
+  if (!trimmed) return null;
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
 
 function toAsrMethod(value: number | null): Mosque['asr_method'] {
   if (value === 1) return 'SHADOW_1X';
@@ -223,13 +246,20 @@ function toJamat(row: JamatPeriodRow, jummah: MosqueJummah[]): MosqueJamat {
     asr: jamatTime(row.asr),
     maghrib: jamatTime(row.maghrib),
     isha: jamatTime(row.isha),
+    fajr_offset: row.fajr_offset,
+    duhr_offset: row.dhuhr_offset,
+    asr_offset: row.asr_offset,
+    maghrib_offset: row.maghrib_offset,
+    isha_offset: row.isha_offset,
     jummah,
   };
 }
 
+type PostRow = { post_no: string; post_name: string; location_iso: string | null };
+
 function toMosque(
   row: MosqueRow,
-  post: { post_no: string; post_name: string } | undefined,
+  post: PostRow | undefined,
   jamat: MosqueJamat | null,
   jummah: MosqueJummah[],
 ): Mosque {
@@ -240,23 +270,25 @@ function toMosque(
     map_only: row.map_only ?? false,
     address: row.address,
     post: post ? { code: post.post_no, city: post.post_name } : null,
+    location_iso: post?.location_iso ?? null,
     lat: row.lat == null ? null : Number(row.lat),
     lon: row.lon == null ? null : Number(row.lon),
     contact_name: row.contact_name,
     contact_phone: row.contact_phone,
     contact_email: row.contact_email,
+    homepage: toHomepage(row.reg_hjemmeside),
     asr_method: toAsrMethod(row.asr_method),
     jamat,
     jummah,
   };
 }
 
-async function fetchPosts(postNos: string[]): Promise<Map<string, { post_no: string; post_name: string }>> {
+async function fetchPosts(postNos: string[]): Promise<Map<string, PostRow>> {
   const unique = [...new Set(postNos.filter(Boolean))];
   if (unique.length === 0) return new Map();
   const { data, error } = await supabase
     .from('location_postnumber')
-    .select('post_no, post_name')
+    .select('post_no, post_name, location_iso')
     .in('post_no', unique);
   if (error) throw error;
   return new Map(data.map((row) => [row.post_no, row]));

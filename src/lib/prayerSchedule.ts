@@ -1,6 +1,6 @@
 import type { PrayerDay } from '@/api/types';
 import type { AsrMethodPreference } from '@/store/settings';
-import { parseTimeToDate } from './time';
+import { addMinutesToTime, parseTimeToDate } from './time';
 
 export type PrayerName = 'fajr' | 'shuruq' | 'duhr' | 'asr' | 'maghrib' | 'isha';
 
@@ -64,6 +64,13 @@ export function buildDaySchedule(
       continue;
     }
     if (!entry.isPrayer) continue;
+    if (entry.name === 'fajr') {
+      const sunrise = day.shuruq_sunrise ?? day.fajr_endtime;
+      if (sunrise) {
+        entry.end = { label: PRAYER_LABELS.shuruq, date: parseTimeToDate(sunrise, baseDate) };
+        continue;
+      }
+    }
     const boundary = entries[index + 1];
     if (boundary) entry.end = { label: boundary.label, date: boundary.date };
   }
@@ -80,6 +87,8 @@ function midnightEnd(day: PrayerDay, ishaDate: Date, baseDate: Date): PrayerWind
 
 export type JamatTimes = Partial<Record<PrayerName, string>>;
 
+export type AdhanTimes = Partial<Record<PrayerName, string>>;
+
 type JamatSource = {
   start_date: string | null;
   end_date: string | null;
@@ -88,6 +97,11 @@ type JamatSource = {
   asr: string | null;
   maghrib: string | null;
   isha: string | null;
+  fajr_offset?: number | null;
+  duhr_offset?: number | null;
+  asr_offset?: number | null;
+  maghrib_offset?: number | null;
+  isha_offset?: number | null;
 };
 
 export function findJamatPeriod<T extends JamatSource>(
@@ -104,16 +118,37 @@ export function findJamatPeriod<T extends JamatSource>(
   );
 }
 
-export function jamatTimesForDate(jamat: JamatSource | null | undefined, isoDate: string): JamatTimes {
+export function adhanTimesFromSchedule(entries: PrayerEntry[]): AdhanTimes {
+  const times: AdhanTimes = {};
+  for (const entry of entries) {
+    times[entry.name] = entry.time;
+  }
+  return times;
+}
+
+function resolveJamatTime(
+  fixed: string | null,
+  offset: number | null | undefined,
+  adhan: string | undefined,
+): string | undefined {
+  if (offset && adhan) return addMinutesToTime(adhan, offset);
+  return fixed ?? undefined;
+}
+
+export function jamatTimesForDate(
+  jamat: JamatSource | null | undefined,
+  isoDate: string,
+  adhan: AdhanTimes = {},
+): JamatTimes {
   if (!jamat) return {};
   if (jamat.start_date && isoDate < jamat.start_date) return {};
   if (jamat.end_date && isoDate > jamat.end_date) return {};
   return {
-    fajr: jamat.fajr ?? undefined,
-    duhr: jamat.duhr ?? undefined,
-    asr: jamat.asr ?? undefined,
-    maghrib: jamat.maghrib ?? undefined,
-    isha: jamat.isha ?? undefined,
+    fajr: resolveJamatTime(jamat.fajr, jamat.fajr_offset, adhan.fajr),
+    duhr: resolveJamatTime(jamat.duhr, jamat.duhr_offset, adhan.duhr),
+    asr: resolveJamatTime(jamat.asr, jamat.asr_offset, adhan.asr),
+    maghrib: resolveJamatTime(jamat.maghrib, jamat.maghrib_offset, adhan.maghrib),
+    isha: resolveJamatTime(jamat.isha, jamat.isha_offset, adhan.isha),
   };
 }
 

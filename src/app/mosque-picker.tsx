@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocations, useMosquesNearby } from '@/api/queries';
 import type { Mosque } from '@/api/types';
 import { AppText, ErrorState, ListRow, Screen, Skeleton } from '@/components/ui';
 import { nearestLocation, useDevicePosition } from '@/hooks/useNearestLocation';
+import { useRefresh } from '@/hooks/useRefresh';
 import { useUserCoords } from '@/hooks/useUserCoords';
 import { distanceKm, formatDistance } from '@/lib/geo';
 import { useTheme } from '@/theme';
@@ -23,6 +24,7 @@ export default function MosquePickerScreen() {
   const setLocation = useSettings((state) => state.setLocation);
   const [query, setQuery] = useState('');
   const { status: gpsStatus, getPosition } = useDevicePosition();
+  const { refreshing, onRefresh } = useRefresh();
 
   const filtered = useMemo(() => {
     if (!mosques) return [];
@@ -42,15 +44,17 @@ export default function MosquePickerScreen() {
 
   const choose = (mosque: Mosque) => {
     setMosque({ orgNr: mosque.org_nr, name: mosque.name });
-    if (locations && mosque.lat != null && mosque.lon != null) {
-      const nearest = nearestLocation(locations, mosque.lat, mosque.lon);
-      if (nearest) {
-        setLocation({
-          iso: nearest.iso,
-          name: nearest.name,
-          lat: nearest.lat,
-          lon: nearest.lon,
-        });
+    if (locations) {
+      const byIso = mosque.location_iso
+        ? locations.find((location) => location.iso === mosque.location_iso)
+        : undefined;
+      const match =
+        byIso ??
+        (mosque.lat != null && mosque.lon != null
+          ? nearestLocation(locations, mosque.lat, mosque.lon)
+          : null);
+      if (match) {
+        setLocation({ iso: match.iso, name: match.name, lat: match.lat, lon: match.lon });
       }
     }
     router.back();
@@ -156,6 +160,13 @@ export default function MosquePickerScreen() {
           data={filtered}
           keyExtractor={(item) => item.mosque.org_nr}
           keyboardShouldPersistTaps="handled"
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={theme.colors.primary}
+            />
+          }
           renderItem={({ item }) => (
             <ListRow
               title={item.mosque.name}

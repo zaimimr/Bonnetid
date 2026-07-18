@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useTheme } from '@/theme';
 import { configureNotificationHandler } from '@/lib/notifications';
 import { useNotificationScheduler } from '@/hooks/useNotificationScheduler';
+import { useAutoLocation } from '@/hooks/useAutoLocation';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -30,13 +31,14 @@ const persister = createAsyncStoragePersister({
 const persistOptions = {
   persister,
   maxAge: 60 * DAY,
-  buster: 'v2',
+  buster: 'v6',
 };
 
 configureNotificationHandler();
 
 function RootNavigator() {
   const theme = useTheme();
+  useAutoLocation();
   useNotificationScheduler();
 
   return (
@@ -87,17 +89,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Innstillinger',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
-          }}
-        />
-        <Stack.Screen
-          name="location-picker"
-          options={{
-            presentation: 'modal',
-            headerShown: true,
-            title: 'Velg sted',
             headerStyle: { backgroundColor: theme.colors.surface },
             headerTitleStyle: { color: theme.colors.textPrimary },
             headerTintColor: theme.colors.primary,

@@ -16,7 +16,7 @@ const FEATURES: Feature[] = [
   {
     href: '/timetable',
     icon: 'grid-outline',
-    title: 'Bønnetider for måneden',
+    title: 'Månedsoversikt',
     description: 'Full tabell med alle tider, dag for dag',
   },
   {

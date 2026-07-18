@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, type RefObject } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useHijriMonth, useSpecialDates } from '@/api/queries';
 import type { HijriDay } from '@/api/types';
@@ -7,6 +7,7 @@ import { MonthGrid } from '@/components/calendar/MonthGrid';
 import { EventCard } from '@/components/calendar/EventCard';
 import { AppText, EmptyState, ErrorState, SectionHeader, Skeleton } from '@/components/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRefresh } from '@/hooks/useRefresh';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import { monthName } from '@/lib/hijri';
@@ -17,6 +18,7 @@ export default function CalendarScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const innerViewRef = useRef<View>(null) as RefObject<View>;
   const eventCardRefs = useRef(new Map<string, View | null>());
+  const { refreshing, onRefresh } = useRefresh();
 
   const today = useMemo(() => new Date(), []);
   const [cursor, setCursor] = useState(() => ({
@@ -86,7 +88,14 @@ export default function CalendarScreen() {
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.xxxl,
       }}
-      showsVerticalScrollIndicator={false}>
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={theme.colors.primary}
+        />
+      }>
       <View
         style={{
           flexDirection: 'row',

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { FlatList, Pressable, TextInput, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, TextInput, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,7 @@ import { useMosquesNearby } from '@/api/queries';
 import type { Mosque } from '@/api/types';
 import { MosqueCard } from '@/components/mosque/MosqueCard';
 import { AppText, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
+import { useRefresh } from '@/hooks/useRefresh';
 import { useUserCoords } from '@/hooks/useUserCoords';
 import { distanceKm } from '@/lib/geo';
 import { useTheme } from '@/theme';
@@ -28,6 +29,7 @@ export default function MosquesScreen() {
   const [mode, setMode] = useState<ViewMode>('list');
   const [sort, setSort] = useState<SortMode>('distance');
   const [query, setQuery] = useState('');
+  const { refreshing, onRefresh } = useRefresh();
 
   const visible: MosqueWithDistance[] = useMemo(() => {
     if (!mosques) return [];
@@ -123,6 +125,13 @@ export default function MosquesScreen() {
         <FlatList
           data={visible}
           keyExtractor={(item) => item.mosque.org_nr}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={theme.colors.primary}
+            />
+          }
           contentContainerStyle={{
             paddingHorizontal: spacing.lg,
             paddingBottom: spacing.xxxl,

@@ -1,18 +1,26 @@
-import { Pressable, Switch, View } from 'react-native';
+import { useState } from 'react';
+import { Linking, Pressable, Switch, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
+import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
+import { useLocations } from '@/api/queries';
+import { detectNearestLocation } from '@/hooks/useAutoLocation';
 import { AppText, Card, ListRow, Screen, SectionHeader } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
-import { requestNotificationPermission } from '@/lib/notifications';
+import { notificationsSupported, requestNotificationPermission } from '@/lib/notifications';
+import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
 import { useActiveLocation, useSettings, type AsrMethodPreference } from '@/store/settings';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const theme = useTheme();
   const location = useActiveLocation();
+  const setLocation = useSettings((state) => state.setLocation);
+  const { data: locations } = useLocations();
+  const [locating, setLocating] = useState(false);
   const mosque = useSettings((state) => state.mosque);
   const setMosque = useSettings((state) => state.setMosque);
   const asrMethod = useSettings((state) => state.asrMethod);
@@ -21,6 +29,25 @@ export default function SettingsScreen() {
   const setThemePreference = useSettings((state) => state.setThemePreference);
   const notificationsEnabled = useSettings((state) => state.notificationsEnabled);
   const setNotificationsEnabled = useSettings((state) => state.setNotificationsEnabled);
+  const asrOverride = useMosqueAsrOverride();
+  const asrLocationDefault = useLocationAsrDefault();
+
+  const detectLocation = async () => {
+    if (!locations || locating) return;
+    const permission = await Location.getForegroundPermissionsAsync();
+    if (!permission.granted && !permission.canAskAgain) {
+      Linking.openSettings().catch(() => {});
+      return;
+    }
+    setLocating(true);
+    try {
+      const detected = await detectNearestLocation(locations);
+      if (detected) setLocation(detected);
+    } catch {
+    } finally {
+      setLocating(false);
+    }
+  };
 
   const toggleNotifications = async (value: boolean) => {
     if (!value) {
@@ -35,15 +62,15 @@ export default function SettingsScreen() {
     <Screen scroll edges={[]}>
       <SectionHeader
         title="Sted og moské"
-        subtitle="Bønnetidene beregnes for kommunen du velger"
+        subtitle="Stedet finnes automatisk fra posisjonen din"
       />
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Sted"
-          subtitle={location.name}
+          subtitle={locating ? 'Finner posisjonen din…' : location.name}
           leading={<Ionicons name="location-outline" size={20} color={theme.colors.primary} />}
-          chevron
-          onPress={() => router.push('/location-picker')}
+          trailing={<Ionicons name="navigate-outline" size={18} color={theme.colors.primary} />}
+          onPress={detectLocation}
           style={{ paddingHorizontal: spacing.md }}
         />
         <Divider />
@@ -70,11 +97,16 @@ export default function SettingsScreen() {
 
       <SectionHeader
         title="Asr-metode"
-        subtitle="Hanafi bruker 2x skygge, øvrige skoler 1x skygge"
+        subtitle={
+          asrOverride && mosque
+            ? `Styres av ${mosque.name}`
+            : 'Hanafi bruker 2x skygge, øvrige skoler 1x skygge'
+        }
       />
       <SegmentedRow<AsrMethodPreference>
-        value={asrMethod}
+        value={asrOverride ?? asrMethod ?? asrLocationDefault ?? 'shadow_1x'}
         onChange={setAsrMethod}
+        disabled={asrOverride != null}
         options={[
           { value: 'shadow_1x', label: '1x skygge' },
           { value: 'shadow_2x', label: '2x skygge' },
@@ -96,7 +128,11 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Varsle ved bønnetid"
-          subtitle="Få beskjed når bønnen starter i ditt sted"
+          subtitle={
+            notificationsSupported
+              ? 'Få beskjed når bønnen starter i ditt sted'
+              : 'Ikke tilgjengelig i Expo Go på Android'
+          }
           leading={
             <Ionicons name="notifications-outline" size={20} color={theme.colors.primary} />
           }
@@ -104,6 +140,7 @@ export default function SettingsScreen() {
             <Switch
               value={notificationsEnabled}
               onValueChange={toggleNotifications}
+              disabled={!notificationsSupported}
               trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
               thumbColor={theme.colors.surface}
             />
@@ -144,10 +181,12 @@ function SegmentedRow<T extends string>({
   value,
   onChange,
   options,
+  disabled = false,
 }: {
   value: T;
   onChange: (value: T) => void;
   options: { value: T; label: string }[];
+  disabled?: boolean;
 }) {
   const theme = useTheme();
   return (
@@ -158,12 +197,14 @@ function SegmentedRow<T extends string>({
         borderRadius: radius.md,
         padding: spacing.xxs,
         gap: spacing.xxs,
+        opacity: disabled ? opacity.disabled : 1,
       }}>
       {options.map((option) => {
         const isActive = option.value === value;
         return (
           <Pressable
             key={option.value}
+            disabled={disabled}
             onPress={() => onChange(option.value)}
             style={({ pressed }) => [
               {

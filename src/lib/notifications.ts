@@ -1,20 +1,41 @@
-import * as Notifications from 'expo-notifications';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
+import { Platform } from 'react-native';
 import type { PrayerEntry } from './prayerSchedule';
 
 const MAX_SCHEDULED = 40;
 
+export const notificationsSupported = !(
+  Platform.OS === 'android' && Constants.executionEnvironment === ExecutionEnvironment.StoreClient
+);
+
+type NotificationsModule = typeof import('expo-notifications');
+
+let modulePromise: Promise<NotificationsModule> | null = null;
+
+function getNotifications(): Promise<NotificationsModule> {
+  modulePromise ??= import('expo-notifications');
+  return modulePromise;
+}
+
 export function configureNotificationHandler() {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-    }),
-  });
+  if (!notificationsSupported) return;
+  getNotifications()
+    .then((Notifications) =>
+      Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowBanner: true,
+          shouldShowList: true,
+          shouldPlaySound: true,
+          shouldSetBadge: false,
+        }),
+      }),
+    )
+    .catch(() => {});
 }
 
 export async function requestNotificationPermission(): Promise<boolean> {
+  if (!notificationsSupported) return false;
+  const Notifications = await getNotifications();
   const current = await Notifications.getPermissionsAsync();
   if (current.granted) return true;
   const requested = await Notifications.requestPermissionsAsync();
@@ -22,6 +43,8 @@ export async function requestNotificationPermission(): Promise<boolean> {
 }
 
 export async function cancelAllPrayerNotifications() {
+  if (!notificationsSupported) return;
+  const Notifications = await getNotifications();
   await Notifications.cancelAllScheduledNotificationsAsync();
 }
 
@@ -29,6 +52,8 @@ export async function schedulePrayerNotifications(
   entries: PrayerEntry[],
   locationName: string,
 ): Promise<number> {
+  if (!notificationsSupported) return 0;
+  const Notifications = await getNotifications();
   await cancelAllPrayerNotifications();
 
   const now = Date.now();

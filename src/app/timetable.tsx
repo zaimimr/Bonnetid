@@ -9,13 +9,16 @@ import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import { monthName } from '@/lib/hijri';
 import { isoDateKey, parseDayKey } from '@/lib/time';
-import { useActiveLocation, useSettings } from '@/store/settings';
+import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
+import { useRefresh } from '@/hooks/useRefresh';
+import { useActiveLocation } from '@/store/settings';
 
 export default function TimetableScreen() {
   const router = useRouter();
   const theme = useTheme();
   const location = useActiveLocation();
-  const asrMethod = useSettings((state) => state.asrMethod);
+  const asrMethod = useEffectiveAsrMethod();
+  const { refreshing, onRefresh } = useRefresh();
 
   const today = new Date();
   const [cursor, setCursor] = useState(() => ({
@@ -35,7 +38,7 @@ export default function TimetableScreen() {
   };
 
   return (
-    <Screen scroll edges={[]}>
+    <Screen scroll edges={[]} refreshing={refreshing} onRefresh={onRefresh}>
       <View
         style={{
           marginTop: spacing.lg,

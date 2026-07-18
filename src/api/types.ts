@@ -6,6 +6,7 @@ export type ApiLocation = {
   fylke: string;
   kommune: string;
   info: string | null;
+  asr_method: 'SHADOW_1X' | 'SHADOW_2X' | null;
 };
 
 export type PrayerDay = {
@@ -44,6 +45,11 @@ export type MosqueJamat = {
   asr: string | null;
   maghrib: string | null;
   isha: string | null;
+  fajr_offset: number | null;
+  duhr_offset: number | null;
+  asr_offset: number | null;
+  maghrib_offset: number | null;
+  isha_offset: number | null;
   jummah?: MosqueJummah[];
 };
 
@@ -59,11 +65,13 @@ export type Mosque = {
   map_only: boolean;
   address: string | null;
   post: MosquePost | null;
+  location_iso: string | null;
   lat: number | null;
   lon: number | null;
   contact_name: string | null;
   contact_phone: string | null;
   contact_email: string | null;
+  homepage: string | null;
   asr_method: 'MIXED' | 'SHADOW_1X' | 'SHADOW_2X' | 'NONE' | string;
   jamat: MosqueJamat | null;
   jummah: MosqueJummah[];

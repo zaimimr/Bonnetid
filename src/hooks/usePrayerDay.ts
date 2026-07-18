@@ -3,7 +3,8 @@ import { usePrayerTimes } from '@/api/queries';
 import type { PrayerDay } from '@/api/types';
 import { buildDaySchedule, findNextPrayer, type NextPrayerResult, type PrayerEntry } from '@/lib/prayerSchedule';
 import { parseDayKey, todayKey } from '@/lib/time';
-import { useActiveLocation, useSettings } from '@/store/settings';
+import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
+import { useActiveLocation } from '@/store/settings';
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
@@ -27,7 +28,7 @@ export type PrayerDayData = {
 
 export function usePrayerDay(now: Date): PrayerDayData {
   const location = useActiveLocation();
-  const asrMethod = useSettings((state) => state.asrMethod);
+  const asrMethod = useEffectiveAsrMethod();
 
   const dayKey = todayKey(now);
   const dayStart = useMemo(() => parseDayKey(dayKey), [dayKey]);

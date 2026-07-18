@@ -49,6 +49,50 @@ export function distanceKm(
   return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+export function greatCirclePoints(
+  fromLat: number,
+  fromLon: number,
+  toLat: number,
+  toLon: number,
+  segments = 64,
+): { lat: number; lon: number }[] {
+  const phi1 = toRadians(fromLat);
+  const lambda1 = toRadians(fromLon);
+  const phi2 = toRadians(toLat);
+  const lambda2 = toRadians(toLon);
+
+  const delta =
+    2 *
+    Math.asin(
+      Math.sqrt(
+        Math.sin((phi2 - phi1) / 2) ** 2 +
+          Math.cos(phi1) * Math.cos(phi2) * Math.sin((lambda2 - lambda1) / 2) ** 2,
+      ),
+    );
+
+  if (delta < 1e-9) {
+    return [
+      { lat: fromLat, lon: fromLon },
+      { lat: toLat, lon: toLon },
+    ];
+  }
+
+  const points: { lat: number; lon: number }[] = [];
+  for (let i = 0; i <= segments; i += 1) {
+    const fraction = i / segments;
+    const a = Math.sin((1 - fraction) * delta) / Math.sin(delta);
+    const b = Math.sin(fraction * delta) / Math.sin(delta);
+    const x = a * Math.cos(phi1) * Math.cos(lambda1) + b * Math.cos(phi2) * Math.cos(lambda2);
+    const y = a * Math.cos(phi1) * Math.sin(lambda1) + b * Math.cos(phi2) * Math.sin(lambda2);
+    const z = a * Math.sin(phi1) + b * Math.sin(phi2);
+    points.push({
+      lat: toDegrees(Math.atan2(z, Math.sqrt(x ** 2 + y ** 2))),
+      lon: toDegrees(Math.atan2(y, x)),
+    });
+  }
+  return points;
+}
+
 export function formatDistance(km: number): string {
   if (km < 1) return `${Math.round(km * 1000)} m`;
   if (km < 10) return `${km.toFixed(1)} km`;

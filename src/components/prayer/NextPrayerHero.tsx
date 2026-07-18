@@ -2,26 +2,24 @@ import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText, Card } from '@/components/ui';
 import { useTheme } from '@/theme';
-import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
+import { hitSlop, opacity, spacing } from '@/theme/tokens';
 import type { NextPrayerResult } from '@/lib/prayerSchedule';
 import { formatCountdown } from '@/lib/time';
 
 export type NextPrayerHeroProps = {
   nextPrayer: NextPrayerResult;
   now: Date;
-  locationName: string;
   hijriText: string;
   gregorianText: string;
-  onPressLocation: () => void;
+  onPressDate?: () => void;
 };
 
 export function NextPrayerHero({
   nextPrayer,
   now,
-  locationName,
   hijriText,
   gregorianText,
-  onPressLocation,
+  onPressDate,
 }: NextPrayerHeroProps) {
   const theme = useTheme();
   const current = nextPrayer.current;
@@ -31,31 +29,7 @@ export function NextPrayerHero({
 
   return (
     <Card rounded="xl" padding="xl" elevated>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Pressable
-          onPress={onPressLocation}
-          hitSlop={hitSlop}
-          style={({ pressed }) => [
-            {
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: spacing.xs,
-              backgroundColor: theme.colors.surfaceSunken,
-              borderRadius: radius.full,
-              paddingVertical: spacing.xs,
-              paddingHorizontal: spacing.md,
-            },
-            pressed && { opacity: opacity.pressed },
-          ]}>
-          <Ionicons name="location-outline" size={15} color={theme.colors.primary} />
-          <AppText size="sm" weight="medium" tone="textSecondary">
-            {locationName}
-          </AppText>
-          <Ionicons name="chevron-down" size={13} color={theme.colors.textMuted} />
-        </Pressable>
-      </View>
-
-      <View style={{ marginTop: spacing.xl, gap: spacing.xxs }}>
+      <View style={{ gap: spacing.xxs }}>
         <AppText size="sm" weight="medium" tone="textMuted">
           {current ? 'Nåværende bønn' : nextPrayer.isTomorrow ? 'Neste bønn i morgen' : 'Neste bønn'}
         </AppText>
@@ -74,22 +48,34 @@ export function NextPrayerHero({
         </AppText>
       </View>
 
-      <View
-        style={{
-          marginTop: spacing.xl,
-          paddingTop: spacing.md,
-          borderTopWidth: 1,
-          borderTopColor: theme.colors.border,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-        }}>
+      <Pressable
+        onPress={onPressDate}
+        disabled={!onPressDate}
+        hitSlop={hitSlop}
+        style={({ pressed }) => [
+          {
+            marginTop: spacing.xl,
+            paddingTop: spacing.md,
+            borderTopWidth: 1,
+            borderTopColor: theme.colors.border,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          },
+          pressed && { opacity: opacity.pressed },
+        ]}>
         <AppText size="sm" tone="textMuted">
           {gregorianText}
         </AppText>
-        <AppText size="sm" weight="medium" tone="textSecondary">
-          {hijriText}
-        </AppText>
-      </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+          <AppText size="sm" weight="medium" tone="textSecondary">
+            {hijriText}
+          </AppText>
+          {onPressDate && (
+            <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} />
+          )}
+        </View>
+      </Pressable>
     </Card>
   );
 }

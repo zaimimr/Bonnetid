@@ -5,6 +5,13 @@ export function parseTimeToDate(time: string, baseDate: Date): Date {
   return result;
 }
 
+export function addMinutesToTime(time: string, minutes: number): string {
+  const [hours, mins] = time.split(':').map(Number);
+  const total = (((hours * 60 + mins + minutes) % 1440) + 1440) % 1440;
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
+}
+
 export function formatCountdown(milliseconds: number): string {
   const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
   const hours = Math.floor(totalSeconds / 3600);
