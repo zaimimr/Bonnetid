@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -136,9 +136,7 @@ function ArOverlay({
         ? `Roter ${Math.round(Math.abs(scene.deltaDeg))}° mot høyre`
         : `Roter ${Math.round(Math.abs(scene.deltaDeg))}° mot venstre`;
 
-  const compassPoor =
-    headingAccuracy != null &&
-    (Platform.OS === 'ios' ? headingAccuracy < 0 || headingAccuracy > 30 : headingAccuracy <= 1);
+  const compassPoor = headingAccuracy != null && headingAccuracy >= 0 && headingAccuracy <= 1;
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
