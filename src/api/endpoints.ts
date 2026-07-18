@@ -9,6 +9,11 @@ function hhmm(time: string | null): string | null {
   return time ? time.slice(0, 5) : null;
 }
 
+function jamatTime(time: string | null): string | null {
+  const trimmed = hhmm(time);
+  return trimmed === '00:00' ? null : trimmed;
+}
+
 function monthRange(year: number, month: number): { start: string; end: string } {
   const lastDay = new Date(year, month, 0).getDate();
   return {
@@ -213,11 +218,11 @@ function toJamat(row: JamatPeriodRow, jummah: MosqueJummah[]): MosqueJamat {
     mosque: row.mosque_id,
     start_date: row.start_date,
     end_date: row.end_date,
-    fajr: hhmm(row.fajr),
-    duhr: hhmm(row.dhuhr),
-    asr: hhmm(row.asr),
-    maghrib: hhmm(row.maghrib),
-    isha: hhmm(row.isha),
+    fajr: jamatTime(row.fajr),
+    duhr: jamatTime(row.dhuhr),
+    asr: jamatTime(row.asr),
+    maghrib: jamatTime(row.maghrib),
+    isha: jamatTime(row.isha),
     jummah,
   };
 }

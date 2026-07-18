@@ -20,15 +20,17 @@ export function nearestLocation(
   return best;
 }
 
-type NearestLocationState = {
-  status: 'idle' | 'locating' | 'denied' | 'error';
-  locate: (locations: ApiLocation[]) => Promise<ApiLocation | null>;
+export type GpsStatus = 'idle' | 'locating' | 'denied' | 'error';
+
+type DevicePositionState = {
+  status: GpsStatus;
+  getPosition: () => Promise<{ lat: number; lon: number } | null>;
 };
 
-export function useNearestLocation(): NearestLocationState {
-  const [status, setStatus] = useState<NearestLocationState['status']>('idle');
+export function useDevicePosition(): DevicePositionState {
+  const [status, setStatus] = useState<GpsStatus>('idle');
 
-  const locate = useCallback(async (locations: ApiLocation[]) => {
+  const getPosition = useCallback(async () => {
     setStatus('locating');
     try {
       const { status: permission } = await Location.requestForegroundPermissionsAsync();
@@ -40,12 +42,32 @@ export function useNearestLocation(): NearestLocationState {
         accuracy: Location.Accuracy.Balanced,
       });
       setStatus('idle');
-      return nearestLocation(locations, position.coords.latitude, position.coords.longitude);
+      return { lat: position.coords.latitude, lon: position.coords.longitude };
     } catch {
       setStatus('error');
       return null;
     }
   }, []);
+
+  return { status, getPosition };
+}
+
+type NearestLocationState = {
+  status: GpsStatus;
+  locate: (locations: ApiLocation[]) => Promise<ApiLocation | null>;
+};
+
+export function useNearestLocation(): NearestLocationState {
+  const { status, getPosition } = useDevicePosition();
+
+  const locate = useCallback(
+    async (locations: ApiLocation[]) => {
+      const coords = await getPosition();
+      if (!coords) return null;
+      return nearestLocation(locations, coords.lat, coords.lon);
+    },
+    [getPosition],
+  );
 
   return { status, locate };
 }

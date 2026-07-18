@@ -1,13 +1,15 @@
 import { useMemo, useState } from 'react';
-import { FlatList, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useMosquesNearby } from '@/api/queries';
+import { useLocations, useMosquesNearby } from '@/api/queries';
+import type { Mosque } from '@/api/types';
 import { AppText, ErrorState, ListRow, Screen, Skeleton } from '@/components/ui';
+import { nearestLocation, useDevicePosition } from '@/hooks/useNearestLocation';
 import { useUserCoords } from '@/hooks/useUserCoords';
 import { distanceKm, formatDistance } from '@/lib/geo';
 import { useTheme } from '@/theme';
-import { fontSize, radius, spacing } from '@/theme/tokens';
+import { fontSize, opacity, radius, spacing } from '@/theme/tokens';
 import { useSettings } from '@/store/settings';
 
 export default function MosquePickerScreen() {
@@ -15,9 +17,12 @@ export default function MosquePickerScreen() {
   const theme = useTheme();
   const coords = useUserCoords();
   const { data: mosques, isLoading, isError, refetch } = useMosquesNearby(coords.lat, coords.lon);
+  const { data: locations } = useLocations();
   const selected = useSettings((state) => state.mosque);
   const setMosque = useSettings((state) => state.setMosque);
+  const setLocation = useSettings((state) => state.setLocation);
   const [query, setQuery] = useState('');
+  const { status: gpsStatus, getPosition } = useDevicePosition();
 
   const filtered = useMemo(() => {
     if (!mosques) return [];
@@ -35,9 +40,83 @@ export default function MosquePickerScreen() {
     return matches.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
   }, [mosques, query, coords.lat, coords.lon]);
 
+  const choose = (mosque: Mosque) => {
+    setMosque({ orgNr: mosque.org_nr, name: mosque.name });
+    if (locations && mosque.lat != null && mosque.lon != null) {
+      const nearest = nearestLocation(locations, mosque.lat, mosque.lon);
+      if (nearest) {
+        setLocation({
+          iso: nearest.iso,
+          name: nearest.name,
+          lat: nearest.lat,
+          lon: nearest.lon,
+        });
+      }
+    }
+    router.back();
+  };
+
+  const useMyPosition = async () => {
+    if (!mosques) return;
+    const position = await getPosition();
+    if (!position) return;
+    let best: Mosque | null = null;
+    let bestDistance = Infinity;
+    for (const mosque of mosques) {
+      if (mosque.lat == null || mosque.lon == null) continue;
+      const distance = distanceKm(position.lat, position.lon, mosque.lat, mosque.lon);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = mosque;
+      }
+    }
+    if (best) choose(best);
+  };
+
   return (
     <Screen edges={[]} padded={false}>
       <View style={{ padding: spacing.lg, gap: spacing.md, flex: 1 }}>
+        <Pressable
+          onPress={useMyPosition}
+          disabled={gpsStatus === 'locating' || !mosques}
+          style={({ pressed }) => [
+            {
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing.sm,
+              backgroundColor: theme.colors.primarySoft,
+              borderRadius: radius.md,
+              padding: spacing.md,
+              minHeight: 48,
+            },
+            pressed && { opacity: opacity.pressed },
+          ]}>
+          {gpsStatus === 'locating' ? (
+            <ActivityIndicator size="small" color={theme.colors.onPrimarySoft} />
+          ) : (
+            <Ionicons name="navigate" size={18} color={theme.colors.onPrimarySoft} />
+          )}
+          <View style={{ flex: 1 }}>
+            <AppText weight="semibold" tone="onPrimarySoft">
+              Bruk min posisjon
+            </AppText>
+            <AppText size="xs" tone="onPrimarySoft">
+              Velger moskeen nærmest deg
+            </AppText>
+          </View>
+        </Pressable>
+
+        {gpsStatus === 'denied' && (
+          <AppText size="sm" tone="danger">
+            Posisjonstilgang avslått. Gi tilgang i systeminnstillinger, eller velg moské manuelt.
+          </AppText>
+        )}
+        {gpsStatus === 'error' && (
+          <AppText size="sm" tone="danger">
+            Fant ikke posisjonen din. Velg moské manuelt.
+          </AppText>
+        )}
+
         <View
           style={{
             flexDirection: 'row',
@@ -91,10 +170,7 @@ export default function MosquePickerScreen() {
                   <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
                 ) : undefined
               }
-              onPress={() => {
-                setMosque({ orgNr: item.mosque.org_nr, name: item.mosque.name });
-                router.back();
-              }}
+              onPress={() => choose(item.mosque)}
             />
           )}
           ItemSeparatorComponent={() => (
