@@ -33,10 +33,10 @@ export function usePrayerDay(now: Date): PrayerDayData {
   const dayStart = useMemo(() => parseDayKey(dayKey), [dayKey]);
   const tomorrowStart = useMemo(() => addDays(dayStart, 1), [dayStart]);
 
-  const currentMonth = usePrayerTimes(location.pk, dayStart.getFullYear(), dayStart.getMonth() + 1);
+  const currentMonth = usePrayerTimes(location.iso, dayStart.getFullYear(), dayStart.getMonth() + 1);
   const needsNextMonth = tomorrowStart.getMonth() !== dayStart.getMonth();
   const nextMonth = usePrayerTimes(
-    location.pk,
+    location.iso,
     tomorrowStart.getFullYear(),
     tomorrowStart.getMonth() + 1,
   );

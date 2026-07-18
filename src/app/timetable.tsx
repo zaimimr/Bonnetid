@@ -23,7 +23,7 @@ export default function TimetableScreen() {
     monthIndex: today.getMonth(),
   }));
 
-  const month = usePrayerTimes(location.pk, cursor.year, cursor.monthIndex + 1);
+  const month = usePrayerTimes(location.iso, cursor.year, cursor.monthIndex + 1);
   const isCurrentMonth =
     cursor.year === today.getFullYear() && cursor.monthIndex === today.getMonth();
 

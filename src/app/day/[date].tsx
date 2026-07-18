@@ -24,7 +24,7 @@ export default function DayScreen() {
   const date = useMemo(() => new Date(`${isoDate}T12:00:00`), [isoDate]);
   const valid = !Number.isNaN(date.getTime());
 
-  const month = usePrayerTimes(location.pk, date.getFullYear(), date.getMonth() + 1);
+  const month = usePrayerTimes(location.iso, date.getFullYear(), date.getMonth() + 1);
   const hijriMonth = useHijriMonth(date.getFullYear(), date.getMonth() + 1);
   const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
   const jamatPeriods = useMosqueJamatPeriods(mosque?.orgNr ?? '', { enabled: mosque != null });

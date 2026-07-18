@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type SavedLocation = {
-  pk: number;
+  iso: string;
   name: string;
   lat: number;
   lon: number;
@@ -31,7 +31,7 @@ type SettingsState = {
 };
 
 export const DEFAULT_LOCATION: SavedLocation = {
-  pk: 181,
+  iso: 'NO0301',
   name: 'Oslo',
   lat: 59.9139,
   lon: 10.7522,
@@ -54,6 +54,14 @@ export const useSettings = create<SettingsState>()(
     {
       name: 'bonnetid-settings',
       storage: createJSONStorage(() => AsyncStorage),
+      version: 1,
+      migrate: (persisted) => {
+        const state = persisted as Partial<SettingsState> | undefined;
+        if (state?.location && typeof (state.location as { iso?: unknown }).iso !== 'string') {
+          state.location = null;
+        }
+        return state as SettingsState;
+      },
     },
   ),
 );

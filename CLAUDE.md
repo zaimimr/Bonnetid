@@ -1,6 +1,6 @@
 # Bønnetid
 
-Expo SDK 57 + React Native + TypeScript prayer times app for Norwegian Muslims. Data source: https://api.bonnetid.no (auth header `Api-Token: <token>`, token in `.env` as `EXPO_PUBLIC_API_TOKEN`).
+Expo SDK 57 + React Native + TypeScript prayer times app for Norwegian Muslims. Data source: Supabase Postgres (project `gsutnlmtvsbwvaslcgfa`) read directly via `@supabase/supabase-js` with the publishable key and public-read RLS. URL/key in `.env` as `EXPO_PUBLIC_SUPABASE_URL`/`EXPO_PUBLIC_SUPABASE_KEY` (code has fallbacks). Locations are keyed by `location_iso` strings like `NO0301` (Oslo).
 
 ## Commands
 
@@ -12,7 +12,8 @@ Expo SDK 57 + React Native + TypeScript prayer times app for Norwegian Muslims. 
 
 - All styling reads semantic theme roles via `useTheme()` from `src/theme`. Never hardcode colors in components; add roles to `src/theme/theme.ts` and primitives to `src/theme/tokens.ts`.
 - UI text is Norwegian bokmål.
-- API layer: raw fetch in `src/api/client.ts`, endpoint functions in `endpoints.ts`, react-query hooks in `queries.ts`. Screens only consume hooks.
+- API layer: Supabase client in `src/api/supabase.ts`, fetch + row-to-app-type mapping in `endpoints.ts`, react-query hooks in `queries.ts`. Screens only consume hooks. DB rows never leak past `endpoints.ts`.
 - Pure logic (time parsing, qibla bearing, hijri formatting, schedule building) lives in `src/lib` and takes explicit arguments, no hooks.
-- Prayer time API dates are `dd-mm-yyyy`, hijri dates from `/dates/` are `yyyy-m-d`, from `/prayertimes/` are `d-m-yyyy`.
+- App-facing date formats (kept from the old REST API): `PrayerDay.date` is `dd-mm-yyyy`, `HijriDay.hijri_date` is `yyyy-m-d`, `PrayerDay.hijri_date` is `d-m-yyyy`, `HijriDay.gregorian_date` is ISO `yyyy-mm-dd`. DB dates are ISO; DB times are `HH:MM:SS` and get trimmed to `HH:MM` in `endpoints.ts`.
+- Offline/Ramadan caching: react-query cache persists to AsyncStorage (`_layout.tsx`, buster `v2`, maxAge 60 days). Prayer times/hijri data are immutable, so hooks use multi-day `staleTime` - most opens hit zero network. Bump the buster when changing cached data shapes.
 - Path alias `@/*` maps to `src/*`.

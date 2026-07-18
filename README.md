@@ -1,6 +1,6 @@
 # Bønnetid
 
-Prayer times app for Muslims in Norway. Built with Expo, React Native and TypeScript. Data from [api.bonnetid.no](https://api.bonnetid.no).
+Prayer times app for Muslims in Norway. Built with Expo, React Native and TypeScript. Data read directly from Supabase Postgres, cached on device for offline and Ramadan-scale load.
 
 ## Features
 
@@ -17,10 +17,11 @@ npm install
 npm start
 ```
 
-Add your API token to `.env`:
+Optional `.env` overrides (code falls back to the public project URL and publishable key):
 
 ```
-EXPO_PUBLIC_API_TOKEN=<your token>
+EXPO_PUBLIC_SUPABASE_URL=<supabase project url>
+EXPO_PUBLIC_SUPABASE_KEY=<publishable key>
 ```
 
 Run on device with Expo Go, or `npm run ios` / `npm run android`.
@@ -31,7 +32,7 @@ Run on device with Expo Go, or `npm run ios` / `npm run android`.
 src/
   app/          expo-router routes (tabs, modals, detail screens)
   theme/        design tokens, semantic light/dark themes, ThemeProvider
-  api/          typed client, endpoint functions, react-query hooks
+  api/          supabase client, endpoint functions with row mapping, react-query hooks
   components/   ui/ primitives + feature components (prayer, mosque, calendar, qibla)
   hooks/        useNow, usePrayerDay, useUserCoords, useCompassHeading
   lib/          pure helpers: time, prayer schedule, geo/qibla, hijri formatting

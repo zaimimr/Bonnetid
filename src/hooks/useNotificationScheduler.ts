@@ -15,8 +15,8 @@ export function useNotificationScheduler() {
 
   const today = new Date();
   const nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
-  const currentMonth = usePrayerTimes(location.pk, today.getFullYear(), today.getMonth() + 1);
-  const nextMonth = usePrayerTimes(location.pk, nextWeek.getFullYear(), nextWeek.getMonth() + 1);
+  const currentMonth = usePrayerTimes(location.iso, today.getFullYear(), today.getMonth() + 1);
+  const nextMonth = usePrayerTimes(location.iso, nextWeek.getFullYear(), nextWeek.getMonth() + 1);
 
   const lastSyncKey = useRef('');
 
@@ -26,7 +26,7 @@ export function useNotificationScheduler() {
 
     const syncKey = [
       enabled,
-      location.pk,
+      location.iso,
       asrMethod,
       currentMonth.dataUpdatedAt,
       nextMonth.dataUpdatedAt,
@@ -48,7 +48,7 @@ export function useNotificationScheduler() {
   }, [
     enabled,
     asrMethod,
-    location.pk,
+    location.iso,
     location.name,
     currentMonth.data,
     currentMonth.dataUpdatedAt,

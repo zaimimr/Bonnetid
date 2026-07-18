@@ -1,4 +1,7 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { QueryClient } from '@tanstack/react-query';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -6,14 +9,29 @@ import { ThemeProvider, useTheme } from '@/theme';
 import { configureNotificationHandler } from '@/lib/notifications';
 import { useNotificationScheduler } from '@/hooks/useNotificationScheduler';
 
+const DAY = 24 * 60 * 60 * 1000;
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 2,
       refetchOnWindowFocus: false,
+      gcTime: 30 * DAY,
     },
   },
 });
+
+const persister = createAsyncStoragePersister({
+  storage: AsyncStorage,
+  key: 'bonnetid-query-cache',
+  throttleTime: 2000,
+});
+
+const persistOptions = {
+  persister,
+  maxAge: 60 * DAY,
+  buster: 'v2',
+};
 
 configureNotificationHandler();
 
@@ -126,11 +144,11 @@ function RootNavigator() {
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
+      <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
         <ThemeProvider>
           <RootNavigator />
         </ThemeProvider>
-      </QueryClientProvider>
+      </PersistQueryClientProvider>
     </GestureHandlerRootView>
   );
 }

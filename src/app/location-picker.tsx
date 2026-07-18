@@ -36,10 +36,10 @@ export default function LocationPickerScreen() {
 
   const choose = (location: ApiLocation) => {
     setLocation({
-      pk: location.pk,
+      iso: location.iso,
       name: location.name,
-      lat: Number(location.lat),
-      lon: Number(location.lon),
+      lat: location.lat,
+      lon: location.lon,
     });
     router.back();
   };
@@ -131,14 +131,14 @@ export default function LocationPickerScreen() {
 
         <FlatList
           data={filtered}
-          keyExtractor={(item) => String(item.pk)}
+          keyExtractor={(item) => item.iso}
           keyboardShouldPersistTaps="handled"
           renderItem={({ item }) => (
             <ListRow
               title={item.name}
               subtitle={fylkeName(item.fylke)}
               trailing={
-                item.pk === active.pk ? (
+                item.iso === active.iso ? (
                   <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
                 ) : undefined
               }

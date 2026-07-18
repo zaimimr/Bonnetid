@@ -1,9 +1,8 @@
 export type ApiLocation = {
-  pk: number;
+  iso: string;
   name: string;
-  lat: string;
-  lon: string;
-  district_code: string | null;
+  lat: number;
+  lon: number;
   fylke: string;
   kommune: string;
   info: string | null;
@@ -12,8 +11,7 @@ export type ApiLocation = {
 export type PrayerDay = {
   location: string;
   date: string;
-  district_code: string | null;
-  kommune: string;
+  kommune: string | null;
   hijri_date: string;
   fajr: string | null;
   fajr_endtime: string | null;
@@ -52,21 +50,17 @@ export type MosqueJamat = {
 export type MosquePost = {
   code: string;
   city: string;
-  district_code: string | null;
-  location: { pk: number; name: string } | null;
 };
 
 export type Mosque = {
   org_nr: string;
   name: string;
-  org_name: string | null;
   info: string | null;
-  district_code: string | null;
   map_only: boolean;
   address: string | null;
   post: MosquePost | null;
-  lat: string | null;
-  lon: string | null;
+  lat: number | null;
+  lon: number | null;
   contact_name: string | null;
   contact_phone: string | null;
   contact_email: string | null;
