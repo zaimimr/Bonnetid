@@ -102,7 +102,7 @@ export function PrayerTimesCard({
                 tone={entry.isPrayer ? 'textPrimary' : 'textMuted'}>
                 {entry.label}
               </AppText>
-              {isHighlighted && <Badge label="Neste" variant="primary" />}
+              {isHighlighted && <Badge label="Nå" variant="primary" />}
             </View>
             <AppText
               weight={isHighlighted ? 'bold' : 'medium'}

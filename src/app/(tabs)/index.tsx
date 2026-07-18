@@ -15,6 +15,7 @@ import { spacing } from '@/theme/tokens';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
 const UPCOMING_EVENT_COUNT = 3;
+const FRIDAY = 5;
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -68,12 +69,10 @@ export default function HomeScreen() {
             />
             <PrayerTimesCard
               schedule={todaySchedule}
-              highlightedName={
-                nextPrayer && !nextPrayer.isTomorrow ? nextPrayer.next.name : undefined
-              }
+              highlightedName={nextPrayer?.current?.name}
               mosqueName={mosque?.name}
               jamatTimes={jamatTimes}
-              jummah={mosqueDetails.data?.jummah ?? []}
+              jummah={now.getDay() === FRIDAY ? (mosqueDetails.data?.jummah ?? []) : []}
               onPressMosque={() =>
                 mosque &&
                 router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } })

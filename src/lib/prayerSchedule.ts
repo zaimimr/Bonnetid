@@ -4,12 +4,18 @@ import { parseTimeToDate } from './time';
 
 export type PrayerName = 'fajr' | 'shuruq' | 'duhr' | 'asr' | 'maghrib' | 'isha';
 
+export type PrayerWindowEnd = {
+  label: string;
+  date: Date;
+};
+
 export type PrayerEntry = {
   name: PrayerName;
   label: string;
   time: string;
   date: Date;
   isPrayer: boolean;
+  end: PrayerWindowEnd | null;
 };
 
 export const PRAYER_LABELS: Record<PrayerName, string> = {
@@ -40,7 +46,7 @@ export function buildDaySchedule(
     { name: 'isha', time: day.isha, isPrayer: true },
   ];
 
-  return source
+  const entries = source
     .filter((entry): entry is { name: PrayerName; time: string; isPrayer: boolean } => entry.time != null)
     .map((entry) => ({
       name: entry.name,
@@ -48,7 +54,28 @@ export function buildDaySchedule(
       time: entry.time,
       date: parseTimeToDate(entry.time, baseDate),
       isPrayer: entry.isPrayer,
+      end: null as PrayerWindowEnd | null,
     }));
+
+  for (let index = 0; index < entries.length; index += 1) {
+    const entry = entries[index];
+    if (entry.name === 'isha') {
+      entry.end = midnightEnd(day, entry.date, baseDate);
+      continue;
+    }
+    if (!entry.isPrayer) continue;
+    const boundary = entries[index + 1];
+    if (boundary) entry.end = { label: boundary.label, date: boundary.date };
+  }
+
+  return entries;
+}
+
+function midnightEnd(day: PrayerDay, ishaDate: Date, baseDate: Date): PrayerWindowEnd | null {
+  if (!day.muntasafallayl_midnight) return null;
+  const date = parseTimeToDate(day.muntasafallayl_midnight, baseDate);
+  if (date.getTime() <= ishaDate.getTime()) date.setDate(date.getDate() + 1);
+  return { label: 'Midnatt', date };
 }
 
 export type JamatTimes = Partial<Record<PrayerName, string>>;
@@ -96,6 +123,13 @@ export type NextPrayerResult = {
   isTomorrow: boolean;
 };
 
+function currentWithinWindow(passed: PrayerEntry[], now: Date): PrayerEntry | null {
+  const last = passed.length > 0 ? passed[passed.length - 1] : null;
+  if (!last) return null;
+  if (last.end && now.getTime() >= last.end.date.getTime()) return null;
+  return last;
+}
+
 export function findNextPrayer(
   today: PrayerEntry[],
   tomorrow: PrayerEntry[],
@@ -103,22 +137,15 @@ export function findNextPrayer(
 ): NextPrayerResult | null {
   const prayersToday = today.filter((entry) => entry.isPrayer);
   const upcoming = prayersToday.find((entry) => entry.date.getTime() > now.getTime());
+  const passed = prayersToday.filter((entry) => entry.date.getTime() <= now.getTime());
+  const current = currentWithinWindow(passed, now);
 
   if (upcoming) {
-    const passed = prayersToday.filter((entry) => entry.date.getTime() <= now.getTime());
-    return {
-      next: upcoming,
-      current: passed.length > 0 ? passed[passed.length - 1] : null,
-      isTomorrow: false,
-    };
+    return { next: upcoming, current, isTomorrow: false };
   }
 
   const firstTomorrow = tomorrow.find((entry) => entry.isPrayer);
   if (!firstTomorrow) return null;
 
-  return {
-    next: firstTomorrow,
-    current: prayersToday.length > 0 ? prayersToday[prayersToday.length - 1] : null,
-    isTomorrow: true,
-  };
+  return { next: firstTomorrow, current, isTomorrow: true };
 }

@@ -24,8 +24,10 @@ export function NextPrayerHero({
   onPressLocation,
 }: NextPrayerHeroProps) {
   const theme = useTheme();
-  const remaining = nextPrayer.next.date.getTime() - now.getTime();
   const current = nextPrayer.current;
+  const countdownTarget = current?.end?.date ?? nextPrayer.next.date;
+  const countdownLabel = current ? (current.end?.label ?? nextPrayer.next.label) : null;
+  const remaining = countdownTarget.getTime() - now.getTime();
 
   return (
     <Card rounded="xl" padding="xl" elevated>
@@ -66,8 +68,8 @@ export function NextPrayerHero({
           </AppText>
         </View>
         <AppText size="sm" weight="medium" tone="textSecondary" tabular>
-          {current
-            ? `${nextPrayer.next.label} om ${formatCountdown(remaining)}`
+          {countdownLabel
+            ? `${countdownLabel} om ${formatCountdown(remaining)}`
             : `om ${formatCountdown(remaining)}`}
         </AppText>
       </View>
