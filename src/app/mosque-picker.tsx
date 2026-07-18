@@ -9,6 +9,7 @@ import { useDevicePosition } from '@/hooks/useNearestLocation';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useUserCoords } from '@/hooks/useUserCoords';
 import { distanceKm, formatDistance } from '@/lib/geo';
+import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { fontSize, opacity, radius, spacing } from '@/theme/tokens';
 import { useSettings } from '@/store/settings';
@@ -44,8 +45,9 @@ export default function MosquePickerScreen() {
     return [sorted[mine], ...sorted.slice(0, mine), ...sorted.slice(mine + 1)];
   }, [mosques, query, coords.lat, coords.lon, selected?.orgNr]);
 
-  const choose = (mosque: Mosque) => {
+  const choose = (mosque: Mosque, method: 'list' | 'gps') => {
     setMosque({ orgNr: mosque.org_nr, name: mosque.name });
+    track('mosque_selected', { orgNr: mosque.org_nr, method });
     router.back();
   };
 
@@ -63,7 +65,7 @@ export default function MosquePickerScreen() {
         best = mosque;
       }
     }
-    if (best) choose(best);
+    if (best) choose(best, 'gps');
   };
 
   return (
@@ -114,6 +116,7 @@ export default function MosquePickerScreen() {
           <Pressable
             onPress={() => {
               setMosque(null);
+              track('mosque_cleared');
               router.back();
             }}
             style={({ pressed }) => [
@@ -204,7 +207,7 @@ export default function MosquePickerScreen() {
                   <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
                 ) : undefined
               }
-              onPress={() => choose(item.mosque)}
+              onPress={() => choose(item.mosque, 'list')}
             />
           )}
           ItemSeparatorComponent={() => (
