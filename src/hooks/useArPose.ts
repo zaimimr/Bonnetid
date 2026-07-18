@@ -5,9 +5,8 @@ import { normalizeAngleDelta } from '@/lib/geo';
 import type { ArPose } from '@/lib/arProjection';
 
 const UPDATE_INTERVAL_MS = 50;
-const TILT_SMOOTHING = 0.25;
-const HEADING_SMOOTHING = 0.2;
-const MAX_ROLL = Math.PI / 4;
+const TILT_SMOOTHING = 0.2;
+const HEADING_SMOOTHING = 0.15;
 
 export type ArPoseState = {
   pose: ArPose | null;
@@ -21,7 +20,7 @@ export function useArPose(enabled: boolean): ArPoseState {
   const [pose, setPose] = useState<ArPose | null>(null);
   const [motionUnavailable, setMotionUnavailable] = useState(false);
 
-  const rawTilt = useRef<{ pitch: number; roll: number } | null>(null);
+  const rawPitch = useRef<number | null>(null);
   const rawHeading = useRef<number | null>(null);
   const smoothed = useRef<ArPose | null>(null);
 
@@ -45,16 +44,14 @@ export function useArPose(enabled: boolean): ArPoseState {
       subscription = DeviceMotion.addListener((measurement: DeviceMotionMeasurement) => {
         const rotation = measurement.rotation;
         if (!rotation) return;
-        const pitch = rotation.beta - Math.PI / 2;
-        const roll = Math.max(-MAX_ROLL, Math.min(MAX_ROLL, rotation.gamma));
-        rawTilt.current = { pitch, roll };
+        rawPitch.current = rotation.beta - Math.PI / 2;
       });
     });
 
     const interval = setInterval(() => {
-      const tilt = rawTilt.current;
+      const pitchNow = rawPitch.current;
       const headingNow = rawHeading.current;
-      if (!tilt || headingNow == null) return;
+      if (pitchNow == null || headingNow == null) return;
 
       const previous = smoothed.current;
       const next: ArPose = previous
@@ -64,10 +61,10 @@ export function useArPose(enabled: boolean): ArPoseState {
                 HEADING_SMOOTHING * normalizeAngleDelta(headingNow - previous.heading) +
                 360) %
               360,
-            pitch: previous.pitch + TILT_SMOOTHING * (tilt.pitch - previous.pitch),
-            roll: previous.roll + TILT_SMOOTHING * (tilt.roll - previous.roll),
+            pitch: previous.pitch + TILT_SMOOTHING * (pitchNow - previous.pitch),
+            roll: 0,
           }
-        : { heading: headingNow, pitch: tilt.pitch, roll: tilt.roll };
+        : { heading: headingNow, pitch: pitchNow, roll: 0 };
 
       smoothed.current = next;
       setPose(next);

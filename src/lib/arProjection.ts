@@ -20,122 +20,87 @@ export type ArScene = {
   deltaDeg: number;
   marker: ScreenPoint | null;
   markerEdge: 'left' | 'right' | null;
-  horizonY: number | null;
   groundPath: ScreenPoint[];
   matCorners: ScreenPoint[] | null;
   matCenter: ScreenPoint | null;
+  pitchHint: 'raise' | 'lower' | null;
 };
 
 const DEG = Math.PI / 180;
 
 export const AR_VERTICAL_FOV_DEG = 60;
-export const AR_EYE_HEIGHT_METERS = 1.45;
-export const AR_MAT_DISTANCE_METERS = 2.1;
+export const AR_EYE_HEIGHT_METERS = 1.5;
+export const AR_MAT_DISTANCE_METERS = 2.4;
 export const AR_MAT_WIDTH_METERS = 0.8;
 export const AR_MAT_LENGTH_METERS = 1.35;
 
-type Vec3 = { x: number; y: number; z: number };
-
-function toCamera(point: Vec3, pitch: number): Vec3 {
-  const cos = Math.cos(pitch);
-  const sin = Math.sin(pitch);
-  return {
-    x: point.x,
-    y: point.y * cos - point.z * sin,
-    z: point.y * sin + point.z * cos,
-  };
-}
-
-function rotate2d(point: ScreenPoint, angle: number): ScreenPoint {
-  const cos = Math.cos(angle);
-  const sin = Math.sin(angle);
-  return {
-    x: point.x * cos - point.y * sin,
-    y: point.x * sin + point.y * cos,
-  };
-}
-
-function projectPoint(
-  point: Vec3,
-  pose: ArPose,
-  viewport: Viewport,
-  focal: number,
-): ScreenPoint | null {
-  const cam = toCamera(point, pose.pitch);
-  if (cam.z < 0.05) return null;
-  const flat = {
-    x: (cam.x / cam.z) * focal,
-    y: (-cam.y / cam.z) * focal,
-  };
-  const rolled = rotate2d(flat, pose.roll);
-  return {
-    x: viewport.width / 2 + rolled.x,
-    y: viewport.height / 2 + rolled.y,
-  };
-}
-
-function groundPoint(deltaRad: number, distance: number, side = 0): Vec3 {
-  const forward = { x: Math.sin(deltaRad), z: Math.cos(deltaRad) };
-  const right = { x: forward.z, z: -forward.x };
-  return {
-    x: forward.x * distance + right.x * side,
-    y: -AR_EYE_HEIGHT_METERS,
-    z: forward.z * distance + right.z * side,
-  };
-}
+const MARKER_VISIBLE_DELTA_DEG = 40;
+const RAISE_HINT_PITCH_DEG = -55;
+const LOWER_HINT_PITCH_DEG = 40;
 
 export function buildArScene(pose: ArPose, qiblaBearing: number, viewport: Viewport): ArScene {
+  const { width, height } = viewport;
   const deltaDeg = normalizeAngleDelta(qiblaBearing - pose.heading);
-  const deltaRad = deltaDeg * DEG;
-  const focal = viewport.height / 2 / Math.tan((AR_VERTICAL_FOV_DEG / 2) * DEG);
+  const focal = height / 2 / Math.tan((AR_VERTICAL_FOV_DEG / 2) * DEG);
 
-  const markerRaw = projectPoint(
-    { x: Math.sin(deltaRad) * 1000, y: 0, z: Math.cos(deltaRad) * 1000 },
-    pose,
-    viewport,
-    focal,
-  );
+  const pitchDeg = pose.pitch / DEG;
+  const pitchHint =
+    pitchDeg < RAISE_HINT_PITCH_DEG ? 'raise' : pitchDeg > LOWER_HINT_PITCH_DEG ? 'lower' : null;
 
-  const margin = 36;
   let marker: ScreenPoint | null = null;
   let markerEdge: 'left' | 'right' | null = null;
-  if (markerRaw && markerRaw.x >= -margin && markerRaw.x <= viewport.width + margin) {
-    marker = markerRaw;
+
+  if (Math.abs(deltaDeg) <= MARKER_VISIBLE_DELTA_DEG) {
+    const x = width / 2 + focal * Math.tan(deltaDeg * DEG);
+    const y = height / 2 + focal * Math.tan(pose.pitch);
+    marker = {
+      x: Math.max(36, Math.min(width - 36, x)),
+      y: Math.max(70, Math.min(height * 0.75, y)),
+    };
   } else {
     markerEdge = deltaDeg < 0 ? 'left' : 'right';
   }
 
-  const horizonAhead = projectPoint({ x: 0, y: 0, z: 1000 }, pose, viewport, focal);
-  const horizonY = horizonAhead ? horizonAhead.y : null;
+  const feet: ScreenPoint = { x: width / 2, y: height + 40 };
+  const groundPath = marker ? [feet, marker] : [];
 
-  const groundPath: ScreenPoint[] = [];
-  for (const distance of [0.7, 1, 1.5, 2, 3, 4, 6, 9, 14, 22, 40, 80]) {
-    const projected = projectPoint(groundPoint(deltaRad, distance), pose, viewport, focal);
-    if (projected) groundPath.push(projected);
+  let matCorners: ScreenPoint[] | null = null;
+  let matCenter: ScreenPoint | null = null;
+
+  if (marker) {
+    const nearDistance = AR_MAT_DISTANCE_METERS - AR_MAT_LENGTH_METERS / 2;
+    const farDistance = AR_MAT_DISTANCE_METERS + AR_MAT_LENGTH_METERS / 2;
+
+    const groundY = (distance: number) => {
+      const elevation = -Math.atan(AR_EYE_HEIGHT_METERS / distance);
+      return height / 2 + focal * Math.tan(pose.pitch - elevation);
+    };
+
+    const lineXAtY = (y: number) => {
+      const span = feet.y - marker.y;
+      if (span <= 0) return feet.x;
+      const t = (feet.y - y) / span;
+      return feet.x + (marker.x - feet.x) * t;
+    };
+
+    const nearY = groundY(nearDistance);
+    const farY = groundY(farDistance);
+
+    if (farY > marker.y + 10 && nearY < height + 160 && nearY > farY + 8) {
+      const nearHalfWidth = (focal * (AR_MAT_WIDTH_METERS / 2)) / nearDistance;
+      const farHalfWidth = (focal * (AR_MAT_WIDTH_METERS / 2)) / farDistance;
+      const nearX = lineXAtY(nearY);
+      const farX = lineXAtY(farY);
+
+      matCorners = [
+        { x: nearX - nearHalfWidth, y: nearY },
+        { x: nearX + nearHalfWidth, y: nearY },
+        { x: farX + farHalfWidth, y: farY },
+        { x: farX - farHalfWidth, y: farY },
+      ];
+      matCenter = { x: (nearX + farX) / 2, y: (nearY + farY) / 2 };
+    }
   }
 
-  const halfLength = AR_MAT_LENGTH_METERS / 2;
-  const halfWidth = AR_MAT_WIDTH_METERS / 2;
-  const cornerOffsets: [number, number][] = [
-    [-halfLength, -halfWidth],
-    [-halfLength, halfWidth],
-    [halfLength, halfWidth],
-    [halfLength, -halfWidth],
-  ];
-  const corners: ScreenPoint[] = [];
-  for (const [along, side] of cornerOffsets) {
-    const projected = projectPoint(
-      groundPoint(deltaRad, AR_MAT_DISTANCE_METERS + along, side),
-      pose,
-      viewport,
-      focal,
-    );
-    if (projected) corners.push(projected);
-  }
-  const matCorners = corners.length === 4 ? corners : null;
-  const matCenter = matCorners
-    ? projectPoint(groundPoint(deltaRad, AR_MAT_DISTANCE_METERS), pose, viewport, focal)
-    : null;
-
-  return { deltaDeg, marker, markerEdge, horizonY, groundPath, matCorners, matCenter };
+  return { deltaDeg, marker, markerEdge, groundPath, matCorners, matCenter, pitchHint };
 }

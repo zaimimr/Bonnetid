@@ -130,11 +130,15 @@ function ArOverlay({
   const guideColor = aligned ? theme.colors.success : theme.colors.accent;
 
   const rotationHint =
-    Math.abs(scene.deltaDeg) <= 5
-      ? null
-      : scene.deltaDeg > 0
-        ? `Roter ${Math.round(Math.abs(scene.deltaDeg))}° mot høyre`
-        : `Roter ${Math.round(Math.abs(scene.deltaDeg))}° mot venstre`;
+    scene.pitchHint === 'raise'
+      ? 'Løft telefonen mot horisonten'
+      : scene.pitchHint === 'lower'
+        ? 'Senk telefonen mot horisonten'
+        : Math.abs(scene.deltaDeg) <= 5
+          ? null
+          : scene.deltaDeg > 0
+            ? `Roter ${Math.round(Math.abs(scene.deltaDeg))}° mot høyre`
+            : `Roter ${Math.round(Math.abs(scene.deltaDeg))}° mot venstre`;
 
   const compassPoor = headingAccuracy != null && headingAccuracy >= 0 && headingAccuracy <= 1;
 
