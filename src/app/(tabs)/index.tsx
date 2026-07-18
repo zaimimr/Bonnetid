@@ -39,7 +39,12 @@ export default function HomeScreen() {
   const mosqueIso = mosqueDetails.data?.location_iso;
   const mosqueInLocation = mosqueIso == null || mosqueIso === location.iso;
   const jamatTimes = mosqueInLocation
-    ? jamatTimesForDate(mosqueDetails.data?.jamat, todayIso, adhanTimesFromSchedule(todaySchedule))
+    ? jamatTimesForDate(
+        mosqueDetails.data?.jamat,
+        todayIso,
+        adhanTimesFromSchedule(todaySchedule),
+        mosqueDetails.data?.jummah ?? [],
+      )
     : {};
 
   const upcomingEvents = useMemo(() => {
@@ -85,10 +90,14 @@ export default function HomeScreen() {
               jummah={
                 mosqueInLocation && now.getDay() === FRIDAY ? (mosqueDetails.data?.jummah ?? []) : []
               }
-              onPressMosque={() =>
-                mosque &&
-                router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } })
-              }
+              onPressMosque={() => {
+                if (!mosque) return;
+                if (mosqueInLocation) {
+                  router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } });
+                } else {
+                  router.push('/mosque-picker');
+                }
+              }}
               onSelectMosque={() => router.push('/mosque-picker')}
             />
           </View>

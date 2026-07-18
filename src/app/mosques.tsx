@@ -3,10 +3,11 @@ import { FlatList, Pressable, RefreshControl, TextInput, View } from 'react-nati
 import MapView, { Marker } from 'react-native-maps';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useMosquesNearby } from '@/api/queries';
+import { useMosques } from '@/api/queries';
 import type { Mosque } from '@/api/types';
 import { MosqueCard } from '@/components/mosque/MosqueCard';
 import { AppText, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
+import { useIsEidPeriod } from '@/hooks/useIsEidPeriod';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useUserCoords } from '@/hooks/useUserCoords';
 import { distanceKm } from '@/lib/geo';
@@ -25,11 +26,12 @@ export default function MosquesScreen() {
   const router = useRouter();
   const theme = useTheme();
   const coords = useUserCoords();
-  const { data: mosques, isLoading, isError, refetch } = useMosquesNearby(coords.lat, coords.lon);
+  const { data: mosques, isLoading, isError, refetch } = useMosques();
   const [mode, setMode] = useState<ViewMode>('list');
   const [sort, setSort] = useState<SortMode>('distance');
   const [query, setQuery] = useState('');
   const { refreshing, onRefresh } = useRefresh();
+  const isEidPeriod = useIsEidPeriod();
 
   const visible: MosqueWithDistance[] = useMemo(() => {
     if (!mosques) return [];
@@ -141,6 +143,7 @@ export default function MosquesScreen() {
             <MosqueCard
               mosque={item.mosque}
               distanceKm={item.distance ?? undefined}
+              showEid={isEidPeriod}
               onPress={() => openMosque(item.mosque)}
             />
           )}

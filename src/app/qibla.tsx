@@ -1,9 +1,10 @@
 import { Pressable, View } from 'react-native';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { QiblaAr } from '@/components/qibla/QiblaAr';
 import { QiblaCompass } from '@/components/qibla/QiblaCompass';
 import { QiblaMap } from '@/components/qibla/QiblaMap';
-import { AppText, Badge, Card, EmptyState, Screen } from '@/components/ui';
+import { AppText, EmptyState, Screen } from '@/components/ui';
 import { useCompassHeading } from '@/hooks/useCompassHeading';
 import { useUserCoords } from '@/hooks/useUserCoords';
 import { formatDistance, distanceKm, KAABA, qiblaBearing } from '@/lib/geo';
@@ -13,7 +14,6 @@ import { opacity, radius, spacing } from '@/theme/tokens';
 type QiblaView = 'compass' | 'map' | '3d';
 
 export default function QiblaScreen() {
-  const theme = useTheme();
   const coords = useUserCoords();
   const { heading, permissionDenied } = useCompassHeading();
   const [view, setView] = useState<QiblaView>('compass');
@@ -52,30 +52,7 @@ export default function QiblaScreen() {
 
         {view === 'map' && <QiblaMap lat={coords.lat} lon={coords.lon} />}
 
-        {view === '3d' && (
-          <Card rounded="xl" padding="xl" style={{ flex: 1, justifyContent: 'center' }}>
-            <View style={{ alignItems: 'center', gap: spacing.md }}>
-              <View
-                style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: radius.full,
-                  backgroundColor: theme.colors.surfaceSunken,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Ionicons name="cube-outline" size={30} color={theme.colors.textMuted} />
-              </View>
-              <Badge label="Under arbeid" variant="accent" />
-              <AppText weight="semibold" align="center">
-                3D-visning kommer
-              </AppText>
-              <AppText size="sm" tone="textSecondary" align="center">
-                Her vil du kunne bevege kameraet fritt og se retningen mot Kaba i 3D.
-              </AppText>
-            </View>
-          </Card>
-        )}
+        {view === '3d' && <QiblaAr qiblaBearing={bearing} />}
       </View>
     </Screen>
   );
@@ -87,7 +64,7 @@ function ViewSwitcher({ view, onChange }: { view: QiblaView; onChange: (view: Qi
   const options: { value: QiblaView; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
     { value: 'compass', label: 'Kompass', icon: 'compass-outline' },
     { value: 'map', label: 'Kart', icon: 'map-outline' },
-    { value: '3d', label: '3D', icon: 'cube-outline' },
+    { value: '3d', label: 'AR', icon: 'cube-outline' },
   ];
 
   return (

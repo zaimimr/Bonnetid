@@ -7,10 +7,12 @@ import {
 } from '@/lib/notifications';
 import { parseDayKey } from '@/lib/time';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
-import { useActiveLocation, useSettings } from '@/store/settings';
+import { NOTIFIABLE_PRAYERS, useActiveLocation, useSettings } from '@/store/settings';
 
 export function useNotificationScheduler() {
   const enabled = useSettings((state) => state.notificationsEnabled);
+  const sound = useSettings((state) => state.notificationSound);
+  const notificationPrayers = useSettings((state) => state.notificationPrayers);
   const asrMethod = useEffectiveAsrMethod();
   const location = useActiveLocation();
 
@@ -25,8 +27,11 @@ export function useNotificationScheduler() {
     const dataReady = currentMonth.data != null;
     if (!dataReady) return;
 
+    const prayersKey = NOTIFIABLE_PRAYERS.filter((prayer) => notificationPrayers[prayer]).join(',');
     const syncKey = [
       enabled,
+      sound,
+      prayersKey,
       location.iso,
       asrMethod,
       currentMonth.dataUpdatedAt,
@@ -41,13 +46,15 @@ export function useNotificationScheduler() {
     }
 
     const days = [...(currentMonth.data ?? []), ...(nextMonth.data ?? [])];
-    const entries: PrayerEntry[] = days.flatMap((day) =>
-      buildDaySchedule(day, parseDayKey(day.date), asrMethod),
-    );
+    const entries: PrayerEntry[] = days
+      .flatMap((day) => buildDaySchedule(day, parseDayKey(day.date), asrMethod))
+      .filter((entry) => entry.name === 'shuruq' || notificationPrayers[entry.name]);
 
-    schedulePrayerNotifications(entries, location.name).catch(() => {});
+    schedulePrayerNotifications(entries, location.name, sound).catch(() => {});
   }, [
     enabled,
+    sound,
+    notificationPrayers,
     asrMethod,
     location.iso,
     location.name,

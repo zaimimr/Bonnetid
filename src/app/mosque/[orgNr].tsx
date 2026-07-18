@@ -4,6 +4,7 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useMosque, usePrayerTimes } from '@/api/queries';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
+import { useIsEidPeriod } from '@/hooks/useIsEidPeriod';
 import { useRefresh } from '@/hooks/useRefresh';
 import type { Mosque } from '@/api/types';
 import { AppText, Card, ErrorState, ListRow, Screen, SectionHeader, Skeleton } from '@/components/ui';
@@ -46,6 +47,8 @@ const TIME_COLUMN_WIDTH = 64;
 function MosqueDetail({ mosque }: { mosque: Mosque }) {
   const theme = useTheme();
   const jamat = mosque.jamat;
+  const isEidPeriod = useIsEidPeriod();
+  const eidTimes = isEidPeriod && mosque.show_eid ? mosque.eid_prayers : [];
 
   const today = useMemo(() => new Date(), []);
   const month = usePrayerTimes(
@@ -66,7 +69,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
     () => adhanTimesFromSchedule(day ? buildDaySchedule(day, today, asrPreference) : []),
     [day, today, asrPreference],
   );
-  const jamatTimes = jamatTimesForDate(jamat, isoDateKey(today), adhanTimes);
+  const jamatTimes = jamatTimesForDate(jamat, isoDateKey(today), adhanTimes, mosque.jummah);
 
   const jamatRows = JAMAT_PRAYERS.map((name) => ({
     name,
@@ -218,6 +221,31 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                   {row.jamat ?? '–'}
                 </AppText>
               </View>
+            ))}
+          </Card>
+        </View>
+      )}
+
+      {eidTimes.length > 0 && (
+        <View>
+          <SectionHeader title="Eid-bønn" />
+          <Card padding="sm" rounded="xl">
+            {eidTimes.map((time, index) => (
+              <ListRow
+                key={`${time}-${index}`}
+                title={eidTimes.length > 1 ? `Eid-bønn ${index + 1}` : 'Eid-bønn'}
+                leading={<Ionicons name="sparkles-outline" size={20} color={theme.colors.primary} />}
+                trailing={
+                  <AppText weight="semibold" tabular>
+                    {time}
+                  </AppText>
+                }
+                style={{
+                  paddingHorizontal: spacing.md,
+                  borderBottomWidth: index === eidTimes.length - 1 ? 0 : 1,
+                  borderBottomColor: theme.colors.border,
+                }}
+              />
             ))}
           </Card>
         </View>

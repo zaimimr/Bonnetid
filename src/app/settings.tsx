@@ -7,12 +7,19 @@ import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocations } from '@/api/queries';
 import { detectNearestLocation } from '@/hooks/useAutoLocation';
-import { AppText, Card, ListRow, Screen, SectionHeader } from '@/components/ui';
+import { AppText, Card, Divider, ListRow, Screen, SectionHeader } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import { notificationsSupported, requestNotificationPermission } from '@/lib/notifications';
+import { getNotificationSound } from '@/lib/notificationSounds';
+import { PRAYER_LABELS } from '@/lib/prayerSchedule';
 import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
-import { useActiveLocation, useSettings, type AsrMethodPreference } from '@/store/settings';
+import {
+  NOTIFIABLE_PRAYERS,
+  useActiveLocation,
+  useSettings,
+  type AsrMethodPreference,
+} from '@/store/settings';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -22,13 +29,15 @@ export default function SettingsScreen() {
   const { data: locations } = useLocations();
   const [locating, setLocating] = useState(false);
   const mosque = useSettings((state) => state.mosque);
-  const setMosque = useSettings((state) => state.setMosque);
   const asrMethod = useSettings((state) => state.asrMethod);
   const setAsrMethod = useSettings((state) => state.setAsrMethod);
   const themePreference = useSettings((state) => state.themePreference);
   const setThemePreference = useSettings((state) => state.setThemePreference);
   const notificationsEnabled = useSettings((state) => state.notificationsEnabled);
   const setNotificationsEnabled = useSettings((state) => state.setNotificationsEnabled);
+  const notificationSound = useSettings((state) => state.notificationSound);
+  const notificationPrayers = useSettings((state) => state.notificationPrayers);
+  const toggleNotificationPrayer = useSettings((state) => state.toggleNotificationPrayer);
   const asrOverride = useMosqueAsrOverride();
   const asrLocationDefault = useLocationAsrDefault();
 
@@ -61,7 +70,7 @@ export default function SettingsScreen() {
   return (
     <Screen scroll edges={[]}>
       <SectionHeader
-        title="Sted og moské"
+        title="Bønnetider"
         subtitle="Stedet finnes automatisk fra posisjonen din"
       />
       <Card padding="sm" rounded="xl">
@@ -82,47 +91,29 @@ export default function SettingsScreen() {
           onPress={() => router.push('/mosque-picker')}
           style={{ paddingHorizontal: spacing.md }}
         />
-        {mosque && (
-          <>
-            <Divider />
-            <ListRow
-              title="Fjern valgt moské"
-              leading={<Ionicons name="close-circle-outline" size={20} color={theme.colors.danger} />}
-              onPress={() => setMosque(null)}
-              style={{ paddingHorizontal: spacing.md }}
-            />
-          </>
-        )}
+        <Divider />
+        <ListRow
+          title="Asr-metode"
+          subtitle={
+            asrOverride && mosque
+              ? `Styres av ${mosque.name}`
+              : 'Hanafi bruker 2x skygge, øvrige skoler 1x skygge'
+          }
+          leading={<Ionicons name="partly-sunny-outline" size={20} color={theme.colors.primary} />}
+          style={{ paddingHorizontal: spacing.md }}
+        />
+        <View style={{ paddingHorizontal: spacing.md, paddingBottom: spacing.sm }}>
+          <SegmentedRow<AsrMethodPreference>
+            value={asrOverride ?? asrMethod ?? asrLocationDefault ?? 'shadow_1x'}
+            onChange={setAsrMethod}
+            disabled={asrOverride != null}
+            options={[
+              { value: 'shadow_1x', label: '1x skygge' },
+              { value: 'shadow_2x', label: '2x skygge' },
+            ]}
+          />
+        </View>
       </Card>
-
-      <SectionHeader
-        title="Asr-metode"
-        subtitle={
-          asrOverride && mosque
-            ? `Styres av ${mosque.name}`
-            : 'Hanafi bruker 2x skygge, øvrige skoler 1x skygge'
-        }
-      />
-      <SegmentedRow<AsrMethodPreference>
-        value={asrOverride ?? asrMethod ?? asrLocationDefault ?? 'shadow_1x'}
-        onChange={setAsrMethod}
-        disabled={asrOverride != null}
-        options={[
-          { value: 'shadow_1x', label: '1x skygge' },
-          { value: 'shadow_2x', label: '2x skygge' },
-        ]}
-      />
-
-      <SectionHeader title="Utseende" />
-      <SegmentedRow
-        value={themePreference}
-        onChange={setThemePreference}
-        options={[
-          { value: 'system', label: 'System' },
-          { value: 'light', label: 'Lys' },
-          { value: 'dark', label: 'Mørk' },
-        ]}
-      />
 
       <SectionHeader title="Varsler" />
       <Card padding="sm" rounded="xl">
@@ -147,6 +138,62 @@ export default function SettingsScreen() {
           }
           style={{ paddingHorizontal: spacing.md }}
         />
+        {notificationsEnabled && (
+          <>
+            <Divider />
+            <ListRow
+              title="Varsellyd"
+              leading={
+                <Ionicons name="musical-notes-outline" size={20} color={theme.colors.primary} />
+              }
+              trailing={
+                <AppText size="sm" tone="textMuted">
+                  {getNotificationSound(notificationSound).label}
+                </AppText>
+              }
+              chevron
+              onPress={() => router.push('/notification-sound')}
+              style={{ paddingHorizontal: spacing.md }}
+            />
+            {NOTIFIABLE_PRAYERS.map((prayer) => (
+              <View key={prayer}>
+                <Divider />
+                <ListRow
+                  title={PRAYER_LABELS[prayer]}
+                  trailing={
+                    <Switch
+                      value={notificationPrayers[prayer]}
+                      onValueChange={() => toggleNotificationPrayer(prayer)}
+                      trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
+                      thumbColor={theme.colors.surface}
+                    />
+                  }
+                  style={{ paddingHorizontal: spacing.md }}
+                />
+              </View>
+            ))}
+          </>
+        )}
+      </Card>
+
+      <SectionHeader title="Utseende" />
+      <Card padding="sm" rounded="xl">
+        <ListRow
+          title="Tema"
+          leading={<Ionicons name="contrast-outline" size={20} color={theme.colors.primary} />}
+          style={{ paddingHorizontal: spacing.md }}
+        />
+        <View style={{ paddingHorizontal: spacing.md, paddingBottom: spacing.sm }}>
+          <SegmentedRow
+            value={themePreference}
+            onChange={setThemePreference}
+            options={[
+              { value: 'system', label: 'System' },
+              { value: 'light', label: 'Lys' },
+              { value: 'dark', label: 'Mørk' },
+            ]}
+          />
+        </View>
       </Card>
 
       <View style={{ alignItems: 'center', gap: spacing.xs, marginTop: spacing.xl }}>
@@ -159,21 +206,11 @@ export default function SettingsScreen() {
         <AppText size="xs" tone="textMuted">
           Versjon {Constants.expoConfig?.version ?? '1.0.0'}
         </AppText>
+        <AppText size="xs" tone="textMuted">
+          Laget av Zaim Imran
+        </AppText>
       </View>
     </Screen>
-  );
-}
-
-function Divider() {
-  const theme = useTheme();
-  return (
-    <View
-      style={{
-        height: 1,
-        backgroundColor: theme.colors.border,
-        marginHorizontal: spacing.md,
-      }}
-    />
   );
 }
 

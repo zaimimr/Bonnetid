@@ -31,7 +31,7 @@ const persister = createAsyncStoragePersister({
 const persistOptions = {
   persister,
   maxAge: 60 * DAY,
-  buster: 'v6',
+  buster: 'v7',
 };
 
 configureNotificationHandler();
@@ -88,6 +88,17 @@ function RootNavigator() {
           options={{
             headerShown: true,
             title: 'Innstillinger',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="notification-sound"
+          options={{
+            headerShown: true,
+            title: 'Varsellyd',
             headerBackTitle: 'Tilbake',
             headerStyle: { backgroundColor: theme.colors.surface },
             headerTitleStyle: { color: theme.colors.textPrimary },

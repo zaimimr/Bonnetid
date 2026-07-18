@@ -50,13 +50,13 @@ export default function DayScreen() {
   const mosqueInLocation = mosqueIso == null || mosqueIso === location.iso;
   const jamatPeriod =
     findJamatPeriod(jamatPeriods.data, isoDate ?? '') ?? mosqueDetails.data?.jamat;
-  const jamatTimes = mosqueInLocation
-    ? jamatTimesForDate(jamatPeriod, isoDate ?? '', adhanTimesFromSchedule(schedule))
-    : {};
   const jummahTimes =
     jamatPeriod && 'jummah' in jamatPeriod && jamatPeriod.jummah && jamatPeriod.jummah.length > 0
       ? jamatPeriod.jummah
       : (mosqueDetails.data?.jummah ?? []);
+  const jamatTimes = mosqueInLocation
+    ? jamatTimesForDate(jamatPeriod, isoDate ?? '', adhanTimesFromSchedule(schedule), jummahTimes)
+    : {};
 
   const goToDay = (delta: number) => {
     const next = new Date(date);

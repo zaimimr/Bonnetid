@@ -1,16 +1,26 @@
-import { useQuery } from '@tanstack/react-query';
+import { useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  fetchHijriMonth,
+  fetchHijriYear,
   fetchLocations,
   fetchMosque,
   fetchMosqueJamatPeriods,
-  fetchMosquesNearby,
+  fetchMosques,
   fetchPrayerTimes,
-  fetchSpecialDates,
 } from './endpoints';
+import type { HijriDay } from './types';
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
+
+function hijriYearOptions(year: number) {
+  return {
+    queryKey: ['hijri-year', year] as const,
+    queryFn: () => fetchHijriYear(year),
+    staleTime: 14 * DAY,
+    gcTime: 60 * DAY,
+  };
+}
 
 export function useLocations() {
   return useQuery({
@@ -27,20 +37,24 @@ export function usePrayerTimes(
   month: number,
   options?: { enabled?: boolean },
 ) {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: ['prayertimes', locationIso, year, month],
-    queryFn: () => fetchPrayerTimes(locationIso, year, month),
+    queryFn: async () => {
+      const hijri = await queryClient.ensureQueryData(hijriYearOptions(year));
+      return fetchPrayerTimes(locationIso, year, month, hijri);
+    },
     staleTime: 3 * DAY,
     gcTime: 60 * DAY,
     enabled: options?.enabled ?? true,
   });
 }
 
-export function useMosquesNearby(lat: number, lon: number) {
+export function useMosques() {
   return useQuery({
-    queryKey: ['mosques', lat.toFixed(3), lon.toFixed(3)],
-    queryFn: () => fetchMosquesNearby(lat, lon),
-    staleTime: 6 * HOUR,
+    queryKey: ['mosques'],
+    queryFn: fetchMosques,
+    staleTime: 3 * DAY,
     gcTime: 30 * DAY,
   });
 }
@@ -49,7 +63,7 @@ export function useMosque(orgNr: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['mosque', orgNr],
     queryFn: () => fetchMosque(orgNr),
-    staleTime: 6 * HOUR,
+    staleTime: 3 * DAY,
     gcTime: 30 * DAY,
     enabled: options?.enabled ?? true,
   });
@@ -59,26 +73,25 @@ export function useMosqueJamatPeriods(orgNr: string, options?: { enabled?: boole
   return useQuery({
     queryKey: ['mosque-jamat-periods', orgNr],
     queryFn: () => fetchMosqueJamatPeriods(orgNr),
-    staleTime: 6 * HOUR,
+    staleTime: 3 * DAY,
     gcTime: 30 * DAY,
     enabled: options?.enabled ?? true,
   });
 }
 
 export function useHijriMonth(year: number, month: number) {
-  return useQuery({
-    queryKey: ['hijri', year, month],
-    queryFn: () => fetchHijriMonth(year, month),
-    staleTime: 14 * DAY,
-    gcTime: 60 * DAY,
-  });
+  const prefix = `${year}-${String(month).padStart(2, '0')}`;
+  const select = useCallback(
+    (days: HijriDay[]) => days.filter((day) => day.gregorian_date.startsWith(prefix)),
+    [prefix],
+  );
+  return useQuery({ ...hijriYearOptions(year), select });
 }
 
 export function useSpecialDates(year: number) {
-  return useQuery({
-    queryKey: ['special-dates', year],
-    queryFn: () => fetchSpecialDates(year),
-    staleTime: 14 * DAY,
-    gcTime: 60 * DAY,
-  });
+  const select = useCallback(
+    (days: HijriDay[]) => days.filter((day) => day.special_date_name != null),
+    [],
+  );
+  return useQuery({ ...hijriYearOptions(year), select });
 }

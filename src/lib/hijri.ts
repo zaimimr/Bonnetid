@@ -11,6 +11,10 @@ export function parseHijriDate(hijriDate: string): ParsedHijri | null {
   return { year, month, day };
 }
 
+export function isEidPrayerPeriod(hijri: ParsedHijri): boolean {
+  return hijri.month === 9 || (hijri.month === 10 && hijri.day === 1);
+}
+
 export function formatHijri(hijriDate: string, monthText: string): string {
   const parsed = parseHijriDate(hijriDate);
   if (!parsed) return hijriDate;
