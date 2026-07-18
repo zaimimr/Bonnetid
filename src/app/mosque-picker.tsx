@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useLocations, useMosquesNearby } from '@/api/queries';
+import { useMosques } from '@/api/queries';
 import type { Mosque } from '@/api/types';
 import { AppText, ErrorState, ListRow, Screen, Skeleton } from '@/components/ui';
-import { nearestLocation, useDevicePosition } from '@/hooks/useNearestLocation';
+import { useDevicePosition } from '@/hooks/useNearestLocation';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useUserCoords } from '@/hooks/useUserCoords';
 import { distanceKm, formatDistance } from '@/lib/geo';
@@ -17,11 +17,9 @@ export default function MosquePickerScreen() {
   const router = useRouter();
   const theme = useTheme();
   const coords = useUserCoords();
-  const { data: mosques, isLoading, isError, refetch } = useMosquesNearby(coords.lat, coords.lon);
-  const { data: locations } = useLocations();
+  const { data: mosques, isLoading, isError, refetch } = useMosques();
   const selected = useSettings((state) => state.mosque);
   const setMosque = useSettings((state) => state.setMosque);
-  const setLocation = useSettings((state) => state.setLocation);
   const [query, setQuery] = useState('');
   const { status: gpsStatus, getPosition } = useDevicePosition();
   const { refreshing, onRefresh } = useRefresh();
@@ -44,19 +42,6 @@ export default function MosquePickerScreen() {
 
   const choose = (mosque: Mosque) => {
     setMosque({ orgNr: mosque.org_nr, name: mosque.name });
-    if (locations) {
-      const byIso = mosque.location_iso
-        ? locations.find((location) => location.iso === mosque.location_iso)
-        : undefined;
-      const match =
-        byIso ??
-        (mosque.lat != null && mosque.lon != null
-          ? nearestLocation(locations, mosque.lat, mosque.lon)
-          : null);
-      if (match) {
-        setLocation({ iso: match.iso, name: match.name, lat: match.lat, lon: match.lon });
-      }
-    }
     router.back();
   };
 
@@ -119,6 +104,36 @@ export default function MosquePickerScreen() {
           <AppText size="sm" tone="danger">
             Fant ikke posisjonen din. Velg moské manuelt.
           </AppText>
+        )}
+
+        {selected && (
+          <Pressable
+            onPress={() => {
+              setMosque(null);
+              router.back();
+            }}
+            style={({ pressed }) => [
+              {
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: spacing.sm,
+                backgroundColor: theme.colors.surfaceSunken,
+                borderRadius: radius.md,
+                padding: spacing.md,
+                minHeight: 48,
+              },
+              pressed && { opacity: opacity.pressed },
+            ]}>
+            <Ionicons name="close-circle-outline" size={18} color={theme.colors.danger} />
+            <View style={{ flex: 1 }}>
+              <AppText weight="semibold" tone="danger">
+                Fjern valgt moské
+              </AppText>
+              <AppText size="xs" tone="textMuted">
+                {selected.name}
+              </AppText>
+            </View>
+          </Pressable>
         )}
 
         <View

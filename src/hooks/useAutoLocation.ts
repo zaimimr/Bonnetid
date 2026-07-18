@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
+import { fetchKommuneIso } from '@/api/kartverket';
 import { useLocations } from '@/api/queries';
 import type { ApiLocation } from '@/api/types';
 import { nearestLocation } from './useNearestLocation';
@@ -13,10 +14,13 @@ export async function detectNearestLocation(
   const position = await Location.getCurrentPositionAsync({
     accuracy: Location.Accuracy.Balanced,
   });
-  const nearest = nearestLocation(locations, position.coords.latitude, position.coords.longitude);
-  return nearest
-    ? { iso: nearest.iso, name: nearest.name, lat: nearest.lat, lon: nearest.lon }
+  const { latitude, longitude } = position.coords;
+  const kommuneIso = await fetchKommuneIso(latitude, longitude);
+  const byKommune = kommuneIso
+    ? (locations.find((location) => location.iso === kommuneIso) ?? null)
     : null;
+  const match = byKommune ?? nearestLocation(locations, latitude, longitude);
+  return match ? { iso: match.iso, name: match.name, lat: match.lat, lon: match.lon } : null;
 }
 
 export function useAutoLocation() {
