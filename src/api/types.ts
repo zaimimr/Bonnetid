@@ -73,6 +73,8 @@ export type Mosque = {
   contact_email: string | null;
   homepage: string | null;
   asr_method: 'MIXED' | 'SHADOW_1X' | 'SHADOW_2X' | 'NONE' | string;
+  show_eid: boolean;
+  eid_prayers: string[];
   jamat: MosqueJamat | null;
   jummah: MosqueJummah[];
 };

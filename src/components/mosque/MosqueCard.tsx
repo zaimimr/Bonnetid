@@ -9,12 +9,14 @@ import { formatDistance } from '@/lib/geo';
 export type MosqueCardProps = {
   mosque: Mosque;
   distanceKm?: number;
+  showEid?: boolean;
   onPress: () => void;
 };
 
-export function MosqueCard({ mosque, distanceKm, onPress }: MosqueCardProps) {
+export function MosqueCard({ mosque, distanceKm, showEid, onPress }: MosqueCardProps) {
   const theme = useTheme();
   const nextJummah = mosque.jummah[0]?.jummah;
+  const eidTimes = showEid && mosque.show_eid ? mosque.eid_prayers : [];
 
   return (
     <Card onPress={onPress} rounded="xl">
@@ -42,6 +44,7 @@ export function MosqueCard({ mosque, distanceKm, onPress }: MosqueCardProps) {
           ) : null}
           <View style={{ flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xxs }}>
             {distanceKm != null && <Badge label={formatDistance(distanceKm)} variant="neutral" />}
+            {eidTimes.length > 0 && <Badge label={`Eid ${eidTimes.join(' · ')}`} variant="primary" />}
             {nextJummah && <Badge label={`Jummah ${nextJummah}`} variant="primary" />}
           </View>
         </View>

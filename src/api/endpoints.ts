@@ -1,3 +1,4 @@
+import { HIJRI_META, type HijriMeta } from '@/lib/hijriMeta';
 import { supabase } from './supabase';
 import type { ApiLocation, HijriDay, Mosque, MosqueJamat, MosqueJummah, PrayerDay } from './types';
 
@@ -12,6 +13,13 @@ function hhmm(time: string | null): string | null {
 function jamatTime(time: string | null): string | null {
   const trimmed = hhmm(time);
   return trimmed === '00:00' ? null : trimmed;
+}
+
+function eidTime(time: string | null): string | null {
+  const match = time?.trim().match(/^(\d{1,2}):(\d{2})/);
+  if (!match) return null;
+  const normalized = `${match[1].padStart(2, '0')}:${match[2]}`;
+  return normalized === '00:00' ? null : normalized;
 }
 
 function monthRange(year: number, month: number): { start: string; end: string } {
@@ -39,39 +47,6 @@ type HijriDateRow = {
   hijri_date_year: number;
   special_date_no: string | null;
 };
-
-type HijriMeta = {
-  monthNames: Map<number, string>;
-  monthStartNames: Map<number, string>;
-  yearlyEvents: Map<string, string>;
-};
-
-let hijriMetaPromise: Promise<HijriMeta> | null = null;
-
-function getHijriMeta(): Promise<HijriMeta> {
-  hijriMetaPromise ??= loadHijriMeta().catch((error) => {
-    hijriMetaPromise = null;
-    throw error;
-  });
-  return hijriMetaPromise;
-}
-
-async function loadHijriMeta(): Promise<HijriMeta> {
-  const [months, events] = await Promise.all([
-    supabase.from('hijri_month').select('hijri_date_month, name_long, no'),
-    supabase.from('hijri_yearly_events').select('hijri_date_month, hijri_date_day, no'),
-  ]);
-  if (months.error) throw months.error;
-  if (events.error) throw events.error;
-
-  return {
-    monthNames: new Map(months.data.map((row) => [row.hijri_date_month, row.name_long])),
-    monthStartNames: new Map(months.data.map((row) => [row.hijri_date_month, row.no])),
-    yearlyEvents: new Map(
-      events.data.map((row) => [`${row.hijri_date_month}-${row.hijri_date_day}`, row.no]),
-    ),
-  };
-}
 
 function toHijriDay(row: HijriDateRow, meta: HijriMeta): HijriDay {
   return {
@@ -117,33 +92,23 @@ export async function fetchPrayerTimes(
   locationIso: string,
   year: number,
   month: number,
+  hijriDays: HijriDay[],
 ): Promise<PrayerDay[]> {
   const { start, end } = monthRange(year, month);
-  const [times, hijri] = await Promise.all([
-    supabase
-      .from('prayertime')
-      .select(
-        'date, location_iso, kommune, fajr, fajr_endtime, shuruq_sunrise, istiwa_noon, duhr, asr, shadow_1x, shadow_2x, asr_endtime, ghrub_sunset, maghrib, isha, muntasafallayl_midnight',
-      )
-      .eq('location_iso', locationIso)
-      .gte('date', start)
-      .lte('date', end)
-      .order('date')
-      .order('prayer_method'),
-    supabase
-      .from('hijri_dates')
-      .select('gregorian_date, hijri_date_day, hijri_date_month, hijri_date_year')
-      .gte('gregorian_date', start)
-      .lte('gregorian_date', end),
-  ]);
+  const times = await supabase
+    .from('prayertime')
+    .select(
+      'date, location_iso, kommune, fajr, fajr_endtime, shuruq_sunrise, istiwa_noon, duhr, asr, shadow_1x, shadow_2x, asr_endtime, ghrub_sunset, maghrib, isha, muntasafallayl_midnight',
+    )
+    .eq('location_iso', locationIso)
+    .gte('date', start)
+    .lte('date', end)
+    .order('date')
+    .order('prayer_method');
   if (times.error) throw times.error;
-  if (hijri.error) throw hijri.error;
 
   const hijriByDate = new Map(
-    hijri.data.map((row) => [
-      row.gregorian_date,
-      `${row.hijri_date_day}-${row.hijri_date_month}-${row.hijri_date_year}`,
-    ]),
+    hijriDays.map((day) => [day.gregorian_date, day.hijri_date.split('-').reverse().join('-')]),
   );
 
   const days: PrayerDay[] = [];
@@ -189,10 +154,14 @@ type MosqueRow = {
   contact_phone: string | null;
   contact_email: string | null;
   reg_hjemmeside: string | null;
+  show_eid: boolean | null;
+  eidprayer_time1: string | null;
+  eidprayer_time2: string | null;
+  eidprayer_time3: string | null;
 };
 
 const MOSQUE_COLUMNS =
-  'organisasjonsnummer, reg_navn, org_name2, org_info, address, post_no, lat, lon, map_only, asr_method, contact_name, contact_phone, contact_email, reg_hjemmeside';
+  'organisasjonsnummer, reg_navn, org_name2, org_info, address, post_no, lat, lon, map_only, asr_method, contact_name, contact_phone, contact_email, reg_hjemmeside, show_eid, eidprayer_time1, eidprayer_time2, eidprayer_time3';
 
 type JamatPeriodRow = {
   id: number;
@@ -278,144 +247,88 @@ function toMosque(
     contact_email: row.contact_email,
     homepage: toHomepage(row.reg_hjemmeside),
     asr_method: toAsrMethod(row.asr_method),
+    show_eid: row.show_eid ?? false,
+    eid_prayers: [row.eidprayer_time1, row.eidprayer_time2, row.eidprayer_time3]
+      .map(eidTime)
+      .filter((time): time is string => time != null),
     jamat,
     jummah,
   };
 }
 
-async function fetchPosts(postNos: string[]): Promise<Map<string, PostRow>> {
-  const unique = [...new Set(postNos.filter(Boolean))];
-  if (unique.length === 0) return new Map();
-  const { data, error } = await supabase
-    .from('location_postnumber')
-    .select('post_no, post_name, location_iso')
-    .in('post_no', unique);
-  if (error) throw error;
-  return new Map(data.map((row) => [row.post_no, row]));
+type JummahRow = { id: number; mosque_id: string | null; jummah: string };
+
+type JamatEmbedRow = JamatPeriodRow & { mosque_jummah: JummahRow[] };
+
+type MosqueEmbedRow = MosqueRow & {
+  location_postnumber: PostRow | null;
+  mosque_jamatperiode: JamatEmbedRow[];
+};
+
+const MOSQUE_EMBED_COLUMNS = `${MOSQUE_COLUMNS}, location_postnumber(post_no, post_name, location_iso), mosque_jamatperiode(${JAMAT_COLUMNS}, mosque_jummah(id, mosque_id, jummah))`;
+
+function sortedJummah(rows: JummahRow[]): MosqueJummah[] {
+  return [...rows].sort((a, b) => a.jummah.localeCompare(b.jummah)).map(toJummah);
 }
 
-async function fetchJummahByJamatIds(jamatIds: number[]): Promise<Map<number, MosqueJummah[]>> {
-  if (jamatIds.length === 0) return new Map();
-  const { data, error } = await supabase
-    .from('mosque_jummah')
-    .select('id, mosque_id, jummah, jamat_id')
-    .in('jamat_id', jamatIds)
-    .order('jummah');
-  if (error) throw error;
-
-  const byJamat = new Map<number, MosqueJummah[]>();
-  for (const row of data) {
-    const list = byJamat.get(row.jamat_id) ?? [];
-    list.push(toJummah(row));
-    byJamat.set(row.jamat_id, list);
-  }
-  return byJamat;
+function currentJamat(row: MosqueEmbedRow): MosqueJamat | null {
+  const period = [...row.mosque_jamatperiode].sort((a, b) =>
+    (b.start_date ?? '').localeCompare(a.start_date ?? ''),
+  )[0];
+  return period ? toJamat(period, sortedJummah(period.mosque_jummah)) : null;
 }
 
-async function fetchCurrentJamatPeriods(mosqueIds: string[]): Promise<Map<string, MosqueJamat>> {
-  if (mosqueIds.length === 0) return new Map();
+function toEmbeddedMosque(row: MosqueEmbedRow): Mosque {
+  const jamat = currentJamat(row);
+  return toMosque(row, row.location_postnumber ?? undefined, jamat, jamat?.jummah ?? []);
+}
+
+export async function fetchMosques(): Promise<Mosque[]> {
   const today = todayIso();
   const { data, error } = await supabase
-    .from('mosque_jamatperiode')
-    .select(JAMAT_COLUMNS)
-    .in('mosque_id', mosqueIds)
-    .lte('start_date', today)
-    .gte('end_date', today)
-    .order('start_date', { ascending: false });
+    .from('mosque_t')
+    .select(MOSQUE_EMBED_COLUMNS)
+    .lte('mosque_jamatperiode.start_date', today)
+    .gte('mosque_jamatperiode.end_date', today)
+    .order('reg_navn');
   if (error) throw error;
 
-  const jummahByJamat = await fetchJummahByJamatIds(data.map((row) => row.id));
-  const byMosque = new Map<string, MosqueJamat>();
-  for (const row of data) {
-    if (!row.mosque_id || byMosque.has(row.mosque_id)) continue;
-    byMosque.set(row.mosque_id, toJamat(row, jummahByJamat.get(row.id) ?? []));
-  }
-  return byMosque;
-}
-
-export async function fetchMosquesNearby(_lat: number, _lon: number): Promise<Mosque[]> {
-  const { data, error } = await supabase.from('mosque_t').select(MOSQUE_COLUMNS).order('reg_navn');
-  if (error) throw error;
-
-  const [posts, jamatByMosque] = await Promise.all([
-    fetchPosts(data.map((row) => row.post_no ?? '')),
-    fetchCurrentJamatPeriods(data.map((row) => row.organisasjonsnummer)),
-  ]);
-
-  return data.map((row) => {
-    const jamat = jamatByMosque.get(row.organisasjonsnummer) ?? null;
-    return toMosque(
-      row,
-      row.post_no ? posts.get(row.post_no) : undefined,
-      jamat,
-      jamat?.jummah ?? [],
-    );
-  });
+  return (data as unknown as MosqueEmbedRow[]).map(toEmbeddedMosque);
 }
 
 export async function fetchMosque(orgNr: string): Promise<Mosque> {
+  const today = todayIso();
   const { data, error } = await supabase
     .from('mosque_t')
-    .select(MOSQUE_COLUMNS)
+    .select(MOSQUE_EMBED_COLUMNS)
     .eq('organisasjonsnummer', orgNr)
+    .lte('mosque_jamatperiode.start_date', today)
+    .gte('mosque_jamatperiode.end_date', today)
     .single();
   if (error) throw error;
 
-  const [posts, jamatByMosque] = await Promise.all([
-    fetchPosts(data.post_no ? [data.post_no] : []),
-    fetchCurrentJamatPeriods([orgNr]),
-  ]);
-
-  const jamat = jamatByMosque.get(orgNr) ?? null;
-  return toMosque(
-    data,
-    data.post_no ? posts.get(data.post_no) : undefined,
-    jamat,
-    jamat?.jummah ?? [],
-  );
+  return toEmbeddedMosque(data as unknown as MosqueEmbedRow);
 }
 
 export async function fetchMosqueJamatPeriods(orgNr: string): Promise<MosqueJamat[]> {
   const { data, error } = await supabase
     .from('mosque_jamatperiode')
-    .select(JAMAT_COLUMNS)
+    .select(`${JAMAT_COLUMNS}, mosque_jummah(id, mosque_id, jummah)`)
     .eq('mosque_id', orgNr)
     .order('start_date');
   if (error) throw error;
 
-  const jummahByJamat = await fetchJummahByJamatIds(data.map((row) => row.id));
-  return data.map((row) => toJamat(row, jummahByJamat.get(row.id) ?? []));
+  return (data as JamatEmbedRow[]).map((row) => toJamat(row, sortedJummah(row.mosque_jummah)));
 }
 
-export async function fetchHijriMonth(year: number, month: number): Promise<HijriDay[]> {
-  const { start, end } = monthRange(year, month);
-  const [meta, days] = await Promise.all([
-    getHijriMeta(),
-    supabase
-      .from('hijri_dates')
-      .select('gregorian_date, hijri_date_day, hijri_date_month, hijri_date_year, special_date_no')
-      .gte('gregorian_date', start)
-      .lte('gregorian_date', end)
-      .order('gregorian_date'),
-  ]);
+export async function fetchHijriYear(year: number): Promise<HijriDay[]> {
+  const days = await supabase
+    .from('hijri_dates')
+    .select('gregorian_date, hijri_date_day, hijri_date_month, hijri_date_year, special_date_no')
+    .gte('gregorian_date', `${year}-01-01`)
+    .lte('gregorian_date', `${year}-12-31`)
+    .order('gregorian_date');
   if (days.error) throw days.error;
 
-  return days.data.map((row) => toHijriDay(row, meta));
-}
-
-export async function fetchSpecialDates(year: number): Promise<HijriDay[]> {
-  const [meta, days] = await Promise.all([
-    getHijriMeta(),
-    supabase
-      .from('hijri_dates')
-      .select('gregorian_date, hijri_date_day, hijri_date_month, hijri_date_year, special_date_no')
-      .gte('gregorian_date', `${year}-01-01`)
-      .lte('gregorian_date', `${year}-12-31`)
-      .order('gregorian_date'),
-  ]);
-  if (days.error) throw days.error;
-
-  return days.data
-    .map((row) => toHijriDay(row, meta))
-    .filter((day) => day.special_date_name != null);
+  return days.data.map((row) => toHijriDay(row, HIJRI_META));
 }

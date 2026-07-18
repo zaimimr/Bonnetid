@@ -135,21 +135,39 @@ function resolveJamatTime(
   return fixed ?? undefined;
 }
 
+const FRIDAY = 5;
+
+function isFriday(isoDate: string): boolean {
+  return new Date(`${isoDate}T12:00:00`).getDay() === FRIDAY;
+}
+
 export function jamatTimesForDate(
   jamat: JamatSource | null | undefined,
   isoDate: string,
   adhan: AdhanTimes = {},
+  jummah: { jummah: string }[] = [],
 ): JamatTimes {
-  if (!jamat) return {};
-  if (jamat.start_date && isoDate < jamat.start_date) return {};
-  if (jamat.end_date && isoDate > jamat.end_date) return {};
-  return {
-    fajr: resolveJamatTime(jamat.fajr, jamat.fajr_offset, adhan.fajr),
-    duhr: resolveJamatTime(jamat.duhr, jamat.duhr_offset, adhan.duhr),
-    asr: resolveJamatTime(jamat.asr, jamat.asr_offset, adhan.asr),
-    maghrib: resolveJamatTime(jamat.maghrib, jamat.maghrib_offset, adhan.maghrib),
-    isha: resolveJamatTime(jamat.isha, jamat.isha_offset, adhan.isha),
-  };
+  const withinPeriod =
+    jamat != null &&
+    (!jamat.start_date || isoDate >= jamat.start_date) &&
+    (!jamat.end_date || isoDate <= jamat.end_date);
+
+  const times: JamatTimes = withinPeriod
+    ? {
+        fajr: resolveJamatTime(jamat.fajr, jamat.fajr_offset, adhan.fajr),
+        duhr: resolveJamatTime(jamat.duhr, jamat.duhr_offset, adhan.duhr),
+        asr: resolveJamatTime(jamat.asr, jamat.asr_offset, adhan.asr),
+        maghrib: resolveJamatTime(jamat.maghrib, jamat.maghrib_offset, adhan.maghrib),
+        isha: resolveJamatTime(jamat.isha, jamat.isha_offset, adhan.isha),
+      }
+    : {};
+
+  const firstJummah = jummah[0]?.jummah;
+  if (firstJummah && isFriday(isoDate)) {
+    times.duhr = firstJummah;
+  }
+
+  return times;
 }
 
 export type NextPrayerResult = {
