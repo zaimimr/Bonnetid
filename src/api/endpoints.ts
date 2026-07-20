@@ -62,8 +62,10 @@ function toHijriDay(row: HijriDateRow, meta: HijriMeta): HijriDay {
 
 function toLocationAsrMethod(value: string | number | null): ApiLocation['asr_method'] {
   const parsed = value == null ? null : Number(value);
+  if (parsed === 0) return 'IRN';
   if (parsed === 1) return 'SHADOW_1X';
   if (parsed === 2) return 'SHADOW_2X';
+  if (parsed === 3) return 'WUSTA';
   return null;
 }
 
@@ -98,7 +100,7 @@ export async function fetchPrayerTimes(
   const times = await supabase
     .from('prayertime')
     .select(
-      'date, location_iso, kommune, fajr, fajr_endtime, shuruq_sunrise, istiwa_noon, duhr, asr, shadow_1x, shadow_2x, asr_endtime, ghrub_sunset, maghrib, isha, muntasafallayl_midnight',
+      'date, location_iso, kommune, fajr, fajr_endtime, shuruq_sunrise, istiwa_noon, duhr, asr, shadow_1x, shadow_2x, wusta_noon_sunset, asr_endtime, ghrub_sunset, maghrib, isha, muntasafallayl_midnight',
     )
     .eq('location_iso', locationIso)
     .gte('date', start)
@@ -129,6 +131,7 @@ export async function fetchPrayerTimes(
       asr: hhmm(row.asr),
       shadow_1x: hhmm(row.shadow_1x),
       shadow_2x: hhmm(row.shadow_2x),
+      wusta_noon_sunset: hhmm(row.wusta_noon_sunset),
       asr_endtime: hhmm(row.asr_endtime),
       ghrub_sunset: hhmm(row.ghrub_sunset),
       maghrib: hhmm(row.maghrib),
@@ -190,10 +193,11 @@ function toHomepage(value: string | null): string | null {
 }
 
 function toAsrMethod(value: number | null): Mosque['asr_method'] {
+  if (value === 0) return 'IRN';
   if (value === 1) return 'SHADOW_1X';
   if (value === 2) return 'SHADOW_2X';
-  if (value === 0) return 'NONE';
-  return 'MIXED';
+  if (value === 3) return 'WUSTA';
+  return 'NONE';
 }
 
 function toJummah(row: { id: number; mosque_id: string | null; jummah: string }): MosqueJummah {

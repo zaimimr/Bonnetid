@@ -16,10 +16,10 @@ export type SavedMosque = {
   name: string;
 };
 
-export type AsrMethodPreference = 'shadow_1x' | 'shadow_2x';
+export type AsrMethodPreference = 'irn' | 'shadow_1x' | 'shadow_2x' | 'wusta';
 type ThemePreference = 'system' | 'light' | 'dark';
 
-export type NotifiablePrayer = Exclude<PrayerName, 'shuruq'>;
+export type NotifiablePrayer = Exclude<PrayerName, 'fajr_endtime'>;
 
 export const NOTIFIABLE_PRAYERS: NotifiablePrayer[] = ['fajr', 'duhr', 'asr', 'maghrib', 'isha'];
 
@@ -39,6 +39,10 @@ type SettingsState = {
   notificationsEnabled: boolean;
   notificationSound: NotificationSoundKey;
   notificationPrayers: Record<NotifiablePrayer, boolean>;
+  launchCount: number;
+  reviewRequested: boolean;
+  registerLaunch: () => void;
+  markReviewRequested: () => void;
   setLocation: (location: SavedLocation) => void;
   setMosque: (mosque: SavedMosque | null) => void;
   setAsrMethod: (method: AsrMethodPreference) => void;
@@ -65,6 +69,10 @@ export const useSettings = create<SettingsState>()(
       notificationsEnabled: false,
       notificationSound: 'default',
       notificationPrayers: ALL_PRAYERS_ENABLED,
+      launchCount: 0,
+      reviewRequested: false,
+      registerLaunch: () => set((state) => ({ launchCount: state.launchCount + 1 })),
+      markReviewRequested: () => set({ reviewRequested: true }),
       setLocation: (location) =>
         set((state) =>
           state.location?.iso === location.iso ? { location } : { location, asrMethod: null },

@@ -22,9 +22,13 @@ export default function QiblaScreen() {
   const kaabaDistance = distanceKm(coords.lat, coords.lon, KAABA.lat, KAABA.lon);
 
   return (
-    <Screen edges={[]}>
+    <Screen>
       <View style={{ marginTop: spacing.lg, gap: spacing.lg, flex: 1 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+        <View
+          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <AppText size="xxl" weight="bold" heading>
+            Qibla
+          </AppText>
           <AppText size="sm" tone="textMuted">
             {formatDistance(kaabaDistance)} til Mekka
           </AppText>
@@ -50,7 +54,7 @@ export default function QiblaScreen() {
           </View>
         )}
 
-        {view === 'map' && <QiblaMap lat={coords.lat} lon={coords.lon} />}
+        {view === 'map' && <QiblaMap lat={coords.lat} lon={coords.lon} heading={heading} />}
 
         {view === '3d' && <QiblaAr qiblaBearing={bearing} />}
       </View>

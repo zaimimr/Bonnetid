@@ -4,6 +4,7 @@ import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import type { PrayerDay } from '@/api/types';
 import type { AsrMethodPreference } from '@/store/settings';
+import { asrTimeFor } from '@/lib/prayerSchedule';
 import { parseDayKey, todayKey } from '@/lib/time';
 
 const COLUMNS = ['Fajr', 'Sol', 'Duhr', 'Asr', 'Maghrib', 'Isha'];
@@ -24,7 +25,7 @@ export function MonthPrayerTable({ days, asrMethod, onDayPress }: MonthPrayerTab
     day.fajr,
     day.shuruq_sunrise,
     day.duhr,
-    (asrMethod === 'shadow_2x' ? day.shadow_2x : day.shadow_1x) ?? day.asr,
+    asrTimeFor(day, asrMethod),
     day.maghrib,
     day.isha,
   ];

@@ -1,9 +1,13 @@
 import { useLocations, useMosque } from '@/api/queries';
 import { useActiveLocation, useSettings, type AsrMethodPreference } from '@/store/settings';
 
-function toPreference(method: 'SHADOW_1X' | 'SHADOW_2X' | string | null | undefined): AsrMethodPreference | null {
+export function toPreference(
+  method: 'IRN' | 'SHADOW_1X' | 'SHADOW_2X' | 'WUSTA' | 'NONE' | string | null | undefined,
+): AsrMethodPreference | null {
+  if (method === 'IRN') return 'irn';
   if (method === 'SHADOW_1X') return 'shadow_1x';
   if (method === 'SHADOW_2X') return 'shadow_2x';
+  if (method === 'WUSTA') return 'wusta';
   return null;
 }
 

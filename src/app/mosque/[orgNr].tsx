@@ -3,7 +3,7 @@ import { ActionSheetIOS, Linking, Platform, Pressable, View } from 'react-native
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useMosque, usePrayerTimes } from '@/api/queries';
-import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
+import { toPreference, useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { useIsEidPeriod } from '@/hooks/useIsEidPeriod';
 import { useRefresh } from '@/hooks/useRefresh';
 import type { Mosque } from '@/api/types';
@@ -17,6 +17,14 @@ import {
   PRAYER_LABELS,
 } from '@/lib/prayerSchedule';
 import { isoDateKey, todayKey } from '@/lib/time';
+
+const ASR_METHOD_LABELS: Record<Mosque['asr_method'], string | null> = {
+  IRN: 'Asr beregnes med IRN standard',
+  SHADOW_1X: 'Asr beregnes med 1x skygge',
+  SHADOW_2X: 'Asr beregnes med 2x skygge (Hanafi)',
+  WUSTA: 'Asr beregnes med Wusta',
+  NONE: null,
+};
 
 export default function MosqueDetailScreen() {
   const { orgNr } = useLocalSearchParams<{ orgNr: string }>();
@@ -59,12 +67,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
   );
   const day = month.data?.find((row) => row.date === todayKey(today));
   const fallbackAsr = useEffectiveAsrMethod();
-  const asrPreference =
-    mosque.asr_method === 'SHADOW_2X'
-      ? 'shadow_2x'
-      : mosque.asr_method === 'SHADOW_1X'
-        ? 'shadow_1x'
-        : fallbackAsr;
+  const asrPreference = toPreference(mosque.asr_method) ?? fallbackAsr;
   const adhanTimes = useMemo(
     () => adhanTimesFromSchedule(day ? buildDaySchedule(day, today, asrPreference) : []),
     [day, today, asrPreference],
@@ -139,13 +142,11 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
               {mosque.info}
             </AppText>
           ) : null}
-          {(mosque.asr_method === 'SHADOW_1X' || mosque.asr_method === 'SHADOW_2X') && (
+          {ASR_METHOD_LABELS[mosque.asr_method] && (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
               <Ionicons name="time-outline" size={16} color={theme.colors.textMuted} />
               <AppText size="sm" tone="textSecondary">
-                {mosque.asr_method === 'SHADOW_2X'
-                  ? 'Asr beregnes med 2x skygge (Hanafi)'
-                  : 'Asr beregnes med 1x skygge'}
+                {ASR_METHOD_LABELS[mosque.asr_method]}
               </AppText>
             </View>
           )}

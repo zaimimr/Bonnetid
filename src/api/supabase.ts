@@ -1,9 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL =
-  process.env.EXPO_PUBLIC_SUPABASE_URL ?? 'https://gsutnlmtvsbwvaslcgfa.supabase.co';
-const SUPABASE_KEY =
-  process.env.EXPO_PUBLIC_SUPABASE_KEY ?? 'sb_publishable_ve8JQmDpZJ6lXShlHxaW9A_120wOhOg';
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const SUPABASE_KEY = process.env.EXPO_PUBLIC_SUPABASE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  throw new Error('Missing EXPO_PUBLIC_SUPABASE_URL or EXPO_PUBLIC_SUPABASE_KEY');
+}
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {

@@ -26,12 +26,6 @@ const FEATURES: Feature[] = [
     description: 'Finn moskeer i nærheten, med kart og jamat-tider',
   },
   {
-    href: '/qibla',
-    icon: 'compass-outline',
-    title: 'Qibla',
-    description: 'Kompass og kart som viser retningen mot Mekka',
-  },
-  {
     href: '/settings',
     icon: 'settings-outline',
     title: 'Innstillinger',
@@ -76,6 +70,31 @@ export default function MoreScreen() {
             </View>
           </Card>
         ))}
+
+        <Card rounded="xl" onPress={() => router.push('/irn')}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
+            <View
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: radius.md,
+                backgroundColor: theme.colors.primarySoft,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <AppText size="sm" weight="bold" tone="primary">
+                IRN
+              </AppText>
+            </View>
+            <View style={{ flex: 1, gap: spacing.xxs }}>
+              <AppText weight="semibold">Islamsk Råd Norge</AppText>
+              <AppText size="sm" tone="textMuted">
+                Om samarbeidet og prosjektet bak appen
+              </AppText>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
+          </View>
+        </Card>
       </View>
     </Screen>
   );

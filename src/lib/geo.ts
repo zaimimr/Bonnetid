@@ -93,6 +93,45 @@ export function greatCirclePoints(
   return points;
 }
 
+export function destinationPoint(
+  lat: number,
+  lon: number,
+  bearingDegrees: number,
+  distanceKm: number,
+): { lat: number; lon: number } {
+  const earthRadiusKm = 6371;
+  const angular = distanceKm / earthRadiusKm;
+  const bearing = toRadians(bearingDegrees);
+  const phi1 = toRadians(lat);
+  const lambda1 = toRadians(lon);
+  const phi2 = Math.asin(
+    Math.sin(phi1) * Math.cos(angular) + Math.cos(phi1) * Math.sin(angular) * Math.cos(bearing),
+  );
+  const lambda2 =
+    lambda1 +
+    Math.atan2(
+      Math.sin(bearing) * Math.sin(angular) * Math.cos(phi1),
+      Math.cos(angular) - Math.sin(phi1) * Math.sin(phi2),
+    );
+  return { lat: toDegrees(phi2), lon: ((toDegrees(lambda2) + 540) % 360) - 180 };
+}
+
+export function facingConePoints(
+  lat: number,
+  lon: number,
+  headingDegrees: number,
+  distanceKm = 0.6,
+  halfAngleDegrees = 22,
+  segments = 6,
+): { lat: number; lon: number }[] {
+  const points = [{ lat, lon }];
+  for (let i = 0; i <= segments; i += 1) {
+    const bearing = headingDegrees - halfAngleDegrees + (2 * halfAngleDegrees * i) / segments;
+    points.push(destinationPoint(lat, lon, bearing, distanceKm));
+  }
+  return points;
+}
+
 export function formatDistance(km: number): string {
   if (km < 1) return `${Math.round(km * 1000)} m`;
   if (km < 10) return `${km.toFixed(1)} km`;

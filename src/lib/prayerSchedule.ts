@@ -2,7 +2,7 @@ import type { PrayerDay } from '@/api/types';
 import type { AsrMethodPreference } from '@/store/settings';
 import { addMinutesToTime, parseTimeToDate } from './time';
 
-export type PrayerName = 'fajr' | 'shuruq' | 'duhr' | 'asr' | 'maghrib' | 'isha';
+export type PrayerName = 'fajr' | 'fajr_endtime' | 'duhr' | 'asr' | 'maghrib' | 'isha';
 
 export type PrayerWindowEnd = {
   label: string;
@@ -20,15 +20,22 @@ export type PrayerEntry = {
 
 export const PRAYER_LABELS: Record<PrayerName, string> = {
   fajr: 'Fajr',
-  shuruq: 'Soloppgang',
+  fajr_endtime: 'Soloppgang',
   duhr: 'Duhr',
   asr: 'Asr',
   maghrib: 'Maghrib',
   isha: 'Isha',
 };
 
-function asrTimeFor(day: PrayerDay, method: AsrMethodPreference): string | null {
-  const preferred = method === 'shadow_2x' ? day.shadow_2x : day.shadow_1x;
+export function asrTimeFor(day: PrayerDay, method: AsrMethodPreference): string | null {
+  const preferred =
+    method === 'shadow_1x'
+      ? day.shadow_1x
+      : method === 'shadow_2x'
+        ? day.shadow_2x
+        : method === 'wusta'
+          ? day.wusta_noon_sunset
+          : day.asr;
   return preferred ?? day.asr;
 }
 
@@ -39,7 +46,7 @@ export function buildDaySchedule(
 ): PrayerEntry[] {
   const source: { name: PrayerName; time: string | null; isPrayer: boolean }[] = [
     { name: 'fajr', time: day.fajr, isPrayer: true },
-    { name: 'shuruq', time: day.shuruq_sunrise, isPrayer: false },
+    { name: 'fajr_endtime', time: day.fajr_endtime, isPrayer: false },
     { name: 'duhr', time: day.duhr, isPrayer: true },
     { name: 'asr', time: asrTimeFor(day, asrMethod), isPrayer: true },
     { name: 'maghrib', time: day.maghrib, isPrayer: true },
@@ -67,7 +74,7 @@ export function buildDaySchedule(
     if (entry.name === 'fajr') {
       const sunrise = day.shuruq_sunrise ?? day.fajr_endtime;
       if (sunrise) {
-        entry.end = { label: PRAYER_LABELS.shuruq, date: parseTimeToDate(sunrise, baseDate) };
+        entry.end = { label: PRAYER_LABELS.fajr_endtime, date: parseTimeToDate(sunrise, baseDate) };
         continue;
       }
     }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Linking, Pressable, Switch, View } from 'react-native';
+import { Linking, Platform, Pressable, Switch, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
@@ -11,6 +11,7 @@ import { AppText, Card, Divider, ListRow, Screen, SectionHeader } from '@/compon
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import { notificationsSupported, requestNotificationPermission } from '@/lib/notifications';
+import { openStoreReview } from '@/lib/review';
 import { getNotificationSound } from '@/lib/notificationSounds';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
 import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
@@ -20,6 +21,8 @@ import {
   useSettings,
   type AsrMethodPreference,
 } from '@/store/settings';
+
+const storeName = Platform.OS === 'ios' ? 'App Store' : 'Google Play';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -92,27 +95,11 @@ export default function SettingsScreen() {
           style={{ paddingHorizontal: spacing.md }}
         />
         <Divider />
-        <ListRow
-          title="Asr-metode"
-          subtitle={
-            asrOverride && mosque
-              ? `Styres av ${mosque.name}`
-              : 'Hanafi bruker 2x skygge, øvrige skoler 1x skygge'
-          }
-          leading={<Ionicons name="partly-sunny-outline" size={20} color={theme.colors.primary} />}
-          style={{ paddingHorizontal: spacing.md }}
+        <AsrMethodDropdown
+          value={asrOverride ?? asrMethod ?? asrLocationDefault ?? 'shadow_1x'}
+          onChange={setAsrMethod}
+          overrideNote={asrOverride && mosque ? `Styres av ${mosque.name}` : null}
         />
-        <View style={{ paddingHorizontal: spacing.md, paddingBottom: spacing.sm }}>
-          <SegmentedRow<AsrMethodPreference>
-            value={asrOverride ?? asrMethod ?? asrLocationDefault ?? 'shadow_1x'}
-            onChange={setAsrMethod}
-            disabled={asrOverride != null}
-            options={[
-              { value: 'shadow_1x', label: '1x skygge' },
-              { value: 'shadow_2x', label: '2x skygge' },
-            ]}
-          />
-        </View>
       </Card>
 
       <SectionHeader title="Varsler" />
@@ -196,6 +183,18 @@ export default function SettingsScreen() {
         </View>
       </Card>
 
+      <SectionHeader title="Om appen" />
+      <Card padding="sm" rounded="xl">
+        <ListRow
+          title="Vurder Bønnetid"
+          subtitle={`Gi appen stjerner og tilbakemelding i ${storeName}`}
+          leading={<Ionicons name="star-outline" size={20} color={theme.colors.primary} />}
+          trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
+          onPress={() => openStoreReview()}
+          style={{ paddingHorizontal: spacing.md }}
+        />
+      </Card>
+
       <View style={{ alignItems: 'center', gap: spacing.xs, marginTop: spacing.xl }}>
         <Image
           source={require('../../assets/images/logo.png')}
@@ -210,7 +209,92 @@ export default function SettingsScreen() {
           Laget av Zaim Imran
         </AppText>
       </View>
+
+      <View style={{ alignItems: 'center', gap: spacing.sm, marginTop: spacing.xl }}>
+        <Image
+          source={
+            theme.scheme === 'dark'
+              ? require('../../assets/images/irn-logo-dark.png')
+              : require('../../assets/images/irn-logo.png')
+          }
+          style={{ width: 44, height: 49 }}
+          contentFit="contain"
+        />
+        <AppText size="xs" tone="textMuted" align="center">
+          Data og støtte fra Islamsk Råd Norge
+        </AppText>
+      </View>
     </Screen>
+  );
+}
+
+const ASR_METHOD_OPTIONS: { value: AsrMethodPreference; label: string; description: string }[] = [
+  { value: 'irn', label: 'IRN standard', description: 'Standardmetoden fra IRN' },
+  { value: 'shadow_1x', label: '1x skygge', description: 'Øvrige lovskoler' },
+  { value: 'shadow_2x', label: '2x skygge', description: 'Hanafi' },
+  { value: 'wusta', label: 'Wusta', description: 'Midtpunkt mellom soltider og solnedgang' },
+];
+
+function AsrMethodDropdown({
+  value,
+  onChange,
+  overrideNote,
+}: {
+  value: AsrMethodPreference;
+  onChange: (value: AsrMethodPreference) => void;
+  overrideNote: string | null;
+}) {
+  const theme = useTheme();
+  const [open, setOpen] = useState(false);
+  const disabled = overrideNote != null;
+  const current = ASR_METHOD_OPTIONS.find((option) => option.value === value);
+  const expanded = open && !disabled;
+
+  return (
+    <View>
+      <ListRow
+        title="Asr-metode"
+        subtitle={overrideNote ?? undefined}
+        leading={<Ionicons name="partly-sunny-outline" size={20} color={theme.colors.primary} />}
+        trailing={
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+            <AppText size="sm" tone="textMuted">
+              {current?.label}
+            </AppText>
+            <Ionicons
+              name={expanded ? 'chevron-up' : 'chevron-down'}
+              size={18}
+              color={theme.colors.textMuted}
+            />
+          </View>
+        }
+        onPress={disabled ? undefined : () => setOpen((prev) => !prev)}
+        style={{ paddingHorizontal: spacing.md }}
+      />
+      {expanded &&
+        ASR_METHOD_OPTIONS.map((option) => {
+          const isActive = option.value === value;
+          return (
+            <View key={option.value}>
+              <Divider />
+              <ListRow
+                title={option.label}
+                subtitle={option.description}
+                trailing={
+                  isActive ? (
+                    <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+                  ) : undefined
+                }
+                onPress={() => {
+                  onChange(option.value);
+                  setOpen(false);
+                }}
+                style={{ paddingHorizontal: spacing.md }}
+              />
+            </View>
+          );
+        })}
+    </View>
   );
 }
 

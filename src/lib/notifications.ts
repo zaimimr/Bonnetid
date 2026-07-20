@@ -77,8 +77,15 @@ export async function schedulePrayerNotifications(
   const channelId = await ensureAndroidChannel(Notifications, soundKey);
 
   const now = Date.now();
+  const seen = new Set<string>();
   const upcoming = entries
     .filter((entry) => entry.isPrayer && entry.date.getTime() > now)
+    .filter((entry) => {
+      const key = `${entry.name}-${entry.date.getTime()}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
     .sort((a, b) => a.date.getTime() - b.date.getTime())
     .slice(0, MAX_SCHEDULED);
 

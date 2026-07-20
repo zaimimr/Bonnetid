@@ -10,7 +10,7 @@ export type { JamatTimes };
 
 const PRAYER_ICONS: Record<PrayerName, keyof typeof Ionicons.glyphMap> = {
   fajr: 'cloudy-night-outline',
-  shuruq: 'sunny-outline',
+  fajr_endtime: 'sunny-outline',
   duhr: 'sunny',
   asr: 'partly-sunny-outline',
   maghrib: 'moon-outline',
@@ -93,7 +93,7 @@ export function PrayerTimesCard({
               borderBottomWidth: index === schedule.length - 1 || isHighlighted ? 0 : 1,
               borderBottomColor: theme.colors.border,
             }}>
-            {entry.name === 'shuruq' ? (
+            {entry.name === 'fajr_endtime' ? (
               <Feather name="sunrise" size={20} color={theme.colors.textMuted} />
             ) : (
               <Ionicons
@@ -103,7 +103,7 @@ export function PrayerTimesCard({
               />
             )}
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-              {entry.name !== 'shuruq' && (
+              {entry.name !== 'fajr_endtime' && (
                 <AppText
                   weight={isHighlighted ? 'bold' : entry.isPrayer ? 'medium' : 'regular'}
                   tone={entry.isPrayer ? 'textPrimary' : 'textMuted'}>

@@ -9,6 +9,7 @@ import { ThemeProvider, useTheme } from '@/theme';
 import { configureNotificationHandler } from '@/lib/notifications';
 import { useNotificationScheduler } from '@/hooks/useNotificationScheduler';
 import { useAutoLocation } from '@/hooks/useAutoLocation';
+import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -31,7 +32,7 @@ const persister = createAsyncStoragePersister({
 const persistOptions = {
   persister,
   maxAge: 60 * DAY,
-  buster: 'v7',
+  buster: 'v8',
 };
 
 configureNotificationHandler();
@@ -40,6 +41,7 @@ function RootNavigator() {
   const theme = useTheme();
   useAutoLocation();
   useNotificationScheduler();
+  useReviewPrompt();
 
   return (
     <>
@@ -73,10 +75,10 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
-          name="qibla"
+          name="settings"
           options={{
             headerShown: true,
-            title: 'Qibla',
+            title: 'Innstillinger',
             headerBackTitle: 'Tilbake',
             headerStyle: { backgroundColor: theme.colors.surface },
             headerTitleStyle: { color: theme.colors.textPrimary },
@@ -84,10 +86,10 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
-          name="settings"
+          name="irn"
           options={{
             headerShown: true,
-            title: 'Innstillinger',
+            title: 'Islamsk Råd Norge',
             headerBackTitle: 'Tilbake',
             headerStyle: { backgroundColor: theme.colors.surface },
             headerTitleStyle: { color: theme.colors.textPrimary },

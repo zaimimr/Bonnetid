@@ -17,9 +17,9 @@ export function useNotificationScheduler() {
   const location = useActiveLocation();
 
   const today = new Date();
-  const nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
+  const nextMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
   const currentMonth = usePrayerTimes(location.iso, today.getFullYear(), today.getMonth() + 1);
-  const nextMonth = usePrayerTimes(location.iso, nextWeek.getFullYear(), nextWeek.getMonth() + 1);
+  const nextMonth = usePrayerTimes(location.iso, nextMonthDate.getFullYear(), nextMonthDate.getMonth() + 1);
 
   const lastSyncKey = useRef('');
 
@@ -48,7 +48,7 @@ export function useNotificationScheduler() {
     const days = [...(currentMonth.data ?? []), ...(nextMonth.data ?? [])];
     const entries: PrayerEntry[] = days
       .flatMap((day) => buildDaySchedule(day, parseDayKey(day.date), asrMethod))
-      .filter((entry) => entry.name === 'shuruq' || notificationPrayers[entry.name]);
+      .filter((entry) => entry.name === 'fajr_endtime' || notificationPrayers[entry.name]);
 
     schedulePrayerNotifications(entries, location.name, sound).catch(() => {});
   }, [

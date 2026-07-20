@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
+  FadeIn,
+  FadeOut,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -15,15 +17,23 @@ import { AppText, Button, EmptyState } from '@/components/ui';
 import { useArPose } from '@/hooks/useArPose';
 import { buildArScene, type ArScene, type Viewport } from '@/lib/arProjection';
 import { isQiblaAligned } from '@/lib/geo';
-import { useTheme } from '@/theme';
-import { radius, spacing } from '@/theme/tokens';
+import { palette, radius, spacing } from '@/theme/tokens';
+
+const AR_INK = palette.neutral0;
+const AR_SCRIM = 'rgba(0, 0, 0, 0.55)';
+const AR_GUIDE = palette.gold400;
+const AR_ALIGNED = palette.emerald400;
+const AR_TEXT_SHADOW = {
+  textShadowColor: 'rgba(0, 0, 0, 0.75)',
+  textShadowOffset: { width: 0, height: 1 },
+  textShadowRadius: 3,
+} as const;
 
 export type QiblaArProps = {
   qiblaBearing: number;
 };
 
 export function QiblaAr({ qiblaBearing }: QiblaArProps) {
-  const theme = useTheme();
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [viewport, setViewport] = useState<Viewport | null>(null);
   const { pose, headingAccuracy, permissionDenied, motionUnavailable } = useArPose(
@@ -32,6 +42,8 @@ export function QiblaAr({ qiblaBearing }: QiblaArProps) {
 
   const aligned = pose ? isQiblaAligned(pose.heading, qiblaBearing) : false;
   const wasAligned = useRef(false);
+  const granted = cameraPermission?.granted ?? false;
+  const [introDone, setIntroDone] = useState(false);
 
   useEffect(() => {
     if (aligned && !wasAligned.current) {
@@ -39,6 +51,12 @@ export function QiblaAr({ qiblaBearing }: QiblaArProps) {
     }
     wasAligned.current = aligned;
   }, [aligned]);
+
+  useEffect(() => {
+    if (!granted) return;
+    const timer = setTimeout(() => setIntroDone(true), 3000);
+    return () => clearTimeout(timer);
+  }, [granted]);
 
   if (!cameraPermission) {
     return null;
@@ -52,7 +70,11 @@ export function QiblaAr({ qiblaBearing }: QiblaArProps) {
           icon="camera-outline"
         />
         {cameraPermission.canAskAgain && (
-          <Button label="Gi kameratilgang" onPress={() => requestCameraPermission()} />
+          <Button
+            label="Gi kameratilgang"
+            onPress={() => requestCameraPermission()}
+            style={{ alignSelf: 'center' }}
+          />
         )}
       </View>
     );
@@ -93,19 +115,22 @@ export function QiblaAr({ qiblaBearing }: QiblaArProps) {
           viewport={viewport}
           aligned={aligned}
           headingAccuracy={headingAccuracy}
+          hintsVisible={introDone}
         />
       )}
+
+      {!introDone && <IntroCoach />}
 
       {!scene && (
         <View style={[StyleSheet.absoluteFill, { justifyContent: 'center', alignItems: 'center' }]}>
           <View
             style={{
-              backgroundColor: theme.colors.overlay,
+              backgroundColor: AR_SCRIM,
               paddingHorizontal: spacing.lg,
               paddingVertical: spacing.md,
               borderRadius: radius.full,
             }}>
-            <AppText size="sm" color={theme.colors.textInverse}>
+            <AppText size="sm" color={AR_INK}>
               Venter på kompass og sensorer …
             </AppText>
           </View>
@@ -120,14 +145,15 @@ function ArOverlay({
   viewport,
   aligned,
   headingAccuracy,
+  hintsVisible,
 }: {
   scene: ArScene;
   viewport: Viewport;
   aligned: boolean;
   headingAccuracy: number | null;
+  hintsVisible: boolean;
 }) {
-  const theme = useTheme();
-  const guideColor = aligned ? theme.colors.success : theme.colors.accent;
+  const guideColor = aligned ? AR_ALIGNED : AR_GUIDE;
 
   const rotationHint =
     scene.pitchHint === 'raise'
@@ -222,7 +248,7 @@ function ArOverlay({
             width: 120,
             alignItems: 'center',
           }}>
-          <AppText size="xs" weight="semibold" color={theme.colors.textInverse}>
+          <AppText size="xs" weight="semibold" color={AR_INK} style={AR_TEXT_SHADOW}>
             Bønneteppe
           </AppText>
         </View>
@@ -241,7 +267,7 @@ function ArOverlay({
         }}>
         <View
           style={{
-            backgroundColor: theme.colors.overlay,
+            backgroundColor: AR_SCRIM,
             paddingHorizontal: spacing.lg,
             paddingVertical: spacing.md,
             borderRadius: radius.full,
@@ -249,11 +275,11 @@ function ArOverlay({
             alignItems: 'center',
             gap: spacing.sm,
           }}>
-          {aligned && <Ionicons name="checkmark-circle" size={18} color={theme.colors.success} />}
+          {aligned && <Ionicons name="checkmark-circle" size={18} color={AR_ALIGNED} />}
           <AppText
             size="sm"
             weight="semibold"
-            color={aligned ? theme.colors.success : theme.colors.textInverse}>
+            color={aligned ? AR_ALIGNED : AR_INK}>
             {aligned ? 'Du peker mot Qibla' : (rotationHint ?? 'Nesten der …')}
           </AppText>
         </View>
@@ -261,23 +287,187 @@ function ArOverlay({
         {compassPoor && (
           <View
             style={{
-              backgroundColor: theme.colors.overlay,
+              backgroundColor: AR_SCRIM,
               paddingHorizontal: spacing.lg,
               paddingVertical: spacing.sm,
               borderRadius: radius.full,
             }}>
-            <AppText size="xs" color={theme.colors.textInverse}>
+            <AppText size="xs" color={AR_INK}>
               Unøyaktig kompass – beveg telefonen i et åttetall
             </AppText>
           </View>
         )}
+      </View>
+
+      {hintsVisible && !aligned && (
+        scene.pitchHint === 'raise' ? <TiltHint /> : <RotateHint />
+      )}
+    </View>
+  );
+}
+
+function RotateHint() {
+  const spin = useSharedValue(0);
+
+  useEffect(() => {
+    spin.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 1100 }),
+        withTiming(-1, { duration: 1100 }),
+      ),
+      -1,
+      true,
+    );
+  }, [spin]);
+
+  const phoneStyle = useAnimatedStyle(() => ({
+    transform: [{ perspective: 500 }, { rotateY: `${spin.value * 32}deg` }],
+  }));
+
+  return (
+    <View
+      style={{
+        position: 'absolute',
+        bottom: spacing.xxl,
+        left: spacing.xl,
+        right: spacing.xl,
+        alignItems: 'center',
+        gap: spacing.sm,
+      }}>
+      <View
+        style={{
+          backgroundColor: AR_SCRIM,
+          borderRadius: radius.full,
+          paddingHorizontal: spacing.lg,
+          paddingVertical: spacing.md,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: spacing.md,
+        }}>
+        <Ionicons name="sync-outline" size={20} color={AR_INK} />
+        <Animated.View style={phoneStyle}>
+          <Ionicons name="phone-portrait-outline" size={30} color={AR_INK} />
+        </Animated.View>
+      </View>
+      <View
+        style={{
+          backgroundColor: AR_SCRIM,
+          borderRadius: radius.full,
+          paddingHorizontal: spacing.lg,
+          paddingVertical: spacing.sm,
+        }}>
+        <AppText size="xs" weight="semibold" color={AR_INK} align="center" style={AR_TEXT_SHADOW}>
+          Hold telefonen loddrett og snu deg til du peker mot pilen
+        </AppText>
+      </View>
+    </View>
+  );
+}
+
+function IntroCoach() {
+  const spin = useSharedValue(0);
+
+  useEffect(() => {
+    spin.value = withRepeat(
+      withSequence(withTiming(1, { duration: 1300 }), withTiming(-1, { duration: 1300 })),
+      -1,
+      true,
+    );
+  }, [spin]);
+
+  const phoneStyle = useAnimatedStyle(() => ({
+    transform: [{ perspective: 700 }, { rotateY: `${spin.value * 45}deg` }],
+  }));
+
+  return (
+    <Animated.View
+      entering={FadeIn.duration(300)}
+      exiting={FadeOut.duration(450)}
+      pointerEvents="none"
+      style={[
+        StyleSheet.absoluteFill,
+        {
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingHorizontal: spacing.xxl,
+          gap: spacing.xl,
+        },
+      ]}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.lg }}>
+        <Ionicons name="sync-outline" size={40} color={AR_INK} />
+        <Animated.View style={phoneStyle}>
+          <Ionicons name="phone-portrait-outline" size={96} color={AR_INK} />
+        </Animated.View>
+        <Ionicons name="sync-outline" size={40} color={AR_INK} />
+      </View>
+      <View style={{ alignItems: 'center', gap: spacing.sm }}>
+        <AppText size="xl" weight="bold" color={AR_INK} align="center" style={AR_TEXT_SHADOW}>
+          Snu deg rundt for å finne Qibla
+        </AppText>
+        <AppText size="sm" color={AR_INK} align="center" style={AR_TEXT_SHADOW}>
+          Hold telefonen loddrett og pek kameraet framover mens du snur deg
+        </AppText>
+      </View>
+    </Animated.View>
+  );
+}
+
+function TiltHint() {
+  const tilt = useSharedValue(0);
+
+  useEffect(() => {
+    tilt.value = withRepeat(
+      withSequence(withTiming(1, { duration: 900 }), withTiming(0, { duration: 900 })),
+      -1,
+    );
+  }, [tilt]);
+
+  const phoneStyle = useAnimatedStyle(() => ({
+    transform: [{ perspective: 500 }, { rotateX: `${tilt.value * 55}deg` }],
+  }));
+
+  return (
+    <View
+      style={{
+        position: 'absolute',
+        bottom: spacing.xxl,
+        left: spacing.xl,
+        right: spacing.xl,
+        alignItems: 'center',
+        gap: spacing.sm,
+      }}>
+      <View
+        style={{
+          backgroundColor: AR_SCRIM,
+          borderRadius: radius.full,
+          paddingHorizontal: spacing.lg,
+          paddingVertical: spacing.md,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: spacing.md,
+        }}>
+        <Ionicons name="arrow-up" size={20} color={AR_INK} />
+        <Animated.View style={phoneStyle}>
+          <Ionicons name="phone-portrait-outline" size={30} color={AR_INK} />
+        </Animated.View>
+      </View>
+      <View
+        style={{
+          backgroundColor: AR_SCRIM,
+          borderRadius: radius.full,
+          paddingHorizontal: spacing.lg,
+          paddingVertical: spacing.sm,
+        }}>
+        <AppText size="xs" weight="semibold" color={AR_INK} align="center" style={AR_TEXT_SHADOW}>
+          Reis telefonen opp – hold den loddrett
+        </AppText>
       </View>
     </View>
   );
 }
 
 function EdgeArrow({ side, viewport }: { side: 'left' | 'right'; viewport: Viewport }) {
-  const theme = useTheme();
   const pulse = useSharedValue(0);
 
   useEffect(() => {
@@ -299,7 +489,7 @@ function EdgeArrow({ side, viewport }: { side: 'left' | 'right'; viewport: Viewp
           position: 'absolute',
           top: viewport.height / 2 - 32,
           [side]: spacing.md,
-          backgroundColor: theme.colors.overlay,
+          backgroundColor: AR_SCRIM,
           borderRadius: radius.full,
           padding: spacing.sm,
         },
@@ -308,7 +498,7 @@ function EdgeArrow({ side, viewport }: { side: 'left' | 'right'; viewport: Viewp
       <Ionicons
         name={side === 'left' ? 'chevron-back' : 'chevron-forward'}
         size={44}
-        color={theme.colors.textInverse}
+        color={AR_INK}
       />
     </Animated.View>
   );

@@ -1,27 +1,31 @@
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Platform, View } from 'react-native';
-import MapView, { Marker, Polyline } from 'react-native-maps';
+import MapView, { Marker, Polygon, Polyline } from 'react-native-maps';
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
-import { greatCirclePoints, KAABA } from '@/lib/geo';
+import { facingConePoints, greatCirclePoints, KAABA } from '@/lib/geo';
+
+const FACING_COLOR = '#1A73E8';
+const FACING_FILL = 'rgba(26, 115, 232, 0.25)';
 
 export type QiblaMapProps = {
   lat: number;
   lon: number;
+  heading?: number | null;
 };
 
-export function QiblaMap({ lat, lon }: QiblaMapProps) {
+export function QiblaMap({ lat, lon, heading }: QiblaMapProps) {
   const theme = useTheme();
 
   return (
     <View style={{ flex: 1, borderRadius: radius.xl, overflow: 'hidden' }}>
       {Platform.OS === 'android' ? (
-        <OsmQiblaMap lat={lat} lon={lon} />
+        <OsmQiblaMap lat={lat} lon={lon} heading={heading} />
       ) : (
-        <NativeQiblaMap lat={lat} lon={lon} />
+        <NativeQiblaMap lat={lat} lon={lon} heading={heading} />
       )}
 
       <View
@@ -41,15 +45,16 @@ export function QiblaMap({ lat, lon }: QiblaMapProps) {
         }}>
         <Ionicons name="information-circle-outline" size={18} color={theme.colors.primary} />
         <AppText size="sm" tone="textSecondary" style={{ flex: 1 }}>
-          Den grønne linjen peker mot Kaba. Bruk landemerker rundt deg til å orientere deg.
+          Den grønne linjen peker mot Kaba. Snu deg til den blå kjeglen dekker linjen.
         </AppText>
       </View>
     </View>
   );
 }
 
-function NativeQiblaMap({ lat, lon }: QiblaMapProps) {
+function NativeQiblaMap({ lat, lon, heading }: QiblaMapProps) {
   const theme = useTheme();
+  const cone = heading != null ? facingConePoints(lat, lon, heading) : null;
 
   return (
     <MapView
@@ -71,6 +76,14 @@ function NativeQiblaMap({ lat, lon }: QiblaMapProps) {
         strokeColor={theme.colors.primary}
         strokeWidth={3}
       />
+      {cone && (
+        <Polygon
+          coordinates={cone.map((point) => ({ latitude: point.lat, longitude: point.lon }))}
+          fillColor={FACING_FILL}
+          strokeColor={FACING_COLOR}
+          strokeWidth={1}
+        />
+      )}
       <Marker
         coordinate={{ latitude: KAABA.lat, longitude: KAABA.lon }}
         title="Kaba"
@@ -81,8 +94,9 @@ function NativeQiblaMap({ lat, lon }: QiblaMapProps) {
   );
 }
 
-function OsmQiblaMap({ lat, lon }: QiblaMapProps) {
+function OsmQiblaMap({ lat, lon, heading }: QiblaMapProps) {
   const theme = useTheme();
+  const webViewRef = useRef<WebView>(null);
 
   const html = useMemo(() => {
     const path = greatCirclePoints(lat, lon, KAABA.lat, KAABA.lon).map((point) => [
@@ -115,6 +129,11 @@ function OsmQiblaMap({ lat, lon }: QiblaMapProps) {
     attribution: '&copy; OpenStreetMap'
   }).addTo(map);
 
+  window.userCone = L.polygon([], {
+    color: '${FACING_COLOR}', weight: 1, fillColor: '${FACING_COLOR}', fillOpacity: 0.25
+  }).addTo(map);
+  window.setCone = function (pts) { window.userCone.setLatLngs(pts); };
+
   L.polyline(${JSON.stringify(path)}, {
     color: '${theme.colors.primary}',
     weight: 3
@@ -132,13 +151,27 @@ function OsmQiblaMap({ lat, lon }: QiblaMapProps) {
 </html>`;
   }, [lat, lon, theme.colors.primary]);
 
+  const pushCone = useCallback(() => {
+    if (heading == null) return;
+    const cone = facingConePoints(lat, lon, heading).map((point) => [point.lat, point.lon]);
+    webViewRef.current?.injectJavaScript(
+      `window.setCone && window.setCone(${JSON.stringify(cone)}); true;`,
+    );
+  }, [lat, lon, heading]);
+
+  useEffect(() => {
+    pushCone();
+  }, [pushCone]);
+
   return (
     <WebView
+      ref={webViewRef}
       style={{ flex: 1 }}
       source={{ html }}
       originWhitelist={['*']}
       setSupportMultipleWindows={false}
       overScrollMode="never"
+      onLoadEnd={pushCone}
     />
   );
 }
