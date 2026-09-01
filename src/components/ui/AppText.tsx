@@ -34,6 +34,16 @@ export type AppTextProps = TextProps & {
   tabular?: boolean;
 };
 
+const maxFontScale: Record<FontSizeToken, number> = {
+  xs: 1.8,
+  sm: 1.8,
+  md: 1.7,
+  lg: 1.6,
+  xl: 1.5,
+  xxl: 1.4,
+  display: 1.3,
+};
+
 export function AppText({
   size = 'md',
   weight = 'regular',
@@ -42,6 +52,7 @@ export function AppText({
   align,
   heading = false,
   tabular = false,
+  maxFontSizeMultiplier,
   style,
   ...rest
 }: AppTextProps) {
@@ -57,5 +68,11 @@ export function AppText({
     fontVariant: tabular ? ['tabular-nums'] : undefined,
   };
 
-  return <Text {...rest} style={[computed, style]} />;
+  return (
+    <Text
+      {...rest}
+      maxFontSizeMultiplier={maxFontSizeMultiplier ?? maxFontScale[size]}
+      style={[computed, style]}
+    />
+  );
 }

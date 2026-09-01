@@ -1,5 +1,6 @@
 import { Pressable, View } from 'react-native';
 import { AppText, Card } from '@/components/ui';
+import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import type { PrayerDay } from '@/api/types';
@@ -8,6 +9,8 @@ import { asrTimeFor } from '@/lib/prayerSchedule';
 import { parseDayKey, todayKey } from '@/lib/time';
 
 const COLUMNS = ['Fajr', 'Sol', 'Duhr', 'Asr', 'Maghrib', 'Isha'];
+const DATE_COLUMN_WIDTH = 40;
+const MAX_TABLE_FONT_SCALE = 1.3;
 const WEEKDAY_LETTERS = ['S', 'M', 'T', 'O', 'T', 'F', 'L'];
 const FRIDAY = 5;
 
@@ -19,7 +22,9 @@ export type MonthPrayerTableProps = {
 
 export function MonthPrayerTable({ days, asrMethod, onDayPress }: MonthPrayerTableProps) {
   const theme = useTheme();
+  const { scale } = useFontScale();
   const today = todayKey();
+  const dateColumnWidth = scaleWidth(DATE_COLUMN_WIDTH, Math.min(scale, MAX_TABLE_FONT_SCALE));
 
   const timesFor = (day: PrayerDay): (string | null)[] => [
     day.fajr,
@@ -39,7 +44,12 @@ export function MonthPrayerTable({ days, asrMethod, onDayPress }: MonthPrayerTab
           paddingHorizontal: spacing.sm,
           gap: spacing.xs,
         }}>
-        <AppText size="xs" weight="medium" tone="textMuted" style={{ width: 40 }}>
+        <AppText
+          size="xs"
+          weight="medium"
+          tone="textMuted"
+          maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}
+          style={{ width: dateColumnWidth }}>
           Dato
         </AppText>
         {COLUMNS.map((column) => (
@@ -49,6 +59,8 @@ export function MonthPrayerTable({ days, asrMethod, onDayPress }: MonthPrayerTab
             weight="medium"
             tone="textMuted"
             align="center"
+            maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}
+            numberOfLines={1}
             style={{ flex: 1 }}>
             {column}
           </AppText>
@@ -75,15 +87,25 @@ export function MonthPrayerTable({ days, asrMethod, onDayPress }: MonthPrayerTab
               },
               pressed && { opacity: opacity.pressed },
             ]}>
-            <View style={{ width: 40, flexDirection: 'row', alignItems: 'baseline', gap: spacing.xxs }}>
+            <View
+              style={{
+                width: dateColumnWidth,
+                flexDirection: 'row',
+                alignItems: 'baseline',
+                gap: spacing.xxs,
+              }}>
               <AppText
                 size="sm"
                 weight={isToday || isFriday ? 'bold' : 'medium'}
                 tone={isToday ? 'onPrimarySoft' : isFriday ? 'primary' : 'textPrimary'}
+                maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}
                 tabular>
                 {date.getDate()}
               </AppText>
-              <AppText size="xs" tone={isFriday ? 'primary' : 'textMuted'}>
+              <AppText
+                size="xs"
+                tone={isFriday ? 'primary' : 'textMuted'}
+                maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}>
                 {WEEKDAY_LETTERS[date.getDay()]}
               </AppText>
             </View>
@@ -95,6 +117,8 @@ export function MonthPrayerTable({ days, asrMethod, onDayPress }: MonthPrayerTab
                 tone={isToday ? 'onPrimarySoft' : index === 1 ? 'textMuted' : 'textSecondary'}
                 align="center"
                 tabular
+                maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}
+                numberOfLines={1}
                 style={{ flex: 1 }}>
                 {time ?? '–'}
               </AppText>

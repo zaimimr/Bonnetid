@@ -33,7 +33,14 @@ export function NextPrayerHero({
         <AppText size="sm" weight="medium" tone="textMuted">
           {current ? 'Nåværende bønn' : nextPrayer.isTomorrow ? 'Neste bønn i morgen' : 'Neste bønn'}
         </AppText>
-        <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.md }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            alignItems: 'baseline',
+            columnGap: spacing.md,
+            rowGap: spacing.xxs,
+          }}>
           <AppText size="display" weight="bold" tone="primary" heading>
             {current ? current.label : nextPrayer.next.label}
           </AppText>
@@ -61,20 +68,19 @@ export function NextPrayerHero({
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
+            gap: spacing.md,
           },
           pressed && { opacity: opacity.pressed },
         ]}>
-        <AppText size="sm" tone="textMuted">
-          {gregorianText}
-        </AppText>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+        <View style={{ flex: 1, gap: spacing.xxs }}>
+          <AppText size="sm" tone="textMuted">
+            {gregorianText}
+          </AppText>
           <AppText size="sm" weight="medium" tone="textSecondary">
             {hijriText}
           </AppText>
-          {onPressDate && (
-            <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} />
-          )}
         </View>
+        {onPressDate && <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} />}
       </Pressable>
     </Card>
   );

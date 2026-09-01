@@ -1,10 +1,12 @@
 import { Pressable, View } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { AppText, Badge, Card } from '@/components/ui';
+import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import type { JamatTimes, PrayerEntry, PrayerName } from '@/lib/prayerSchedule';
 import type { MosqueJummah } from '@/api/types';
+import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from './TimeCell';
 
 export type { JamatTimes };
 
@@ -16,8 +18,6 @@ const PRAYER_ICONS: Record<PrayerName, keyof typeof Ionicons.glyphMap> = {
   maghrib: 'moon-outline',
   isha: 'moon',
 };
-
-const TIME_COLUMN_WIDTH = 64;
 
 export type PrayerTimesCardProps = {
   schedule: PrayerEntry[];
@@ -41,12 +41,14 @@ export function PrayerTimesCard({
   onSelectMosque,
 }: PrayerTimesCardProps) {
   const theme = useTheme();
+  const { scale, isStacked } = useFontScale();
   const hasJamat = Object.values(jamatTimes).some(Boolean);
   const hasMosque = Boolean(mosqueName);
+  const columnWidth = scaleWidth(TIME_COLUMN_WIDTH, scale);
 
   return (
     <Card padding="sm" rounded="xl">
-      {hasJamat && (
+      {hasJamat && !isStacked && (
         <View
           style={{
             flexDirection: 'row',
@@ -62,7 +64,7 @@ export function PrayerTimesCard({
             weight="medium"
             tone="textMuted"
             align="right"
-            style={{ width: TIME_COLUMN_WIDTH }}>
+            style={{ width: columnWidth }}>
             Adhan
           </AppText>
           <AppText
@@ -70,7 +72,7 @@ export function PrayerTimesCard({
             weight="medium"
             tone="textMuted"
             align="right"
-            style={{ width: TIME_COLUMN_WIDTH }}>
+            style={{ width: columnWidth }}>
             Jamat
           </AppText>
         </View>
@@ -79,13 +81,37 @@ export function PrayerTimesCard({
       {schedule.map((entry, index) => {
         const isHighlighted = entry.name === highlightedName;
         const jamatTime = jamatTimes[entry.name];
+        const showLabel = isStacked || entry.name !== 'fajr_endtime';
+        const times = (
+          <>
+            <TimeCell
+              value={entry.time}
+              label="Adhan"
+              stacked={isStacked}
+              width={hasJamat ? columnWidth : undefined}
+              weight={isHighlighted ? 'bold' : 'medium'}
+              tone={entry.isPrayer ? 'textPrimary' : 'textMuted'}
+            />
+            {hasJamat && (
+              <TimeCell
+                value={jamatTime ?? '–'}
+                label="Jamat"
+                stacked={isStacked}
+                width={columnWidth}
+                weight={isHighlighted ? 'semibold' : 'regular'}
+                tone={jamatTime ? 'primary' : 'textMuted'}
+              />
+            )}
+          </>
+        );
+
         return (
           <View
             key={entry.name}
             style={{
               flexDirection: 'row',
-              alignItems: 'center',
-              gap: spacing.md,
+              alignItems: isStacked ? 'flex-start' : 'center',
+              gap: isStacked ? spacing.sm : spacing.md,
               paddingVertical: spacing.md,
               paddingHorizontal: spacing.md,
               borderRadius: radius.lg,
@@ -102,35 +128,28 @@ export function PrayerTimesCard({
                 color={isHighlighted ? theme.colors.primary : theme.colors.textMuted}
               />
             )}
-            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-              {entry.name !== 'fajr_endtime' && (
-                <AppText
-                  weight={isHighlighted ? 'bold' : entry.isPrayer ? 'medium' : 'regular'}
-                  tone={entry.isPrayer ? 'textPrimary' : 'textMuted'}>
-                  {entry.label}
-                </AppText>
-              )}
-              {isHighlighted && <Badge label="Nå" variant="primary" />}
+            <View style={{ flex: 1, gap: isStacked ? spacing.xs : 0 }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  columnGap: spacing.sm,
+                  rowGap: spacing.xxs,
+                }}>
+                {showLabel && (
+                  <AppText
+                    weight={isHighlighted ? 'bold' : entry.isPrayer ? 'medium' : 'regular'}
+                    tone={entry.isPrayer ? 'textPrimary' : 'textMuted'}
+                    style={{ flexShrink: 1 }}>
+                    {entry.label}
+                  </AppText>
+                )}
+                {isHighlighted && <Badge label="Nå" variant="primary" />}
+              </View>
+              {isStacked && <TimeCellRow>{times}</TimeCellRow>}
             </View>
-            <AppText
-              weight={isHighlighted ? 'bold' : 'medium'}
-              tone={entry.isPrayer ? 'textPrimary' : 'textMuted'}
-              align="right"
-              tabular
-              style={hasJamat ? { width: TIME_COLUMN_WIDTH } : undefined}>
-              {entry.time}
-            </AppText>
-            {hasJamat && (
-              <AppText
-                size="md"
-                weight={isHighlighted ? 'semibold' : 'regular'}
-                tone={jamatTime ? 'primary' : 'textMuted'}
-                align="right"
-                tabular
-                style={{ width: TIME_COLUMN_WIDTH }}>
-                {jamatTime ?? '–'}
-              </AppText>
-            )}
+            {!isStacked && times}
           </View>
         );
       })}
@@ -150,18 +169,20 @@ export function PrayerTimesCard({
               key={entry.id}
               style={{
                 flexDirection: 'row',
+                flexWrap: 'wrap',
                 alignItems: 'center',
-                gap: spacing.md,
+                columnGap: spacing.md,
+                rowGap: spacing.xxs,
                 paddingVertical: spacing.sm,
                 paddingHorizontal: spacing.md,
                 borderBottomWidth: index === jummah.length - 1 ? 0 : 1,
                 borderBottomColor: theme.colors.border,
               }}>
               <Ionicons name="people-outline" size={18} color={theme.colors.primary} />
-              <AppText weight="medium" style={{ flex: 1 }}>
+              <AppText weight="medium" style={{ flexShrink: 1 }}>
                 {jummah.length > 1 ? `Jummah ${index + 1}` : 'Jummah'}
               </AppText>
-              <AppText weight="semibold" tone="primary" tabular>
+              <AppText weight="semibold" tone="primary" tabular style={{ marginLeft: 'auto' }}>
                 {entry.jummah}
               </AppText>
             </View>
@@ -185,7 +206,7 @@ export function PrayerTimesCard({
             pressed && { opacity: opacity.pressed },
           ]}>
           <Ionicons name="business-outline" size={15} color={theme.colors.textMuted} />
-          <AppText size="xs" tone="textMuted" style={{ flex: 1 }} numberOfLines={1}>
+          <AppText size="xs" tone="textMuted" style={{ flex: 1 }} numberOfLines={2}>
             {mosqueNote ?? `Jamat-tider fra ${mosqueName}`}
           </AppText>
           <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} />

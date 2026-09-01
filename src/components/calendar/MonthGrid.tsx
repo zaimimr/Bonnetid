@@ -1,5 +1,6 @@
 import { Pressable, View } from 'react-native';
 import { AppText, Card } from '@/components/ui';
+import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import type { HijriDay } from '@/api/types';
@@ -7,6 +8,9 @@ import { parseHijriDate } from '@/lib/hijri';
 import { isoDateKey } from '@/lib/time';
 
 const WEEKDAY_LABELS = ['man', 'tir', 'ons', 'tor', 'fre', 'lør', 'søn'];
+const CELL_HEIGHT = 52;
+const DAY_HEIGHT = 44;
+const MAX_GRID_FONT_SCALE = 1.25;
 
 export type MonthGridProps = {
   year: number;
@@ -18,6 +22,10 @@ export type MonthGridProps = {
 
 export function MonthGrid({ year, monthIndex, days, selectedIso, onDayPress }: MonthGridProps) {
   const theme = useTheme();
+  const { scale } = useFontScale();
+  const gridScale = Math.min(scale, MAX_GRID_FONT_SCALE);
+  const cellHeight = scaleWidth(CELL_HEIGHT, gridScale);
+  const dayHeight = scaleWidth(DAY_HEIGHT, gridScale);
   const todayIso = isoDateKey();
   const byDate = new Map(days.map((day) => [day.gregorian_date, day]));
 
@@ -44,6 +52,8 @@ export function MonthGrid({ year, monthIndex, days, selectedIso, onDayPress }: M
             weight="medium"
             tone="textMuted"
             align="center"
+            maxFontSizeMultiplier={MAX_GRID_FONT_SCALE}
+            numberOfLines={1}
             style={{ flex: 1 }}>
             {label}
           </AppText>
@@ -52,7 +62,8 @@ export function MonthGrid({ year, monthIndex, days, selectedIso, onDayPress }: M
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.sm }}>
         {cells.map((cell, index) => {
-          if (!cell) return <View key={`blank-${index}`} style={{ width: '14.28%', height: 52 }} />;
+          if (!cell)
+            return <View key={`blank-${index}`} style={{ width: '14.28%', height: cellHeight }} />;
 
           const isToday = cell.iso === todayIso;
           const isSelected = cell.iso === selectedIso;
@@ -72,7 +83,7 @@ export function MonthGrid({ year, monthIndex, days, selectedIso, onDayPress }: M
               style={({ pressed }) => [
                 {
                   width: '14.28%',
-                  height: 52,
+                  height: cellHeight,
                   alignItems: 'center',
                   justifyContent: 'center',
                 },
@@ -81,7 +92,7 @@ export function MonthGrid({ year, monthIndex, days, selectedIso, onDayPress }: M
               <View
                 style={{
                   width: 40,
-                  height: 44,
+                  height: dayHeight,
                   borderRadius: radius.md,
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -94,13 +105,18 @@ export function MonthGrid({ year, monthIndex, days, selectedIso, onDayPress }: M
                   borderColor: theme.colors.accent,
                   gap: 1,
                 }}>
-                <AppText size="sm" weight={isToday || isSelected ? 'bold' : 'medium'} color={textColor}>
+                <AppText
+                  size="sm"
+                  weight={isToday || isSelected ? 'bold' : 'medium'}
+                  color={textColor}
+                  maxFontSizeMultiplier={MAX_GRID_FONT_SCALE}>
                   {cell.dayOfMonth}
                 </AppText>
                 {hijriDay != null && (
                   <AppText
                     size="xs"
-                    color={isToday ? theme.colors.onPrimary : isSpecial ? theme.colors.onPrimarySoft : theme.colors.textMuted}>
+                    color={isToday ? theme.colors.onPrimary : isSpecial ? theme.colors.onPrimarySoft : theme.colors.textMuted}
+                    maxFontSizeMultiplier={MAX_GRID_FONT_SCALE}>
                     {hijriDay}
                   </AppText>
                 )}
