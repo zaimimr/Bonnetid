@@ -5,7 +5,7 @@ import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
 import { NextPrayerHero } from '@/components/prayer/NextPrayerHero';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { EventCard } from '@/components/calendar/EventCard';
-import { ErrorState, Screen, SectionHeader, Skeleton } from '@/components/ui';
+import { EmptyState, ErrorState, Screen, SectionHeader, Skeleton } from '@/components/ui';
 import { useNow } from '@/hooks/useNow';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { useRefresh } from '@/hooks/useRefresh';
@@ -60,6 +60,10 @@ export default function HomeScreen() {
         {isLoading && <Skeleton height={220} rounded="xl" />}
 
         {isError && <ErrorState onRetry={refetch} />}
+
+        {!isLoading && !isError && todaySchedule.length === 0 && (
+          <EmptyState message="Ingen bønnetider for dette stedet i dag" icon="time-outline" />
+        )}
 
         {nextPrayer && (
           <NextPrayerHero

@@ -152,6 +152,7 @@ export default function MosquePickerScreen() {
             placeholder="Søk etter moské"
             placeholderTextColor={theme.colors.textMuted}
             autoCorrect={false}
+            maxFontSizeMultiplier={1.6}
             style={{
               flex: 1,
               paddingVertical: spacing.md,

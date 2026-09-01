@@ -95,6 +95,7 @@ export default function MosquesScreen() {
               placeholder="Søk etter moské eller by"
               placeholderTextColor={theme.colors.textMuted}
               autoCorrect={false}
+              maxFontSizeMultiplier={1.6}
               style={{
                 flex: 1,
                 paddingVertical: spacing.md,
