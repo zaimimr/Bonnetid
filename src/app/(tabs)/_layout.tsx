@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/components/ui';
 import { useTheme } from '@/theme';
 
-const MAX_TAB_FONT_SCALE = 1.3;
+const MAX_TAB_FONT_SCALE = 1.15;
 
 function TabLabel({ title, color }: { title: string; color: string }) {
   return (

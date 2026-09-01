@@ -41,10 +41,15 @@ export function NextPrayerHero({
             columnGap: spacing.md,
             rowGap: spacing.xxs,
           }}>
-          <AppText size="display" weight="bold" tone="primary" heading>
+          <AppText
+            size="display"
+            weight="bold"
+            tone="primary"
+            heading
+            style={{ flexShrink: 0 }}>
             {current ? current.label : nextPrayer.next.label}
           </AppText>
-          <AppText size="xxl" weight="semibold" tabular>
+          <AppText size="xxl" weight="semibold" tabular style={{ flexShrink: 0 }}>
             {current ? current.time : nextPrayer.next.time}
           </AppText>
         </View>

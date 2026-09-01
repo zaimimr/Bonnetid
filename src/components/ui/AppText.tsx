@@ -1,4 +1,4 @@
-import { Text, type TextProps, type TextStyle } from 'react-native';
+import { Platform, Text, useWindowDimensions, type TextProps, type TextStyle } from 'react-native';
 import { useTheme } from '@/theme';
 import {
   fontFamily,
@@ -57,13 +57,17 @@ export function AppText({
   ...rest
 }: AppTextProps) {
   const theme = useTheme();
+  const { fontScale } = useWindowDimensions();
+
+  const cap = maxFontSizeMultiplier ?? maxFontScale[size];
+  const lineHeightScale = Platform.OS === 'ios' ? Math.min(Math.max(fontScale || 1, 1), cap) : 1;
 
   const computed: TextStyle = {
     fontSize: fontSize[size],
     fontWeight: fontWeight[weight],
     color: color ?? theme.colors[tone],
     textAlign: align,
-    lineHeight: fontSize[size] * (heading ? lineHeight.tight : lineHeight.normal),
+    lineHeight: fontSize[size] * (heading ? lineHeight.tight : lineHeight.normal) * lineHeightScale,
     fontFamily: heading ? fontFamily.heading : fontFamily.body,
     fontVariant: tabular ? ['tabular-nums'] : undefined,
   };
@@ -71,7 +75,7 @@ export function AppText({
   return (
     <Text
       {...rest}
-      maxFontSizeMultiplier={maxFontSizeMultiplier ?? maxFontScale[size]}
+      maxFontSizeMultiplier={cap}
       style={[computed, style]}
     />
   );

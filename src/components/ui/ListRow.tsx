@@ -30,7 +30,7 @@ export function ListRow({
     <>
       {leading && <View style={{ marginRight: spacing.md }}>{leading}</View>}
       <View style={{ flex: 1, gap: spacing.xxs }}>
-        <AppText weight="medium" numberOfLines={1}>
+        <AppText weight="medium" numberOfLines={2}>
           {title}
         </AppText>
         {subtitle ? (

@@ -34,7 +34,7 @@ export function MosqueCard({ mosque, distanceKm, showEid, onPress }: MosqueCardP
         </View>
 
         <View style={{ flex: 1, gap: spacing.xxs }}>
-          <AppText weight="semibold" numberOfLines={1}>
+          <AppText weight="semibold" numberOfLines={2}>
             {mosque.name}
           </AppText>
           {mosque.address ? (

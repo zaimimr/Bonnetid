@@ -26,9 +26,11 @@ export function TimeCell({
   if (stacked) {
     return (
       <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs }}>
-        <AppText size="xs" tone="textMuted">
-          {label}
-        </AppText>
+        {label ? (
+          <AppText size="xs" tone="textMuted">
+            {label}
+          </AppText>
+        ) : null}
         <AppText size={size} weight={weight} tone={tone} tabular>
           {value}
         </AppText>

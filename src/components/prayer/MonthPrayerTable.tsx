@@ -1,4 +1,4 @@
-import { Pressable, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { AppText, Card } from '@/components/ui';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useTheme } from '@/theme';
@@ -10,7 +10,9 @@ import { parseDayKey, todayKey } from '@/lib/time';
 
 const COLUMNS = ['Fajr', 'Sol', 'Duhr', 'Asr', 'Maghrib', 'Isha'];
 const DATE_COLUMN_WIDTH = 40;
+const TIME_COLUMN_WIDTH = 52;
 const MAX_TABLE_FONT_SCALE = 1.3;
+const SCROLL_FROM_SCALE = 1.15;
 const WEEKDAY_LETTERS = ['S', 'M', 'T', 'O', 'T', 'F', 'L'];
 const FRIDAY = 5;
 
@@ -24,7 +26,12 @@ export function MonthPrayerTable({ days, asrMethod, onDayPress }: MonthPrayerTab
   const theme = useTheme();
   const { scale } = useFontScale();
   const today = todayKey();
-  const dateColumnWidth = scaleWidth(DATE_COLUMN_WIDTH, Math.min(scale, MAX_TABLE_FONT_SCALE));
+  const tableScale = Math.min(scale, MAX_TABLE_FONT_SCALE);
+  const dateColumnWidth = scaleWidth(DATE_COLUMN_WIDTH, tableScale);
+  const scrolls = scale >= SCROLL_FROM_SCALE;
+  const timeColumnStyle = scrolls
+    ? { width: scaleWidth(TIME_COLUMN_WIDTH, tableScale) }
+    : { flex: 1 };
 
   const timesFor = (day: PrayerDay): (string | null)[] => [
     day.fajr,
@@ -35,8 +42,8 @@ export function MonthPrayerTable({ days, asrMethod, onDayPress }: MonthPrayerTab
     day.isha,
   ];
 
-  return (
-    <Card padding="sm" rounded="xl">
+  const table = (
+    <View style={scrolls ? undefined : { width: '100%' }}>
       <View
         style={{
           flexDirection: 'row',
@@ -60,8 +67,8 @@ export function MonthPrayerTable({ days, asrMethod, onDayPress }: MonthPrayerTab
             tone="textMuted"
             align="center"
             maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}
-            numberOfLines={1}
-            style={{ flex: 1 }}>
+            numberOfLines={2}
+            style={timeColumnStyle}>
             {column}
           </AppText>
         ))}
@@ -119,13 +126,25 @@ export function MonthPrayerTable({ days, asrMethod, onDayPress }: MonthPrayerTab
                 tabular
                 maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}
                 numberOfLines={1}
-                style={{ flex: 1 }}>
+                style={timeColumnStyle}>
                 {time ?? '–'}
               </AppText>
             ))}
           </Pressable>
         );
       })}
+    </View>
+  );
+
+  return (
+    <Card padding="sm" rounded="xl">
+      {scrolls ? (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {table}
+        </ScrollView>
+      ) : (
+        table
+      )}
     </Card>
   );
 }

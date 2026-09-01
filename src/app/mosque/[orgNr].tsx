@@ -7,6 +7,7 @@ import { toPreference, useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMeth
 import { useIsEidPeriod } from '@/hooks/useIsEidPeriod';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { Mosque } from '@/api/types';
 import { AppText, Card, ErrorState, ListRow, Screen, SectionHeader, Skeleton } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -56,6 +57,8 @@ const JAMAT_PRAYERS = ['fajr', 'duhr', 'asr', 'maghrib', 'isha'] as const;
 function MosqueDetail({ mosque }: { mosque: Mosque }) {
   const theme = useTheme();
   const { scale, isStacked } = useFontScale();
+  const { isWide } = useResponsive();
+  const stacked = isStacked && !isWide;
   const columnWidth = scaleWidth(TIME_COLUMN_WIDTH, scale);
   const jamat = mosque.jamat;
   const isEidPeriod = useIsEidPeriod();
@@ -170,7 +173,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
             }
           />
           <Card padding="sm" rounded="xl">
-            {!isStacked && (
+            {!stacked && (
               <View
                 style={{
                   flexDirection: 'row',
@@ -205,13 +208,13 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                   <TimeCell
                     value={row.adhan ?? '–'}
                     label="Adhan"
-                    stacked={isStacked}
+                    stacked={stacked}
                     width={columnWidth}
                   />
                   <TimeCell
                     value={row.jamat ?? '–'}
                     label="Jamat"
-                    stacked={isStacked}
+                    stacked={stacked}
                     width={columnWidth}
                     weight="semibold"
                     tone={row.jamat ? 'primary' : 'textMuted'}
@@ -222,18 +225,18 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                 <View
                   key={row.name}
                   style={{
-                    flexDirection: isStacked ? 'column' : 'row',
-                    alignItems: isStacked ? 'stretch' : 'center',
-                    gap: isStacked ? spacing.xs : spacing.md,
+                    flexDirection: stacked ? 'column' : 'row',
+                    alignItems: stacked ? 'stretch' : 'center',
+                    gap: stacked ? spacing.xs : spacing.md,
                     paddingVertical: spacing.md,
                     paddingHorizontal: spacing.md,
                     borderBottomWidth: index === jamatRows.length - 1 ? 0 : 1,
                     borderBottomColor: theme.colors.border,
                   }}>
-                  <AppText weight="medium" style={isStacked ? undefined : { flex: 1 }}>
+                  <AppText weight="medium" style={stacked ? undefined : { flex: 1 }}>
                     {PRAYER_LABELS[row.name]}
                   </AppText>
-                  {isStacked ? <TimeCellRow>{times}</TimeCellRow> : times}
+                  {stacked ? <TimeCellRow>{times}</TimeCellRow> : times}
                 </View>
               );
             })}
