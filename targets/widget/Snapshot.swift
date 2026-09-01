@@ -161,10 +161,19 @@ enum PrayerFormat {
     return "om under 1 min"
   }
 
+  /// A stale activity can outlive its target; a range whose upper bound is in the past traps.
+  static func countdownRange(to end: Date, from now: Date = Date()) -> ClosedRange<Date> {
+    now...max(end, now.addingTimeInterval(1))
+  }
+
+  static func progressRange(from start: Date, to end: Date) -> ClosedRange<Date> {
+    start...max(end, start.addingTimeInterval(1))
+  }
+
   static func symbol(for kind: String) -> String {
     switch kind {
     case "fajr": return "moon.stars"
-    case "sunrise": return "sunrise"
+    case "sunrise", "fajr_endtime": return "sunrise"
     case "duhr": return "sun.max"
     case "asr": return "cloud.sun"
     case "maghrib": return "sunset"

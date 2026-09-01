@@ -13,36 +13,37 @@ struct PrayerTimelineProvider: TimelineProvider {
   }
 
   func getSnapshot(in context: Context, completion: @escaping (PrayerTimelineEntry) -> Void) {
-    completion(entry(at: Date()))
+    completion(entry(at: Date(), snapshot: PrayerSnapshot.load()))
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<PrayerTimelineEntry>) -> Void) {
     let now = Date()
-    var entries: [PrayerTimelineEntry] = [entry(at: now)]
+    let snapshot = PrayerSnapshot.load()
+    var entries: [PrayerTimelineEntry] = [entry(at: now, snapshot: snapshot)]
 
     // Pre-computed entries cost nothing at runtime, so the countdown stays honest without
     // spending the widget's refresh budget: every minute for the next hour, then every
     // five minutes for the rest of the day.
     for minute in stride(from: 1, through: 60, by: 1) {
-      let date = now.addingTimeInterval(Double(minute) * 60)
-      entries.append(entry(at: date))
+      entries.append(entry(at: now.addingTimeInterval(Double(minute) * 60), snapshot: snapshot))
     }
     for minute in stride(from: 65, through: 12 * 60, by: 5) {
-      let date = now.addingTimeInterval(Double(minute) * 60)
-      entries.append(entry(at: date))
+      entries.append(entry(at: now.addingTimeInterval(Double(minute) * 60), snapshot: snapshot))
     }
 
     completion(Timeline(entries: entries, policy: .atEnd))
   }
 
-  private func entry(at date: Date) -> PrayerTimelineEntry {
-    guard let snapshot = PrayerSnapshot.load() else {
+  private func entry(at date: Date, snapshot: PrayerSnapshot?) -> PrayerTimelineEntry {
+    guard let snapshot else {
       return PrayerTimelineEntry(date: date, moment: nil, dailyPrayers: [])
     }
+    let moment = PrayerMoment.resolve(from: snapshot, at: date)
     return PrayerTimelineEntry(
       date: date,
-      moment: PrayerMoment.resolve(from: snapshot, at: date),
-      dailyPrayers: snapshot.dailyPrayers(for: date)
+      moment: moment,
+      // After the last prayer of the day the useful column set is tomorrow's, not today's.
+      dailyPrayers: snapshot.dailyPrayers(for: moment?.headline.at ?? date)
     )
   }
 }
@@ -97,7 +98,7 @@ private struct SmallPrayerView: View {
       .padding(.top, 1)
 
       Text(PrayerFormat.time(moment.headline.at))
-        .prayerTime(.system(size: 34, weight: .bold))
+        .prayerTime(.system(.largeTitle, design: .default).weight(.bold))
         .foregroundStyle(PrayerColor.ink)
         .minimumScaleFactor(0.7)
         .lineLimit(1)
@@ -186,7 +187,7 @@ private struct PrayerColumn: View {
         .lineLimit(1)
         .minimumScaleFactor(0.7)
       Text(PrayerFormat.time(prayer.at))
-        .prayerTime(.system(size: 17, weight: isNext ? .bold : .medium))
+        .prayerTime(.system(.subheadline, design: .default).weight(isNext ? .bold : .medium))
         .foregroundStyle(isNext ? PrayerColor.onBrandPlate : PrayerColor.ink)
         .lineLimit(1)
         .minimumScaleFactor(0.7)

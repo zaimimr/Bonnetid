@@ -24,7 +24,7 @@ struct PrayerLiveActivity: Widget {
         DynamicIslandExpandedRegion(.trailing) {
           VStack(alignment: .trailing, spacing: 1) {
             Text(PrayerFormat.time(context.state.prayerAt))
-              .prayerTime(.system(size: 20, weight: .bold))
+              .prayerTime(.system(.title3, design: .default).weight(.bold))
               .foregroundStyle(PrayerColor.ink)
             Text(context.attributes.locationName)
               .font(.caption2)
@@ -36,7 +36,10 @@ struct PrayerLiveActivity: Widget {
         DynamicIslandExpandedRegion(.bottom) {
           VStack(spacing: 5) {
             ProgressView(
-              timerInterval: context.state.windowStart...context.state.windowEnd,
+              timerInterval: PrayerFormat.progressRange(
+                from: context.state.windowStart,
+                to: context.state.windowEnd
+              ),
               countsDown: false,
               label: { EmptyView() },
               currentValueLabel: { EmptyView() }
@@ -48,7 +51,7 @@ struct PrayerLiveActivity: Widget {
                 .font(.caption)
                 .foregroundStyle(PrayerColor.inkSecondary)
               Spacer(minLength: 8)
-              Text(timerInterval: Date()...context.state.windowEnd, countsDown: true)
+              Text(timerInterval: PrayerFormat.countdownRange(to: context.state.windowEnd), countsDown: true)
                 .prayerTime(.caption)
                 .foregroundStyle(PrayerColor.inkSecondary)
                 .frame(maxWidth: 76, alignment: .trailing)
@@ -59,7 +62,7 @@ struct PrayerLiveActivity: Widget {
         Image(systemName: PrayerFormat.symbol(for: context.state.prayerKind))
           .foregroundStyle(PrayerColor.brand)
       } compactTrailing: {
-        Text(timerInterval: Date()...context.state.windowEnd, countsDown: true)
+        Text(timerInterval: PrayerFormat.countdownRange(to: context.state.windowEnd), countsDown: true)
           .prayerTime(.caption2)
           .foregroundStyle(PrayerColor.brand)
           .frame(maxWidth: 54)
@@ -96,12 +99,12 @@ private struct LockScreenActivityView: View {
         Spacer(minLength: 8)
 
         Text(PrayerFormat.time(state.prayerAt))
-          .prayerTime(.system(size: 26, weight: .bold))
+          .prayerTime(.system(.title, design: .default).weight(.bold))
           .foregroundStyle(PrayerColor.ink)
       }
 
       ProgressView(
-        timerInterval: state.windowStart...state.windowEnd,
+        timerInterval: PrayerFormat.progressRange(from: state.windowStart, to: state.windowEnd),
         countsDown: false,
         label: { EmptyView() },
         currentValueLabel: { EmptyView() }
@@ -112,7 +115,7 @@ private struct LockScreenActivityView: View {
         Text(state.isNow ? "\(state.nextLabel) om" : "Begynner om")
           .font(.caption)
           .foregroundStyle(PrayerColor.inkMuted)
-        Text(timerInterval: Date()...state.windowEnd, countsDown: true)
+        Text(timerInterval: PrayerFormat.countdownRange(to: state.windowEnd), countsDown: true)
           .prayerTime(.caption)
           .fontWeight(.medium)
           .foregroundStyle(PrayerColor.inkSecondary)
