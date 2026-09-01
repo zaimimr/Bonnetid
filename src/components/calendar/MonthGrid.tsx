@@ -1,6 +1,7 @@
 import { Pressable, View } from 'react-native';
 import { AppText, Card } from '@/components/ui';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
+import { useResponsive } from '@/hooks/useResponsive';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import type { HijriDay } from '@/api/types';
@@ -10,6 +11,8 @@ import { isoDateKey } from '@/lib/time';
 const WEEKDAY_LABELS = ['man', 'tir', 'ons', 'tor', 'fre', 'lør', 'søn'];
 const CELL_HEIGHT = 52;
 const DAY_HEIGHT = 44;
+const DAY_WIDTH = 40;
+const WIDE_DAY_WIDTH = 56;
 const MAX_GRID_FONT_SCALE = 1.25;
 
 export type MonthGridProps = {
@@ -23,7 +26,9 @@ export type MonthGridProps = {
 export function MonthGrid({ year, monthIndex, days, selectedIso, onDayPress }: MonthGridProps) {
   const theme = useTheme();
   const { scale } = useFontScale();
+  const { isWide } = useResponsive();
   const gridScale = Math.min(scale, MAX_GRID_FONT_SCALE);
+  const dayWidth = scaleWidth(isWide ? WIDE_DAY_WIDTH : DAY_WIDTH, gridScale);
   const cellHeight = scaleWidth(CELL_HEIGHT, gridScale);
   const dayHeight = scaleWidth(DAY_HEIGHT, gridScale);
   const todayIso = isoDateKey();
@@ -91,7 +96,7 @@ export function MonthGrid({ year, monthIndex, days, selectedIso, onDayPress }: M
               ]}>
               <View
                 style={{
-                  width: 40,
+                  width: dayWidth,
                   height: dayHeight,
                   borderRadius: radius.md,
                   alignItems: 'center',

@@ -174,6 +174,9 @@ export default function MosquePickerScreen() {
         <FlatList
           data={filtered}
           keyExtractor={(item) => item.mosque.org_nr}
+          keyboardDismissMode="on-drag"
+          automaticallyAdjustKeyboardInsets
+          contentContainerStyle={{ paddingBottom: spacing.xxl }}
           keyboardShouldPersistTaps="handled"
           refreshControl={
             <RefreshControl

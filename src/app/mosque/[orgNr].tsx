@@ -134,7 +134,10 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
               hitSlop={spacing.xs}
               style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
               <Ionicons name="location-outline" size={16} color={theme.colors.primary} />
-              <AppText size="sm" tone={mosque.lat && mosque.lon ? 'primary' : 'textSecondary'}>
+              <AppText
+                size="sm"
+                tone={mosque.lat && mosque.lon ? 'primary' : 'textSecondary'}
+                style={{ flex: 1 }}>
                 {mosque.address}
                 {mosque.post ? `, ${mosque.post.code} ${mosque.post.city}` : ''}
               </AppText>
@@ -148,7 +151,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
           {ASR_METHOD_LABELS[mosque.asr_method] && (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
               <Ionicons name="time-outline" size={16} color={theme.colors.textMuted} />
-              <AppText size="sm" tone="textSecondary">
+              <AppText size="sm" tone="textSecondary" style={{ flex: 1 }}>
                 {ASR_METHOD_LABELS[mosque.asr_method]}
               </AppText>
             </View>

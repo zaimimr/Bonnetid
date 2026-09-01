@@ -274,12 +274,14 @@ function ArOverlay({
             flexDirection: 'row',
             alignItems: 'center',
             gap: spacing.sm,
+            maxWidth: '100%',
           }}>
           {aligned && <Ionicons name="checkmark-circle" size={18} color={AR_ALIGNED} />}
           <AppText
             size="sm"
             weight="semibold"
-            color={aligned ? AR_ALIGNED : AR_INK}>
+            color={aligned ? AR_ALIGNED : AR_INK}
+            style={{ flexShrink: 1 }}>
             {aligned ? 'Du peker mot Qibla' : (rotationHint ?? 'Nesten der …')}
           </AppText>
         </View>

@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, TextInput, View } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useMosques } from '@/api/queries';
 import type { Mosque } from '@/api/types';
 import { MosqueCard } from '@/components/mosque/MosqueCard';
+import { MosqueMap, type MosqueMapPin } from '@/components/mosque/MosqueMap';
 import { AppText, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
 import { useIsEidPeriod } from '@/hooks/useIsEidPeriod';
 import { useRefresh } from '@/hooks/useRefresh';
@@ -57,11 +57,25 @@ export default function MosquesScreen() {
     return withDistance.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
   }, [mosques, query, sort, coords.lat, coords.lon]);
 
-  const openMosque = (mosque: Mosque) =>
-    router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.org_nr } });
+  const openMosque = (orgNr: string) =>
+    router.push({ pathname: '/mosque/[orgNr]', params: { orgNr } });
+
+  const pins: MosqueMapPin[] = useMemo(
+    () =>
+      visible
+        .filter((item) => item.mosque.lat != null && item.mosque.lon != null)
+        .map((item) => ({
+          orgNr: item.mosque.org_nr,
+          name: item.mosque.name,
+          address: item.mosque.address,
+          lat: Number(item.mosque.lat),
+          lon: Number(item.mosque.lon),
+        })),
+    [visible],
+  );
 
   return (
-    <Screen padded={false} edges={[]}>
+    <Screen padded={false} edges={[]} maxWidth={mode === 'map' ? null : undefined}>
       <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.lg, gap: spacing.md }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
           <View
@@ -134,6 +148,8 @@ export default function MosquesScreen() {
         <FlatList
           data={visible}
           keyExtractor={(item) => item.mosque.org_nr}
+          keyboardDismissMode="on-drag"
+          automaticallyAdjustKeyboardInsets
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -151,7 +167,7 @@ export default function MosquesScreen() {
               mosque={item.mosque}
               distanceKm={item.distance ?? undefined}
               showEid={isEidPeriod}
-              onPress={() => openMosque(item.mosque)}
+              onPress={() => openMosque(item.mosque.org_nr)}
             />
           )}
           ListEmptyComponent={
@@ -163,32 +179,9 @@ export default function MosquesScreen() {
       )}
 
       {!isLoading && !isError && mode === 'map' && (
-        <MapView
-          style={{ flex: 1 }}
-          initialRegion={{
-            latitude: coords.lat,
-            longitude: coords.lon,
-            latitudeDelta: 0.08,
-            longitudeDelta: 0.08,
-          }}
-          showsUserLocation>
-          {visible
-            .filter((item) => item.mosque.lat && item.mosque.lon)
-            .map((item) => (
-              <Marker
-                key={item.mosque.org_nr}
-                coordinate={{
-                  latitude: Number(item.mosque.lat),
-                  longitude: Number(item.mosque.lon),
-                }}
-                title={item.mosque.name}
-                description={item.mosque.address ?? undefined}
-                pinColor={theme.colors.primary}
-                onCalloutPress={() => openMosque(item.mosque)}
-              />
-            ))}
-        </MapView>
+        <MosqueMap pins={pins} center={{ lat: coords.lat, lon: coords.lon }} onSelect={openMosque} />
       )}
+
     </Screen>
   );
 }
