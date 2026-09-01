@@ -11,6 +11,7 @@ import { AppText, Card, Divider, ListRow, Screen, SectionHeader } from '@/compon
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import { notificationsSupported, requestNotificationPermission } from '@/lib/notifications';
+import { liveActivitiesEnabled, prayerWidgetAvailable } from '../../modules/prayer-widget';
 import { openStoreReview } from '@/lib/review';
 import { getNotificationSound } from '@/lib/notificationSounds';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
@@ -23,6 +24,8 @@ import {
 } from '@/store/settings';
 
 const storeName = Platform.OS === 'ios' ? 'App Store' : 'Google Play';
+const liveActivitySupported =
+  Platform.OS === 'ios' && prayerWidgetAvailable && liveActivitiesEnabled();
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -40,6 +43,8 @@ export default function SettingsScreen() {
   const setNotificationsEnabled = useSettings((state) => state.setNotificationsEnabled);
   const notificationSound = useSettings((state) => state.notificationSound);
   const notificationPrayers = useSettings((state) => state.notificationPrayers);
+  const liveActivityEnabled = useSettings((state) => state.liveActivityEnabled);
+  const setLiveActivityEnabled = useSettings((state) => state.setLiveActivityEnabled);
   const toggleNotificationPrayer = useSettings((state) => state.toggleNotificationPrayer);
   const asrOverride = useMosqueAsrOverride();
   const asrLocationDefault = useLocationAsrDefault();
@@ -162,6 +167,28 @@ export default function SettingsScreen() {
           </>
         )}
       </Card>
+
+      {liveActivitySupported && (
+        <>
+          <SectionHeader title="Låseskjerm" />
+          <Card padding="sm" rounded="xl">
+            <ListRow
+              title="Følg neste bønn"
+              subtitle="Nedtelling på låseskjermen og i Dynamic Island mens appen er åpnet"
+              leading={<Ionicons name="timer-outline" size={20} color={theme.colors.primary} />}
+              trailing={
+                <Switch
+                  value={liveActivityEnabled}
+                  onValueChange={setLiveActivityEnabled}
+                  trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
+                  thumbColor={theme.colors.surface}
+                />
+              }
+              style={{ paddingHorizontal: spacing.md }}
+            />
+          </Card>
+        </>
+      )}
 
       <SectionHeader title="Utseende" />
       <Card padding="sm" rounded="xl">

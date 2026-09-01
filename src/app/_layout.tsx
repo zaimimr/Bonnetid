@@ -10,6 +10,8 @@ import { configureNotificationHandler } from '@/lib/notifications';
 import { useNotificationScheduler } from '@/hooks/useNotificationScheduler';
 import { useAutoLocation } from '@/hooks/useAutoLocation';
 import { useReviewPrompt } from '@/hooks/useReviewPrompt';
+import { useWidgetSync } from '@/hooks/useWidgetSync';
+import { useNow } from '@/hooks/useNow';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -39,9 +41,11 @@ configureNotificationHandler();
 
 function RootNavigator() {
   const theme = useTheme();
+  const now = useNow(60_000);
   useAutoLocation();
   useNotificationScheduler();
   useReviewPrompt();
+  useWidgetSync(now);
 
   return (
     <>

@@ -1,12 +1,29 @@
 # Bønnetid
 
-Expo SDK 54 (max Expo Go supports; do not upgrade past 54 while Expo Go is the test client) + React Native + TypeScript prayer times app for Norwegian Muslims. Data source: Supabase Postgres (project `gsutnlmtvsbwvaslcgfa`) read directly via `@supabase/supabase-js` with the publishable key and public-read RLS. URL/key in `.env` as `EXPO_PUBLIC_SUPABASE_URL`/`EXPO_PUBLIC_SUPABASE_KEY`. Locations are keyed by `location_iso` strings like `NO0301` (Oslo).
+Expo SDK 54 (max Expo Go supports; do not upgrade past 54) + React Native + TypeScript prayer times app for Norwegian Muslims. Data source: Supabase Postgres (project `gsutnlmtvsbwvaslcgfa`) read directly via `@supabase/supabase-js` with the publishable key and public-read RLS. URL/key in `.env` as `EXPO_PUBLIC_SUPABASE_URL`/`EXPO_PUBLIC_SUPABASE_KEY`. Locations are keyed by `location_iso` strings like `NO0301` (Oslo).
+
+## Native surfaces (widgets + Live Activity)
+
+The iOS widgets, lock screen accessories and the Dynamic Island Live Activity are Swift, so they
+only run in a dev build - Expo Go cannot load them. The JS app still runs in Expo Go; the widget
+bridge is a `requireOptionalNativeModule`, so every call no-ops there.
+
+- Widget/Live Activity UI: `targets/widget/` (generated into Xcode by `@bacons/apple-targets`).
+- Snapshot bridge + ActivityKit control: `modules/prayer-widget/` (local Expo module, Swift + Kotlin).
+- Shared payload: `src/lib/widgetSnapshot.ts` writes absolute ISO instants into the app group
+  `group.no.irn.bonnetid` (iOS) / SharedPreferences `prayer_widget` (Android). Widgets never call
+  Supabase; they build a WidgetKit timeline from the snapshot, so they work offline.
+- `PrayerActivityAttributes.swift` exists twice on purpose (target + module). ActivityKit needs the
+  same type in both binaries; keep the copies identical.
+- `ios/` and `android/` are generated (CNG) and gitignored: `npx expo prebuild -p ios --clean`,
+  then `npx expo run:ios`. A device or EAS build additionally needs `ios.appleTeamId` in app.json.
 
 ## Commands
 
 - `npm start` - dev server
 - `npx tsc --noEmit` - typecheck
 - `npx expo lint` - lint (react-compiler rules enabled, refs during render are errors)
+- `npx expo run:ios` - local dev build, required for widget and Live Activity work
 
 ## Conventions
 

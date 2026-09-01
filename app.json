@@ -15,8 +15,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "no.irn.bonnetid",
+      "entitlements": {
+        "com.apple.security.application-groups": ["group.no.irn.bonnetid"]
+      },
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
+        "NSSupportsLiveActivities": true,
         "LSApplicationQueriesSchemes": [
           "comgooglemaps",
           "waze"
@@ -43,6 +47,7 @@
     },
     "plugins": [
       "expo-router",
+      "@bacons/apple-targets",
       [
         "expo-splash-screen",
         {
