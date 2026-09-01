@@ -65,8 +65,9 @@ function OsmMosqueMap({ pins, center, onSelect }: MosqueMapProps) {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   html, body, #map { height: 100%; margin: 0; }
+  .leaflet-div-icon { background: transparent; border: 0; }
   .pin {
-    width: 18px; height: 18px; border-radius: 9px;
+    width: 18px; height: 18px; border-radius: 50%;
     background: ${theme.colors.primary}; border: 3px solid #ffffff;
     box-shadow: 0 1px 4px rgba(0,0,0,0.4);
   }
@@ -119,8 +120,8 @@ function OsmMosqueMap({ pins, center, onSelect }: MosqueMapProps) {
         icon: L.divIcon({
           className: '',
           html: '<div class="pin"></div>',
-          iconSize: [18, 18],
-          iconAnchor: [9, 9]
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
         })
       })
         .bindPopup(popupContent(pin))

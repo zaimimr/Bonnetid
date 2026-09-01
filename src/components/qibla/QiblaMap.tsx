@@ -116,7 +116,7 @@ function OsmQiblaMap({ lat, lon, heading }: QiblaMapProps) {
   html, body, #map { height: 100%; margin: 0; }
   .kaaba-icon { font-size: 26px; line-height: 1; text-align: center; }
   .user-dot {
-    width: 16px; height: 16px; border-radius: 8px;
+    width: 16px; height: 16px; border-radius: 50%;
     background: #1a73e8; border: 3px solid #ffffff;
     box-shadow: 0 1px 4px rgba(0,0,0,0.4);
   }
