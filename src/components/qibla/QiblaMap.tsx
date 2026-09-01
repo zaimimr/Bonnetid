@@ -45,7 +45,9 @@ export function QiblaMap({ lat, lon, heading }: QiblaMapProps) {
         }}>
         <Ionicons name="information-circle-outline" size={18} color={theme.colors.primary} />
         <AppText size="sm" tone="textSecondary" style={{ flex: 1 }}>
-          Den grønne linjen peker mot Kaba. Snu deg til den blå kjeglen dekker linjen.
+          {heading == null
+            ? 'Den grønne linjen peker mot Kaba.'
+            : 'Den grønne linjen peker mot Kaba. Snu deg til den blå kjeglen dekker linjen.'}
         </AppText>
       </View>
     </View>

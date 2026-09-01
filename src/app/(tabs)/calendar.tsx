@@ -8,6 +8,7 @@ import { EventCard } from '@/components/calendar/EventCard';
 import { AppText, EmptyState, ErrorState, SectionHeader, Skeleton } from '@/components/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRefresh } from '@/hooks/useRefresh';
+import { useResponsive } from '@/hooks/useResponsive';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import { monthName } from '@/lib/hijri';
@@ -15,6 +16,7 @@ import { monthName } from '@/lib/hijri';
 export default function CalendarScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth } = useResponsive();
   const scrollRef = useRef<ScrollView>(null);
   const innerViewRef = useRef<View>(null) as RefObject<View>;
   const eventCardRefs = useRef(new Map<string, View | null>());
@@ -85,7 +87,8 @@ export default function CalendarScreen() {
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       contentContainerStyle={{
         paddingTop: insets.top + spacing.lg,
-        paddingHorizontal: spacing.lg,
+        paddingLeft: spacing.lg + insets.left,
+        paddingRight: spacing.lg + insets.right,
         paddingBottom: spacing.xxxl,
       }}
       showsVerticalScrollIndicator={false}
@@ -96,86 +99,91 @@ export default function CalendarScreen() {
           tintColor={theme.colors.primary}
         />
       }>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-        <View style={{ gap: spacing.xxs }}>
-          <AppText size="xxl" weight="bold" heading>
-            {monthName(cursor.monthIndex)} {cursor.year}
-          </AppText>
-          {hijriRange ? (
-            <AppText size="sm" tone="textMuted">
-              {hijriRange}
+      <View style={{ width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            rowGap: spacing.sm,
+            columnGap: spacing.md,
+          }}>
+          <View style={{ gap: spacing.xxs, flexShrink: 1 }}>
+            <AppText size="xxl" weight="bold" heading>
+              {monthName(cursor.monthIndex)} {cursor.year}
             </AppText>
-          ) : null}
-        </View>
-
-        <View style={{ flexDirection: 'row', gap: spacing.sm, alignItems: 'center' }}>
-          {!isCurrentMonth && (
-            <Pressable
-              onPress={() => {
-                setSelectedIso(null);
-                setCursor({ year: today.getFullYear(), monthIndex: today.getMonth() });
-              }}
-              hitSlop={hitSlop}
-              style={({ pressed }) => [
-                {
-                  paddingVertical: spacing.sm,
-                  paddingHorizontal: spacing.md,
-                  borderRadius: radius.full,
-                  backgroundColor: theme.colors.primarySoft,
-                },
-                pressed && { opacity: opacity.pressed },
-              ]}>
-              <AppText size="sm" weight="semibold" tone="onPrimarySoft">
-                I dag
+            {hijriRange ? (
+              <AppText size="sm" tone="textMuted">
+                {hijriRange}
               </AppText>
-            </Pressable>
-          )}
-          <MonthArrow direction="back" onPress={() => shiftMonth(-1)} />
-          <MonthArrow direction="forward" onPress={() => shiftMonth(1)} />
+            ) : null}
+          </View>
+
+          <View style={{ flexDirection: 'row', gap: spacing.sm, alignItems: 'center' }}>
+            {!isCurrentMonth && (
+              <Pressable
+                onPress={() => {
+                  setSelectedIso(null);
+                  setCursor({ year: today.getFullYear(), monthIndex: today.getMonth() });
+                }}
+                hitSlop={hitSlop}
+                style={({ pressed }) => [
+                  {
+                    paddingVertical: spacing.sm,
+                    paddingHorizontal: spacing.md,
+                    borderRadius: radius.full,
+                    backgroundColor: theme.colors.primarySoft,
+                  },
+                  pressed && { opacity: opacity.pressed },
+                ]}>
+                <AppText size="sm" weight="semibold" tone="onPrimarySoft">
+                  I dag
+                </AppText>
+              </Pressable>
+            )}
+            <MonthArrow direction="back" onPress={() => shiftMonth(-1)} />
+            <MonthArrow direction="forward" onPress={() => shiftMonth(1)} />
+          </View>
         </View>
-      </View>
 
-      <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
-        {month.isLoading && <Skeleton height={320} rounded="xl" />}
-        {month.isError && <ErrorState onRetry={month.refetch} />}
-        {month.data && (
-          <MonthGrid
-            year={cursor.year}
-            monthIndex={cursor.monthIndex}
-            days={month.data}
-            selectedIso={selectedIso}
-            onDayPress={onDayPress}
-          />
-        )}
-
-        <View>
-          <SectionHeader
-            title={`Merkedager i ${monthName(cursor.monthIndex).toLowerCase()}`}
-          />
-          {eventsLoading && <Skeleton height={180} rounded="xl" />}
-          {specials.isError && <ErrorState onRetry={specials.refetch} />}
-          {!eventsLoading && events.length === 0 && (
-            <EmptyState message="Ingen merkedager denne måneden" icon="calendar-clear-outline" />
+        <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
+          {month.isLoading && <Skeleton height={320} rounded="xl" />}
+          {month.isError && <ErrorState onRetry={month.refetch} />}
+          {month.data && (
+            <MonthGrid
+              year={cursor.year}
+              monthIndex={cursor.monthIndex}
+              days={month.data}
+              selectedIso={selectedIso}
+              onDayPress={onDayPress}
+            />
           )}
-          <View style={{ gap: spacing.md }}>
-            {events.map((event) => (
-              <View
-                key={event.gregorian_date + event.special_date_name}
-                ref={(node) => {
-                  eventCardRefs.current.set(event.gregorian_date, node);
-                }}>
-                <EventCard
-                  event={event}
-                  selected={event.gregorian_date === selectedIso}
-                  onPress={() => jumpToEvent(event)}
-                />
-              </View>
-            ))}
+
+          <View>
+            <SectionHeader
+              title={`Merkedager i ${monthName(cursor.monthIndex).toLowerCase()}`}
+            />
+            {eventsLoading && <Skeleton height={180} rounded="xl" />}
+            {specials.isError && <ErrorState onRetry={specials.refetch} />}
+            {!eventsLoading && events.length === 0 && (
+              <EmptyState message="Ingen merkedager denne måneden" icon="calendar-clear-outline" />
+            )}
+            <View style={{ gap: spacing.md }}>
+              {events.map((event) => (
+                <View
+                  key={event.gregorian_date + event.special_date_name}
+                  ref={(node) => {
+                    eventCardRefs.current.set(event.gregorian_date, node);
+                  }}>
+                  <EventCard
+                    event={event}
+                    selected={event.gregorian_date === selectedIso}
+                    onPress={() => jumpToEvent(event)}
+                  />
+                </View>
+              ))}
+            </View>
           </View>
         </View>
       </View>

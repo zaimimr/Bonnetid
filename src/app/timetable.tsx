@@ -43,10 +43,13 @@ export default function TimetableScreen() {
         style={{
           marginTop: spacing.lg,
           flexDirection: 'row',
+          flexWrap: 'wrap',
           alignItems: 'center',
           justifyContent: 'space-between',
+          rowGap: spacing.sm,
+          columnGap: spacing.md,
         }}>
-        <View style={{ gap: spacing.xxs }}>
+        <View style={{ gap: spacing.xxs, flexShrink: 1 }}>
           <AppText size="lg" weight="bold" heading>
             {monthName(cursor.monthIndex)} {cursor.year}
           </AppText>

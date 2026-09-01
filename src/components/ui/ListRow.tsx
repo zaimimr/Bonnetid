@@ -39,7 +39,11 @@ export function ListRow({
           </AppText>
         ) : null}
       </View>
-      {trailing && <View style={{ marginLeft: spacing.md }}>{trailing}</View>}
+      {trailing && (
+        <View style={{ marginLeft: spacing.md, flexShrink: 1, alignItems: 'flex-end' }}>
+          {trailing}
+        </View>
+      )}
       {chevron && (
         <Ionicons
           name="chevron-forward"

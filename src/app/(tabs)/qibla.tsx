@@ -1,11 +1,12 @@
-import { Pressable, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { QiblaAr } from '@/components/qibla/QiblaAr';
 import { QiblaCompass } from '@/components/qibla/QiblaCompass';
 import { QiblaMap } from '@/components/qibla/QiblaMap';
-import { AppText, EmptyState, Screen } from '@/components/ui';
+import { AppText, Card, EmptyState, Screen } from '@/components/ui';
 import { useCompassHeading } from '@/hooks/useCompassHeading';
+import { useResponsive } from '@/hooks/useResponsive';
 import { useUserCoords } from '@/hooks/useUserCoords';
 import { formatDistance, distanceKm, KAABA, qiblaBearing } from '@/lib/geo';
 import { useTheme } from '@/theme';
@@ -16,6 +17,7 @@ type QiblaView = 'compass' | 'map' | '3d';
 export default function QiblaScreen() {
   const coords = useUserCoords();
   const { heading, permissionDenied } = useCompassHeading();
+  const { isLandscape } = useResponsive();
   const [view, setView] = useState<QiblaView>('compass');
 
   const bearing = qiblaBearing(coords.lat, coords.lon);
@@ -25,7 +27,14 @@ export default function QiblaScreen() {
     <Screen>
       <View style={{ marginTop: spacing.lg, gap: spacing.lg, flex: 1 }}>
         <View
-          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            columnGap: spacing.md,
+            rowGap: spacing.xxs,
+          }}>
           <AppText size="xxl" weight="bold" heading>
             Qibla
           </AppText>
@@ -44,21 +53,61 @@ export default function QiblaScreen() {
         ) : null}
 
         {view === 'compass' && !permissionDenied && (
-          <View style={{ flex: 1, justifyContent: 'center' }}>
-            <QiblaCompass heading={heading ?? 0} qiblaBearing={bearing} />
-            {coords.source === 'settings' && (
-              <AppText size="xs" tone="textMuted" align="center" style={{ marginTop: spacing.lg }}>
-                Basert på valgt sted. Gi posisjonstilgang for mer nøyaktig retning.
-              </AppText>
+          <ScrollView
+            contentContainerStyle={{
+              flexGrow: 1,
+              justifyContent: 'center',
+              paddingBottom: spacing.lg,
+            }}
+            showsVerticalScrollIndicator={false}>
+            {isLandscape ? (
+              <RotateNotice bearing={bearing} />
+            ) : (
+              <>
+                <QiblaCompass heading={heading ?? 0} qiblaBearing={bearing} />
+                {coords.source === 'settings' && (
+                  <AppText
+                    size="xs"
+                    tone="textMuted"
+                    align="center"
+                    style={{ marginTop: spacing.lg }}>
+                    Basert på valgt sted. Gi posisjonstilgang for mer nøyaktig retning.
+                  </AppText>
+                )}
+              </>
             )}
-          </View>
+          </ScrollView>
         )}
 
-        {view === 'map' && <QiblaMap lat={coords.lat} lon={coords.lon} heading={heading} />}
+        {view === 'map' && (
+          <QiblaMap lat={coords.lat} lon={coords.lon} heading={isLandscape ? null : heading} />
+        )}
 
-        {view === '3d' && <QiblaAr qiblaBearing={bearing} />}
+        {view === '3d' &&
+          (isLandscape ? (
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+              <RotateNotice bearing={bearing} />
+            </View>
+          ) : (
+            <QiblaAr qiblaBearing={bearing} />
+          ))}
       </View>
     </Screen>
+  );
+}
+
+function RotateNotice({ bearing }: { bearing: number }) {
+  const theme = useTheme();
+  return (
+    <Card rounded="xl" style={{ alignItems: 'center', gap: spacing.md }}>
+      <Ionicons name="phone-portrait-outline" size={32} color={theme.colors.primary} />
+      <AppText size="display" weight="bold" heading tabular>
+        {Math.round(bearing)}°
+      </AppText>
+      <AppText tone="textSecondary" align="center">
+        Qibla ligger {Math.round(bearing)}° fra nord. Vend enheten til stående for å bruke kompasset.
+      </AppText>
+    </Card>
   );
 }
 
@@ -109,7 +158,10 @@ function ViewSwitcher({ view, onChange }: { view: QiblaView; onChange: (view: Qi
             <AppText
               size="sm"
               weight={isActive ? 'semibold' : 'regular'}
-              tone={isActive ? 'textPrimary' : 'textMuted'}>
+              tone={isActive ? 'textPrimary' : 'textMuted'}
+              maxFontSizeMultiplier={1.4}
+              numberOfLines={1}
+              style={{ flexShrink: 1 }}>
               {option.label}
             </AppText>
           </Pressable>

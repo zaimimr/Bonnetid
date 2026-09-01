@@ -42,7 +42,14 @@ export function MosqueCard({ mosque, distanceKm, showEid, onPress }: MosqueCardP
               {mosque.address}
             </AppText>
           ) : null}
-          <View style={{ flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xxs }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              columnGap: spacing.sm,
+              rowGap: spacing.xs,
+              marginTop: spacing.xxs,
+            }}>
             {distanceKm != null && <Badge label={formatDistance(distanceKm)} variant="neutral" />}
             {eidTimes.length > 0 && <Badge label={`Eid ${eidTimes.join(' · ')}`} variant="primary" />}
             {nextJummah && <Badge label={`Jummah ${nextJummah}`} variant="primary" />}

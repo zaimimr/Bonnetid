@@ -32,16 +32,17 @@ export function EventCard({ event, selected = false, onPress }: EventCardProps) 
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
         <View
           style={{
-            width: 48,
+            minWidth: 48,
+            paddingHorizontal: spacing.xs,
             borderRadius: radius.md,
             backgroundColor: selected ? theme.colors.surface : theme.colors.primarySoft,
             paddingVertical: spacing.sm,
             alignItems: 'center',
           }}>
-          <AppText size="lg" weight="bold" tone="onPrimarySoft">
+          <AppText size="lg" weight="bold" tone="onPrimarySoft" numberOfLines={1}>
             {date.getDate()}
           </AppText>
-          <AppText size="xs" tone="onPrimarySoft">
+          <AppText size="xs" tone="onPrimarySoft" numberOfLines={1}>
             {monthName(date.getMonth()).slice(0, 3)}
           </AppText>
         </View>

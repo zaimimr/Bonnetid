@@ -3,7 +3,7 @@
     "name": "Bønnetid",
     "slug": "bonnetid",
     "version": "1.1.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "bonnetid",
     "userInterfaceStyle": "automatic",
@@ -13,7 +13,7 @@
       "backgroundColor": "#0F1714"
     },
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "no.irn.bonnetid",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,

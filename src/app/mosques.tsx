@@ -97,7 +97,14 @@ export default function MosquesScreen() {
           <ModeToggle mode={mode} onChange={setMode} />
         </View>
 
-        <View style={{ flexDirection: 'row', gap: spacing.sm, paddingBottom: spacing.md }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            columnGap: spacing.sm,
+            rowGap: spacing.sm,
+            paddingBottom: spacing.md,
+          }}>
           <SortChip
             label="Nærmest meg"
             icon="navigate-outline"
@@ -224,7 +231,9 @@ function SortChip({
       <AppText
         size="sm"
         weight={active ? 'semibold' : 'regular'}
-        tone={active ? 'onPrimarySoft' : 'textSecondary'}>
+        tone={active ? 'onPrimarySoft' : 'textSecondary'}
+        numberOfLines={1}
+        style={{ flexShrink: 1 }}>
         {label}
       </AppText>
     </Pressable>

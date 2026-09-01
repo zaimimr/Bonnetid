@@ -7,11 +7,13 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/components/ui';
+import { useResponsive } from '@/hooks/useResponsive';
 import { isQiblaAligned, normalizeAngleDelta } from '@/lib/geo';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
 
-const COMPASS_SIZE = 280;
+const MAX_COMPASS_SIZE = 280;
+const MIN_COMPASS_SIZE = 160;
 
 function shortestRotation(from: number, to: number): number {
   return from + normalizeAngleDelta(to - from);
@@ -31,7 +33,12 @@ export type QiblaCompassProps = {
 
 export function QiblaCompass({ heading, qiblaBearing }: QiblaCompassProps) {
   const theme = useTheme();
+  const { width, height } = useResponsive();
   const roseRotation = useSharedValue(0);
+
+  const compassSize = Math.round(
+    Math.max(MIN_COMPASS_SIZE, Math.min(MAX_COMPASS_SIZE, width - spacing.xxl * 2, height * 0.42)),
+  );
 
   const isAligned = isQiblaAligned(heading, qiblaBearing);
 
@@ -47,7 +54,7 @@ export function QiblaCompass({ heading, qiblaBearing }: QiblaCompassProps) {
 
   return (
     <View style={{ alignItems: 'center', gap: spacing.xl }}>
-      <View style={{ width: COMPASS_SIZE, height: COMPASS_SIZE + 20, alignItems: 'center' }}>
+      <View style={{ width: compassSize, height: compassSize + 20, alignItems: 'center' }}>
         <Ionicons
           name="caret-down"
           size={26}
@@ -57,9 +64,9 @@ export function QiblaCompass({ heading, qiblaBearing }: QiblaCompassProps) {
         <Animated.View
           style={[
             {
-              width: COMPASS_SIZE,
-              height: COMPASS_SIZE,
-              borderRadius: COMPASS_SIZE / 2,
+              width: compassSize,
+              height: compassSize,
+              borderRadius: compassSize / 2,
               borderWidth: 3,
               borderColor: isAligned ? theme.colors.primary : theme.colors.border,
               backgroundColor: theme.colors.surface,
@@ -73,8 +80,8 @@ export function QiblaCompass({ heading, qiblaBearing }: QiblaCompassProps) {
               key={cardinal.label}
               style={{
                 position: 'absolute',
-                width: COMPASS_SIZE,
-                height: COMPASS_SIZE,
+                width: compassSize,
+                height: compassSize,
                 alignItems: 'center',
                 transform: [{ rotate: `${cardinal.angle}deg` }],
               }}>
@@ -91,8 +98,8 @@ export function QiblaCompass({ heading, qiblaBearing }: QiblaCompassProps) {
           <View
             style={{
               position: 'absolute',
-              width: COMPASS_SIZE,
-              height: COMPASS_SIZE,
+              width: compassSize,
+              height: compassSize,
               alignItems: 'center',
               transform: [{ rotate: `${qiblaBearing}deg` }],
             }}>

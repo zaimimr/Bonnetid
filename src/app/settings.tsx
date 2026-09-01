@@ -134,7 +134,7 @@ export default function SettingsScreen() {
                 <Ionicons name="musical-notes-outline" size={20} color={theme.colors.primary} />
               }
               trailing={
-                <AppText size="sm" tone="textMuted">
+                <AppText size="sm" tone="textMuted" numberOfLines={1}>
                   {getNotificationSound(notificationSound).label}
                 </AppText>
               }
@@ -258,7 +258,7 @@ function AsrMethodDropdown({
         leading={<Ionicons name="partly-sunny-outline" size={20} color={theme.colors.primary} />}
         trailing={
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-            <AppText size="sm" tone="textMuted">
+            <AppText size="sm" tone="textMuted" numberOfLines={1}>
               {current?.label}
             </AppText>
             <Ionicons
@@ -342,7 +342,10 @@ function SegmentedRow<T extends string>({
             <AppText
               size="sm"
               weight={isActive ? 'semibold' : 'regular'}
-              tone={isActive ? 'textPrimary' : 'textMuted'}>
+              tone={isActive ? 'textPrimary' : 'textMuted'}
+              align="center"
+              maxFontSizeMultiplier={1.4}
+              numberOfLines={1}>
               {option.label}
             </AppText>
           </Pressable>
