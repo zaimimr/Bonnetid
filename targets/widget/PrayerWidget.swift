@@ -5,11 +5,20 @@ struct PrayerTimelineEntry: TimelineEntry {
   let date: Date
   let moment: PrayerMoment?
   let dailyPrayers: [PrayerEntry]
+  /// Start time of the prayer that is running, so a column can be marked as the one in progress.
+  let currentPrayerAt: Date?
+  let showJamat: Bool
 }
 
 struct PrayerTimelineProvider: TimelineProvider {
   func placeholder(in context: Context) -> PrayerTimelineEntry {
-    PrayerTimelineEntry(date: Date(), moment: nil, dailyPrayers: [])
+    PrayerTimelineEntry(
+      date: Date(),
+      moment: nil,
+      dailyPrayers: [],
+      currentPrayerAt: nil,
+      showJamat: false
+    )
   }
 
   func getSnapshot(in context: Context, completion: @escaping (PrayerTimelineEntry) -> Void) {
@@ -36,14 +45,22 @@ struct PrayerTimelineProvider: TimelineProvider {
 
   private func entry(at date: Date, snapshot: PrayerSnapshot?) -> PrayerTimelineEntry {
     guard let snapshot else {
-      return PrayerTimelineEntry(date: date, moment: nil, dailyPrayers: [])
+      return PrayerTimelineEntry(
+        date: date,
+        moment: nil,
+        dailyPrayers: [],
+        currentPrayerAt: nil,
+        showJamat: false
+      )
     }
     let moment = PrayerMoment.resolve(from: snapshot, at: date)
     return PrayerTimelineEntry(
       date: date,
       moment: moment,
       // After the last prayer of the day the useful column set is tomorrow's, not today's.
-      dailyPrayers: snapshot.dailyPrayers(for: moment?.headline.at ?? date)
+      dailyPrayers: snapshot.dailyPrayers(for: moment?.headline.at ?? date),
+      currentPrayerAt: snapshot.currentPrayer(at: date)?.at,
+      showJamat: snapshot.jamatVisible
     )
   }
 }
@@ -89,7 +106,7 @@ private struct SmallPrayerView: View {
         Image(systemName: PrayerFormat.symbol(for: moment.headline.kind))
           .font(.caption)
           .foregroundStyle(PrayerColor.brand)
-        Text(moment.headline.label)
+        Text(moment.headline.printedLabel)
           .font(.headline)
           .foregroundStyle(PrayerColor.brand)
           .lineLimit(1)
@@ -150,7 +167,11 @@ private struct MediumPrayerView: View {
 
       HStack(alignment: .center, spacing: 4) {
         ForEach(entry.dailyPrayers, id: \.at) { prayer in
-          PrayerColumn(prayer: prayer, isNext: prayer.at == moment.headline.at)
+          PrayerColumn(
+            prayer: prayer,
+            isCurrent: prayer.at == entry.currentPrayerAt,
+            showJamat: entry.showJamat
+          )
         }
       }
 
@@ -181,27 +202,36 @@ private struct MediumPrayerView: View {
 
 private struct PrayerColumn: View {
   let prayer: PrayerEntry
-  let isNext: Bool
+  /// The plate marks the prayer in progress, never one that has not started yet.
+  let isCurrent: Bool
+  let showJamat: Bool
 
   var body: some View {
     VStack(spacing: 3) {
-      Text(prayer.label)
+      Text(prayer.printedLabel)
         .font(.caption2)
-        .foregroundStyle(isNext ? PrayerColor.onBrandPlate : PrayerColor.inkMuted)
+        .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.inkMuted)
         .lineLimit(1)
         .minimumScaleFactor(0.7)
-      Text(PrayerFormat.time(prayer.at))
-        .prayerTime(.system(.subheadline, design: .default).weight(isNext ? .bold : .medium))
-        .foregroundStyle(isNext ? PrayerColor.onBrandPlate : PrayerColor.ink)
+      Text(PrayerFormat.time(prayer.printedAt))
+        .prayerTime(.system(.subheadline, design: .default).weight(isCurrent ? .bold : .medium))
+        .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.ink)
         .lineLimit(1)
         .minimumScaleFactor(0.7)
+      if showJamat, let jamat = prayer.jamat {
+        Text(PrayerFormat.time(jamat))
+          .prayerTime(.caption2)
+          .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.brand)
+          .lineLimit(1)
+          .minimumScaleFactor(0.7)
+      }
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, 6)
     .padding(.horizontal, 2)
     .background(
       RoundedRectangle(cornerRadius: 10, style: .continuous)
-        .fill(isNext ? PrayerColor.brandPlate : Color.clear)
+        .fill(isCurrent ? PrayerColor.brandPlate : Color.clear)
     )
   }
 }
@@ -215,7 +245,7 @@ private struct RectangularPrayerView: View {
       HStack(spacing: 4) {
         Image(systemName: PrayerFormat.symbol(for: moment.headline.kind))
           .font(.caption2)
-        Text(moment.headline.label)
+        Text(moment.headline.printedLabel)
           .font(.headline)
           .lineLimit(1)
         Text(PrayerFormat.time(moment.headline.at))
@@ -259,7 +289,7 @@ private struct InlinePrayerView: View {
 
   var body: some View {
     Label(
-      "\(moment.headline.label) \(PrayerFormat.time(moment.headline.at))",
+      "\(moment.headline.printedLabel) \(PrayerFormat.time(moment.headline.at))",
       systemImage: PrayerFormat.symbol(for: moment.headline.kind)
     )
     .containerBackground(.clear, for: .widget)

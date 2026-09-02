@@ -14,7 +14,8 @@ struct PrayerActivityState: Record {
   @Field var windowStart: Double = 0
   @Field var windowEnd: Double = 0
   @Field var isNow: Bool = false
-  @Field var nextLabel: String = ""
+  /// When the activity should be gone from the screen.
+  @Field var dismissAt: Double = 0
 }
 
 @available(iOS 16.2, *)
@@ -49,23 +50,32 @@ public class PrayerWidgetModule: Module {
         throw LiveActivityDisabledException()
       }
 
+      let dismissAt = Date(timeIntervalSince1970: state.dismissAt)
       let content = ActivityContent(
         state: state.toContentState(),
-        staleDate: Date(timeIntervalSince1970: state.windowEnd).addingTimeInterval(5 * 60),
+        staleDate: dismissAt,
         relevanceScore: state.isNow ? 100 : 50
       )
 
+      let activity: Activity<PrayerActivityAttributes>
       if let existing = ActivityStore.current ?? Self.adoptRunningActivity() {
         await existing.update(content)
-        ActivityStore.current = existing
-        return
+        activity = existing
+      } else {
+        activity = try Activity.request(
+          attributes: PrayerActivityAttributes(locationName: state.locationName),
+          content: content,
+          pushType: nil
+        )
       }
+      ActivityStore.current = activity
 
-      ActivityStore.current = try Activity.request(
-        attributes: PrayerActivityAttributes(locationName: state.locationName),
-        content: content,
-        pushType: nil
-      )
+      // Once the prayer has started nothing more needs to change, so hand ActivityKit the
+      // removal time: the activity leaves the screen on its own, with the app closed.
+      if state.isNow {
+        await activity.end(content, dismissalPolicy: .after(dismissAt))
+        ActivityStore.current = nil
+      }
     }
 
     AsyncFunction("endActivity") {
@@ -92,8 +102,7 @@ private extension PrayerActivityState {
       prayerAt: Date(timeIntervalSince1970: prayerAt),
       windowStart: Date(timeIntervalSince1970: windowStart),
       windowEnd: Date(timeIntervalSince1970: windowEnd),
-      isNow: isNow,
-      nextLabel: nextLabel
+      isNow: isNow
     )
   }
 }

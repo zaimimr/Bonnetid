@@ -10,15 +10,16 @@ import { useHijriMonth, useMosque, usePrayerTimes } from '@/api/queries';
 import type { PrayerDay } from '@/api/types';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { formatHijri } from '@/lib/hijri';
+import { resolveActivityWindow } from '@/lib/liveActivityWindow';
+import { isJummahCell, type SnapshotDayInput } from '@/lib/widgetSnapshot';
 import {
   adhanTimesFromSchedule,
   buildDaySchedule,
-  findNextPrayer,
   jamatTimesForDate,
   type PrayerEntry,
 } from '@/lib/prayerSchedule';
 import { isoDateKey, parseDayKey, todayKey } from '@/lib/time';
-import { buildSnapshot, snapshotIsEmpty, type SnapshotDayInput } from '@/lib/widgetSnapshot';
+import { buildSnapshot, snapshotIsEmpty } from '@/lib/widgetSnapshot';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
 const SNAPSHOT_DAYS = 3;
@@ -42,6 +43,7 @@ export function useWidgetSync(now: Date) {
   const location = useActiveLocation();
   const asrMethod = useEffectiveAsrMethod();
   const mosque = useSettings((state) => state.mosque);
+  const showJamat = useSettings((state) => state.widgetShowJamat);
   const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
 
   const dayKey = todayKey(now);
@@ -82,6 +84,7 @@ export function useWidgetSync(now: Date) {
         schedule,
         hijriText: hijriRow ? formatHijri(hijriRow.hijri_date, hijriRow.hijri_month_text) : '',
         jamatTimes,
+        hasJummah: mosqueInLocation && (mosqueDetails.data?.jummah?.length ?? 0) > 0,
       };
     });
 
@@ -103,10 +106,11 @@ export function useWidgetSync(now: Date) {
       buildSnapshot({
         locationName: location.name,
         mosqueName: mosqueInLocation ? (mosque?.name ?? null) : null,
+        showJamat: showJamat && mosqueInLocation && mosque != null,
         generatedAt: now,
         days,
       }),
-    [location.name, mosque?.name, mosqueInLocation, days, now],
+    [location.name, mosque, mosqueInLocation, showJamat, days, now],
   );
 
   // `now` ticks every second in the app; the payload only matters when the times change.
@@ -131,7 +135,7 @@ export function useWidgetSync(now: Date) {
     return { today, tomorrow };
   }, [days]);
 
-  const syncActivity = useLiveActivitySync(location.name, schedules);
+  const syncActivity = useLiveActivitySync(location.name, schedules, days);
 
   useEffect(() => {
     syncActivity();
@@ -145,10 +149,12 @@ export function useWidgetSync(now: Date) {
 /**
  * The activity is refreshed whenever the app comes to the foreground: iOS only lets an app start
  * one while it is running, and ActivityKit keeps the countdown ticking on its own in between.
+ * It only exists inside the window around a prayer (see resolveActivityWindow).
  */
 function useLiveActivitySync(
   locationName: string,
   schedules: { today: PrayerEntry[]; tomorrow: PrayerEntry[] },
+  days: SnapshotDayInput[],
 ) {
   const enabled = useSettings((state) => state.liveActivityEnabled);
   const lastState = useRef<string | null>(null);
@@ -157,31 +163,38 @@ function useLiveActivitySync(
     return () => {
       if (!prayerWidgetAvailable) return;
 
+      const stop = () => {
+        lastState.current = null;
+        void endPrayerActivity();
+      };
+
       if (!enabled) {
-        lastState.current = null;
-        void endPrayerActivity();
+        stop();
         return;
       }
 
-      const at = new Date();
-      const result = findNextPrayer(schedules.today, schedules.tomorrow, at);
-      if (!result) {
-        lastState.current = null;
-        void endPrayerActivity();
+      const window = resolveActivityWindow(
+        [...schedules.today, ...schedules.tomorrow],
+        new Date(),
+      );
+      if (!window) {
+        stop();
         return;
       }
 
-      const headline = result.current ?? result.next;
-      const windowStart = result.current?.date ?? at;
+      const day = days.find((entry) => entry.date.toDateString() === window.prayer.date.toDateString());
+      const label =
+        day && isJummahCell(day, window.prayer.name) ? 'Jummah' : window.prayer.label;
+
       const state = {
         locationName,
-        prayerLabel: headline.label,
-        prayerKind: headline.name,
-        prayerAt: headline.date.getTime() / 1000,
-        windowStart: windowStart.getTime() / 1000,
-        windowEnd: result.next.date.getTime() / 1000,
-        isNow: result.current != null,
-        nextLabel: result.next.label,
+        prayerLabel: label,
+        prayerKind: window.prayer.name,
+        prayerAt: window.prayer.date.getTime() / 1000,
+        windowStart: window.phaseStart.getTime() / 1000,
+        windowEnd: window.phaseEnd.getTime() / 1000,
+        isNow: window.isNow,
+        dismissAt: window.dismissAt.getTime() / 1000,
       };
 
       const key = JSON.stringify(state);
@@ -189,5 +202,5 @@ function useLiveActivitySync(
       lastState.current = key;
       void startOrUpdatePrayerActivity(state);
     };
-  }, [enabled, locationName, schedules.today, schedules.tomorrow]);
+  }, [enabled, locationName, schedules.today, schedules.tomorrow, days]);
 }

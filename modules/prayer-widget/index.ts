@@ -6,10 +6,12 @@ export type PrayerActivityState = {
   prayerKind: string;
   /** Epoch seconds. */
   prayerAt: number;
+  /** Bounds of the phase being shown, for the progress bar. */
   windowStart: number;
   windowEnd: number;
   isNow: boolean;
-  nextLabel: string;
+  /** When the activity should leave the screen for good. */
+  dismissAt: number;
 };
 
 type PrayerWidgetNativeModule = {

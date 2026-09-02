@@ -9,6 +9,13 @@ struct PrayerEntry: Codable, Hashable {
   let at: Date
   let isPrayer: Bool
   let jamat: Date?
+  /// Optional so a snapshot written by an older build still decodes.
+  let displayLabel: String?
+  let displayAt: Date?
+
+  /// What a widget prints: "Jummah" on Friday when the mosque has one.
+  var printedLabel: String { displayLabel ?? label }
+  var printedAt: Date { displayAt ?? at }
 }
 
 struct PrayerDaySnapshot: Codable, Hashable {
@@ -23,13 +30,18 @@ struct PrayerSnapshot: Codable, Hashable {
   let locationName: String
   let mosqueName: String?
   let days: [PrayerDaySnapshot]
+  /// Optional so a snapshot written by an older build still decodes.
+  let showJamat: Bool?
+
+  var jamatVisible: Bool { showJamat ?? false }
 
   static let placeholder = PrayerSnapshot(
     version: 1,
     generatedAt: Date(),
     locationName: "Oslo",
     mosqueName: nil,
-    days: []
+    days: [],
+    showJamat: false
   )
 
   static func load() -> PrayerSnapshot? {
@@ -74,6 +86,21 @@ struct PrayerSnapshot: Codable, Hashable {
   func hijriText(for date: Date) -> String {
     let key = PrayerSnapshot.dayKeyFormatter.string(from: date)
     return days.first(where: { $0.date == key })?.hijriText ?? days.first?.hijriText ?? ""
+  }
+
+  /// The prayer that is currently running, using the same boundaries as the app: the last
+  /// prayer that has started, until the next entry begins. Sunrise counts as a boundary, so
+  /// Fajr stops being current at sunrise rather than lingering until Duhr.
+  func currentPrayer(at date: Date) -> PrayerEntry? {
+    let entries = allPrayers
+    guard let index = entries.lastIndex(where: { $0.isPrayer && $0.at <= date }) else {
+      return nil
+    }
+    let next = entries.index(after: index)
+    if entries.indices.contains(next), date >= entries[next].at {
+      return nil
+    }
+    return entries[index]
   }
 
   /// The five daily prayers for the calendar day containing `date`, sunrise excluded.

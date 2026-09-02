@@ -40,6 +40,7 @@ type SettingsState = {
   notificationSound: NotificationSoundKey;
   notificationPrayers: Record<NotifiablePrayer, boolean>;
   liveActivityEnabled: boolean;
+  widgetShowJamat: boolean;
   launchCount: number;
   reviewRequested: boolean;
   registerLaunch: () => void;
@@ -52,6 +53,7 @@ type SettingsState = {
   setNotificationSound: (sound: NotificationSoundKey) => void;
   toggleNotificationPrayer: (prayer: NotifiablePrayer) => void;
   setLiveActivityEnabled: (enabled: boolean) => void;
+  setWidgetShowJamat: (show: boolean) => void;
 };
 
 export const DEFAULT_LOCATION: SavedLocation = {
@@ -72,6 +74,7 @@ export const useSettings = create<SettingsState>()(
       notificationSound: 'default',
       notificationPrayers: ALL_PRAYERS_ENABLED,
       liveActivityEnabled: true,
+      widgetShowJamat: false,
       launchCount: 0,
       reviewRequested: false,
       registerLaunch: () => set((state) => ({ launchCount: state.launchCount + 1 })),
@@ -86,6 +89,7 @@ export const useSettings = create<SettingsState>()(
       setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),
       setNotificationSound: (notificationSound) => set({ notificationSound }),
       setLiveActivityEnabled: (liveActivityEnabled) => set({ liveActivityEnabled }),
+      setWidgetShowJamat: (widgetShowJamat) => set({ widgetShowJamat }),
       toggleNotificationPrayer: (prayer) =>
         set((state) => ({
           notificationPrayers: {
