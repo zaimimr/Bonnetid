@@ -1,3 +1,4 @@
+import AppIntents
 import SwiftUI
 import WidgetKit
 
@@ -12,7 +13,7 @@ struct PrayerTimelineEntry: TimelineEntry {
   let hasJamatTimes: Bool
 }
 
-struct PrayerTimelineProvider: TimelineProvider {
+struct PrayerTimelineProvider: AppIntentTimelineProvider {
   func placeholder(in context: Context) -> PrayerTimelineEntry {
     PrayerTimelineEntry(
       date: Date(),
@@ -24,29 +25,44 @@ struct PrayerTimelineProvider: TimelineProvider {
     )
   }
 
-  func getSnapshot(in context: Context, completion: @escaping (PrayerTimelineEntry) -> Void) {
-    completion(entry(at: Date(), snapshot: PrayerSnapshot.load()))
+  func snapshot(
+    for configuration: PrayerWidgetConfiguration,
+    in context: Context
+  ) async -> PrayerTimelineEntry {
+    entry(at: Date(), snapshot: PrayerSnapshot.load(), showJamat: configuration.showJamat)
   }
 
-  func getTimeline(in context: Context, completion: @escaping (Timeline<PrayerTimelineEntry>) -> Void) {
+  func timeline(
+    for configuration: PrayerWidgetConfiguration,
+    in context: Context
+  ) async -> Timeline<PrayerTimelineEntry> {
     let now = Date()
     let snapshot = PrayerSnapshot.load()
-    var entries: [PrayerTimelineEntry] = [entry(at: now, snapshot: snapshot)]
+    let showJamat = configuration.showJamat
+    var entries = [entry(at: now, snapshot: snapshot, showJamat: showJamat)]
 
     // Pre-computed entries cost nothing at runtime, so the countdown stays honest without
     // spending the widget's refresh budget: every minute for the next hour, then every
     // five minutes for the rest of the day.
     for minute in stride(from: 1, through: 60, by: 1) {
-      entries.append(entry(at: now.addingTimeInterval(Double(minute) * 60), snapshot: snapshot))
+      entries.append(
+        entry(at: now.addingTimeInterval(Double(minute) * 60), snapshot: snapshot, showJamat: showJamat)
+      )
     }
     for minute in stride(from: 65, through: 12 * 60, by: 5) {
-      entries.append(entry(at: now.addingTimeInterval(Double(minute) * 60), snapshot: snapshot))
+      entries.append(
+        entry(at: now.addingTimeInterval(Double(minute) * 60), snapshot: snapshot, showJamat: showJamat)
+      )
     }
 
-    completion(Timeline(entries: entries, policy: .atEnd))
+    return Timeline(entries: entries, policy: .atEnd)
   }
 
-  private func entry(at date: Date, snapshot: PrayerSnapshot?) -> PrayerTimelineEntry {
+  private func entry(
+    at date: Date,
+    snapshot: PrayerSnapshot?,
+    showJamat: Bool
+  ) -> PrayerTimelineEntry {
     guard let snapshot else {
       return PrayerTimelineEntry(
         date: date,
@@ -64,7 +80,7 @@ struct PrayerTimelineProvider: TimelineProvider {
       // After the last prayer of the day the useful column set is tomorrow's, not today's.
       dailyPrayers: snapshot.dailyPrayers(for: moment?.headline.at ?? date),
       currentPrayerAt: snapshot.currentPrayer(at: date)?.at,
-      showJamat: WidgetPreferences.showJamat,
+      showJamat: showJamat,
       hasJamatTimes: snapshot.hasJamatTimes
     )
   }
@@ -182,23 +198,21 @@ private struct MediumPrayerView: View {
 
       Spacer(minLength: 8)
 
-      HStack(spacing: 8) {
-        HStack(spacing: 5) {
-          Image(systemName: PrayerFormat.symbol(for: moment.headline.kind))
+      HStack(spacing: 5) {
+        Image(systemName: PrayerFormat.symbol(for: moment.headline.kind))
+          .font(.caption2)
+        Text(footerLine)
+          .font(.caption)
+          .fontWeight(.medium)
+          .lineLimit(1)
+          .minimumScaleFactor(0.8)
+        if entry.showJamat, entry.hasJamatTimes {
+          Text("· jamat")
             .font(.caption2)
-          Text(footerLine)
-            .font(.caption)
-            .fontWeight(.medium)
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
-        }
-        .foregroundStyle(PrayerColor.brand)
-
-        if entry.hasJamatTimes {
-          Spacer(minLength: 4)
-          JamatToggle(isOn: entry.showJamat)
+            .foregroundStyle(PrayerColor.inkMuted)
         }
       }
+      .foregroundStyle(PrayerColor.brand)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     .containerBackground(PrayerColor.surface, for: .widget)
@@ -245,31 +259,6 @@ private struct PrayerColumn: View {
       RoundedRectangle(cornerRadius: 10, style: .continuous)
         .fill(isCurrent ? PrayerColor.brandPlate : Color.clear)
     )
-  }
-}
-
-/// Tapping this runs ToggleJamatIntent in the extension: the widget reloads with the other
-/// mode, without opening the app.
-private struct JamatToggle: View {
-  let isOn: Bool
-
-  var body: some View {
-    Button(intent: ToggleJamatIntent()) {
-      HStack(spacing: 3) {
-        Image(systemName: isOn ? "checkmark" : "plus")
-          .font(.system(size: 9, weight: .bold))
-        Text("Jamat")
-          .font(.caption2)
-          .fontWeight(.medium)
-      }
-      .foregroundStyle(isOn ? PrayerColor.onBrandPlate : PrayerColor.inkMuted)
-      .padding(.horizontal, 8)
-      .padding(.vertical, 5)
-      .background(
-        Capsule().fill(isOn ? PrayerColor.brandPlate : PrayerColor.hairline.opacity(0.5))
-      )
-    }
-    .buttonStyle(.plain)
   }
 }
 
@@ -371,7 +360,11 @@ private struct MissingSnapshotView: View {
 
 struct PrayerWidget: Widget {
   var body: some WidgetConfiguration {
-    StaticConfiguration(kind: "BonnetidPrayerWidget", provider: PrayerTimelineProvider()) { entry in
+    AppIntentConfiguration(
+      kind: "BonnetidPrayerWidget",
+      intent: PrayerWidgetConfiguration.self,
+      provider: PrayerTimelineProvider()
+    ) { entry in
       PrayerWidgetView(entry: entry)
     }
     .configurationDisplayName("Bønnetider")
