@@ -5,7 +5,7 @@ module.exports = (config) => ({
   displayName: 'Bønnetid',
   icon: '../../assets/images/icon.png',
   deploymentTarget: '17.0',
-  frameworks: ['SwiftUI', 'WidgetKit', 'ActivityKit'],
+  frameworks: ['SwiftUI', 'WidgetKit', 'ActivityKit', 'AppIntents'],
   entitlements: {
     'com.apple.security.application-groups':
       config.ios.entitlements['com.apple.security.application-groups'],

@@ -43,7 +43,6 @@ export function useWidgetSync(now: Date) {
   const location = useActiveLocation();
   const asrMethod = useEffectiveAsrMethod();
   const mosque = useSettings((state) => state.mosque);
-  const showJamat = useSettings((state) => state.widgetShowJamat);
   const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
 
   const dayKey = todayKey(now);
@@ -106,11 +105,10 @@ export function useWidgetSync(now: Date) {
       buildSnapshot({
         locationName: location.name,
         mosqueName: mosqueInLocation ? (mosque?.name ?? null) : null,
-        showJamat: showJamat && mosqueInLocation && mosque != null,
         generatedAt: now,
         days,
       }),
-    [location.name, mosque, mosqueInLocation, showJamat, days, now],
+    [location.name, mosque, mosqueInLocation, days, now],
   );
 
   // `now` ticks every second in the app; the payload only matters when the times change.

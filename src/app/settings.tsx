@@ -45,8 +45,6 @@ export default function SettingsScreen() {
   const notificationPrayers = useSettings((state) => state.notificationPrayers);
   const liveActivityEnabled = useSettings((state) => state.liveActivityEnabled);
   const setLiveActivityEnabled = useSettings((state) => state.setLiveActivityEnabled);
-  const widgetShowJamat = useSettings((state) => state.widgetShowJamat);
-  const setWidgetShowJamat = useSettings((state) => state.setWidgetShowJamat);
   const toggleNotificationPrayer = useSettings((state) => state.toggleNotificationPrayer);
   const asrOverride = useMosqueAsrOverride();
   const asrLocationDefault = useLocationAsrDefault();
@@ -169,33 +167,6 @@ export default function SettingsScreen() {
           </>
         )}
       </Card>
-
-      {prayerWidgetAvailable && (
-        <>
-          <SectionHeader title="Widget" />
-          <Card padding="sm" rounded="xl">
-            <ListRow
-              title="Vis jamat-tider"
-              subtitle={
-                mosque
-                  ? `Jamat-tidene fra ${mosque.name} under adhan-tidene i widgeten`
-                  : 'Velg din moské for å vise jamat-tider i widgeten'
-              }
-              leading={<Ionicons name="grid-outline" size={20} color={theme.colors.primary} />}
-              trailing={
-                <Switch
-                  value={widgetShowJamat && mosque != null}
-                  onValueChange={setWidgetShowJamat}
-                  disabled={mosque == null}
-                  trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
-                  thumbColor={theme.colors.surface}
-                />
-              }
-              style={{ paddingHorizontal: spacing.md }}
-            />
-          </Card>
-        </>
-      )}
 
       {liveActivitySupported && (
         <>

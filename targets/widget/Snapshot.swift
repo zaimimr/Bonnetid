@@ -11,11 +11,17 @@ struct PrayerEntry: Codable, Hashable {
   let jamat: Date?
   /// Optional so a snapshot written by an older build still decodes.
   let displayLabel: String?
-  let displayAt: Date?
+  let isJummah: Bool?
 
   /// What a widget prints: "Jummah" on Friday when the mosque has one.
   var printedLabel: String { displayLabel ?? label }
-  var printedAt: Date { displayAt ?? at }
+
+  /// The single time to print when jamat times are hidden. On Friday the congregation time is
+  /// the one people need, so it wins over the adhan.
+  func printedAt(showJamat: Bool) -> Date {
+    if !showJamat, isJummah == true, let jamat { return jamat }
+    return at
+  }
 }
 
 struct PrayerDaySnapshot: Codable, Hashable {
@@ -30,18 +36,18 @@ struct PrayerSnapshot: Codable, Hashable {
   let locationName: String
   let mosqueName: String?
   let days: [PrayerDaySnapshot]
-  /// Optional so a snapshot written by an older build still decodes.
-  let showJamat: Bool?
 
-  var jamatVisible: Bool { showJamat ?? false }
+  /// True when at least one prayer has a jamat time, i.e. a mosque is selected.
+  var hasJamatTimes: Bool {
+    days.contains { day in day.prayers.contains { $0.jamat != nil } }
+  }
 
   static let placeholder = PrayerSnapshot(
     version: 1,
     generatedAt: Date(),
     locationName: "Oslo",
     mosqueName: nil,
-    days: [],
-    showJamat: false
+    days: []
   )
 
   static func load() -> PrayerSnapshot? {

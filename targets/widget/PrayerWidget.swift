@@ -8,6 +8,8 @@ struct PrayerTimelineEntry: TimelineEntry {
   /// Start time of the prayer that is running, so a column can be marked as the one in progress.
   let currentPrayerAt: Date?
   let showJamat: Bool
+  /// False when no mosque is selected, in which case the toggle has nothing to show.
+  let hasJamatTimes: Bool
 }
 
 struct PrayerTimelineProvider: TimelineProvider {
@@ -17,7 +19,8 @@ struct PrayerTimelineProvider: TimelineProvider {
       moment: nil,
       dailyPrayers: [],
       currentPrayerAt: nil,
-      showJamat: false
+      showJamat: false,
+      hasJamatTimes: false
     )
   }
 
@@ -50,7 +53,8 @@ struct PrayerTimelineProvider: TimelineProvider {
         moment: nil,
         dailyPrayers: [],
         currentPrayerAt: nil,
-        showJamat: false
+        showJamat: false,
+        hasJamatTimes: false
       )
     }
     let moment = PrayerMoment.resolve(from: snapshot, at: date)
@@ -60,7 +64,8 @@ struct PrayerTimelineProvider: TimelineProvider {
       // After the last prayer of the day the useful column set is tomorrow's, not today's.
       dailyPrayers: snapshot.dailyPrayers(for: moment?.headline.at ?? date),
       currentPrayerAt: snapshot.currentPrayer(at: date)?.at,
-      showJamat: snapshot.jamatVisible
+      showJamat: WidgetPreferences.showJamat,
+      hasJamatTimes: snapshot.hasJamatTimes
     )
   }
 }
@@ -114,7 +119,7 @@ private struct SmallPrayerView: View {
       }
       .padding(.top, 1)
 
-      Text(PrayerFormat.time(moment.headline.at))
+      Text(PrayerFormat.time(moment.headline.printedAt(showJamat: false)))
         .prayerTime(.system(.largeTitle, design: .default).weight(.bold))
         .foregroundStyle(PrayerColor.ink)
         .minimumScaleFactor(0.7)
@@ -177,16 +182,23 @@ private struct MediumPrayerView: View {
 
       Spacer(minLength: 8)
 
-      HStack(spacing: 5) {
-        Image(systemName: PrayerFormat.symbol(for: moment.headline.kind))
-          .font(.caption2)
-        Text(footerLine)
-          .font(.caption)
-          .fontWeight(.medium)
-          .lineLimit(1)
-          .minimumScaleFactor(0.8)
+      HStack(spacing: 8) {
+        HStack(spacing: 5) {
+          Image(systemName: PrayerFormat.symbol(for: moment.headline.kind))
+            .font(.caption2)
+          Text(footerLine)
+            .font(.caption)
+            .fontWeight(.medium)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+        }
+        .foregroundStyle(PrayerColor.brand)
+
+        if entry.hasJamatTimes {
+          Spacer(minLength: 4)
+          JamatToggle(isOn: entry.showJamat)
+        }
       }
-      .foregroundStyle(PrayerColor.brand)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     .containerBackground(PrayerColor.surface, for: .widget)
@@ -213,7 +225,7 @@ private struct PrayerColumn: View {
         .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.inkMuted)
         .lineLimit(1)
         .minimumScaleFactor(0.7)
-      Text(PrayerFormat.time(prayer.printedAt))
+      Text(PrayerFormat.time(prayer.printedAt(showJamat: showJamat)))
         .prayerTime(.system(.subheadline, design: .default).weight(isCurrent ? .bold : .medium))
         .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.ink)
         .lineLimit(1)
@@ -233,6 +245,31 @@ private struct PrayerColumn: View {
       RoundedRectangle(cornerRadius: 10, style: .continuous)
         .fill(isCurrent ? PrayerColor.brandPlate : Color.clear)
     )
+  }
+}
+
+/// Tapping this runs ToggleJamatIntent in the extension: the widget reloads with the other
+/// mode, without opening the app.
+private struct JamatToggle: View {
+  let isOn: Bool
+
+  var body: some View {
+    Button(intent: ToggleJamatIntent()) {
+      HStack(spacing: 3) {
+        Image(systemName: isOn ? "checkmark" : "plus")
+          .font(.system(size: 9, weight: .bold))
+        Text("Jamat")
+          .font(.caption2)
+          .fontWeight(.medium)
+      }
+      .foregroundStyle(isOn ? PrayerColor.onBrandPlate : PrayerColor.inkMuted)
+      .padding(.horizontal, 8)
+      .padding(.vertical, 5)
+      .background(
+        Capsule().fill(isOn ? PrayerColor.brandPlate : PrayerColor.hairline.opacity(0.5))
+      )
+    }
+    .buttonStyle(.plain)
   }
 }
 

@@ -16,7 +16,6 @@ export type SnapshotDayInput = {
 export type SnapshotInput = {
   locationName: string;
   mosqueName?: string | null;
-  showJamat: boolean;
   generatedAt: Date;
   days: SnapshotDayInput[];
 };
@@ -29,10 +28,10 @@ export type SnapshotPrayer = {
   displayLabel: string;
   /** When the prayer starts, used for "next" and "now". */
   at: string;
-  /** The time a widget prints, which can be the jummah time. */
-  displayAt: string;
   isPrayer: boolean;
   jamat: string | null;
+  /** True when `jamat` is this Friday's jummah time rather than an ordinary jamat time. */
+  isJummah: boolean;
 };
 
 export type SnapshotDay = {
@@ -46,7 +45,6 @@ export type Snapshot = {
   generatedAt: string;
   locationName: string;
   mosqueName: string | null;
-  showJamat: boolean;
   days: SnapshotDay[];
 };
 
@@ -74,7 +72,6 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
     generatedAt: input.generatedAt.toISOString(),
     locationName: input.locationName,
     mosqueName: input.mosqueName ?? null,
-    showJamat: input.showJamat,
     days: input.days.map((day) => ({
       date: isoDateKey(day.date),
       hijriText: day.hijriText,
@@ -87,11 +84,9 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
           label: entry.label,
           displayLabel: jummah ? 'Jummah' : entry.label,
           at: entry.date.toISOString(),
-          // With jamat times hidden there is only one line, and on Friday the congregation
-          // time is the one worth printing.
-          displayAt: jummah && !input.showJamat ? jamat : entry.date.toISOString(),
           isPrayer: entry.isPrayer,
           jamat,
+          isJummah: jummah,
         };
       }),
     })),
