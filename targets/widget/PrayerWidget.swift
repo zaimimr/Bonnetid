@@ -128,7 +128,7 @@ private struct MediumPrayerView: View {
   let moment: PrayerMoment
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 10) {
+    VStack(alignment: .leading, spacing: 0) {
       HStack(spacing: 6) {
         Text(moment.locationName)
           .font(.caption)
@@ -146,11 +146,15 @@ private struct MediumPrayerView: View {
         }
       }
 
-      HStack(alignment: .top, spacing: 4) {
+      Spacer(minLength: 8)
+
+      HStack(alignment: .center, spacing: 4) {
         ForEach(entry.dailyPrayers, id: \.at) { prayer in
           PrayerColumn(prayer: prayer, isNext: prayer.at == moment.headline.at)
         }
       }
+
+      Spacer(minLength: 8)
 
       HStack(spacing: 5) {
         Image(systemName: PrayerFormat.symbol(for: moment.headline.kind))
