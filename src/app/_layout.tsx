@@ -35,7 +35,7 @@ const persister = createAsyncStoragePersister({
 const persistOptions = {
   persister,
   maxAge: 60 * DAY,
-  buster: 'v8',
+  buster: 'v9',
 };
 
 configureNotificationHandler();

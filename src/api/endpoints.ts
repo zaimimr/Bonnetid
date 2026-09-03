@@ -157,6 +157,7 @@ type MosqueRow = {
   contact_phone: string | null;
   contact_email: string | null;
   reg_hjemmeside: string | null;
+  logo: string | null;
   show_eid: boolean | null;
   eidprayer_time1: string | null;
   eidprayer_time2: string | null;
@@ -164,7 +165,7 @@ type MosqueRow = {
 };
 
 const MOSQUE_COLUMNS =
-  'organisasjonsnummer, reg_navn, org_name2, org_info, address, post_no, lat, lon, map_only, asr_method, contact_name, contact_phone, contact_email, reg_hjemmeside, show_eid, eidprayer_time1, eidprayer_time2, eidprayer_time3';
+  'organisasjonsnummer, reg_navn, org_name2, org_info, address, post_no, lat, lon, map_only, asr_method, contact_name, contact_phone, contact_email, reg_hjemmeside, logo, show_eid, eidprayer_time1, eidprayer_time2, eidprayer_time3';
 
 type JamatPeriodRow = {
   id: number;
@@ -190,6 +191,11 @@ function toHomepage(value: string | null): string | null {
   const trimmed = value?.trim();
   if (!trimmed) return null;
   return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
+function toLogo(value: string | null): string | null {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
 }
 
 function toAsrMethod(value: number | null): Mosque['asr_method'] {
@@ -250,6 +256,7 @@ function toMosque(
     contact_phone: row.contact_phone,
     contact_email: row.contact_email,
     homepage: toHomepage(row.reg_hjemmeside),
+    logo: toLogo(row.logo),
     asr_method: toAsrMethod(row.asr_method),
     show_eid: row.show_eid ?? false,
     eid_prayers: [row.eidprayer_time1, row.eidprayer_time2, row.eidprayer_time3]
