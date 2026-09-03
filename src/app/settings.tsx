@@ -16,6 +16,7 @@ import { openStoreReview } from '@/lib/review';
 import { getNotificationSound } from '@/lib/notificationSounds';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
 import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
+import { useRamadanStatus } from '@/hooks/useRamadanStatus';
 import {
   NOTIFIABLE_PRAYERS,
   useActiveLocation,
@@ -53,6 +54,10 @@ export default function SettingsScreen() {
   const setEndReminderEnabled = useSettings((state) => state.setEndReminderEnabled);
   const asrOverride = useMosqueAsrOverride();
   const asrLocationDefault = useLocationAsrDefault();
+  const ramadanRemindersEnabled = useSettings((state) => state.ramadanRemindersEnabled);
+  const setRamadanRemindersEnabled = useSettings((state) => state.setRamadanRemindersEnabled);
+  const ramadan = useRamadanStatus(new Date());
+  const showRamadanSection = ramadan.isRamadan || ramadan.daysUntilRamadan != null;
 
   const detectLocation = async () => {
     if (!locations || locating) return;
@@ -189,6 +194,29 @@ export default function SettingsScreen() {
           </>
         )}
       </Card>
+
+      {showRamadanSection && (
+        <>
+          <SectionHeader title="Ramadan" />
+          <Card padding="sm" rounded="xl">
+            <ListRow
+              title="Suhoor-påminnelse"
+              subtitle="45 minutter før Fajr i Ramadan"
+              leading={<Ionicons name="moon-outline" size={20} color={theme.colors.primary} />}
+              trailing={
+                <Switch
+                  value={ramadanRemindersEnabled}
+                  onValueChange={setRamadanRemindersEnabled}
+                  disabled={!notificationsSupported}
+                  trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
+                  thumbColor={theme.colors.surface}
+                />
+              }
+              style={{ paddingHorizontal: spacing.md }}
+            />
+          </Card>
+        </>
+      )}
 
       {liveActivitySupported && (
         <>

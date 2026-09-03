@@ -7,18 +7,19 @@ import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { PrayerTodoCard } from '@/components/prayer/PrayerTodoCard';
 import { WeekStrip } from '@/components/prayer/WeekStrip';
 import { EventCard } from '@/components/calendar/EventCard';
-import { EmptyState, ErrorState, Screen, SectionHeader, Skeleton } from '@/components/ui';
+import { RamadanCard } from '@/components/ramadan/RamadanCard';
+import { AppText, EmptyState, ErrorState, Screen, SectionHeader, Skeleton } from '@/components/ui';
 import { useNow } from '@/hooks/useNow';
+import { useTimezoneNote } from '@/hooks/useTimezoneNote';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { useRefresh } from '@/hooks/useRefresh';
 import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
-import { isoDateKey } from '@/lib/time';
+import { isoDateIsFriday, osloDateKey, osloDayStart } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
 const UPCOMING_EVENT_COUNT = 3;
-const FRIDAY = 5;
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -27,12 +28,15 @@ export default function HomeScreen() {
   const mosque = useSettings((state) => state.mosque);
   const { todaySchedule, nextPrayer, isLoading, isError, refetch } = usePrayerDay(now);
   const { refreshing, onRefresh } = useRefresh();
-  const hijriMonth = useHijriMonth(now.getFullYear(), now.getMonth() + 1);
-  const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
-  const specialsThisYear = useSpecialDates(now.getFullYear());
-  const specialsNextYear = useSpecialDates(now.getFullYear() + 1);
+  const timezoneNote = useTimezoneNote(now);
+  const today = osloDayStart(now);
+  const todayIso = osloDateKey(now);
 
-  const todayIso = isoDateKey(now);
+  const hijriMonth = useHijriMonth(today.getFullYear(), today.getMonth() + 1);
+  const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
+  const specialsThisYear = useSpecialDates(today.getFullYear());
+  const specialsNextYear = useSpecialDates(today.getFullYear() + 1);
+
   const todayHijri = hijriMonth.data?.find((day) => day.gregorian_date === todayIso);
   const hijriText = todayHijri
     ? formatHijri(todayHijri.hijri_date, todayHijri.hijri_month_text)
@@ -72,12 +76,14 @@ export default function HomeScreen() {
             nextPrayer={nextPrayer}
             now={now}
             hijriText={hijriText}
-            gregorianText={formatGregorianLong(now)}
+            gregorianText={formatGregorianLong(today)}
             onPressDate={() =>
               router.push({ pathname: '/day/[date]', params: { date: todayIso } })
             }
           />
         )}
+
+        <RamadanCard />
 
         {todaySchedule.length > 0 && <PrayerTodoCard now={now} todaySchedule={todaySchedule} />}
 
@@ -88,7 +94,13 @@ export default function HomeScreen() {
               subtitle={
                 mosque && mosqueInLocation ? `${location.name} · ${mosque.name}` : location.name
               }
+              style={timezoneNote ? { marginBottom: spacing.xs } : undefined}
             />
+            {timezoneNote && (
+              <AppText size="xs" tone="textMuted" style={{ marginBottom: spacing.md }}>
+                {timezoneNote}
+              </AppText>
+            )}
             <PrayerTimesCard
               schedule={todaySchedule}
               highlightedName={nextPrayer?.current?.name}
@@ -96,7 +108,7 @@ export default function HomeScreen() {
               mosqueNote={mosqueInLocation ? undefined : 'Moskeen er i en annen kommune'}
               jamatTimes={jamatTimes}
               jummah={
-                mosqueInLocation && now.getDay() === FRIDAY ? (mosqueDetails.data?.jummah ?? []) : []
+                mosqueInLocation && isoDateIsFriday(todayIso) ? (mosqueDetails.data?.jummah ?? []) : []
               }
               onPressMosque={() => {
                 if (!mosque) return;

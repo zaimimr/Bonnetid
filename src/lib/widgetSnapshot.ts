@@ -1,5 +1,5 @@
 import type { PrayerEntry } from './prayerSchedule';
-import { isoDateKey } from './time';
+import { isoDateKey, localClockNear } from './time';
 
 export const SNAPSHOT_VERSION = 1;
 const FRIDAY = 5;
@@ -50,14 +50,10 @@ export type Snapshot = {
   days: SnapshotDay[];
 };
 
-/** `HH:MM` on the given calendar day, as an absolute instant in the device's zone. */
-function jamatInstant(day: Date, time: string | undefined): string | null {
+function jamatInstant(adhanAt: Date, time: string | undefined): string | null {
   if (!time) return null;
-  const [hours, minutes] = time.split(':').map(Number);
-  if (Number.isNaN(hours) || Number.isNaN(minutes)) return null;
-  const date = new Date(day);
-  date.setHours(hours, minutes, 0, 0);
-  return date.toISOString();
+  const instant = localClockNear(adhanAt, time);
+  return Number.isNaN(instant.getTime()) ? null : instant.toISOString();
 }
 
 export function isJummahCell(day: SnapshotDayInput, prayerName: string): boolean {
@@ -79,7 +75,7 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
       date: isoDateKey(day.date),
       hijriText: day.hijriText,
       prayers: day.schedule.map((entry) => {
-        const jamat = jamatInstant(day.date, day.jamatTimes?.[entry.name]);
+        const jamat = jamatInstant(entry.date, day.jamatTimes?.[entry.name]);
         const jummah = isJummahCell(day, entry.name) && jamat != null;
 
         return {

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { usePrayerTimes } from '@/api/queries';
 import type { PrayerDay } from '@/api/types';
 import { buildDaySchedule, findNextPrayer, type NextPrayerResult, type PrayerEntry } from '@/lib/prayerSchedule';
-import { parseDayKey, todayKey } from '@/lib/time';
+import { osloDayKey, parseDayKey, todayKey } from '@/lib/time';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { useActiveLocation } from '@/store/settings';
 
@@ -20,6 +20,7 @@ function findDay(days: PrayerDay[] | undefined, date: Date): PrayerDay | undefin
 export type PrayerDayData = {
   today: PrayerDay | undefined;
   todaySchedule: PrayerEntry[];
+  tomorrowSchedule: PrayerEntry[];
   nextPrayer: NextPrayerResult | null;
   isLoading: boolean;
   isError: boolean;
@@ -30,7 +31,7 @@ export function usePrayerDay(now: Date): PrayerDayData {
   const location = useActiveLocation();
   const asrMethod = useEffectiveAsrMethod();
 
-  const dayKey = todayKey(now);
+  const dayKey = osloDayKey(now);
   const dayStart = useMemo(() => parseDayKey(dayKey), [dayKey]);
   const tomorrowStart = useMemo(() => addDays(dayStart, 1), [dayStart]);
 
@@ -65,6 +66,7 @@ export function usePrayerDay(now: Date): PrayerDayData {
   return {
     today: todayRow,
     todaySchedule,
+    tomorrowSchedule,
     nextPrayer,
     isLoading: currentMonth.isLoading,
     isError: currentMonth.isError,

@@ -10,6 +10,7 @@ import { configureNotificationHandler } from '@/lib/notifications';
 import { useNotificationScheduler } from '@/hooks/useNotificationScheduler';
 import { useNotificationResponses } from '@/hooks/useNotificationResponses';
 import { useAutoLocation } from '@/hooks/useAutoLocation';
+import { useRamadanReminders } from '@/hooks/useRamadanReminders';
 import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 import { useWidgetSync } from '@/hooks/useWidgetSync';
 import { useNow } from '@/hooks/useNow';
@@ -47,6 +48,7 @@ function RootNavigator() {
   useAutoLocation();
   useNotificationScheduler();
   useNotificationResponses();
+  useRamadanReminders();
   useReviewPrompt();
   useWidgetSync(now);
   usePrayerLogSync();

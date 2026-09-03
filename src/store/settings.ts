@@ -42,6 +42,7 @@ type SettingsState = {
   endReminderEnabled: boolean;
   liveActivityEnabled: boolean;
   widgetShowJamat: boolean;
+  ramadanRemindersEnabled: boolean;
   launchCount: number;
   reviewRequested: boolean;
   registerLaunch: () => void;
@@ -56,6 +57,7 @@ type SettingsState = {
   setEndReminderEnabled: (enabled: boolean) => void;
   setLiveActivityEnabled: (enabled: boolean) => void;
   setWidgetShowJamat: (enabled: boolean) => void;
+  setRamadanRemindersEnabled: (enabled: boolean) => void;
 };
 
 export const DEFAULT_LOCATION: SavedLocation = {
@@ -78,6 +80,7 @@ export const useSettings = create<SettingsState>()(
       endReminderEnabled: true,
       liveActivityEnabled: true,
       widgetShowJamat: false,
+      ramadanRemindersEnabled: true,
       launchCount: 0,
       reviewRequested: false,
       registerLaunch: () => set((state) => ({ launchCount: state.launchCount + 1 })),
@@ -94,6 +97,7 @@ export const useSettings = create<SettingsState>()(
       setEndReminderEnabled: (endReminderEnabled) => set({ endReminderEnabled }),
       setLiveActivityEnabled: (liveActivityEnabled) => set({ liveActivityEnabled }),
       setWidgetShowJamat: (widgetShowJamat) => set({ widgetShowJamat }),
+      setRamadanRemindersEnabled: (ramadanRemindersEnabled) => set({ ramadanRemindersEnabled }),
       toggleNotificationPrayer: (prayer) =>
         set((state) => ({
           notificationPrayers: {
