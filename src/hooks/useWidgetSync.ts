@@ -166,6 +166,10 @@ function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now
         run();
       };
 
+      // Before the times have loaded there is nothing to say, and ending a running activity
+      // over an empty schedule would make it flicker on every cold start.
+      if (days.length === 0) return;
+
       if (!window) {
         apply('', () => void endPrayerActivity());
         return;
