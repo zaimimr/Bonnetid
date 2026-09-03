@@ -1,4 +1,5 @@
-import type { PrayerEntry } from './prayerSchedule';
+import type { PrayerEntry, PrayerName } from './prayerSchedule';
+import { isoDateKey } from './time';
 
 export type PrayerStatus = 'prayed' | 'skipped';
 
@@ -118,4 +119,51 @@ export function unmarkedPrayers(
   now: Date,
 ): LoggedPrayer[] {
   return startedPrayers(days, log, now).filter((prayer) => prayer.status === null);
+}
+
+export const TRACKED_PRAYERS: PrayerName[] = ['fajr', 'duhr', 'asr', 'maghrib', 'isha'];
+
+const MONDAY_OFFSET = 6;
+
+export function weekDayKeys(now: Date): string[] {
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  monday.setDate(monday.getDate() - (now.getDay() + MONDAY_OFFSET) % 7);
+  return Array.from({ length: 7 }, (_, index) => {
+    const day = new Date(monday);
+    day.setDate(day.getDate() + index);
+    return isoDateKey(day);
+  });
+}
+
+export type WeekCell = {
+  prayer: PrayerName;
+  started: boolean;
+  status: PrayerStatus | null;
+};
+
+export type WeekColumn = {
+  isoDate: string;
+  isToday: boolean;
+  isFuture: boolean;
+  cells: WeekCell[];
+};
+
+export function weekColumns(
+  days: string[],
+  todayIso: string,
+  todaySchedule: PrayerEntry[],
+  log: PrayerLog,
+  now: Date,
+): WeekColumn[] {
+  const time = now.getTime();
+  return days.map((isoDate) => {
+    const isToday = isoDate === todayIso;
+    const isFuture = isoDate > todayIso;
+    const cells = TRACKED_PRAYERS.map((prayer) => {
+      const entry = isToday ? todaySchedule.find((item) => item.name === prayer) : undefined;
+      const started = isFuture ? false : isToday ? entry != null && entry.date.getTime() <= time : true;
+      return { prayer, started, status: statusOf(log, isoDate, prayer) };
+    });
+    return { isoDate, isToday, isFuture, cells };
+  });
 }

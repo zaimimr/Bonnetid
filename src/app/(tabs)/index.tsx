@@ -4,6 +4,8 @@ import { useRouter } from 'expo-router';
 import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
 import { NextPrayerHero } from '@/components/prayer/NextPrayerHero';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
+import { PrayerTodoCard } from '@/components/prayer/PrayerTodoCard';
+import { WeekStrip } from '@/components/prayer/WeekStrip';
 import { EventCard } from '@/components/calendar/EventCard';
 import { EmptyState, ErrorState, Screen, SectionHeader, Skeleton } from '@/components/ui';
 import { useNow } from '@/hooks/useNow';
@@ -77,6 +79,8 @@ export default function HomeScreen() {
           />
         )}
 
+        {todaySchedule.length > 0 && <PrayerTodoCard now={now} todaySchedule={todaySchedule} />}
+
         {todaySchedule.length > 0 && (
           <View>
             <SectionHeader
@@ -103,7 +107,12 @@ export default function HomeScreen() {
                 }
               }}
               onSelectMosque={() => router.push('/mosque-picker')}
+              statusDate={todayIso}
+              now={now}
             />
+            <View style={{ marginTop: spacing.md }}>
+              <WeekStrip now={now} todaySchedule={todaySchedule} />
+            </View>
           </View>
         )}
 

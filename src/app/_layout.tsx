@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useTheme } from '@/theme';
 import { configureNotificationHandler } from '@/lib/notifications';
 import { useNotificationScheduler } from '@/hooks/useNotificationScheduler';
+import { useNotificationResponses } from '@/hooks/useNotificationResponses';
 import { useAutoLocation } from '@/hooks/useAutoLocation';
 import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 import { useWidgetSync } from '@/hooks/useWidgetSync';
@@ -45,6 +46,7 @@ function RootNavigator() {
   const now = useNow(60_000);
   useAutoLocation();
   useNotificationScheduler();
+  useNotificationResponses();
   useReviewPrompt();
   useWidgetSync(now);
   usePrayerLogSync();

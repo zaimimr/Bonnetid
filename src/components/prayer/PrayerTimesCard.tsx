@@ -1,12 +1,17 @@
+import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { AppText, Badge, Card } from '@/components/ui';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useResponsive } from '@/hooks/useResponsive';
+import { usePrayerMark } from '@/hooks/usePrayerMark';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
+import { statusOf } from '@/lib/prayerLog';
 import type { JamatTimes, PrayerEntry, PrayerName } from '@/lib/prayerSchedule';
 import type { MosqueJummah } from '@/api/types';
+import { usePrayerLog } from '@/store/prayerLog';
+import { PrayerStatusChoice, PrayerStatusControl, STATUS_CONTROL_SIZE } from './PrayerStatusControl';
 import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from './TimeCell';
 
 export type { JamatTimes };
@@ -27,6 +32,8 @@ export type PrayerTimesCardProps = {
   mosqueNote?: string;
   jamatTimes?: JamatTimes;
   jummah?: MosqueJummah[];
+  statusDate?: string;
+  now?: Date;
   onPressMosque?: () => void;
   onSelectMosque?: () => void;
 };
@@ -38,14 +45,23 @@ export function PrayerTimesCard({
   mosqueNote,
   jamatTimes = {},
   jummah = [],
+  statusDate,
+  now,
   onPressMosque,
   onSelectMosque,
 }: PrayerTimesCardProps) {
   const theme = useTheme();
+  const log = usePrayerLog((state) => state.log);
+  const markPrayer = usePrayerMark();
+  const [openKey, setOpenKey] = useState<string | null>(null);
   const { scale, isStacked } = useFontScale();
   const { isWide } = useResponsive();
   const stacked = isStacked && !isWide;
   const hasJamat = Object.values(jamatTimes).some(Boolean);
+  const showStatus =
+    statusDate != null &&
+    now != null &&
+    schedule.some((entry) => entry.isPrayer && entry.date.getTime() <= now.getTime());
   const hasMosque = Boolean(mosqueName);
   const columnWidth = scaleWidth(TIME_COLUMN_WIDTH, scale);
 
@@ -85,6 +101,11 @@ export function PrayerTimesCard({
         const isHighlighted = entry.name === highlightedName;
         const jamatTime = jamatTimes[entry.name];
         const showLabel = stacked || entry.name !== 'fajr_endtime';
+        const status = statusDate ? statusOf(log, statusDate, entry.name) : null;
+        const started =
+          entry.isPrayer && (now ? entry.date.getTime() <= now.getTime() : false);
+        const entryKey = `${statusDate}|${entry.name}`;
+        const choiceOpen = openKey === entryKey;
         const times = (
           <>
             <TimeCell
@@ -112,47 +133,79 @@ export function PrayerTimesCard({
           <View
             key={entry.name}
             style={{
-              flexDirection: 'row',
-              alignItems: stacked ? 'flex-start' : 'center',
-              gap: stacked ? spacing.sm : spacing.md,
-              paddingVertical: spacing.md,
-              paddingHorizontal: spacing.md,
               borderRadius: radius.lg,
               backgroundColor: isHighlighted ? theme.colors.primarySoft : 'transparent',
               borderBottomWidth: index === schedule.length - 1 || isHighlighted ? 0 : 1,
               borderBottomColor: theme.colors.border,
             }}>
-            {entry.name === 'fajr_endtime' ? (
-              <Feather name="sunrise" size={20} color={theme.colors.textMuted} />
-            ) : (
-              <Ionicons
-                name={PRAYER_ICONS[entry.name]}
-                size={20}
-                color={isHighlighted ? theme.colors.primary : theme.colors.textMuted}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: stacked ? 'flex-start' : 'center',
+                gap: stacked ? spacing.sm : spacing.md,
+                paddingVertical: spacing.md,
+                paddingHorizontal: spacing.md,
+              }}>
+              {entry.name === 'fajr_endtime' ? (
+                <Feather name="sunrise" size={20} color={theme.colors.textMuted} />
+              ) : (
+                <Ionicons
+                  name={PRAYER_ICONS[entry.name]}
+                  size={20}
+                  color={isHighlighted ? theme.colors.primary : theme.colors.textMuted}
+                />
+              )}
+              <View style={{ flex: 1, gap: stacked ? spacing.xs : 0 }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    columnGap: spacing.sm,
+                    rowGap: spacing.xxs,
+                  }}>
+                  {showLabel && (
+                    <AppText
+                      weight={isHighlighted ? 'bold' : entry.isPrayer ? 'medium' : 'regular'}
+                      tone={entry.isPrayer ? 'textPrimary' : 'textMuted'}
+                      style={{ flexShrink: 1 }}>
+                      {entry.label}
+                    </AppText>
+                  )}
+                  {isHighlighted && <Badge label="Nå" variant="primary" />}
+                </View>
+                {stacked && <TimeCellRow>{times}</TimeCellRow>}
+              </View>
+              {!stacked && times}
+              {showStatus && (
+                <View style={{ width: STATUS_CONTROL_SIZE, alignItems: 'flex-end' }}>
+                  {started && statusDate && (
+                    <PrayerStatusControl
+                      label={entry.label}
+                      status={status}
+                      expanded={choiceOpen}
+                      onPress={() => {
+                        if (status === null && !choiceOpen) {
+                          markPrayer(statusDate, entry.name, 'prayed');
+                          return;
+                        }
+                        setOpenKey(choiceOpen ? null : entryKey);
+                      }}
+                    />
+                  )}
+                </View>
+              )}
+            </View>
+            {showStatus && started && choiceOpen && statusDate && (
+              <PrayerStatusChoice
+                label={entry.label}
+                status={status}
+                onSelect={(next) => {
+                  markPrayer(statusDate, entry.name, next);
+                  setOpenKey(null);
+                }}
               />
             )}
-            <View style={{ flex: 1, gap: stacked ? spacing.xs : 0 }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
-                  columnGap: spacing.sm,
-                  rowGap: spacing.xxs,
-                }}>
-                {showLabel && (
-                  <AppText
-                    weight={isHighlighted ? 'bold' : entry.isPrayer ? 'medium' : 'regular'}
-                    tone={entry.isPrayer ? 'textPrimary' : 'textMuted'}
-                    style={{ flexShrink: 1 }}>
-                    {entry.label}
-                  </AppText>
-                )}
-                {isHighlighted && <Badge label="Nå" variant="primary" />}
-              </View>
-              {stacked && <TimeCellRow>{times}</TimeCellRow>}
-            </View>
-            {!stacked && times}
           </View>
         );
       })}
