@@ -9,5 +9,6 @@
   android:updatePeriodMillis="1800000"
   android:widgetCategory="home_screen"
   android:initialLayout="@layout/prayer_widget_small"
+  android:previewImage="@drawable/prayer_widget_preview"
   android:previewLayout="@layout/prayer_widget_small"
   android:description="@string/prayer_widget_description" />
