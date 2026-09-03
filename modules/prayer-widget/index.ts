@@ -2,16 +2,14 @@ import { requireOptionalNativeModule } from 'expo';
 
 export type PrayerActivityState = {
   locationName: string;
+  /** Calendar day of the prayer; the buttons write the log under this key. */
+  isoDate: string;
   prayerLabel: string;
   prayerKind: string;
   /** Epoch seconds. */
   prayerAt: number;
-  /** Bounds of the phase being shown, for the progress bar. */
-  windowStart: number;
+  /** End of the prayer's window, also the activity's stale date. */
   windowEnd: number;
-  isNow: boolean;
-  /** When the activity should leave the screen for good. */
-  dismissAt: number;
 };
 
 type PrayerWidgetNativeModule = {

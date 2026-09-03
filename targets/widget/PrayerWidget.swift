@@ -11,6 +11,14 @@ struct PrayerTimelineEntry: TimelineEntry {
   let showJamat: Bool
   /// False when no mosque is selected, in which case the toggle has nothing to show.
   let hasJamatTimes: Bool
+  /// Log key to status, as marked from the app, a widget or the Live Activity.
+  let statuses: [String: String]
+}
+
+extension PrayerEntry {
+  var logKey: String { PrayerLogStore.key(PrayerSnapshot.dayKey(for: at), kind) }
+
+  func status(in statuses: [String: String]) -> String? { statuses[logKey] }
 }
 
 struct PrayerTimelineProvider: AppIntentTimelineProvider {
@@ -21,7 +29,8 @@ struct PrayerTimelineProvider: AppIntentTimelineProvider {
       dailyPrayers: [],
       currentPrayerAt: nil,
       showJamat: false,
-      hasJamatTimes: false
+      hasJamatTimes: false,
+      statuses: [:]
     )
   }
 
@@ -29,7 +38,12 @@ struct PrayerTimelineProvider: AppIntentTimelineProvider {
     for configuration: PrayerWidgetConfiguration,
     in context: Context
   ) async -> PrayerTimelineEntry {
-    entry(at: Date(), snapshot: PrayerSnapshot.load(), showJamat: configuration.showJamat)
+    entry(
+      at: Date(),
+      snapshot: PrayerSnapshot.load(),
+      showJamat: configuration.showJamat,
+      statuses: PrayerLogStore.statuses()
+    )
   }
 
   func timeline(
@@ -39,19 +53,31 @@ struct PrayerTimelineProvider: AppIntentTimelineProvider {
     let now = Date()
     let snapshot = PrayerSnapshot.load()
     let showJamat = configuration.showJamat
-    var entries = [entry(at: now, snapshot: snapshot, showJamat: showJamat)]
+    // The snapshot and the log are read once, not once per entry.
+    let statuses = PrayerLogStore.statuses()
+    var entries = [entry(at: now, snapshot: snapshot, showJamat: showJamat, statuses: statuses)]
 
     // Pre-computed entries cost nothing at runtime, so the countdown stays honest without
     // spending the widget's refresh budget: every minute for the next hour, then every
     // five minutes for the rest of the day.
     for minute in stride(from: 1, through: 60, by: 1) {
       entries.append(
-        entry(at: now.addingTimeInterval(Double(minute) * 60), snapshot: snapshot, showJamat: showJamat)
+        entry(
+          at: now.addingTimeInterval(Double(minute) * 60),
+          snapshot: snapshot,
+          showJamat: showJamat,
+          statuses: statuses
+        )
       )
     }
     for minute in stride(from: 65, through: 12 * 60, by: 5) {
       entries.append(
-        entry(at: now.addingTimeInterval(Double(minute) * 60), snapshot: snapshot, showJamat: showJamat)
+        entry(
+          at: now.addingTimeInterval(Double(minute) * 60),
+          snapshot: snapshot,
+          showJamat: showJamat,
+          statuses: statuses
+        )
       )
     }
 
@@ -61,7 +87,8 @@ struct PrayerTimelineProvider: AppIntentTimelineProvider {
   private func entry(
     at date: Date,
     snapshot: PrayerSnapshot?,
-    showJamat: Bool
+    showJamat: Bool,
+    statuses: [String: String]
   ) -> PrayerTimelineEntry {
     guard let snapshot else {
       return PrayerTimelineEntry(
@@ -70,7 +97,8 @@ struct PrayerTimelineProvider: AppIntentTimelineProvider {
         dailyPrayers: [],
         currentPrayerAt: nil,
         showJamat: false,
-        hasJamatTimes: false
+        hasJamatTimes: false,
+        statuses: [:]
       )
     }
     let moment = PrayerMoment.resolve(from: snapshot, at: date)
@@ -81,7 +109,8 @@ struct PrayerTimelineProvider: AppIntentTimelineProvider {
       dailyPrayers: snapshot.dailyPrayers(for: moment?.headline.at ?? date),
       currentPrayerAt: snapshot.currentPrayer(at: date)?.at,
       showJamat: showJamat,
-      hasJamatTimes: snapshot.hasJamatTimes
+      hasJamatTimes: snapshot.hasJamatTimes,
+      statuses: statuses
     )
   }
 }
@@ -97,13 +126,21 @@ struct PrayerWidgetView: View {
         case .systemMedium:
           MediumPrayerView(entry: entry, moment: moment)
         case .accessoryRectangular:
-          RectangularPrayerView(moment: moment, now: entry.date)
+          RectangularPrayerView(
+            moment: moment,
+            now: entry.date,
+            status: moment.headline.status(in: entry.statuses)
+          )
         case .accessoryCircular:
           CircularPrayerView(moment: moment, now: entry.date)
         case .accessoryInline:
-          InlinePrayerView(moment: moment)
+          InlinePrayerView(moment: moment, status: moment.headline.status(in: entry.statuses))
         default:
-          SmallPrayerView(moment: moment, now: entry.date)
+          SmallPrayerView(
+            moment: moment,
+            now: entry.date,
+            status: moment.headline.status(in: entry.statuses)
+          )
         }
       } else {
         MissingSnapshotView(family: family)
@@ -116,6 +153,7 @@ struct PrayerWidgetView: View {
 private struct SmallPrayerView: View {
   let moment: PrayerMoment
   let now: Date
+  let status: String?
 
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
@@ -132,12 +170,14 @@ private struct SmallPrayerView: View {
           .foregroundStyle(PrayerColor.brand)
           .lineLimit(1)
           .minimumScaleFactor(0.8)
+        PrayerStatusMark(status: status, tint: PrayerColor.brand)
       }
       .padding(.top, 1)
 
       Text(PrayerFormat.time(moment.headline.printedAt(showJamat: false)))
         .prayerTime(.system(.largeTitle, design: .default).weight(.bold))
         .foregroundStyle(PrayerColor.ink)
+        .strikethrough(status == "skipped")
         .minimumScaleFactor(0.7)
         .lineLimit(1)
 
@@ -150,6 +190,7 @@ private struct SmallPrayerView: View {
         .minimumScaleFactor(0.85)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
+    .opacity(status == "skipped" ? 0.55 : 1)
     .containerBackground(PrayerColor.surface, for: .widget)
   }
 
@@ -191,7 +232,8 @@ private struct MediumPrayerView: View {
           PrayerColumn(
             prayer: prayer,
             isCurrent: prayer.at == entry.currentPrayerAt,
-            showJamat: entry.showJamat
+            showJamat: entry.showJamat,
+            status: prayer.status(in: entry.statuses)
           )
         }
       }
@@ -231,17 +273,25 @@ private struct PrayerColumn: View {
   /// The plate marks the prayer in progress, never one that has not started yet.
   let isCurrent: Bool
   let showJamat: Bool
+  let status: String?
 
   var body: some View {
     VStack(spacing: 3) {
-      Text(prayer.printedLabel)
-        .font(.caption2)
-        .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.inkMuted)
-        .lineLimit(1)
-        .minimumScaleFactor(0.7)
+      HStack(spacing: 2) {
+        Text(prayer.printedLabel)
+          .font(.caption2)
+          .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.inkMuted)
+          .lineLimit(1)
+          .minimumScaleFactor(0.7)
+        PrayerStatusMark(
+          status: status,
+          tint: isCurrent ? PrayerColor.onBrandPlate : PrayerColor.brand
+        )
+      }
       Text(PrayerFormat.time(prayer.printedAt(showJamat: showJamat)))
         .prayerTime(.system(.subheadline, design: .default).weight(isCurrent ? .bold : .medium))
         .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.ink)
+        .strikethrough(status == "skipped")
         .lineLimit(1)
         .minimumScaleFactor(0.7)
       if showJamat, let jamat = prayer.jamat {
@@ -259,12 +309,28 @@ private struct PrayerColumn: View {
       RoundedRectangle(cornerRadius: 10, style: .continuous)
         .fill(isCurrent ? PrayerColor.brandPlate : Color.clear)
     )
+    .opacity(status == "skipped" ? 0.5 : 1)
+  }
+}
+
+/// A prayed prayer gets a checkmark; a skipped one is dimmed by its container instead.
+private struct PrayerStatusMark: View {
+  let status: String?
+  let tint: Color
+
+  var body: some View {
+    if status == "prayed" {
+      Image(systemName: "checkmark.circle.fill")
+        .font(.caption2)
+        .foregroundStyle(tint)
+    }
   }
 }
 
 private struct RectangularPrayerView: View {
   let moment: PrayerMoment
   let now: Date
+  let status: String?
 
   var body: some View {
     VStack(alignment: .leading, spacing: 1) {
@@ -276,6 +342,11 @@ private struct RectangularPrayerView: View {
           .lineLimit(1)
         Text(PrayerFormat.time(moment.headline.at))
           .prayerTime(.headline)
+          .strikethrough(status == "skipped")
+        if status == "prayed" {
+          Image(systemName: "checkmark.circle.fill")
+            .font(.caption2)
+        }
       }
       .widgetAccentable()
 
@@ -289,6 +360,7 @@ private struct RectangularPrayerView: View {
       .minimumScaleFactor(0.8)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
+    .opacity(status == "skipped" ? 0.6 : 1)
     .containerBackground(.clear, for: .widget)
   }
 }
@@ -312,11 +384,14 @@ private struct CircularPrayerView: View {
 
 private struct InlinePrayerView: View {
   let moment: PrayerMoment
+  let status: String?
 
   var body: some View {
     Label(
       "\(moment.headline.printedLabel) \(PrayerFormat.time(moment.headline.at))",
-      systemImage: PrayerFormat.symbol(for: moment.headline.kind)
+      systemImage: status == "prayed"
+        ? "checkmark.circle.fill"
+        : PrayerFormat.symbol(for: moment.headline.kind)
     )
     .containerBackground(.clear, for: .widget)
   }
