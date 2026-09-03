@@ -90,7 +90,7 @@ struct PrayerSnapshot: Codable, Hashable {
   }
 
   func hijriText(for date: Date) -> String {
-    let key = PrayerSnapshot.dayKeyFormatter.string(from: date)
+    let key = PrayerSnapshot.dayKey(for: date)
     return days.first(where: { $0.date == key })?.hijriText ?? days.first?.hijriText ?? ""
   }
 
@@ -111,9 +111,13 @@ struct PrayerSnapshot: Codable, Hashable {
 
   /// The five daily prayers for the calendar day containing `date`, sunrise excluded.
   func dailyPrayers(for date: Date) -> [PrayerEntry] {
-    let key = PrayerSnapshot.dayKeyFormatter.string(from: date)
+    let key = PrayerSnapshot.dayKey(for: date)
     let day = days.first(where: { $0.date == key }) ?? days.first
     return day?.prayers.filter(\.isPrayer) ?? []
+  }
+
+  static func dayKey(for date: Date) -> String {
+    dayKeyFormatter.string(from: date)
   }
 
   private static let dayKeyFormatter: DateFormatter = {

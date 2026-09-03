@@ -51,7 +51,7 @@ function RootNavigator() {
   useRamadanReminders();
   useReviewPrompt();
   useWidgetSync(now);
-  usePrayerLogSync();
+  usePrayerLogSync(now);
 
   return (
     <>

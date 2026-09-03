@@ -12,14 +12,10 @@ import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { formatHijri } from '@/lib/hijri';
 import { resolveActivityWindow } from '@/lib/liveActivityWindow';
 import { isJummahCell, type SnapshotDayInput } from '@/lib/widgetSnapshot';
-import {
-  adhanTimesFromSchedule,
-  buildDaySchedule,
-  jamatTimesForDate,
-  type PrayerEntry,
-} from '@/lib/prayerSchedule';
+import { adhanTimesFromSchedule, buildDaySchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
 import { isoDateKey, osloDayKey, parseDayKey, todayKey } from '@/lib/time';
 import { buildSnapshot, snapshotIsEmpty } from '@/lib/widgetSnapshot';
+import { usePrayerLog } from '@/store/prayerLog';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
 const SNAPSHOT_DAYS = 3;
@@ -129,13 +125,7 @@ export function useWidgetSync(now: Date) {
     setPrayerSnapshot(snapshot);
   }, [payloadKey, snapshot]);
 
-  const schedules = useMemo(() => {
-    const today = days[0]?.schedule ?? [];
-    const tomorrow = days[1]?.schedule ?? [];
-    return { today, tomorrow };
-  }, [days]);
-
-  const syncActivity = useLiveActivitySync(location.name, schedules, days);
+  const syncActivity = useLiveActivitySync(location.name, days, now);
 
   useEffect(() => {
     syncActivity();
@@ -147,60 +137,57 @@ export function useWidgetSync(now: Date) {
 }
 
 /**
- * The activity is refreshed whenever the app comes to the foreground: iOS only lets an app start
- * one while it is running, and ActivityKit keeps the countdown ticking on its own in between.
- * It only exists inside the window around a prayer (see resolveActivityWindow).
+ * The activity mirrors whichever prayer is unmarked right now. It is refreshed on every minute
+ * tick and whenever the app comes to the foreground, because iOS only lets an app start one
+ * while it is running; ActivityKit keeps the countdown ticking on its own in between.
  */
-function useLiveActivitySync(
-  locationName: string,
-  schedules: { today: PrayerEntry[]; tomorrow: PrayerEntry[] },
-  days: SnapshotDayInput[],
-) {
+function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now: Date) {
   const enabled = useSettings((state) => state.liveActivityEnabled);
-  const lastState = useRef<string | null>(null);
+  const log = usePrayerLog((state) => state.log);
+  const applied = useRef<string | null>(null);
+
+  const activityDays = useMemo(
+    () => days.map((day) => ({ isoDate: isoDateKey(day.date), schedule: day.schedule })),
+    [days],
+  );
+
+  const window = useMemo(
+    () => (enabled ? resolveActivityWindow(activityDays, log, now) : null),
+    [enabled, activityDays, log, now],
+  );
 
   return useMemo(() => {
     return () => {
       if (!prayerWidgetAvailable) return;
 
-      const stop = () => {
-        lastState.current = null;
-        void endPrayerActivity();
+      const apply = (key: string, run: () => void) => {
+        if (applied.current === key) return;
+        applied.current = key;
+        run();
       };
 
-      if (!enabled) {
-        stop();
-        return;
-      }
+      // Before the times have loaded there is nothing to say, and ending a running activity
+      // over an empty schedule would make it flicker on every cold start.
+      if (days.length === 0) return;
 
-      const window = resolveActivityWindow(
-        [...schedules.today, ...schedules.tomorrow],
-        new Date(),
-      );
       if (!window) {
-        stop();
+        apply('', () => void endPrayerActivity());
         return;
       }
 
-      const day = days.find((entry) => entry.date.toDateString() === window.prayer.date.toDateString());
-      const label =
-        day && isJummahCell(day, window.prayer.name) ? 'Jummah' : window.prayer.label;
+      const day = days.find((entry) => isoDateKey(entry.date) === window.isoDate);
+      const label = day && isJummahCell(day, window.prayer.name) ? 'Jummah' : window.prayer.label;
 
       const state = {
         locationName,
+        isoDate: window.isoDate,
         prayerLabel: label,
         prayerKind: window.prayer.name,
         prayerAt: window.prayer.date.getTime() / 1000,
-        windowStart: window.phaseStart.getTime() / 1000,
-        windowEnd: window.phaseEnd.getTime() / 1000,
-        isNow: window.isNow,
-        dismissAt: window.dismissAt.getTime() / 1000,
+        windowEnd: window.windowEnd.getTime() / 1000,
       };
 
-      const key = JSON.stringify(state);
-      if (lastState.current === key) return;
-      lastState.current = key;
-      void startOrUpdatePrayerActivity(state);
+      apply(JSON.stringify(state), () => void startOrUpdatePrayerActivity(state));
     };
-  }, [enabled, locationName, schedules.today, schedules.tomorrow, days]);
+  }, [window, locationName, days]);
 }
