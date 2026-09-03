@@ -13,7 +13,7 @@ import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { useRefresh } from '@/hooks/useRefresh';
 import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
-import { isoDateIsFriday, osloDateKey } from '@/lib/time';
+import { isoDateIsFriday, osloDateKey, osloDayStart } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
@@ -27,12 +27,14 @@ export default function HomeScreen() {
   const { todaySchedule, nextPrayer, isLoading, isError, refetch } = usePrayerDay(now);
   const { refreshing, onRefresh } = useRefresh();
   const timezoneNote = useTimezoneNote(now);
-  const hijriMonth = useHijriMonth(now.getFullYear(), now.getMonth() + 1);
-  const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
-  const specialsThisYear = useSpecialDates(now.getFullYear());
-  const specialsNextYear = useSpecialDates(now.getFullYear() + 1);
-
+  const today = osloDayStart(now);
   const todayIso = osloDateKey(now);
+
+  const hijriMonth = useHijriMonth(today.getFullYear(), today.getMonth() + 1);
+  const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
+  const specialsThisYear = useSpecialDates(today.getFullYear());
+  const specialsNextYear = useSpecialDates(today.getFullYear() + 1);
+
   const todayHijri = hijriMonth.data?.find((day) => day.gregorian_date === todayIso);
   const hijriText = todayHijri
     ? formatHijri(todayHijri.hijri_date, todayHijri.hijri_month_text)
@@ -72,7 +74,7 @@ export default function HomeScreen() {
             nextPrayer={nextPrayer}
             now={now}
             hijriText={hijriText}
-            gregorianText={formatGregorianLong(now)}
+            gregorianText={formatGregorianLong(today)}
             onPressDate={() =>
               router.push({ pathname: '/day/[date]', params: { date: todayIso } })
             }
