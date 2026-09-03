@@ -5,6 +5,7 @@ import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
 import { NextPrayerHero } from '@/components/prayer/NextPrayerHero';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { EventCard } from '@/components/calendar/EventCard';
+import { RamadanCard } from '@/components/ramadan/RamadanCard';
 import { AppText, EmptyState, ErrorState, Screen, SectionHeader, Skeleton } from '@/components/ui';
 import { useNow } from '@/hooks/useNow';
 import { useTimezoneNote } from '@/hooks/useTimezoneNote';
@@ -77,6 +78,8 @@ export default function HomeScreen() {
             }
           />
         )}
+
+        <RamadanCard />
 
         {todaySchedule.length > 0 && (
           <View>
