@@ -23,10 +23,9 @@ export const usePrayerLog = create<PrayerLogState>()(
     (set, get) => ({
       log: {},
       setStatus: (isoDate, prayer, status) => {
-        const log = prunePrayerLog(
-          { ...get().log, [prayerLogKey(isoDate, prayer)]: { status, at: Date.now() } },
-          new Date(),
-        );
+        const native = parsePrayerLog(readNativePrayerLog());
+        const mark = { [prayerLogKey(isoDate, prayer)]: { status, at: Date.now() } };
+        const log = prunePrayerLog(mergePrayerLogs(native, get().log, mark), new Date());
         set({ log });
         writeNativePrayerLog(log);
       },

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { usePrayerTimes } from '@/api/queries';
 import { unmarkedPrayers, type LoggedPrayer } from '@/lib/prayerLog';
 import { buildDaySchedule, type PrayerEntry } from '@/lib/prayerSchedule';
-import { isoDateKey, parseDayKey, todayKey } from '@/lib/time';
+import { isoDateKey, osloDateKey, osloDayStart, parseDayKey, todayKey } from '@/lib/time';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { usePrayerLog } from '@/store/prayerLog';
 import { useActiveLocation } from '@/store/settings';
@@ -17,8 +17,8 @@ export function usePrayerTodo(now: Date, todaySchedule: PrayerEntry[]): LoggedPr
   const minute = Math.floor(now.getTime() / MINUTE_MS);
   const at = useMemo(() => new Date(minute * MINUTE_MS), [minute]);
 
-  const todayIso = isoDateKey(at);
-  const yesterday = new Date(at);
+  const todayIso = osloDateKey(at);
+  const yesterday = osloDayStart(at);
   yesterday.setDate(yesterday.getDate() - 1);
   const yesterdayKey = todayKey(yesterday);
   const yesterdayIso = isoDateKey(yesterday);

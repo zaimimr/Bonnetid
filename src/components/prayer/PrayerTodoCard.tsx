@@ -6,7 +6,7 @@ import { usePrayerMark } from '@/hooks/usePrayerMark';
 import { usePrayerTodo } from '@/hooks/usePrayerTodo';
 import { formatTimeOfDay } from '@/lib/prayerReminders';
 import type { PrayerEntry } from '@/lib/prayerSchedule';
-import { isoDateKey } from '@/lib/time';
+import { osloDateKey } from '@/lib/time';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 
@@ -20,7 +20,7 @@ export function PrayerTodoCard({ now, todaySchedule }: PrayerTodoCardProps) {
   const { isStacked } = useFontScale();
   const markPrayer = usePrayerMark();
   const pending = usePrayerTodo(now, todaySchedule);
-  const todayIso = isoDateKey(now);
+  const todayIso = osloDateKey(now);
 
   if (pending.length === 0) return null;
 

@@ -58,6 +58,13 @@ export function configureNotificationHandler() {
     .catch(() => {});
 }
 
+export async function hasNotificationPermission(): Promise<boolean> {
+  if (!notificationsSupported) return false;
+  const Notifications = await getNotifications();
+  const current = await Notifications.getPermissionsAsync();
+  return current.granted;
+}
+
 export async function requestNotificationPermission(): Promise<boolean> {
   if (!notificationsSupported) return false;
   const Notifications = await getNotifications();

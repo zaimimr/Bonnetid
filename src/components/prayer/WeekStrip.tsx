@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { AppText, Card } from '@/components/ui';
 import { weekColumns, weekDayKeys, type WeekCell, type WeekColumn } from '@/lib/prayerLog';
 import type { PrayerEntry } from '@/lib/prayerSchedule';
-import { isoDateKey } from '@/lib/time';
+import { osloDateKey } from '@/lib/time';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import { usePrayerLog } from '@/store/prayerLog';
@@ -26,7 +26,7 @@ export function WeekStrip({ now, todaySchedule }: WeekStripProps) {
 
   const minute = Math.floor(now.getTime() / MINUTE_MS);
   const at = useMemo(() => new Date(minute * MINUTE_MS), [minute]);
-  const todayIso = isoDateKey(at);
+  const todayIso = osloDateKey(at);
   const columns = useMemo(
     () => weekColumns(weekDayKeys(at), todayIso, todaySchedule, log, at),
     [at, todayIso, todaySchedule, log],

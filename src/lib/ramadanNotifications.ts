@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { notificationsSupported, requestNotificationPermission } from './notifications';
+import { notificationsSupported, hasNotificationPermission } from './notifications';
 import { SUHOOR_REMINDER_MINUTES } from './ramadan';
 
 export const RAMADAN_IDENTIFIER_PREFIX = 'ramadan|';
@@ -67,7 +67,7 @@ export async function scheduleSuhoorReminders(
     return 0;
   }
 
-  const granted = await requestNotificationPermission();
+  const granted = await hasNotificationPermission();
   if (!granted) {
     await cancelRamadanNotifications();
     return 0;

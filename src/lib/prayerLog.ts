@@ -1,5 +1,5 @@
 import type { PrayerEntry, PrayerName } from './prayerSchedule';
-import { isoDateKey } from './time';
+import { isoDateKey, osloDayStart } from './time';
 
 export type PrayerStatus = 'prayed' | 'skipped';
 
@@ -119,8 +119,8 @@ export const TRACKED_PRAYERS: PrayerName[] = ['fajr', 'duhr', 'asr', 'maghrib', 
 const MONDAY_OFFSET = 6;
 
 export function weekDayKeys(now: Date): string[] {
-  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  monday.setDate(monday.getDate() - (now.getDay() + MONDAY_OFFSET) % 7);
+  const monday = osloDayStart(now);
+  monday.setDate(monday.getDate() - (monday.getDay() + MONDAY_OFFSET) % 7);
   return Array.from({ length: 7 }, (_, index) => {
     const day = new Date(monday);
     day.setDate(day.getDate() + index);

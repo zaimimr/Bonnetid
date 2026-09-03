@@ -124,6 +124,7 @@ struct PrayerSnapshot: Codable, Hashable {
     let formatter = DateFormatter()
     formatter.calendar = Calendar(identifier: .gregorian)
     formatter.dateFormat = "yyyy-MM-dd"
+    formatter.timeZone = TimeZone(identifier: "Europe/Oslo")
     return formatter
   }()
 }
