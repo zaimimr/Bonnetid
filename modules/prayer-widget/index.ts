@@ -19,6 +19,8 @@ type PrayerWidgetNativeModule = {
   areLiveActivitiesEnabled: () => boolean;
   startOrUpdateActivity: (state: PrayerActivityState) => Promise<void>;
   endActivity: () => Promise<void>;
+  getPrayerLog: () => string | null;
+  setPrayerLog: (json: string) => void;
 };
 
 /** Null in Expo Go and on web: every call below turns into a no-op. */
@@ -40,4 +42,13 @@ export async function startOrUpdatePrayerActivity(state: PrayerActivityState) {
 
 export async function endPrayerActivity() {
   await native?.endActivity();
+}
+
+/** JSON of `PrayerLog` (see src/lib/prayerLog.ts) as last written by the app or a native surface. */
+export function readNativePrayerLog(): string | null {
+  return native?.getPrayerLog() ?? null;
+}
+
+export function writeNativePrayerLog(log: unknown) {
+  native?.setPrayerLog(JSON.stringify(log));
 }

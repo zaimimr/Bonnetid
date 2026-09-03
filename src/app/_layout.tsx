@@ -12,6 +12,7 @@ import { useAutoLocation } from '@/hooks/useAutoLocation';
 import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 import { useWidgetSync } from '@/hooks/useWidgetSync';
 import { useNow } from '@/hooks/useNow';
+import { usePrayerLogSync } from '@/hooks/usePrayerLogSync';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -46,6 +47,7 @@ function RootNavigator() {
   useNotificationScheduler();
   useReviewPrompt();
   useWidgetSync(now);
+  usePrayerLogSync();
 
   return (
     <>

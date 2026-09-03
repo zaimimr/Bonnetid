@@ -4,6 +4,7 @@ import WidgetKit
 
 private let appGroupIdentifier = "group.no.irn.bonnetid"
 private let snapshotKey = "prayer_snapshot_v1"
+private let prayerLogKey = "prayer_log_v1"
 
 struct PrayerActivityState: Record {
   @Field var locationName: String = ""
@@ -32,6 +33,18 @@ public class PrayerWidgetModule: Module {
         throw AppGroupUnavailableException()
       }
       defaults.set(json, forKey: snapshotKey)
+      WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    Function("getPrayerLog") { () -> String? in
+      UserDefaults(suiteName: appGroupIdentifier)?.string(forKey: prayerLogKey)
+    }
+
+    Function("setPrayerLog") { (json: String) in
+      guard let defaults = UserDefaults(suiteName: appGroupIdentifier) else {
+        throw AppGroupUnavailableException()
+      }
+      defaults.set(json, forKey: prayerLogKey)
       WidgetCenter.shared.reloadAllTimelines()
     }
 
