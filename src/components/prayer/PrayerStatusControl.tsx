@@ -87,9 +87,11 @@ export function PrayerStatusChoice({ label, status, onSelect }: PrayerStatusChoi
         style={{
           flexDirection: 'row',
           flex: 1,
-          minWidth: 200,
+          minWidth: 180,
           backgroundColor: theme.colors.surfaceSunken,
           borderRadius: radius.md,
+          borderWidth: 1,
+          borderColor: theme.colors.border,
           padding: spacing.xxs,
           gap: spacing.xxs,
         }}>
@@ -162,7 +164,7 @@ function ChoiceSegment({
         tone={active ? 'textPrimary' : 'textSecondary'}
         align="center"
         maxFontSizeMultiplier={1.4}
-        numberOfLines={1}>
+        numberOfLines={2}>
         {text}
       </AppText>
     </Pressable>

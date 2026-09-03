@@ -141,8 +141,20 @@ export type PrayerNotificationPlan = {
   soundKey: NotificationSoundKey;
 };
 
-export async function syncPrayerNotifications(plan: PrayerNotificationPlan): Promise<number> {
-  if (!notificationsSupported) return 0;
+let pending: Promise<unknown> = Promise.resolve();
+
+function serialize<T>(task: () => Promise<T>): Promise<T> {
+  const next = pending.then(task, task);
+  pending = next.catch(() => {});
+  return next;
+}
+
+export function syncPrayerNotifications(plan: PrayerNotificationPlan): Promise<number> {
+  if (!notificationsSupported) return Promise.resolve(0);
+  return serialize(() => runSync(plan));
+}
+
+async function runSync(plan: PrayerNotificationPlan): Promise<number> {
   const Notifications = await getNotifications();
   await ensurePrayerCategory(Notifications);
 
@@ -225,30 +237,37 @@ export async function syncPrayerNotifications(plan: PrayerNotificationPlan): Pro
   return upcoming.length;
 }
 
-export async function cancelPrayerNotifications() {
-  if (!notificationsSupported) return;
-  const Notifications = await getNotifications();
-  const existing = await Notifications.getAllScheduledNotificationsAsync();
-  for (const request of existing) {
-    if (!isOwned(request.identifier)) continue;
-    await Notifications.cancelScheduledNotificationAsync(request.identifier);
-    syncedSignatures.delete(request.identifier);
-  }
+export function cancelPrayerNotifications(): Promise<void> {
+  if (!notificationsSupported) return Promise.resolve();
+  return serialize(async () => {
+    const Notifications = await getNotifications();
+    const existing = await Notifications.getAllScheduledNotificationsAsync();
+    for (const request of existing) {
+      if (!isOwned(request.identifier)) continue;
+      await Notifications.cancelScheduledNotificationAsync(request.identifier);
+      syncedSignatures.delete(request.identifier);
+    }
+  });
 }
 
-export async function cancelPrayerReminder(isoDate: string, prayer: string) {
-  if (!notificationsSupported) return;
-  const identifier = reminderNotificationId(isoDate, prayer);
-  const Notifications = await getNotifications();
-  await Notifications.cancelScheduledNotificationAsync(identifier);
-  syncedSignatures.delete(identifier);
+export function cancelPrayerReminder(isoDate: string, prayer: string): Promise<void> {
+  if (!notificationsSupported) return Promise.resolve();
+  return serialize(async () => {
+    const identifier = reminderNotificationId(isoDate, prayer);
+    const Notifications = await getNotifications();
+    await Notifications.cancelScheduledNotificationAsync(identifier);
+    syncedSignatures.delete(identifier);
+  });
 }
 
 export type PrayerActionHandler = (isoDate: string, prayer: string, status: PrayerStatus) => void;
 
+const COLD_START_MAX_AGE_MS = 15 * 60 * 1000;
+const SECONDS_SCALE_LIMIT = 1e12;
+
 type NotificationResponseLike = {
   actionIdentifier: string;
-  notification: { request: { identifier: string; content: { data?: unknown } } };
+  notification: { date?: number; request: { identifier: string; content: { data?: unknown } } };
 };
 
 const handledResponses = new Set<string>();
@@ -296,9 +315,16 @@ export async function addPrayerActionListener(
   return () => subscription.remove();
 }
 
+function shownRecently(response: NotificationResponseLike): boolean {
+  const raw = response.notification.date;
+  if (typeof raw !== 'number' || Number.isNaN(raw)) return true;
+  const shownAt = raw < SECONDS_SCALE_LIMIT ? raw * 1000 : raw;
+  return Date.now() - shownAt <= COLD_START_MAX_AGE_MS;
+}
+
 export async function consumeLastPrayerAction(handler: PrayerActionHandler) {
   if (!notificationsSupported) return;
   const Notifications = await getNotifications();
   const response = await Notifications.getLastNotificationResponseAsync();
-  if (response) applyResponse(response, handler);
+  if (response && shownRecently(response)) applyResponse(response, handler);
 }

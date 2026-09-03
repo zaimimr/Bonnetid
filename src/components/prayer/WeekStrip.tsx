@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AppText, Card } from '@/components/ui';
-import { weekColumns, weekDayKeys, type WeekCell } from '@/lib/prayerLog';
+import { weekColumns, weekDayKeys, type WeekCell, type WeekColumn } from '@/lib/prayerLog';
 import type { PrayerEntry } from '@/lib/prayerSchedule';
 import { isoDateKey } from '@/lib/time';
 import { useTheme } from '@/theme';
@@ -53,7 +53,8 @@ export function WeekStrip({ now, todaySchedule }: WeekStripProps) {
               router.push({ pathname: '/day/[date]', params: { date: column.isoDate } })
             }
             accessibilityRole="button"
-            accessibilityLabel={`Vis bønnetider for ${WEEKDAY_NAMES[index]}`}
+            accessibilityLabel={`${WEEKDAY_NAMES[index]}, ${describe(column)}`}
+            accessibilityHint="Viser bønnetidene for dagen"
             style={({ pressed }) => [
               {
                 flex: 1,
@@ -82,6 +83,14 @@ export function WeekStrip({ now, todaySchedule }: WeekStripProps) {
       </View>
     </Card>
   );
+}
+
+function describe(column: WeekColumn): string {
+  if (column.isFuture) return 'ikke begynt';
+  const prayed = column.cells.filter((cell) => cell.status === 'prayed').length;
+  const started = column.cells.filter((cell) => cell.started).length;
+  if (started === 0) return 'ingen bønner ennå';
+  return `${prayed} av ${started} markert som bedt`;
 }
 
 function Dot({ cell }: { cell: WeekCell }) {

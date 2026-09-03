@@ -53,11 +53,15 @@ export function PrayerTimesCard({
   const theme = useTheme();
   const log = usePrayerLog((state) => state.log);
   const markPrayer = usePrayerMark();
-  const [openPrayer, setOpenPrayer] = useState<PrayerName | null>(null);
+  const [openKey, setOpenKey] = useState<string | null>(null);
   const { scale, isStacked } = useFontScale();
   const { isWide } = useResponsive();
   const stacked = isStacked && !isWide;
   const hasJamat = Object.values(jamatTimes).some(Boolean);
+  const showStatus =
+    statusDate != null &&
+    now != null &&
+    schedule.some((entry) => entry.isPrayer && entry.date.getTime() <= now.getTime());
   const hasMosque = Boolean(mosqueName);
   const columnWidth = scaleWidth(TIME_COLUMN_WIDTH, scale);
 
@@ -100,7 +104,8 @@ export function PrayerTimesCard({
         const status = statusDate ? statusOf(log, statusDate, entry.name) : null;
         const started =
           entry.isPrayer && (now ? entry.date.getTime() <= now.getTime() : false);
-        const choiceOpen = openPrayer === entry.name;
+        const entryKey = `${statusDate}|${entry.name}`;
+        const choiceOpen = openKey === entryKey;
         const times = (
           <>
             <TimeCell
@@ -172,9 +177,9 @@ export function PrayerTimesCard({
                 {stacked && <TimeCellRow>{times}</TimeCellRow>}
               </View>
               {!stacked && times}
-              {statusDate && (
+              {showStatus && (
                 <View style={{ width: STATUS_CONTROL_SIZE, alignItems: 'flex-end' }}>
-                  {started && (
+                  {started && statusDate && (
                     <PrayerStatusControl
                       label={entry.label}
                       status={status}
@@ -184,20 +189,20 @@ export function PrayerTimesCard({
                           markPrayer(statusDate, entry.name, 'prayed');
                           return;
                         }
-                        setOpenPrayer(choiceOpen ? null : entry.name);
+                        setOpenKey(choiceOpen ? null : entryKey);
                       }}
                     />
                   )}
                 </View>
               )}
             </View>
-            {statusDate && started && choiceOpen && (
+            {showStatus && started && choiceOpen && statusDate && (
               <PrayerStatusChoice
                 label={entry.label}
                 status={status}
                 onSelect={(next) => {
                   markPrayer(statusDate, entry.name, next);
-                  setOpenPrayer(null);
+                  setOpenKey(null);
                 }}
               />
             )}
