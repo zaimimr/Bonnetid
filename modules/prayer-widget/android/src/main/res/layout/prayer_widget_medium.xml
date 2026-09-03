@@ -82,6 +82,16 @@
         android:maxLines="1"
         android:text="05:12" />
 
+      <ImageView
+        android:id="@+id/column_check_0"
+        android:layout_width="11dp"
+        android:layout_height="11dp"
+        android:layout_marginTop="2dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"
+        android:contentDescription="@string/prayer_widget_prayed"
+        android:src="@drawable/prayer_widget_check" />
+
       <TextView
         android:id="@+id/column_jamat_0"
         android:layout_width="match_parent"
@@ -132,6 +142,16 @@
         android:fontFeatureSettings="tnum"
         android:maxLines="1"
         android:text="05:12" />
+
+      <ImageView
+        android:id="@+id/column_check_1"
+        android:layout_width="11dp"
+        android:layout_height="11dp"
+        android:layout_marginTop="2dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"
+        android:contentDescription="@string/prayer_widget_prayed"
+        android:src="@drawable/prayer_widget_check" />
 
       <TextView
         android:id="@+id/column_jamat_1"
@@ -184,6 +204,16 @@
         android:maxLines="1"
         android:text="05:12" />
 
+      <ImageView
+        android:id="@+id/column_check_2"
+        android:layout_width="11dp"
+        android:layout_height="11dp"
+        android:layout_marginTop="2dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"
+        android:contentDescription="@string/prayer_widget_prayed"
+        android:src="@drawable/prayer_widget_check" />
+
       <TextView
         android:id="@+id/column_jamat_2"
         android:layout_width="match_parent"
@@ -235,6 +265,16 @@
         android:maxLines="1"
         android:text="05:12" />
 
+      <ImageView
+        android:id="@+id/column_check_3"
+        android:layout_width="11dp"
+        android:layout_height="11dp"
+        android:layout_marginTop="2dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"
+        android:contentDescription="@string/prayer_widget_prayed"
+        android:src="@drawable/prayer_widget_check" />
+
       <TextView
         android:id="@+id/column_jamat_3"
         android:layout_width="match_parent"
@@ -285,6 +325,16 @@
         android:fontFeatureSettings="tnum"
         android:maxLines="1"
         android:text="05:12" />
+
+      <ImageView
+        android:id="@+id/column_check_4"
+        android:layout_width="11dp"
+        android:layout_height="11dp"
+        android:layout_marginTop="2dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"
+        android:contentDescription="@string/prayer_widget_prayed"
+        android:src="@drawable/prayer_widget_check" />
 
       <TextView
         android:id="@+id/column_jamat_4"

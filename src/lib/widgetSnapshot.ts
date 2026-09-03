@@ -17,6 +17,8 @@ export type SnapshotInput = {
   locationName: string;
   mosqueName?: string | null;
   showJamat?: boolean;
+  /** Android only: post the ongoing "har du bedt?" notification when a prayer starts. */
+  lockScreenEnabled?: boolean;
   generatedAt: Date;
   days: SnapshotDayInput[];
 };
@@ -47,6 +49,7 @@ export type Snapshot = {
   locationName: string;
   mosqueName: string | null;
   showJamat: boolean;
+  lockScreenEnabled: boolean;
   days: SnapshotDay[];
 };
 
@@ -71,6 +74,7 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
     locationName: input.locationName,
     mosqueName: input.mosqueName ?? null,
     showJamat: input.showJamat ?? false,
+    lockScreenEnabled: input.lockScreenEnabled ?? false,
     days: input.days.map((day) => ({
       date: isoDateKey(day.date),
       hijriText: day.hijriText,

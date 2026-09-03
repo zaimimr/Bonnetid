@@ -17,17 +17,34 @@
     android:maxLines="1"
     android:text="Neste" />
 
-  <TextView
-    android:id="@+id/headline_label"
+  <LinearLayout
+    android:id="@+id/headline_row"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="1dp"
-    android:textSize="16sp"
-    android:textStyle="bold"
-    android:textColor="@color/prayer_widget_brand"
-    android:maxLines="1"
-    android:ellipsize="end"
-    android:text="Duhr" />
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <TextView
+      android:id="@+id/headline_label"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textSize="16sp"
+      android:textStyle="bold"
+      android:textColor="@color/prayer_widget_brand"
+      android:maxLines="1"
+      android:ellipsize="end"
+      android:text="Duhr" />
+
+    <ImageView
+      android:id="@+id/headline_check"
+      android:layout_width="13dp"
+      android:layout_height="13dp"
+      android:layout_marginStart="4dp"
+      android:visibility="gone"
+      android:contentDescription="@string/prayer_widget_prayed"
+      android:src="@drawable/prayer_widget_check" />
+  </LinearLayout>
 
   <TextView
     android:id="@+id/headline_time"
