@@ -18,6 +18,7 @@ class PrayerWidgetModule : Module() {
         .edit()
         .putString(SNAPSHOT_KEY, json)
         .apply()
+      PrayerAppWidget.updateAll(context)
     }
 
     Function("areLiveActivitiesEnabled") { false }

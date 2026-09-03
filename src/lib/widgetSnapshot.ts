@@ -16,6 +16,7 @@ export type SnapshotDayInput = {
 export type SnapshotInput = {
   locationName: string;
   mosqueName?: string | null;
+  showJamat?: boolean;
   generatedAt: Date;
   days: SnapshotDayInput[];
 };
@@ -45,6 +46,7 @@ export type Snapshot = {
   generatedAt: string;
   locationName: string;
   mosqueName: string | null;
+  showJamat: boolean;
   days: SnapshotDay[];
 };
 
@@ -72,6 +74,7 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
     generatedAt: input.generatedAt.toISOString(),
     locationName: input.locationName,
     mosqueName: input.mosqueName ?? null,
+    showJamat: input.showJamat ?? false,
     days: input.days.map((day) => ({
       date: isoDateKey(day.date),
       hijriText: day.hijriText,

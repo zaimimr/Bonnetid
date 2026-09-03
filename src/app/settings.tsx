@@ -26,6 +26,7 @@ import {
 const storeName = Platform.OS === 'ios' ? 'App Store' : 'Google Play';
 const liveActivitySupported =
   Platform.OS === 'ios' && prayerWidgetAvailable && liveActivitiesEnabled();
+const widgetJamatSupported = Platform.OS === 'android' && prayerWidgetAvailable;
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -44,6 +45,8 @@ export default function SettingsScreen() {
   const notificationSound = useSettings((state) => state.notificationSound);
   const notificationPrayers = useSettings((state) => state.notificationPrayers);
   const liveActivityEnabled = useSettings((state) => state.liveActivityEnabled);
+  const widgetShowJamat = useSettings((state) => state.widgetShowJamat);
+  const setWidgetShowJamat = useSettings((state) => state.setWidgetShowJamat);
   const setLiveActivityEnabled = useSettings((state) => state.setLiveActivityEnabled);
   const toggleNotificationPrayer = useSettings((state) => state.toggleNotificationPrayer);
   const asrOverride = useMosqueAsrOverride();
@@ -180,6 +183,33 @@ export default function SettingsScreen() {
                 <Switch
                   value={liveActivityEnabled}
                   onValueChange={setLiveActivityEnabled}
+                  trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
+                  thumbColor={theme.colors.surface}
+                />
+              }
+              style={{ paddingHorizontal: spacing.md }}
+            />
+          </Card>
+        </>
+      )}
+
+      {widgetJamatSupported && (
+        <>
+          <SectionHeader title="Widget" />
+          <Card padding="sm" rounded="xl">
+            <ListRow
+              title="Vis jamat-tider"
+              subtitle={
+                mosque
+                  ? `Widgeten viser jamat-tidene til ${mosque.name} under bønnetidene`
+                  : 'Velg en moské for å vise jamat-tider i widgeten'
+              }
+              leading={<Ionicons name="people-outline" size={20} color={theme.colors.primary} />}
+              trailing={
+                <Switch
+                  value={widgetShowJamat}
+                  onValueChange={setWidgetShowJamat}
+                  disabled={mosque == null}
                   trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
                   thumbColor={theme.colors.surface}
                 />

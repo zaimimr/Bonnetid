@@ -1,0 +1,9 @@
+<resources>
+  <color name="prayer_widget_brand">#FF6FBA9D</color>
+  <color name="prayer_widget_brand_plate">#FF27362F</color>
+  <color name="prayer_widget_on_brand_plate">#FFD3EAE0</color>
+  <color name="prayer_widget_surface">#FF151F1B</color>
+  <color name="prayer_widget_ink">#FFF6F8F7</color>
+  <color name="prayer_widget_ink_secondary">#FFC6D0CB</color>
+  <color name="prayer_widget_ink_muted">#FF8C9A93</color>
+</resources>
