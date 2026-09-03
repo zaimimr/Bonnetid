@@ -14,9 +14,7 @@ import {
 
 type PrayerLogState = {
   log: PrayerLog;
-  /** `null` clears a mark. Writes through to the native surfaces. */
   setStatus: (isoDate: string, prayer: string, status: PrayerStatus | null) => void;
-  /** Pulls marks made from the widget / Live Activity / notification actions into the app. */
   syncFromNative: () => void;
 };
 
