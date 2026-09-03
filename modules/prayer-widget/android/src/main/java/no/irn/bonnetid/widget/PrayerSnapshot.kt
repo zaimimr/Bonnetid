@@ -35,6 +35,7 @@ data class PrayerSnapshot(
   val locationName: String,
   val mosqueName: String?,
   val showJamat: Boolean,
+  val lockScreenEnabled: Boolean,
   val days: List<PrayerDaySnapshot>,
 ) {
   val allPrayers: List<PrayerEntry>
@@ -48,10 +49,17 @@ data class PrayerSnapshot(
     return days.firstOrNull { it.date == key }?.hijriText ?: days.firstOrNull()?.hijriText ?: ""
   }
 
-  fun dailyPrayers(at: Long): List<PrayerEntry> {
+  fun dayFor(at: Long): PrayerDaySnapshot? {
     val key = dayKey(at)
-    val day = days.firstOrNull { it.date == key } ?: days.firstOrNull()
-    return day?.prayers?.filter { it.isPrayer } ?: emptyList()
+    return days.firstOrNull { it.date == key } ?: days.firstOrNull()
+  }
+
+  fun dailyPrayers(at: Long): List<PrayerEntry> {
+    return dayFor(at)?.prayers?.filter { it.isPrayer } ?: emptyList()
+  }
+
+  fun windowEnd(prayer: PrayerEntry): Long? {
+    return allPrayers.firstOrNull { it.at > prayer.at }?.at
   }
 
   fun currentPrayer(at: Long): PrayerEntry? {
@@ -113,6 +121,7 @@ data class PrayerSnapshot(
           locationName = root.optString("locationName"),
           mosqueName = optStringOrNull(root, "mosqueName"),
           showJamat = root.optBoolean("showJamat", false),
+          lockScreenEnabled = root.optBoolean("lockScreenEnabled", false),
           days = days,
         )
       } catch (error: Exception) {

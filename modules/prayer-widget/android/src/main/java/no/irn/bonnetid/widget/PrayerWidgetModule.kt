@@ -20,6 +20,7 @@ class PrayerWidgetModule : Module() {
         .putString(SNAPSHOT_KEY, json)
         .apply()
       PrayerAppWidget.updateAll(context)
+      PrayerStatusNotifier.sync(context)
     }
 
     Function("getPrayerLog") {
@@ -36,6 +37,7 @@ class PrayerWidgetModule : Module() {
         .putString(PRAYER_LOG_KEY, json)
         .apply()
       PrayerAppWidget.updateAll(context)
+      PrayerStatusNotifier.refreshPosted(context)
     }
 
     Function("areLiveActivitiesEnabled") { false }

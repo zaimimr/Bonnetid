@@ -24,8 +24,12 @@ import {
 } from '@/store/settings';
 
 const storeName = Platform.OS === 'ios' ? 'App Store' : 'Google Play';
-const liveActivitySupported =
-  Platform.OS === 'ios' && prayerWidgetAvailable && liveActivitiesEnabled();
+const lockScreenSupported =
+  prayerWidgetAvailable && (Platform.OS === 'android' || liveActivitiesEnabled());
+const lockScreenSubtitle =
+  Platform.OS === 'android'
+    ? 'Varsel på låseskjermen når bønnetiden starter, med Bedt / Hopp over'
+    : 'Nedtelling på låseskjermen og i Dynamic Island mens appen er åpnet';
 const widgetJamatSupported = Platform.OS === 'android' && prayerWidgetAvailable;
 
 export default function SettingsScreen() {
@@ -171,13 +175,13 @@ export default function SettingsScreen() {
         )}
       </Card>
 
-      {liveActivitySupported && (
+      {lockScreenSupported && (
         <>
           <SectionHeader title="Låseskjerm" />
           <Card padding="sm" rounded="xl">
             <ListRow
               title="Følg neste bønn"
-              subtitle="Nedtelling på låseskjermen og i Dynamic Island mens appen er åpnet"
+              subtitle={lockScreenSubtitle}
               leading={<Ionicons name="timer-outline" size={20} color={theme.colors.primary} />}
               trailing={
                 <Switch

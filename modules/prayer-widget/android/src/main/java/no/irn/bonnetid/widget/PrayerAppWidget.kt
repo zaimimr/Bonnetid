@@ -84,6 +84,14 @@ class PrayerAppWidget : AppWidgetProvider() {
       R.id.column_jamat_3,
       R.id.column_jamat_4,
     )
+    private val columnCheckIds = intArrayOf(
+      R.id.column_check_0,
+      R.id.column_check_1,
+      R.id.column_check_2,
+      R.id.column_check_3,
+      R.id.column_check_4,
+    )
+    private const val SKIPPED_ALPHA = 0.4f
 
     fun updateAll(context: Context) {
       val manager = AppWidgetManager.getInstance(context) ?: return
@@ -104,7 +112,7 @@ class PrayerAppWidget : AppWidgetProvider() {
         } else if (isWide(manager, id)) {
           mediumViews(context, snapshot, moment, now)
         } else {
-          smallViews(context, moment, now, snapshot.showJamat && snapshot.hasJamatTimes)
+          smallViews(context, snapshot, moment, now)
         }
         views.setOnClickPendingIntent(R.id.root, openAppIntent(context))
         manager.updateAppWidget(id, views)
@@ -119,10 +127,11 @@ class PrayerAppWidget : AppWidgetProvider() {
 
     private fun smallViews(
       context: Context,
+      snapshot: PrayerSnapshot,
       moment: PrayerMoment,
       now: Long,
-      showJamat: Boolean,
     ): RemoteViews {
+      val showJamat = snapshot.showJamat && snapshot.hasJamatTimes
       val views = RemoteViews(context.packageName, R.layout.prayer_widget_small)
       views.setTextViewText(R.id.state, moment.stateLabel)
       views.setTextViewText(R.id.headline_label, moment.headline.displayLabel)
@@ -130,6 +139,15 @@ class PrayerAppWidget : AppWidgetProvider() {
         R.id.headline_time,
         PrayerFormat.time(moment.headline.printedAt(showJamat)),
       )
+
+      val status = statusOf(context, snapshot, moment.headline)
+      views.setViewVisibility(
+        R.id.headline_check,
+        if (status == PrayerLogStore.STATUS_PRAYED) View.VISIBLE else View.GONE,
+      )
+      val alpha = if (status == PrayerLogStore.STATUS_SKIPPED) SKIPPED_ALPHA else 1f
+      views.setFloat(R.id.headline_row, "setAlpha", alpha)
+      views.setFloat(R.id.headline_time, "setAlpha", alpha)
 
       if (moment.isNow) {
         views.setTextViewText(R.id.countdown_label, moment.next.label)
@@ -152,8 +170,10 @@ class PrayerAppWidget : AppWidgetProvider() {
       views.setTextViewText(R.id.hijri, moment.hijriText)
 
       val showJamat = snapshot.showJamat && snapshot.hasJamatTimes
-      val prayers = snapshot.dailyPrayers(moment.headline.at)
+      val day = snapshot.dayFor(moment.headline.at)
+      val prayers = day?.prayers?.filter { it.isPrayer } ?: emptyList()
       val currentAt = snapshot.currentPrayer(now)?.at
+      val log = PrayerLogStore.read(context)
 
       for (index in columnIds.indices) {
         val prayer = prayers.getOrNull(index)
@@ -175,6 +195,17 @@ class PrayerAppWidget : AppWidgetProvider() {
           PrayerFormat.time(prayer.printedAt(showJamat)),
         )
 
+        val status = day?.let { PrayerLogStore.statusOf(log, it.date, prayer.kind) }
+        views.setViewVisibility(
+          columnCheckIds[index],
+          if (status == PrayerLogStore.STATUS_PRAYED) View.VISIBLE else View.GONE,
+        )
+        views.setFloat(
+          columnIds[index],
+          "setAlpha",
+          if (status == PrayerLogStore.STATUS_SKIPPED) SKIPPED_ALPHA else 1f,
+        )
+
         val jamat = prayer.jamat
         if (showJamat && jamat != null) {
           views.setTextViewText(columnJamatIds[index], PrayerFormat.time(jamat))
@@ -191,6 +222,17 @@ class PrayerAppWidget : AppWidgetProvider() {
       setCountdown(views, R.id.countdown, moment.next.at, now)
       views.setViewVisibility(R.id.footer_jamat, if (showJamat) View.VISIBLE else View.GONE)
       return views
+    }
+
+    private fun statusOf(
+      context: Context,
+      snapshot: PrayerSnapshot,
+      prayer: PrayerEntry,
+    ): String? {
+      if (!prayer.isPrayer) return null
+      val day = snapshot.dayFor(prayer.at) ?: return null
+      if (day.prayers.none { it.kind == prayer.kind && it.at == prayer.at }) return null
+      return PrayerLogStore.statusOf(context, day.date, prayer.kind)
     }
 
     private fun setCountdown(views: RemoteViews, viewId: Int, target: Long, now: Long) {
