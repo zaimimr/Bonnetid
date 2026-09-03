@@ -1,8 +1,9 @@
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText, Badge, Card } from '@/components/ui';
+import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { useTheme } from '@/theme';
-import { radius, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 import type { Mosque } from '@/api/types';
 import { formatDistance } from '@/lib/geo';
 
@@ -21,17 +22,7 @@ export function MosqueCard({ mosque, distanceKm, showEid, onPress }: MosqueCardP
   return (
     <Card onPress={onPress} rounded="xl">
       <View style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'center' }}>
-        <View
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: radius.md,
-            backgroundColor: theme.colors.primarySoft,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Ionicons name="business" size={22} color={theme.colors.primary} />
-        </View>
+        <MosqueLogo uri={mosque.logo} size="md" />
 
         <View style={{ flex: 1, gap: spacing.xxs }}>
           <AppText weight="semibold" numberOfLines={2}>

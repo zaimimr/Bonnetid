@@ -73,6 +73,7 @@ export type Mosque = {
   contact_phone: string | null;
   contact_email: string | null;
   homepage: string | null;
+  logo: string | null;
   asr_method: 'IRN' | 'SHADOW_1X' | 'SHADOW_2X' | 'WUSTA' | 'NONE';
   show_eid: boolean;
   eid_prayers: string[];

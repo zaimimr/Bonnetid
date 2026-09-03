@@ -9,6 +9,7 @@ import { useRefresh } from '@/hooks/useRefresh';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useResponsive } from '@/hooks/useResponsive';
 import type { Mosque } from '@/api/types';
+import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { AppText, Card, ErrorState, ListRow, Screen, SectionHeader, Skeleton } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
@@ -126,39 +127,42 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
   return (
     <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
       <Card rounded="xl">
-        <View style={{ gap: spacing.sm }}>
-          <AppText size="xl" weight="bold" heading>
-            {mosque.name}
-          </AppText>
-          {mosque.address ? (
-            <Pressable
-              onPress={openDirections}
-              disabled={!mosque.lat || !mosque.lon}
-              hitSlop={spacing.xs}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-              <Ionicons name="location-outline" size={16} color={theme.colors.primary} />
-              <AppText
-                size="sm"
-                tone={mosque.lat && mosque.lon ? 'primary' : 'textSecondary'}
-                style={{ flex: 1 }}>
-                {mosque.address}
-                {mosque.post ? `, ${mosque.post.code} ${mosque.post.city}` : ''}
-              </AppText>
-            </Pressable>
-          ) : null}
-          {mosque.info ? (
-            <AppText size="sm" tone="textMuted">
-              {mosque.info}
+        <View style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' }}>
+          <MosqueLogo uri={mosque.logo} size="lg" />
+          <View style={{ flex: 1, gap: spacing.sm }}>
+            <AppText size="xl" weight="bold" heading>
+              {mosque.name}
             </AppText>
-          ) : null}
-          {ASR_METHOD_LABELS[mosque.asr_method] && (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-              <Ionicons name="time-outline" size={16} color={theme.colors.textMuted} />
-              <AppText size="sm" tone="textSecondary" style={{ flex: 1 }}>
-                {ASR_METHOD_LABELS[mosque.asr_method]}
+            {mosque.address ? (
+              <Pressable
+                onPress={openDirections}
+                disabled={!mosque.lat || !mosque.lon}
+                hitSlop={spacing.xs}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+                <Ionicons name="location-outline" size={16} color={theme.colors.primary} />
+                <AppText
+                  size="sm"
+                  tone={mosque.lat && mosque.lon ? 'primary' : 'textSecondary'}
+                  style={{ flex: 1 }}>
+                  {mosque.address}
+                  {mosque.post ? `, ${mosque.post.code} ${mosque.post.city}` : ''}
+                </AppText>
+              </Pressable>
+            ) : null}
+            {mosque.info ? (
+              <AppText size="sm" tone="textMuted">
+                {mosque.info}
               </AppText>
-            </View>
-          )}
+            ) : null}
+            {ASR_METHOD_LABELS[mosque.asr_method] && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+                <Ionicons name="time-outline" size={16} color={theme.colors.textMuted} />
+                <AppText size="sm" tone="textSecondary" style={{ flex: 1 }}>
+                  {ASR_METHOD_LABELS[mosque.asr_method]}
+                </AppText>
+              </View>
+            )}
+          </View>
         </View>
       </Card>
 
