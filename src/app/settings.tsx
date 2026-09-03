@@ -49,6 +49,8 @@ export default function SettingsScreen() {
   const setWidgetShowJamat = useSettings((state) => state.setWidgetShowJamat);
   const setLiveActivityEnabled = useSettings((state) => state.setLiveActivityEnabled);
   const toggleNotificationPrayer = useSettings((state) => state.toggleNotificationPrayer);
+  const endReminderEnabled = useSettings((state) => state.endReminderEnabled);
+  const setEndReminderEnabled = useSettings((state) => state.setEndReminderEnabled);
   const asrOverride = useMosqueAsrOverride();
   const asrLocationDefault = useLocationAsrDefault();
 
@@ -167,6 +169,23 @@ export default function SettingsScreen() {
                 />
               </View>
             ))}
+            <Divider />
+            <ListRow
+              title="Påminnelse før tiden går ut"
+              subtitle="30 minutter før bønnetiden er over, hvis du ikke har markert bønnen som bedt"
+              leading={
+                <Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />
+              }
+              trailing={
+                <Switch
+                  value={endReminderEnabled}
+                  onValueChange={setEndReminderEnabled}
+                  trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
+                  thumbColor={theme.colors.surface}
+                />
+              }
+              style={{ paddingHorizontal: spacing.md }}
+            />
           </>
         )}
       </Card>

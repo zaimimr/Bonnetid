@@ -16,6 +16,7 @@ import {
 import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { isoDateKey, todayKey } from '@/lib/time';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
+import { useNow } from '@/hooks/useNow';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
@@ -28,6 +29,7 @@ export default function DayScreen() {
   const asrMethod = useEffectiveAsrMethod();
   const mosque = useSettings((state) => state.mosque);
   const { refreshing, onRefresh } = useRefresh();
+  const now = useNow(30_000);
 
   const date = useMemo(() => new Date(`${isoDate}T12:00:00`), [isoDate]);
   const valid = !Number.isNaN(date.getTime());
@@ -116,6 +118,8 @@ export default function DayScreen() {
             mosqueNote={mosqueInLocation ? undefined : 'Moskeen er i en annen kommune'}
             jamatTimes={jamatTimes}
             jummah={mosqueInLocation && isFriday ? jummahTimes : []}
+            statusDate={isoDate}
+            now={now}
             onPressMosque={() =>
               mosque &&
               router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } })

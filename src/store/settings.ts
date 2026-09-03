@@ -39,6 +39,7 @@ type SettingsState = {
   notificationsEnabled: boolean;
   notificationSound: NotificationSoundKey;
   notificationPrayers: Record<NotifiablePrayer, boolean>;
+  endReminderEnabled: boolean;
   liveActivityEnabled: boolean;
   widgetShowJamat: boolean;
   launchCount: number;
@@ -52,6 +53,7 @@ type SettingsState = {
   setNotificationsEnabled: (enabled: boolean) => void;
   setNotificationSound: (sound: NotificationSoundKey) => void;
   toggleNotificationPrayer: (prayer: NotifiablePrayer) => void;
+  setEndReminderEnabled: (enabled: boolean) => void;
   setLiveActivityEnabled: (enabled: boolean) => void;
   setWidgetShowJamat: (enabled: boolean) => void;
 };
@@ -73,6 +75,7 @@ export const useSettings = create<SettingsState>()(
       notificationsEnabled: false,
       notificationSound: 'default',
       notificationPrayers: ALL_PRAYERS_ENABLED,
+      endReminderEnabled: true,
       liveActivityEnabled: true,
       widgetShowJamat: false,
       launchCount: 0,
@@ -88,6 +91,7 @@ export const useSettings = create<SettingsState>()(
       setThemePreference: (themePreference) => set({ themePreference }),
       setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),
       setNotificationSound: (notificationSound) => set({ notificationSound }),
+      setEndReminderEnabled: (endReminderEnabled) => set({ endReminderEnabled }),
       setLiveActivityEnabled: (liveActivityEnabled) => set({ liveActivityEnabled }),
       setWidgetShowJamat: (widgetShowJamat) => set({ widgetShowJamat }),
       toggleNotificationPrayer: (prayer) =>
