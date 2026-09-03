@@ -2,7 +2,7 @@
   "expo": {
     "name": "Bønnetid",
     "slug": "bonnetid",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "bonnetid",
@@ -15,8 +15,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "no.irn.bonnetid",
+      "appleTeamId": "9L246T935B",
       "entitlements": {
-        "com.apple.security.application-groups": ["group.no.irn.bonnetid"]
+        "com.apple.security.application-groups": [
+          "group.no.irn.bonnetid"
+        ]
       },
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -71,7 +74,10 @@
       [
         "expo-notifications",
         {
-          "sounds": ["./assets/sounds/adhan.wav", "./assets/sounds/adhan_kort.wav"]
+          "sounds": [
+            "./assets/sounds/adhan.wav",
+            "./assets/sounds/adhan_kort.wav"
+          ]
         }
       ],
       "expo-font",
