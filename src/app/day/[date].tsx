@@ -17,6 +17,7 @@ import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { isoDateKey, todayKey } from '@/lib/time';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { useRefresh } from '@/hooks/useRefresh';
+import { useTimezoneNote } from '@/hooks/useTimezoneNote';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
 const FRIDAY = 5;
@@ -31,6 +32,7 @@ export default function DayScreen() {
 
   const date = useMemo(() => new Date(`${isoDate}T12:00:00`), [isoDate]);
   const valid = !Number.isNaN(date.getTime());
+  const timezoneNote = useTimezoneNote(date);
 
   const month = usePrayerTimes(location.iso, date.getFullYear(), date.getMonth() + 1);
   const hijriMonth = useHijriMonth(date.getFullYear(), date.getMonth() + 1);
@@ -102,6 +104,12 @@ export default function DayScreen() {
         </View>
         <DayArrow direction="forward" onPress={() => goToDay(1)} />
       </View>
+
+      {timezoneNote && (
+        <AppText size="xs" tone="textMuted" align="center" style={{ marginTop: spacing.md }}>
+          {timezoneNote}
+        </AppText>
+      )}
 
       <View style={{ marginTop: spacing.lg }}>
         {month.isLoading && <Skeleton height={360} rounded="xl" />}

@@ -1,6 +1,12 @@
 import type { PrayerDay } from '@/api/types';
 import type { AsrMethodPreference } from '@/store/settings';
-import { addMinutesToTime, parseTimeToDate } from './time';
+import {
+  addMinutesToTime,
+  formatLocalClock,
+  isoDateIsFriday,
+  osloTimeToLocalClock,
+  parseTimeToDate,
+} from './time';
 
 export type PrayerName = 'fajr' | 'fajr_endtime' | 'duhr' | 'asr' | 'maghrib' | 'isha';
 
@@ -55,14 +61,17 @@ export function buildDaySchedule(
 
   const entries = source
     .filter((entry): entry is { name: PrayerName; time: string; isPrayer: boolean } => entry.time != null)
-    .map((entry) => ({
-      name: entry.name,
-      label: PRAYER_LABELS[entry.name],
-      time: entry.time,
-      date: parseTimeToDate(entry.time, baseDate),
-      isPrayer: entry.isPrayer,
-      end: null as PrayerWindowEnd | null,
-    }));
+    .map((entry) => {
+      const date = parseTimeToDate(entry.time, baseDate);
+      return {
+        name: entry.name,
+        label: PRAYER_LABELS[entry.name],
+        time: formatLocalClock(date),
+        date,
+        isPrayer: entry.isPrayer,
+        end: null as PrayerWindowEnd | null,
+      };
+    });
 
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
@@ -87,9 +96,12 @@ export function buildDaySchedule(
 
 function midnightEnd(day: PrayerDay, ishaDate: Date, baseDate: Date): PrayerWindowEnd | null {
   if (!day.muntasafallayl_midnight) return null;
-  const date = parseTimeToDate(day.muntasafallayl_midnight, baseDate);
-  if (date.getTime() <= ishaDate.getTime()) date.setDate(date.getDate() + 1);
-  return { label: 'Midnatt', date };
+  const sameDay = parseTimeToDate(day.muntasafallayl_midnight, baseDate);
+  if (sameDay.getTime() > ishaDate.getTime()) return { label: 'Midnatt', date: sameDay };
+
+  const nextDay = new Date(baseDate);
+  nextDay.setDate(nextDay.getDate() + 1);
+  return { label: 'Midnatt', date: parseTimeToDate(day.muntasafallayl_midnight, nextDay) };
 }
 
 export type JamatTimes = Partial<Record<PrayerName, string>>;
@@ -134,18 +146,14 @@ export function adhanTimesFromSchedule(entries: PrayerEntry[]): AdhanTimes {
 }
 
 function resolveJamatTime(
+  isoDate: string,
   fixed: string | null,
   offset: number | null | undefined,
   adhan: string | undefined,
 ): string | undefined {
   if (offset && adhan) return addMinutesToTime(adhan, offset);
-  return fixed ?? undefined;
-}
-
-const FRIDAY = 5;
-
-function isFriday(isoDate: string): boolean {
-  return new Date(`${isoDate}T12:00:00`).getDay() === FRIDAY;
+  if (!fixed) return undefined;
+  return osloTimeToLocalClock(isoDate, fixed) ?? undefined;
 }
 
 export function jamatTimesForDate(
@@ -161,17 +169,17 @@ export function jamatTimesForDate(
 
   const times: JamatTimes = withinPeriod
     ? {
-        fajr: resolveJamatTime(jamat.fajr, jamat.fajr_offset, adhan.fajr),
-        duhr: resolveJamatTime(jamat.duhr, jamat.duhr_offset, adhan.duhr),
-        asr: resolveJamatTime(jamat.asr, jamat.asr_offset, adhan.asr),
-        maghrib: resolveJamatTime(jamat.maghrib, jamat.maghrib_offset, adhan.maghrib),
-        isha: resolveJamatTime(jamat.isha, jamat.isha_offset, adhan.isha),
+        fajr: resolveJamatTime(isoDate, jamat.fajr, jamat.fajr_offset, adhan.fajr),
+        duhr: resolveJamatTime(isoDate, jamat.duhr, jamat.duhr_offset, adhan.duhr),
+        asr: resolveJamatTime(isoDate, jamat.asr, jamat.asr_offset, adhan.asr),
+        maghrib: resolveJamatTime(isoDate, jamat.maghrib, jamat.maghrib_offset, adhan.maghrib),
+        isha: resolveJamatTime(isoDate, jamat.isha, jamat.isha_offset, adhan.isha),
       }
     : {};
 
   const firstJummah = jummah[0]?.jummah;
-  if (firstJummah && isFriday(isoDate)) {
-    times.duhr = firstJummah;
+  if (firstJummah && isoDateIsFriday(isoDate)) {
+    times.duhr = osloTimeToLocalClock(isoDate, firstJummah) ?? firstJummah;
   }
 
   return times;
@@ -204,7 +212,9 @@ export function findNextPrayer(
     return { next: upcoming, current, isTomorrow: false };
   }
 
-  const firstTomorrow = tomorrow.find((entry) => entry.isPrayer);
+  const prayersTomorrow = tomorrow.filter((entry) => entry.isPrayer);
+  const firstTomorrow =
+    prayersTomorrow.find((entry) => entry.date.getTime() > now.getTime()) ?? prayersTomorrow[0];
   if (!firstTomorrow) return null;
 
   return { next: firstTomorrow, current, isTomorrow: true };

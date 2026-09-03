@@ -6,6 +6,17 @@ import type { ApiLocation } from '@/api/types';
 import { nearestLocation } from './useNearestLocation';
 import { useSettings, type SavedLocation } from '@/store/settings';
 
+const NORWAY_BOUNDS = { minLat: 57.5, maxLat: 71.5, minLon: 4, maxLon: 31.5 };
+
+export function isInsideNorway(latitude: number, longitude: number): boolean {
+  return (
+    latitude >= NORWAY_BOUNDS.minLat &&
+    latitude <= NORWAY_BOUNDS.maxLat &&
+    longitude >= NORWAY_BOUNDS.minLon &&
+    longitude <= NORWAY_BOUNDS.maxLon
+  );
+}
+
 export async function detectNearestLocation(
   locations: ApiLocation[],
 ): Promise<SavedLocation | null> {
@@ -15,6 +26,7 @@ export async function detectNearestLocation(
     accuracy: Location.Accuracy.Balanced,
   });
   const { latitude, longitude } = position.coords;
+  if (!isInsideNorway(latitude, longitude)) return null;
   const kommuneIso = await fetchKommuneIso(latitude, longitude);
   const byKommune = kommuneIso
     ? (locations.find((location) => location.iso === kommuneIso) ?? null)
