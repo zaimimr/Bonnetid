@@ -6,7 +6,7 @@ import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import type { HijriDay } from '@/api/types';
 import { parseHijriDate } from '@/lib/hijri';
-import { isoDateKey } from '@/lib/time';
+import { isoDateKey, osloDateKey } from '@/lib/time';
 
 const WEEKDAY_LABELS = ['man', 'tir', 'ons', 'tor', 'fre', 'lør', 'søn'];
 const CELL_HEIGHT = 52;
@@ -31,7 +31,7 @@ export function MonthGrid({ year, monthIndex, days, selectedIso, onDayPress }: M
   const dayWidth = scaleWidth(isWide ? WIDE_DAY_WIDTH : DAY_WIDTH, gridScale);
   const cellHeight = scaleWidth(CELL_HEIGHT, gridScale);
   const dayHeight = scaleWidth(DAY_HEIGHT, gridScale);
-  const todayIso = isoDateKey();
+  const todayIso = osloDateKey();
   const byDate = new Map(days.map((day) => [day.gregorian_date, day]));
 
   const firstOfMonth = new Date(year, monthIndex, 1);

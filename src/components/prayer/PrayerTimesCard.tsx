@@ -6,6 +6,7 @@ import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useResponsive } from '@/hooks/useResponsive';
 import { usePrayerMark } from '@/hooks/usePrayerMark';
 import { useTheme } from '@/theme';
+import { osloTimeToLocalClock } from '@/lib/time';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import { statusOf } from '@/lib/prayerLog';
 import type { JamatTimes, PrayerEntry, PrayerName } from '@/lib/prayerSchedule';
@@ -239,7 +240,7 @@ export function PrayerTimesCard({
                 {jummah.length > 1 ? `Jummah ${index + 1}` : 'Jummah'}
               </AppText>
               <AppText weight="semibold" tone="primary" tabular style={{ marginLeft: 'auto' }}>
-                {entry.jummah}
+                {(statusDate && osloTimeToLocalClock(statusDate, entry.jummah)) ?? entry.jummah}
               </AppText>
             </View>
           ))}

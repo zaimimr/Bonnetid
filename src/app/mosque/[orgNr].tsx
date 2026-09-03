@@ -19,7 +19,7 @@ import {
   jamatTimesForDate,
   PRAYER_LABELS,
 } from '@/lib/prayerSchedule';
-import { isoDateKey, todayKey } from '@/lib/time';
+import { osloDateKey, osloDayKey, osloDayStart, osloTimeToLocalClock } from '@/lib/time';
 import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from '@/components/prayer/TimeCell';
 
 const ASR_METHOD_LABELS: Record<Mosque['asr_method'], string | null> = {
@@ -65,21 +65,21 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
   const isEidPeriod = useIsEidPeriod();
   const eidTimes = isEidPeriod && mosque.show_eid ? mosque.eid_prayers : [];
 
-  const today = useMemo(() => new Date(), []);
+  const today = useMemo(() => osloDayStart(new Date()), []);
   const month = usePrayerTimes(
     mosque.location_iso ?? '',
     today.getFullYear(),
     today.getMonth() + 1,
     { enabled: mosque.location_iso != null },
   );
-  const day = month.data?.find((row) => row.date === todayKey(today));
+  const day = month.data?.find((row) => row.date === osloDayKey(today));
   const fallbackAsr = useEffectiveAsrMethod();
   const asrPreference = toPreference(mosque.asr_method) ?? fallbackAsr;
   const adhanTimes = useMemo(
     () => adhanTimesFromSchedule(day ? buildDaySchedule(day, today, asrPreference) : []),
     [day, today, asrPreference],
   );
-  const jamatTimes = jamatTimesForDate(jamat, isoDateKey(today), adhanTimes, mosque.jummah);
+  const jamatTimes = jamatTimesForDate(jamat, osloDateKey(today), adhanTimes, mosque.jummah);
 
   const jamatRows = JAMAT_PRAYERS.map((name) => ({
     name,
@@ -283,7 +283,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                 title={mosque.jummah.length > 1 ? `Jummah ${index + 1}` : 'Fredagsbønn'}
                 trailing={
                   <AppText weight="semibold" tabular>
-                    {entry.jummah}
+                    {osloTimeToLocalClock(today, entry.jummah) ?? entry.jummah}
                   </AppText>
                 }
                 style={{

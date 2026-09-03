@@ -18,7 +18,7 @@ import {
   jamatTimesForDate,
   type PrayerEntry,
 } from '@/lib/prayerSchedule';
-import { isoDateKey, parseDayKey, todayKey } from '@/lib/time';
+import { isoDateKey, osloDayKey, parseDayKey, todayKey } from '@/lib/time';
 import { buildSnapshot, snapshotIsEmpty } from '@/lib/widgetSnapshot';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
@@ -46,7 +46,7 @@ export function useWidgetSync(now: Date) {
   const showJamat = useSettings((state) => state.widgetShowJamat);
   const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
 
-  const dayKey = todayKey(now);
+  const dayKey = osloDayKey(now);
   const dayStart = useMemo(() => parseDayKey(dayKey), [dayKey]);
   const lastDay = useMemo(() => addDays(dayStart, SNAPSHOT_DAYS - 1), [dayStart]);
 
