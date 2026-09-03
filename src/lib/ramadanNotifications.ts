@@ -4,7 +4,7 @@ import { SUHOOR_REMINDER_MINUTES } from './ramadan';
 
 export const RAMADAN_IDENTIFIER_PREFIX = 'ramadan|';
 
-const MAX_SCHEDULED = 30;
+const MAX_SCHEDULED = 10;
 const CHANNEL_ID = 'ramadan-suhoor';
 const MINUTE_MS = 60_000;
 

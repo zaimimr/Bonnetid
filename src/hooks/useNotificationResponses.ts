@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { addPrayerActionListener, consumeLastPrayerAction } from '@/lib/notifications';
+import { prayerLogKey } from '@/lib/prayerLog';
 import { usePrayerLog } from '@/store/prayerLog';
 
 export function useNotificationResponses() {
@@ -9,7 +10,14 @@ export function useNotificationResponses() {
     let remove: (() => void) | null = null;
     let cancelled = false;
 
-    const handle = (isoDate: string, prayer: string, status: 'prayed' | 'skipped') => {
+    const handle = (
+      isoDate: string,
+      prayer: string,
+      status: 'prayed' | 'skipped',
+      shownAt: number | null,
+    ) => {
+      const existing = usePrayerLog.getState().log[prayerLogKey(isoDate, prayer)];
+      if (existing && shownAt != null && existing.at > shownAt) return;
       setStatus(isoDate, prayer, status);
     };
 

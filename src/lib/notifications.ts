@@ -5,7 +5,7 @@ import type { PrayerStatus } from './prayerLog';
 import { reminderBody, reminderTitle, type PrayerReminder } from './prayerReminders';
 import { getNotificationSound, type NotificationSoundKey } from './notificationSounds';
 
-const MAX_SCHEDULED = 56;
+const MAX_SCHEDULED = 50;
 
 const PRAYER_PREFIX = 'prayer|';
 const REMINDER_PREFIX = 'reminder|';
@@ -267,7 +267,12 @@ export function cancelPrayerReminder(isoDate: string, prayer: string): Promise<v
   });
 }
 
-export type PrayerActionHandler = (isoDate: string, prayer: string, status: PrayerStatus) => void;
+export type PrayerActionHandler = (
+  isoDate: string,
+  prayer: string,
+  status: PrayerStatus,
+  shownAt: number | null,
+) => void;
 
 const COLD_START_MAX_AGE_MS = 15 * 60 * 1000;
 const SECONDS_SCALE_LIMIT = 1e12;
@@ -308,7 +313,7 @@ function applyResponse(response: NotificationResponseLike, handler: PrayerAction
   const action = readAction(response);
   if (!action || handledResponses.has(action.key)) return;
   handledResponses.add(action.key);
-  handler(action.isoDate, action.prayer, action.status);
+  handler(action.isoDate, action.prayer, action.status, shownAtOf(response));
 }
 
 export async function addPrayerActionListener(
@@ -322,10 +327,15 @@ export async function addPrayerActionListener(
   return () => subscription.remove();
 }
 
-function shownRecently(response: NotificationResponseLike): boolean {
+function shownAtOf(response: NotificationResponseLike): number | null {
   const raw = response.notification.date;
-  if (typeof raw !== 'number' || Number.isNaN(raw)) return true;
-  const shownAt = raw < SECONDS_SCALE_LIMIT ? raw * 1000 : raw;
+  if (typeof raw !== 'number' || Number.isNaN(raw)) return null;
+  return raw < SECONDS_SCALE_LIMIT ? raw * 1000 : raw;
+}
+
+function shownRecently(response: NotificationResponseLike): boolean {
+  const shownAt = shownAtOf(response);
+  if (shownAt == null) return true;
   return Date.now() - shownAt <= COLD_START_MAX_AGE_MS;
 }
 

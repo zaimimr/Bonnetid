@@ -43,9 +43,17 @@ export async function endPrayerActivity() {
 }
 
 export function readNativePrayerLog(): string | null {
-  return native?.getPrayerLog() ?? null;
+  try {
+    return native?.getPrayerLog() ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export function writeNativePrayerLog(log: unknown) {
-  native?.setPrayerLog(JSON.stringify(log));
+  try {
+    native?.setPrayerLog(JSON.stringify(log));
+  } catch {
+    return;
+  }
 }

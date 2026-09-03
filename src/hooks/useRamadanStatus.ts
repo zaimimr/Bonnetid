@@ -2,11 +2,12 @@ import { useMemo } from 'react';
 import { useHijriMonth } from '@/api/queries';
 import type { HijriDay } from '@/api/types';
 import { ramadanStatusFrom, type RamadanStatus } from '@/lib/ramadan';
-import { osloDateKey } from '@/lib/time';
+import { osloDateKey, osloDayStart } from '@/lib/time';
 
 export function useHijriLookahead(now: Date): HijriDay[] {
-  const thisMonth = useHijriMonth(now.getFullYear(), now.getMonth() + 1);
-  const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const today = osloDayStart(now);
+  const thisMonth = useHijriMonth(today.getFullYear(), today.getMonth() + 1);
+  const nextMonthStart = new Date(today.getFullYear(), today.getMonth() + 1, 1);
   const nextMonth = useHijriMonth(nextMonthStart.getFullYear(), nextMonthStart.getMonth() + 1);
 
   return useMemo(

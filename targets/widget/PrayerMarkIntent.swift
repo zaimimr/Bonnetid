@@ -3,10 +3,6 @@ import AppIntents
 import Foundation
 import WidgetKit
 
-/// Shared with the app target: modules/prayer-widget/ios/PrayerMarkIntent.swift is an identical
-/// copy. A LiveActivityIntent is rendered by the widget extension but performed in the app's
-/// process, so the same type has to compile into both binaries. Change one, change the other.
-
 private let prayerLogSuiteName = "group.no.irn.bonnetid"
 private let prayerLogDefaultsKey = "prayer_log_v1"
 
