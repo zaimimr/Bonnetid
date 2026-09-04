@@ -1,5 +1,5 @@
 import { Switch, View } from 'react-native';
-import { AppText, Card, Divider, ListRow, Screen } from '@/components/ui';
+import { Card, Divider, ListRow, Screen } from '@/components/ui';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
 import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
@@ -39,12 +39,6 @@ export default function NotificationPrayersScreen() {
         ))}
       </Card>
 
-      <AppText
-        size="xs"
-        tone="textMuted"
-        style={{ marginTop: spacing.sm, paddingHorizontal: spacing.md }}>
-        Du får varsel når bønnen begynner i stedet du har valgt.
-      </AppText>
     </Screen>
   );
 }

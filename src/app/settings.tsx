@@ -25,18 +25,12 @@ import { useRamadanStatus } from '@/hooks/useRamadanStatus';
 import { track, trackError } from '@/lib/telemetry';
 import { NOTIFIABLE_PRAYERS, useActiveLocation, useSettings } from '@/store/settings';
 
-const storeName = Platform.OS === 'ios' ? 'App Store' : 'Google Play';
 const lockScreenSupported =
   prayerWidgetAvailable && (Platform.OS === 'android' || liveActivitiesEnabled());
 const hasIsland = Platform.OS === 'ios' && dynamicIslandAvailable();
 const lockScreenTitle =
-  Platform.OS === 'android' ? 'Varsel på låseskjermen' : 'Følg bønnen på låseskjermen';
-const lockScreenSubtitle =
-  Platform.OS === 'android'
-    ? 'Vises når bønnetiden starter, med Bedt og Hopp over'
-    : hasIsland
-      ? 'Nedtelling på låseskjermen og i Dynamic Island'
-      : 'Nedtelling på låseskjermen';
+  Platform.OS === 'android' ? 'Varsel på låseskjermen' : 'Nedtelling på låseskjermen';
+const lockScreenSubtitle = hasIsland ? 'Også i Dynamic Island' : undefined;
 const widgetJamatSupported = Platform.OS === 'android' && prayerWidgetAvailable;
 const ROW = { paddingHorizontal: spacing.md } as const;
 
@@ -121,7 +115,7 @@ export default function SettingsScreen() {
 
   return (
     <Screen scroll edges={[]}>
-      <SectionHeader title="Bønnetider" subtitle="Stedet finnes automatisk fra posisjonen din" />
+      <SectionHeader title="Bønnetider" />
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Sted"
@@ -159,11 +153,7 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Varsle ved bønnetid"
-          subtitle={
-            notificationsSupported
-              ? 'Beskjed når bønnen begynner'
-              : 'Ikke tilgjengelig i Expo Go på Android'
-          }
+          subtitle={notificationsSupported ? undefined : 'Ikke tilgjengelig i Expo Go på Android'}
           leading={<Ionicons name="notifications-outline" size={20} color={theme.colors.primary} />}
           trailing={
             <Switch
@@ -203,7 +193,7 @@ export default function SettingsScreen() {
                 <Divider />
                 <ListRow
                   title="Suhoor-påminnelse"
-                  subtitle="45 minutter før Fajr i Ramadan"
+                  subtitle="45 minutter før Fajr"
                   leading={<Ionicons name="moon-outline" size={20} color={theme.colors.primary} />}
                   trailing={
                     <Switch
@@ -226,7 +216,6 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Marker bønner"
-          subtitle="Hold oversikt over bønnene dine"
           leading={
             <Ionicons name="checkmark-done-outline" size={20} color={theme.colors.primary} />
           }
@@ -245,7 +234,7 @@ export default function SettingsScreen() {
             <Divider />
             <ListRow
               title="Påminnelse før tiden går ut"
-              subtitle="30 minutter før bønnetiden er over, hvis du ikke har markert bønnen"
+              subtitle="30 minutter før tiden er ute"
               leading={<Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />}
               trailing={
                 <Switch
@@ -323,7 +312,6 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Vurder Bønnetid"
-          subtitle={`Gi appen stjerner i ${storeName}`}
           leading={<Ionicons name="star-outline" size={20} color={theme.colors.primary} />}
           trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
           onPress={() => openStoreReview()}
@@ -332,7 +320,6 @@ export default function SettingsScreen() {
         <Divider />
         <ListRow
           title="Islamsk Råd Norge"
-          subtitle="Om samarbeidet og prosjektet bak appen"
           leading={
             <Image
               source={

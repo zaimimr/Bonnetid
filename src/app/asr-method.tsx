@@ -46,14 +46,14 @@ export default function AsrMethodScreen() {
         ))}
       </Card>
 
-      <AppText
-        size="xs"
-        tone="textMuted"
-        style={{ marginTop: spacing.sm, paddingHorizontal: spacing.md }}>
-        {locked && mosque
-          ? `${mosque.name} bestemmer asr-metoden, så den kan ikke endres her.`
-          : 'Metoden bestemmer når asr begynner. Er du i tvil, følg moskeen din.'}
-      </AppText>
+      {locked && mosque && (
+        <AppText
+          size="xs"
+          tone="textMuted"
+          style={{ marginTop: spacing.sm, paddingHorizontal: spacing.md }}>
+          {`${mosque.name} bestemmer asr-metoden`}
+        </AppText>
+      )}
     </Screen>
   );
 }
