@@ -48,6 +48,7 @@ export function PrayerStatusChoice({ label, status, onSelect }: PrayerStatusChoi
           flexDirection: 'row',
           flex: 1,
           minWidth: 180,
+          maxWidth: 320,
           backgroundColor: theme.colors.surfaceSunken,
           borderRadius: radius.md,
           borderWidth: 1,

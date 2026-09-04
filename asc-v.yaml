@@ -1,0 +1,463 @@
+- generic [active] [ref=f4e1]:
+  - banner "App Store Connect" [ref=f4e3]:
+    - generic [ref=f4e4]:
+      - heading "App Store Connect" [level=1] [ref=f4e20]:
+        - link "App Store Connect" [ref=f4e21] [cursor=pointer]:
+          - /url: /
+      - navigation "Global" [ref=f4e7]:
+        - list [ref=f4e23]:
+          - listitem [ref=f4e24]:
+            - link "Apps" [ref=f4e25] [cursor=pointer]:
+              - /url: /apps
+          - listitem [ref=f4e26]:
+            - link "Trends" [ref=f4e27] [cursor=pointer]:
+              - /url: /trends
+          - listitem [ref=f4e28]:
+            - link "Reports" [ref=f4e29] [cursor=pointer]:
+              - /url: /itc/payments_and_financial_reports
+          - listitem [ref=f4e30]:
+            - link "Business" [ref=f4e31] [cursor=pointer]:
+              - /url: /business
+          - listitem [ref=f4e32]:
+            - link "Users and Access" [ref=f4e33] [cursor=pointer]:
+              - /url: /access/users
+      - button "Zaim Imran Zaim Imran Account name menu" [ref=f4e35] [cursor=pointer]:
+        - generic:
+          - generic: Zaim Imran
+          - generic: Zaim Imran
+          - img [ref=f4e36]
+  - generic [ref=f4e41]:
+    - button "Apps menu, Bønnetid, selected" [ref=f4e46] [cursor=pointer]:
+      - generic [ref=f4e47]:
+        - generic "Bønnetid" [ref=f4e48]:
+          - img "Bønnetid" [ref=f4e49]
+        - generic [ref=f4e50]: Bønnetid
+      - img [ref=f4e52]
+    - navigation "Apps" [ref=f4e55]:
+      - list [ref=f4e56]:
+        - listitem [ref=f4e57]:
+          - link "Distribution" [ref=f4e58] [cursor=pointer]:
+            - /url: /apps/6792056685/distribution
+        - listitem [ref=f4e59]:
+          - link "Analytics" [ref=f4e60] [cursor=pointer]:
+            - /url: /apps/6792056685/analytics
+        - listitem [ref=f4e61]:
+          - link "TestFlight" [ref=f4e62] [cursor=pointer]:
+            - /url: /teams/a2d1bd8d-dc23-4161-904a-9f088eef8144/apps/6792056685/testflight
+        - listitem [ref=f4e63]:
+          - link "Xcode Cloud" [ref=f4e64] [cursor=pointer]:
+            - /url: /teams/a2d1bd8d-dc23-4161-904a-9f088eef8144/apps/6792056685/ci
+  - main [ref=f4e68]:
+    - generic [ref=f4e73]:
+      - navigation "Distribution" [ref=f4e75]:
+        - list [ref=f4e76]:
+          - listitem [ref=f4e77]:
+            - generic [ref=f4e78]:
+              - heading "iOS App" [level=2] [ref=f4e80]
+              - list [ref=f4e81]:
+                - listitem [ref=f4e82]:
+                  - link "1.2.0 Prepare for Submission" [ref=f4e83] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/ios/version/inflight
+                    - generic [ref=f4e84]:
+                      - img [ref=f4e85]
+                      - text: 1.2.0 Prepare for Submission
+                - listitem [ref=f4e87]:
+                  - link "1.1 Ready for Distribution" [ref=f4e88] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/ios/version/deliverable
+                    - generic [ref=f4e89]:
+                      - img [ref=f4e90]
+                      - text: 1.1 Ready for Distribution
+            - button "Add Platform" [ref=f4e92] [cursor=pointer]
+          - listitem [ref=f4e93]:
+            - separator [ref=f4e94]
+          - listitem [ref=f4e95]:
+            - heading "General" [level=2] [ref=f4e97]
+            - list [ref=f4e98]:
+              - listitem [ref=f4e99]:
+                - link "App Information" [ref=f4e100] [cursor=pointer]:
+                  - /url: /apps/6792056685/distribution/info
+                  - generic [ref=f4e101]: App Information
+              - listitem [ref=f4e102]:
+                - link "App Review" [ref=f4e103] [cursor=pointer]:
+                  - /url: /apps/6792056685/distribution/reviewsubmissions
+                  - generic [ref=f4e104]: App Review
+              - listitem [ref=f4e105]:
+                - link "History" [ref=f4e106] [cursor=pointer]:
+                  - /url: /apps/6792056685/distribution/activity/ios/versions
+                  - generic [ref=f4e107]: History
+          - listitem [ref=f4e108]:
+            - separator [ref=f4e109]
+          - listitem [ref=f4e110]:
+            - heading "App Store" [level=2] [ref=f4e112]
+            - generic [ref=f4e113]:
+              - heading "Trust & Safety" [level=3] [ref=f4e115]
+              - list [ref=f4e116]:
+                - listitem [ref=f4e117]:
+                  - link "App Privacy" [ref=f4e118] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/privacy
+                    - generic [ref=f4e119]: App Privacy
+                - listitem [ref=f4e120]:
+                  - link "App Accessibility" [ref=f4e121] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/accessibility
+                    - generic [ref=f4e122]: App Accessibility
+                - listitem [ref=f4e123]:
+                  - link "Ratings and Reviews" [ref=f4e124] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/ratings/ios
+                    - generic [ref=f4e125]: Ratings and Reviews
+            - generic [ref=f4e126]:
+              - heading "Growth & Marketing" [level=3] [ref=f4e128]
+              - list [ref=f4e129]:
+                - listitem [ref=f4e130]:
+                  - link "In-App Events" [ref=f4e131] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/events
+                    - generic [ref=f4e132]: In-App Events
+                - listitem [ref=f4e133]:
+                  - link "Custom Product Pages" [ref=f4e134] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/productpages
+                    - generic [ref=f4e135]: Custom Product Pages
+                - listitem [ref=f4e136]:
+                  - link "Product Page Optimization" [ref=f4e137] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/optimization
+                    - generic [ref=f4e138]: Product Page Optimization
+                - listitem [ref=f4e139]:
+                  - link "Promo Codes" [ref=f4e140] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/promo_codes/generate
+                    - generic [ref=f4e141]: Promo Codes
+                - listitem [ref=f4e142]:
+                  - link "Game Center" [ref=f4e143] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/gamecenter
+                    - generic [ref=f4e144]: Game Center
+            - generic [ref=f4e145]:
+              - heading "Monetization" [level=3] [ref=f4e147]
+              - list [ref=f4e148]:
+                - listitem [ref=f4e149]:
+                  - link "Pricing and Availability" [ref=f4e150] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/pricing
+                    - generic [ref=f4e151]: Pricing and Availability
+                - listitem [ref=f4e152]:
+                  - link "In-App Purchases" [ref=f4e153] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/iaps
+                    - generic [ref=f4e154]: In-App Purchases
+                - listitem [ref=f4e155]:
+                  - link "Subscriptions" [ref=f4e156] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/subscriptions
+                    - generic [ref=f4e157]: Subscriptions
+            - generic [ref=f4e158]:
+              - heading "Featuring" [level=3] [ref=f4e160]
+              - list [ref=f4e161]:
+                - listitem [ref=f4e162]:
+                  - link "Nominations" [ref=f4e163] [cursor=pointer]:
+                    - /url: /apps/6792056685/distribution/nominations
+                    - generic [ref=f4e164]: Nominations
+      - generic [ref=f4e167]:
+        - generic [ref=f4e168]:
+          - generic [ref=f4e169]:
+            - heading "iOS App Version 1.2.0" [level=2] [ref=f4e172]
+            - generic [ref=f4e173]:
+              - button "Save" [disabled] [ref=f4e174]
+              - button "Add for Review" [ref=f4e175] [cursor=pointer]
+          - separator [ref=f4e176]
+        - generic [ref=f4e177]:
+          - generic [ref=f4e180]:
+            - paragraph [ref=f4e182]: The assets and metadata below appear on your app’s product page, when users install your app, and will be used for web engine search results once you release your app.
+            - generic [ref=f4e185]:
+              - button "English (U.S.)" [ref=f4e186] [cursor=pointer]:
+                - text: English (U.S.)
+                - img [ref=f4e187]
+              - button "?" [ref=f4e191] [cursor=pointer]
+          - separator [ref=f4e192]
+          - generic [ref=f4e193]:
+            - heading "Previews and Screenshots" [level=3] [ref=f4e194]
+            - button "More information" [ref=f4e196] [cursor=pointer]: "?"
+          - paragraph [ref=f4e197]: Adding accurate screenshots of your app on the newest devices can help you represent the app's user experience. Keep in mind that we'll use these screenshots for all display sizes and localizations. Screenshots are only required for iOS apps, and only the first 3 will be used on the app installation sheets.
+          - generic [ref=f4e198]:
+            - tablist [ref=f4e199]:
+              - tab "iPhone" [selected] [ref=f4e200] [cursor=pointer]:
+                - generic [ref=f4e201]: iPhone
+              - tab "iPad" [ref=f4e202] [cursor=pointer]:
+                - generic [ref=f4e203]: iPad
+              - tab "Apple Watch" [ref=f4e204] [cursor=pointer]:
+                - generic [ref=f4e205]: Apple Watch
+            - paragraph [ref=f4e206]:
+              - link "View All Sizes in Media Manager" [ref=f4e207] [cursor=pointer]:
+                - /url: /apps/6792056685/distribution/ios/version/inflight/media-manager/iphone
+          - generic [ref=f4e209]:
+            - generic:
+              - alert
+            - tabpanel "iPhone" [ref=f4e210]:
+              - generic [ref=f4e211]:
+                - generic [ref=f4e212]:
+                  - img [ref=f4e215]
+                  - generic [ref=f4e220]:
+                    - generic [ref=f4e221]: iPhone
+                    - generic [ref=f4e222]: 6.5" Display
+                - region [ref=f4e223]:
+                  - tabpanel [ref=f4e224]:
+                    - generic [ref=f4e227]:
+                      - list "App Previews from 6.5\" Display"
+                      - list "Screenshots from 6.5\" Display" [ref=f4e228]:
+                        - listitem [ref=f4e229]:
+                          - generic [ref=f4e230]:
+                            - button "Screenshot 01_hero.png" [ref=f4e231]:
+                              - img [ref=f4e233]
+                            - button "Delete" [ref=f4e234] [cursor=pointer]:
+                              - img [ref=f4e235]
+                        - listitem [ref=f4e237]:
+                          - generic [ref=f4e238]:
+                            - button "Screenshot 02_jamat.png" [ref=f4e239]:
+                              - img [ref=f4e241]
+                            - button "Delete" [ref=f4e242] [cursor=pointer]:
+                              - img [ref=f4e243]
+                        - listitem [ref=f4e245]:
+                          - generic [ref=f4e246]:
+                            - button "Screenshot 03_calendar.png" [ref=f4e247]:
+                              - img [ref=f4e249]
+                            - button "Delete" [ref=f4e250] [cursor=pointer]:
+                              - img [ref=f4e251]
+                        - listitem [ref=f4e253]:
+                          - generic [ref=f4e254]:
+                            - button "Screenshot 04_mosques.png" [ref=f4e255]:
+                              - img [ref=f4e257]
+                            - button "Delete" [ref=f4e258] [cursor=pointer]:
+                              - img [ref=f4e259]
+                        - listitem [ref=f4e261]:
+                          - generic [ref=f4e262]:
+                            - button "Screenshot 05a_panorama_left.png" [ref=f4e263]:
+                              - img [ref=f4e265]
+                            - button "Delete" [ref=f4e266] [cursor=pointer]:
+                              - img [ref=f4e267]
+                        - listitem [ref=f4e269]:
+                          - generic [ref=f4e270]:
+                            - button "Screenshot 05b_panorama_right.png" [ref=f4e271]:
+                              - img [ref=f4e273]
+                            - button "Delete" [ref=f4e274] [cursor=pointer]:
+                              - img [ref=f4e275]
+                    - generic [ref=f4e277]:
+                      - paragraph [ref=f4e279]: 0 of 3 App Previews
+                      - paragraph [ref=f4e281]: 6 of 10 Screenshots
+                      - paragraph [ref=f4e284]:
+                        - button "Choose File" [ref=f4e285] [cursor=pointer]
+                      - paragraph [ref=f4e287]:
+                        - button "Delete All" [ref=f4e288] [cursor=pointer]
+          - generic [ref=f4e289]:
+            - generic [ref=f4e290]:
+              - generic [ref=f4e292]:
+                - generic [ref=f4e293]: Promotional Text
+                - button "More information" [ref=f4e295] [cursor=pointer]: "?"
+              - textbox "Promotional Text" [ref=f4e297]
+              - status "Characters remaining" [ref=f4e299]: "170"
+            - separator [ref=f4e301]
+            - generic [ref=f4e302]:
+              - generic [ref=f4e304]:
+                - generic [ref=f4e305]: Description
+                - button "More information" [ref=f4e307] [cursor=pointer]: "?"
+              - textbox "Description" [ref=f4e309]: "Islamsk Råd Norge lanserer nye standardiserte bønnetider for hele Norge, nå rett på din mobil! Bønnetid kan du stole på. Dette historiske prosjektet, ledet av IRN, har et mangfold av medlemsmoskeer og samarbeidspartnere som Islamic Cultural Centre (ICC) og Det Islamske forbundet (Rabita) med på laget. Funksjoner: * Ikke mist bønnen din, sett opp alarm eller få en lydløs beskjed når bønnen starter. * Velge din by og moske for en personlig tilpasning til appen * Qibla: finn bønneretning på kart eller med kompass * Finn raskt ut når de muslimske helligdagene er med den splitter nye hijrikalenderen * Finn jummah tidene til moskeene i Norge * En standardisert tabell for hele Norge, nå slipper du å finne og sammenligne forskjellige bønnetidstabeller * Og mer funksjoner blir lansert utover 2026 Ta gjerne kontakt med oss på app@irn.no. Terms of use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+              - status "Characters remaining" [ref=f4e311]: 3,076
+            - generic [ref=f4e312]:
+              - generic [ref=f4e314]:
+                - generic [ref=f4e315]: What's New in This Version
+                - button "More information" [ref=f4e317] [cursor=pointer]: "?"
+              - textbox "What's New in This Version" [ref=f4e319]: "- Widget på hjemskjerm og låseskjerm: neste bønn med nedtelling, og valgfrie jamat-tider - Live-aktivitet i Dynamic Island som står til du markerer bønnen - Marker bønner som bedt eller hoppet over, og få påminnelse før bønnevinduet lukkes - Ramadan-modus med påminnelse før suhoor - Moskélogoer i moskélista og på moskésiden - Full iPad-støtte og riktig visning ved rotasjon - Bedre lesbarhet ved store tekststørrelser - Rettet tidssone, så bønnetidene alltid følger norsk klokke"
+              - status "Characters remaining" [ref=f4e321]: 3,520
+            - generic [ref=f4e322]:
+              - generic [ref=f4e324]:
+                - generic [ref=f4e325]: Keywords
+                - button "More information" [ref=f4e327] [cursor=pointer]: "?"
+              - textbox "Keywords" [ref=f4e329]: bønn,bønnetider,moské,qibla,adhan,imsak,iftar,jummah,ramadan,ummah,islam,eid,ashura,kalender,azan
+              - status "Characters remaining" [ref=f4e331]: "3"
+            - generic [ref=f4e332]:
+              - generic [ref=f4e334]:
+                - generic [ref=f4e335]: Support URL
+                - button "More information" [ref=f4e337] [cursor=pointer]: "?"
+              - textbox "Support URL" [ref=f4e339]: https://irn.no/
+            - generic [ref=f4e340]:
+              - generic [ref=f4e342]:
+                - generic [ref=f4e343]: Marketing URL
+                - button "More information" [ref=f4e345] [cursor=pointer]: "?"
+              - textbox "Marketing URL" [ref=f4e347]: https://irn.no/
+            - generic [ref=f4e348]:
+              - generic [ref=f4e350]:
+                - generic [ref=f4e351]: Version
+                - button "More information" [ref=f4e353] [cursor=pointer]: "?"
+              - textbox "Version" [ref=f4e355]: 1.2.0
+            - generic [ref=f4e356]:
+              - generic [ref=f4e358]:
+                - generic [ref=f4e359]: Copyright
+                - button "More information" [ref=f4e361] [cursor=pointer]: "?"
+              - textbox "Copyright" [ref=f4e363]: © Islamsk Råd Norge
+              - status "Characters remaining" [ref=f4e365]: "181"
+            - generic [ref=f4e366]:
+              - generic [ref=f4e368]:
+                - generic [ref=f4e369]: Routing App Coverage File
+                - button "More information" [ref=f4e371] [cursor=pointer]: "?"
+              - generic [ref=f4e373] [cursor=pointer]:
+                - button "Choose File" [ref=f4e374]
+                - generic [ref=f4e376]: Choose File
+          - separator [ref=f4e377]
+          - button "App Clip" [ref=f4e379] [cursor=pointer]:
+            - img [ref=f4e381]
+            - text: App Clip
+          - generic [ref=f4e384]:
+            - heading "iMessage App" [level=3] [ref=f4e385]:
+              - button "iMessage App" [ref=f4e386] [cursor=pointer]:
+                - img [ref=f4e388]
+                - text: iMessage App
+            - button "More information" [ref=f4e391] [cursor=pointer]: "?"
+        - generic [ref=f4e392]:
+          - heading "Build" [level=3] [ref=f4e394]
+          - table [ref=f4e396]:
+            - rowgroup [ref=f4e397]:
+              - row "Build Version Has App Clip" [ref=f4e398]:
+                - columnheader "Build" [ref=f4e399]:
+                  - generic [ref=f4e401]: Build
+                - columnheader "Version" [ref=f4e402]:
+                  - generic [ref=f4e404]: Version
+                - columnheader "Has App Clip" [ref=f4e405]:
+                  - generic [ref=f4e407]: Has App Clip
+                - columnheader [ref=f4e408]
+            - rowgroup [ref=f4e409]:
+              - row "App Icon 17 1.2.0 No Delete" [ref=f4e410]:
+                - cell "App Icon 17" [ref=f4e411]:
+                  - generic [ref=f4e413]:
+                    - link "App Icon" [ref=f4e414] [cursor=pointer]:
+                      - /url: /apps/6792056685/testflight/ios/764c37c0-ec53-4c7c-98b4-b81e5561abac/metadata
+                      - generic "App Icon" [ref=f4e415]:
+                        - img "App Icon" [ref=f4e416]
+                    - link "17" [ref=f4e418] [cursor=pointer]:
+                      - /url: /apps/6792056685/testflight/ios/764c37c0-ec53-4c7c-98b4-b81e5561abac/metadata
+                - cell "1.2.0" [ref=f4e419]:
+                  - generic [ref=f4e420]: 1.2.0
+                - cell "No" [ref=f4e421]:
+                  - paragraph [ref=f4e423]: "No"
+                - cell "Delete" [ref=f4e424]:
+                  - button "Delete":
+                    - img [ref=f4e425] [cursor=pointer]
+          - paragraph [ref=f4e427]: Included Assets
+          - generic [ref=f4e429]:
+            - button "App Icon" [ref=f4e430] [cursor=pointer]:
+              - generic "App Icon" [ref=f4e431]:
+                - img "App Icon" [ref=f4e432]
+            - paragraph [ref=f4e433]: App Icon
+        - generic [ref=f4e434]:
+          - heading "In-App Purchases and Subscriptions" [level=3] [ref=f4e435]
+          - generic [ref=f4e436]:
+            - img [ref=f4e437]
+            - paragraph [ref=f4e439]:
+              - text: In-app purchases and subscriptions can now be submitted for review from the In-App Purchases and Subscriptions sections. Include an app version in your submission to have items reviewed together. Your first in-app purchase and subscription must be submitted with a new app version.
+              - link "Learn More" [ref=f4e440] [cursor=pointer]:
+                - /url: https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/submit-an-in-app-purchase
+            - button [ref=f4e441] [cursor=pointer]:
+              - img [ref=f4e442]
+        - generic [ref=f4e449] [cursor=pointer]:
+          - checkbox "Game Center" [ref=f4e451]
+          - text: Game Center
+        - separator [ref=f4e453]
+        - generic [ref=f4e454]:
+          - heading "App Review Information" [level=3] [ref=f4e455]
+          - generic [ref=f4e456]:
+            - generic [ref=f4e458]:
+              - generic [ref=f4e460]:
+                - generic [ref=f4e461]: Sign-In Information
+                - button "More information" [ref=f4e463] [cursor=pointer]: "?"
+              - paragraph [ref=f4e464]: Provide a user name and password so we can sign in to your app. We’ll need this to complete your app review.
+              - generic [ref=f4e466]:
+                - checkbox "Sign-in required" [ref=f4e467]
+                - generic [ref=f4e469]: Sign-in required
+            - generic [ref=f4e470]:
+              - generic [ref=f4e472]:
+                - generic [ref=f4e473]: Contact Information
+                - button "More information" [ref=f4e475] [cursor=pointer]: "?"
+              - textbox "First name" [ref=f4e478]: Zaim
+              - textbox "Last name" [ref=f4e481]: Imran
+              - textbox "Phone number" [ref=f4e484]: "+4740170752"
+              - textbox "Email" [ref=f4e487]: app@irn.no
+            - generic [ref=f4e488]:
+              - generic [ref=f4e490]:
+                - generic [ref=f4e491]: Notes
+                - button "More information" [ref=f4e493] [cursor=pointer]: "?"
+              - paragraph [ref=f4e494]:
+                - generic [ref=f4e495]:
+                  - text: Chinese law requires apps with news, religious, book, and magazine content to have relevant permits in order to be available on the App Store in China mainland. If applicable, enter information about your permits below.
+                  - link "Learn More" [ref=f4e496] [cursor=pointer]:
+                    - /url: https://developer.apple.com/help/app-store-connect/reference/app-information
+              - textbox "Notes" [ref=f4e498]
+              - status "Characters remaining" [ref=f4e500]: 4,000
+            - generic [ref=f4e501]:
+              - generic [ref=f4e503]:
+                - generic [ref=f4e504]: Attachment
+                - button "More information" [ref=f4e506] [cursor=pointer]: "?"
+              - generic [ref=f4e508] [cursor=pointer]:
+                - button "Choose File (Optional)" [ref=f4e509]
+                - generic [ref=f4e511]: Choose File (Optional)
+        - separator [ref=f4e512]
+        - generic [ref=f4e513]:
+          - heading "App Store Version Release" [level=3] [ref=f4e514]
+          - paragraph [ref=f4e515]: To make your app available on the App Store, you can automatically release it after it’s been approved by App Review. You can also manually release it on the App Store at a later date.
+          - generic [ref=f4e516]:
+            - generic [ref=f4e518]:
+              - generic [ref=f4e519]:
+                - radio "Manually release this version" [ref=f4e520]
+                - generic [ref=f4e522]: Manually release this version
+              - generic [ref=f4e523]:
+                - radio "Automatically release this version" [checked] [ref=f4e524]
+                - generic [ref=f4e526]: Automatically release this version
+              - generic [ref=f4e527]:
+                - radio "Automatically release this version after App Review, no earlier than" [ref=f4e528]
+                - generic [ref=f4e530]: Automatically release this version after App Review, no earlier than
+            - paragraph [ref=f4e532]: Your local date and time.
+            - generic [ref=f4e535]:
+              - textbox "Automatically release this version after App Review, no earlier than" [disabled] [ref=f4e536]: Sep 4, 2026 18:00
+              - text: CEST
+        - separator [ref=f4e537]
+        - generic [ref=f4e538]:
+          - heading "Phased Release for App Store Automatic Updates" [level=3] [ref=f4e539]
+          - paragraph [ref=f4e540]:
+            - generic [ref=f4e541]:
+              - text: Phased release for automatic updates lets you gradually release this update over a 7-day period to users who have turned on automatic updates from the App Store. Keep in mind that this version will still be available to all users as a manual update from the App Store. You can pause the phased release for up to 30 days or release this update to all users at any time.
+              - link "Learn More" [ref=f4e542] [cursor=pointer]:
+                - /url: https://developer.apple.com/help/app-store-connect/update-your-app/release-a-version-update-in-phases
+          - generic [ref=f4e545]:
+            - generic [ref=f4e546]:
+              - radio "Release update to all users immediately" [checked] [ref=f4e547]
+              - generic [ref=f4e549]: Release update to all users immediately
+            - generic [ref=f4e550]:
+              - radio "Release update over 7-day period using phased release" [ref=f4e551]
+              - generic [ref=f4e553]: Release update over 7-day period using phased release
+        - separator [ref=f4e554]
+        - generic [ref=f4e555]:
+          - heading "Reset iOS App Store Summary Rating Edit" [level=3] [ref=f4e556]:
+            - text: Reset iOS App Store Summary Rating
+            - button "Edit" [ref=f4e557] [cursor=pointer]
+          - paragraph [ref=f4e558]:
+            - generic [ref=f4e559]:
+              - text: You can reset your app’s App Store summary rating for all countries or regions when you release this version. Keep in mind that once this version is released, you won’t be able to restore the rating. Your app’s existing customer reviews will still appear on the App Store.
+              - link "View Ratings and Reviews" [ref=f4e560] [cursor=pointer]:
+                - /url: /apps/6792056685/distribution/ratings/ios
+          - generic [ref=f4e563]:
+            - generic [ref=f4e564]:
+              - radio "Keep existing rating" [checked] [disabled] [ref=f4e565]
+              - generic [ref=f4e567]: Keep existing rating
+            - generic [ref=f4e568]:
+              - radio "Reset rating when this version is released" [disabled] [ref=f4e569]
+              - generic [ref=f4e571]: Reset rating when this version is released
+  - contentinfo [ref=f4e10]:
+    - generic [ref=f4e11]:
+      - list [ref=f4e572]:
+        - listitem [ref=f4e573]:
+          - link "App Store Connect" [ref=f4e574] [cursor=pointer]:
+            - /url: /apps
+      - list [ref=f4e12]:
+        - listitem [ref=f4e13]: Copyright © 2026 Apple Inc. All rights reserved. |
+        - listitem [ref=f4e14]:
+          - link "Terms of Service" [ref=f4e15] [cursor=pointer]:
+            - /url: /WebObjects/iTunesConnect.woa/wa/termsOfService
+          - text: "|"
+        - listitem [ref=f4e16]:
+          - link "Privacy Policy" [ref=f4e17] [cursor=pointer]:
+            - /url: https://www.apple.com/legal/privacy
+          - text: "|"
+        - listitem [ref=f4e18]:
+          - link "Contact Us" [ref=f4e19] [cursor=pointer]:
+            - /url: /contact-us
+  - log [ref=f4e575]
+  - log [ref=f4e576]

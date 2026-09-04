@@ -13,13 +13,13 @@ import {
 } from '@/lib/prayerLog';
 import { osloDateKey } from '@/lib/time';
 import { useTheme } from '@/theme';
-import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
+import { opacity, radius, spacing } from '@/theme/tokens';
 import { usePrayerLog } from '@/store/prayerLog';
 
 const WEEKDAY_LABELS = ['M', 'T', 'O', 'T', 'F', 'L', 'S'];
 const WEEKDAY_NAMES = ['mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag', 'søndag'];
 const LABEL_COLUMN = 76;
-const ROW_HEIGHT = 46;
+const ROW_HEIGHT = 48;
 const DOT_SIZE = 26;
 const MAX_LABEL_SCALE = 1.2;
 const MINUTE_MS = 60 * 1000;
@@ -54,7 +54,9 @@ export function WeekGrid({ now, todaySchedule, onToggle }: WeekGridProps) {
         ))}
       </View>
 
-      {TRACKED_PRAYERS.map((prayer, rowIndex) => (
+      {TRACKED_PRAYERS.map((prayer, rowIndex) => {
+        const lastRow = rowIndex === TRACKED_PRAYERS.length - 1;
+        return (
         <View
           key={prayer}
           style={{
@@ -83,9 +85,9 @@ export function WeekGrid({ now, todaySchedule, onToggle }: WeekGridProps) {
                 style={{
                   flex: 1,
                   alignSelf: 'stretch',
-                  alignItems: 'center',
-                  justifyContent: 'center',
                   backgroundColor: column.isToday ? theme.colors.primarySoft : 'transparent',
+                  borderBottomLeftRadius: column.isToday && lastRow ? radius.sm : 0,
+                  borderBottomRightRadius: column.isToday && lastRow ? radius.sm : 0,
                 }}>
                 {cell && (
                   <DayCell
@@ -103,7 +105,8 @@ export function WeekGrid({ now, todaySchedule, onToggle }: WeekGridProps) {
             );
           })}
         </View>
-      ))}
+        );
+      })}
     </Card>
   );
 }
@@ -163,12 +166,20 @@ function DayCell({
     <Pressable
       onPress={onPress}
       disabled={!started}
-      hitSlop={hitSlop}
       accessibilityRole="checkbox"
       accessibilityLabel={`${PRAYER_LABELS[prayer]} ${weekday}`}
       accessibilityState={{ checked: prayed, disabled: !started }}
       style={({ pressed }) => [
         {
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: ROW_HEIGHT,
+        },
+        pressed && { opacity: opacity.pressed },
+      ]}>
+      <View
+        style={{
           width: DOT_SIZE,
           height: DOT_SIZE,
           borderRadius: radius.full,
@@ -182,10 +193,9 @@ function DayCell({
               : theme.colors.borderStrong
             : theme.colors.border,
           opacity: started ? 1 : opacity.disabled,
-        },
-        pressed && { opacity: opacity.pressed },
-      ]}>
-      {prayed && <Ionicons name="checkmark" size={16} color={theme.colors.onPrimary} />}
+        }}>
+        {prayed && <Ionicons name="checkmark" size={16} color={theme.colors.onPrimary} />}
+      </View>
     </Pressable>
   );
 }
