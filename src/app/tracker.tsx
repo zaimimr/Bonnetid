@@ -62,8 +62,9 @@ export default function TrackerScreen() {
             ))}
           </Card>
 
-          <SectionHeader title="Denne uken" />
-          <WeekStrip now={now} todaySchedule={todaySchedule} />
+          <View style={{ marginTop: spacing.lg }}>
+            <WeekStrip now={now} todaySchedule={todaySchedule} />
+          </View>
 
           <View
             style={{
@@ -74,7 +75,7 @@ export default function TrackerScreen() {
             }}>
             <Ionicons name="lock-closed-outline" size={14} color={theme.colors.textMuted} />
             <AppText size="xs" tone="textMuted" style={{ flex: 1 }}>
-              Markeringene ligger bare på denne enheten
+              Markeringene blir bare hos deg
             </AppText>
           </View>
         </>
@@ -102,7 +103,7 @@ function TrackerRow({
   const started = entry.date.getTime() <= now.getTime();
   const ended = entry.end != null && now.getTime() >= entry.end.date.getTime();
   const note = !started
-    ? `Starter kl. ${formatTimeOfDay(entry.date)}`
+    ? ''
     : ended
       ? 'Tiden er over'
       : entry.end
@@ -131,9 +132,11 @@ function TrackerRow({
           {entry.time}
         </AppText>
         {!stacked && <View style={{ width: spacing.xs }} />}
-        <AppText size="xs" tone="textMuted" numberOfLines={1}>
-          {note}
-        </AppText>
+        {note !== '' && (
+          <AppText size="xs" tone="textMuted" numberOfLines={1}>
+            {note}
+          </AppText>
+        )}
       </View>
       {started && (
         <PrayerStatusChoice label={entry.label} status={status} onSelect={onSelect} />
