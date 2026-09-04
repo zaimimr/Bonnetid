@@ -82,7 +82,14 @@
       ],
       "expo-font",
       "expo-web-browser",
-      "expo-audio"
+      "expo-audio",
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "zaim-imran",
+          "project": "react-native"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

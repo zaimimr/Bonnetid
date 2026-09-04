@@ -1,12 +1,14 @@
+import { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { QueryClient } from '@tanstack/react-query';
+import { QueryCache, QueryClient } from '@tanstack/react-query';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { Stack } from 'expo-router';
+import { Stack, useNavigationContainerRef } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useTheme } from '@/theme';
 import { configureNotificationHandler } from '@/lib/notifications';
+import { initTelemetry, navigationIntegration, Sentry, trackError } from '@/lib/telemetry';
 import { useNotificationScheduler } from '@/hooks/useNotificationScheduler';
 import { useNotificationResponses } from '@/hooks/useNotificationResponses';
 import { useAutoLocation } from '@/hooks/useAutoLocation';
@@ -16,9 +18,15 @@ import { useWidgetSync } from '@/hooks/useWidgetSync';
 import { useNow } from '@/hooks/useNow';
 import { usePrayerLogSync } from '@/hooks/usePrayerLogSync';
 
+initTelemetry();
+
 const DAY = 24 * 60 * 60 * 1000;
 
 const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error, query) =>
+      trackError(error, 'react-query', { queryKey: JSON.stringify(query.queryKey) }),
+  }),
   defaultOptions: {
     queries: {
       retry: 2,
@@ -166,7 +174,13 @@ function RootNavigator() {
   );
 }
 
-export default function RootLayout() {
+function RootLayout() {
+  const navigationRef = useNavigationContainerRef();
+
+  useEffect(() => {
+    navigationIntegration.registerNavigationContainer(navigationRef);
+  }, [navigationRef]);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
@@ -177,3 +191,5 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+export default Sentry.wrap(RootLayout);

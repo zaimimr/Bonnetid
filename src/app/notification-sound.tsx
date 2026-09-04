@@ -5,6 +5,7 @@ import { AppText, Card, Divider, ListRow, Screen } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { NOTIFICATION_SOUNDS, type NotificationSoundOption } from '@/lib/notificationSounds';
+import { track } from '@/lib/telemetry';
 import { useSettings } from '@/store/settings';
 
 export default function NotificationSoundScreen() {
@@ -15,6 +16,7 @@ export default function NotificationSoundScreen() {
 
   const selectSound = (option: NotificationSoundOption) => {
     setNotificationSound(option.key);
+    track('notification_sound_changed', { sound: option.key });
     if (option.previewAsset == null) {
       previewPlayer.pause();
       return;

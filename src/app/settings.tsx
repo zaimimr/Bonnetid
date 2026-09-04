@@ -17,6 +17,7 @@ import { getNotificationSound } from '@/lib/notificationSounds';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
 import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
 import { useRamadanStatus } from '@/hooks/useRamadanStatus';
+import { track, trackError } from '@/lib/telemetry';
 import {
   NOTIFIABLE_PRAYERS,
   useActiveLocation,
@@ -75,8 +76,12 @@ export default function SettingsScreen() {
     setLocating(true);
     try {
       const detected = await detectNearestLocation(locations);
-      if (detected) setLocation(detected);
-    } catch {
+      if (detected) {
+        setLocation(detected);
+        track('location_detected', { iso: detected.iso, source: 'settings' });
+      }
+    } catch (error) {
+      trackError(error, 'location-detect');
     } finally {
       setLocating(false);
     }
@@ -85,10 +90,12 @@ export default function SettingsScreen() {
   const toggleNotifications = async (value: boolean) => {
     if (!value) {
       setNotificationsEnabled(false);
+      track('notifications_toggled', { enabled: false });
       return;
     }
     const granted = await requestNotificationPermission();
     setNotificationsEnabled(granted);
+    track('notifications_toggled', { enabled: granted });
   };
 
   const toggleLockScreen = async (value: boolean) => {
@@ -127,7 +134,10 @@ export default function SettingsScreen() {
         <Divider />
         <AsrMethodDropdown
           value={asrOverride ?? asrMethod ?? asrLocationDefault ?? 'shadow_1x'}
-          onChange={setAsrMethod}
+          onChange={(method) => {
+            setAsrMethod(method);
+            track('asr_method_changed', { method });
+          }}
           overrideNote={asrOverride && mosque ? `Styres av ${mosque.name}` : null}
         />
       </Card>
@@ -180,7 +190,13 @@ export default function SettingsScreen() {
                   trailing={
                     <Switch
                       value={notificationPrayers[prayer]}
-                      onValueChange={() => toggleNotificationPrayer(prayer)}
+                      onValueChange={() => {
+                        toggleNotificationPrayer(prayer);
+                        track('notification_prayer_toggled', {
+                          prayer,
+                          enabled: !notificationPrayers[prayer],
+                        });
+                      }}
                       trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
                       thumbColor={theme.colors.surface}
                     />
@@ -314,7 +330,10 @@ export default function SettingsScreen() {
         <View style={{ paddingHorizontal: spacing.md, paddingBottom: spacing.sm }}>
           <SegmentedRow
             value={themePreference}
-            onChange={setThemePreference}
+            onChange={(preference) => {
+              setThemePreference(preference);
+              track('theme_changed', { theme: preference });
+            }}
             options={[
               { value: 'system', label: 'System' },
               { value: 'light', label: 'Lys' },

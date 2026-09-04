@@ -4,6 +4,7 @@ import { fetchKommuneIso } from '@/api/kartverket';
 import { useLocations } from '@/api/queries';
 import type { ApiLocation } from '@/api/types';
 import { nearestLocation } from './useNearestLocation';
+import { track, trackError } from '@/lib/telemetry';
 import { useSettings, type SavedLocation } from '@/store/settings';
 
 const NORWAY_BOUNDS = { minLat: 57.5, maxLat: 71.5, minLon: 4, maxLon: 31.5 };
@@ -46,8 +47,11 @@ export function useAutoLocation() {
 
     detectNearestLocation(locations)
       .then((detected) => {
-        if (detected) setLocation(detected);
+        if (detected) {
+          setLocation(detected);
+          track('location_detected', { iso: detected.iso, source: 'auto' });
+        }
       })
-      .catch(() => {});
+      .catch((error) => trackError(error, 'auto-location'));
   }, [locations, setLocation]);
 }

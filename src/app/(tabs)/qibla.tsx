@@ -9,6 +9,7 @@ import { useCompassHeading } from '@/hooks/useCompassHeading';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useUserCoords } from '@/hooks/useUserCoords';
 import { formatDistance, distanceKm, KAABA, qiblaBearing } from '@/lib/geo';
+import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 
@@ -43,7 +44,13 @@ export default function QiblaScreen() {
           </AppText>
         </View>
 
-        <ViewSwitcher view={view} onChange={setView} />
+        <ViewSwitcher
+          view={view}
+          onChange={(next) => {
+            setView(next);
+            track('qibla_view_changed', { view: next });
+          }}
+        />
 
         {permissionDenied && view === 'compass' ? (
           <EmptyState
