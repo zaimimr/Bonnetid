@@ -137,6 +137,28 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="notification-prayers"
+          options={{
+            headerShown: true,
+            title: 'Bønner',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="asr-method"
+          options={{
+            headerShown: true,
+            title: 'Asr-metode',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
           name="mosque-picker"
           options={{
             presentation: 'modal',

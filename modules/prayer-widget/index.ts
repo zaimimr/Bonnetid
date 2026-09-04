@@ -16,6 +16,7 @@ export type PrayerActivityState = {
 type PrayerWidgetNativeModule = {
   setSnapshot: (json: string) => void;
   areLiveActivitiesEnabled: () => boolean;
+  hasDynamicIsland?: () => boolean;
   startOrUpdateActivity: (state: PrayerActivityState) => Promise<void>;
   endActivity: () => Promise<void>;
   getPrayerLog: () => string | null;
@@ -33,6 +34,14 @@ export function setPrayerSnapshot(snapshot: unknown) {
 
 export function liveActivitiesEnabled() {
   return native?.areLiveActivitiesEnabled() ?? false;
+}
+
+export function dynamicIslandAvailable() {
+  try {
+    return native?.hasDynamicIsland?.() ?? false;
+  } catch {
+    return false;
+  }
 }
 
 export async function startOrUpdatePrayerActivity(state: PrayerActivityState) {

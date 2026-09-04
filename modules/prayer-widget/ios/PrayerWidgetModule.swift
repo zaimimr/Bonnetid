@@ -46,6 +46,10 @@ public class PrayerWidgetModule: Module {
       WidgetCenter.shared.reloadAllTimelines()
     }
 
+    Function("hasDynamicIsland") { () -> Bool in
+      Self.hasDynamicIsland()
+    }
+
     Function("areLiveActivitiesEnabled") { () -> Bool in
       if #available(iOS 16.2, *) {
         return ActivityAuthorizationInfo().areActivitiesEnabled
@@ -89,6 +93,30 @@ public class PrayerWidgetModule: Module {
       }
       ActivityStore.current = nil
     }
+  }
+
+  /// iPhone 14 Pro and every phone after it: model identifiers iPhone15,2 and up, skipping the
+  /// plain iPhone 14 pair. The simulator reports its host architecture, so read its own identifier.
+  private static func hasDynamicIsland() -> Bool {
+    var info = utsname()
+    uname(&info)
+    let machine = withUnsafePointer(to: &info.machine) { pointer in
+      pointer.withMemoryRebound(to: CChar.self, capacity: 1) { String(cString: $0) }
+    }
+    let identifier = machine.hasPrefix("iPhone")
+      ? machine
+      : ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"] ?? machine
+
+    guard identifier.hasPrefix("iPhone") else { return false }
+    let numbers = identifier.dropFirst("iPhone".count).split(separator: ",")
+    guard
+      numbers.count == 2,
+      let major = Int(numbers[0]),
+      let minor = Int(numbers[1])
+    else { return false }
+
+    if major >= 16 { return true }
+    return major == 15 && minor >= 2
   }
 
   /// After a cold start, or after a button on the activity ended it from the app's own process,
