@@ -106,14 +106,6 @@ export function startedPrayers(
   );
 }
 
-export function unmarkedPrayers(
-  days: { isoDate: string; schedule: PrayerEntry[] }[],
-  log: PrayerLog,
-  now: Date,
-): LoggedPrayer[] {
-  return startedPrayers(days, log, now).filter((prayer) => prayer.status === null);
-}
-
 export const TRACKED_PRAYERS: PrayerName[] = ['fajr', 'duhr', 'asr', 'maghrib', 'isha'];
 
 const MONDAY_OFFSET = 6;

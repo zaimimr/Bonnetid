@@ -13,7 +13,7 @@ import type { JamatTimes, PrayerEntry, PrayerName } from '@/lib/prayerSchedule';
 import type { MosqueJummah } from '@/api/types';
 import { usePrayerLog } from '@/store/prayerLog';
 import { usePrayerTrackerEnabled } from '@/store/settings';
-import { PrayerStatusChoice, PrayerStatusMark } from './PrayerStatusControl';
+import { PrayerPrayedButton, PrayerStatusMark } from './PrayerStatusControl';
 import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from './TimeCell';
 
 export type { JamatTimes };
@@ -109,7 +109,7 @@ export function PrayerTimesCard({
         const entryKey = `${statusDate}|${entry.name}`;
         const choiceOpen = openKey === entryKey;
         const markable = showStatus && started && statusDate != null;
-        const showChoice = markable && (choiceOpen || (active && status === null));
+        const showPrayedButton = markable && status === null && (active || choiceOpen);
         const times = (
           <>
             <TimeCell
@@ -144,12 +144,28 @@ export function PrayerTimesCard({
             }}>
             <Pressable
               disabled={!markable}
-              onPress={() => setOpenKey(choiceOpen ? null : entryKey)}
+              onPress={() => {
+                if (!statusDate) return;
+                if (status === 'prayed') {
+                  markPrayer(statusDate, entry.name, null);
+                  setOpenKey(null);
+                  return;
+                }
+                if (active) {
+                  markPrayer(statusDate, entry.name, 'prayed');
+                  return;
+                }
+                setOpenKey(choiceOpen ? null : entryKey);
+              }}
               accessibilityRole={markable ? 'button' : undefined}
               accessibilityLabel={
-                markable ? `${entry.label}, marker som bedt eller hoppet over` : undefined
+                markable
+                  ? status === 'prayed'
+                    ? `${entry.label}, markert som bedt. Trykk for å fjerne markeringen`
+                    : `${entry.label}, trykk for å markere som bedt`
+                  : undefined
               }
-              accessibilityState={markable ? { expanded: showChoice } : undefined}
+              accessibilityState={markable ? { checked: status === 'prayed' } : undefined}
               style={({ pressed }) => [
                 {
                   flexDirection: 'row',
@@ -193,12 +209,11 @@ export function PrayerTimesCard({
               </View>
               {!stacked && times}
             </Pressable>
-            {showChoice && statusDate && (
-              <PrayerStatusChoice
+            {showPrayedButton && statusDate && (
+              <PrayerPrayedButton
                 label={entry.label}
-                status={status}
-                onSelect={(next) => {
-                  markPrayer(statusDate, entry.name, next);
+                onPress={() => {
+                  markPrayer(statusDate, entry.name, 'prayed');
                   setOpenKey(null);
                 }}
               />

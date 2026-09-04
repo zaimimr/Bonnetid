@@ -3,7 +3,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
-import type { PrayerStatus } from '@/lib/prayerLog';
 
 export const STATUS_MARK_SIZE = 14;
 
@@ -24,98 +23,43 @@ export function PrayerStatusMark({ label }: PrayerStatusMarkProps) {
   );
 }
 
-export type PrayerStatusChoiceProps = {
+export type PrayerPrayedButtonProps = {
   label: string;
-  status: PrayerStatus | null;
-  onSelect: (status: PrayerStatus | null) => void;
+  onPress: () => void;
 };
 
-export function PrayerStatusChoice({ label, status, onSelect }: PrayerStatusChoiceProps) {
+export function PrayerPrayedButton({ label, onPress }: PrayerPrayedButtonProps) {
   const theme = useTheme();
 
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        gap: spacing.sm,
-        paddingHorizontal: spacing.md,
-        paddingBottom: spacing.md,
-      }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          flex: 1,
-          minWidth: 180,
-          maxWidth: 320,
-          backgroundColor: theme.colors.surfaceSunken,
-          borderRadius: radius.md,
-          borderWidth: 1,
-          borderColor: theme.colors.border,
-          padding: spacing.xxs,
-          gap: spacing.xxs,
-        }}>
-        <ChoiceSegment
-          text="Bedt"
-          active={status === 'prayed'}
-          accessibilityLabel={`Marker ${label} som bedt`}
-          onPress={() => onSelect(status === 'prayed' ? null : 'prayed')}
-        />
-        <ChoiceSegment
-          text="Hopp over"
-          active={status === 'skipped'}
-          accessibilityLabel={`Hopp over ${label}`}
-          onPress={() => onSelect(status === 'skipped' ? null : 'skipped')}
-        />
-      </View>
+    <View style={{ paddingHorizontal: spacing.md, paddingBottom: spacing.md }}>
+      <Pressable
+        onPress={onPress}
+        hitSlop={hitSlop}
+        accessibilityRole="button"
+        accessibilityLabel={`Marker ${label} som bedt`}
+        style={({ pressed }) => [
+          {
+            alignSelf: 'flex-start',
+            minHeight: 44,
+            minWidth: 140,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: spacing.xs,
+            paddingHorizontal: spacing.lg,
+            borderRadius: radius.full,
+            backgroundColor: theme.colors.surface,
+            borderWidth: 1,
+            borderColor: theme.colors.primary,
+          },
+          pressed && { opacity: opacity.pressed },
+        ]}>
+        <Ionicons name="checkmark" size={18} color={theme.colors.primary} />
+        <AppText size="sm" weight="semibold" tone="primary" maxFontSizeMultiplier={1.4}>
+          Bedt
+        </AppText>
+      </Pressable>
     </View>
-  );
-}
-
-function ChoiceSegment({
-  text,
-  active,
-  accessibilityLabel,
-  onPress,
-}: {
-  text: string;
-  active: boolean;
-  accessibilityLabel: string;
-  onPress: () => void;
-}) {
-  const theme = useTheme();
-  return (
-    <Pressable
-      onPress={onPress}
-      hitSlop={hitSlop}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      accessibilityState={{ selected: active }}
-      style={({ pressed }) => [
-        {
-          flex: 1,
-          minHeight: 36,
-          paddingVertical: spacing.sm,
-          paddingHorizontal: spacing.sm,
-          borderRadius: radius.sm,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: active ? theme.colors.surface : 'transparent',
-          borderWidth: active ? 1 : 0,
-          borderColor: theme.colors.border,
-        },
-        pressed && { opacity: opacity.pressed },
-      ]}>
-      <AppText
-        size="sm"
-        weight={active ? 'semibold' : 'regular'}
-        tone={active ? 'textPrimary' : 'textSecondary'}
-        align="center"
-        maxFontSizeMultiplier={1.4}
-        numberOfLines={2}>
-        {text}
-      </AppText>
-    </Pressable>
   );
 }
