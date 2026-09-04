@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { usePrayerTimes } from '@/api/queries';
 import { AppText, Card, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
-import { PrayerCheck } from '@/components/prayer/PrayerStatusControl';
+import { PrayerActionButton, PrayerStatusMark } from '@/components/prayer/PrayerStatusControl';
 import { WeekOverview } from '@/components/prayer/WeekOverview';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { useFontScale } from '@/hooks/useFontScale';
@@ -46,6 +46,7 @@ export default function TrackerScreen() {
 
   const todayIso = osloDateKey(now);
   const [selectedIso, setSelectedIso] = useState(todayIso);
+  const [openPrayer, setOpenPrayer] = useState<string | null>(null);
   const selected = selectedIso > todayIso ? todayIso : selectedIso;
   const isToday = selected === todayIso;
 
@@ -78,7 +79,14 @@ export default function TrackerScreen() {
   return (
     <Screen scroll edges={[]} refreshing={refreshing} onRefresh={onRefresh}>
       <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
-        <WeekOverview columns={columns} selectedIso={selected} onSelect={setSelectedIso} />
+        <WeekOverview
+          columns={columns}
+          selectedIso={selected}
+          onSelect={(isoDate) => {
+            setOpenPrayer(null);
+            setSelectedIso(isoDate);
+          }}
+        />
 
         <View>
           <View
@@ -90,7 +98,10 @@ export default function TrackerScreen() {
             }}>
             <DayArrow
               direction="back"
-              onPress={() => setSelectedIso(shiftIso(selected, -1))}
+              onPress={() => {
+                setOpenPrayer(null);
+                setSelectedIso(shiftIso(selected, -1));
+              }}
               disabled={false}
             />
             <AppText weight="semibold" align="center" style={{ flex: 1 }} numberOfLines={1}>
@@ -98,7 +109,10 @@ export default function TrackerScreen() {
             </AppText>
             <DayArrow
               direction="forward"
-              onPress={() => setSelectedIso(shiftIso(selected, 1))}
+              onPress={() => {
+                setOpenPrayer(null);
+                setSelectedIso(shiftIso(selected, 1));
+              }}
               disabled={isToday}
             />
           </View>
@@ -114,44 +128,61 @@ export default function TrackerScreen() {
               {schedule.map((entry, index) => {
                 const status = statusOf(log, selected, entry.name);
                 const started = !isToday || entry.date.getTime() <= now.getTime();
+                const open = openPrayer === entry.name;
                 return (
                   <View
                     key={entry.name}
                     style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: spacing.sm,
-                      paddingLeft: spacing.md,
-                      paddingRight: spacing.xs,
-                      paddingVertical: spacing.xs,
-                      minHeight: 52,
                       borderTopWidth: index === 0 ? 0 : 1,
                       borderTopColor: theme.colors.border,
                     }}>
-                    <AppText
-                      weight="medium"
-                      tone={started ? 'textPrimary' : 'textMuted'}
-                      style={{ flex: 1 }}
-                      numberOfLines={1}>
-                      {entry.label}
-                    </AppText>
-                    <AppText
-                      size={isStacked ? 'sm' : 'md'}
-                      tone={started ? 'textSecondary' : 'textMuted'}
-                      tabular>
-                      {entry.time}
-                    </AppText>
-                    {started ? (
-                      <PrayerCheck
+                    <Pressable
+                      disabled={!started}
+                      onPress={() => setOpenPrayer(open ? null : entry.name)}
+                      accessibilityRole={started ? 'button' : undefined}
+                      accessibilityLabel={
+                        started
+                          ? status === 'prayed'
+                            ? `${entry.label}, markert som bedt`
+                            : `${entry.label}, ikke markert`
+                          : undefined
+                      }
+                      accessibilityState={started ? { expanded: open } : undefined}
+                      style={({ pressed }) => [
+                        {
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: spacing.sm,
+                          paddingHorizontal: spacing.md,
+                          paddingVertical: spacing.md,
+                          minHeight: 52,
+                        },
+                        pressed && started && { opacity: opacity.pressed },
+                      ]}>
+                      <AppText
+                        weight="medium"
+                        tone={started ? 'textPrimary' : 'textMuted'}
+                        numberOfLines={1}>
+                        {entry.label}
+                      </AppText>
+                      {status === 'prayed' && <PrayerStatusMark label={entry.label} />}
+                      <AppText
+                        size={isStacked ? 'sm' : 'md'}
+                        tone={started ? 'textSecondary' : 'textMuted'}
+                        tabular
+                        style={{ marginLeft: 'auto' }}>
+                        {entry.time}
+                      </AppText>
+                    </Pressable>
+                    {started && open && (
+                      <PrayerActionButton
                         label={entry.label}
-                        prayed={status === 'prayed'}
-                        emphasis="active"
-                        onToggle={() =>
-                          markPrayer(selected, entry.name, status === 'prayed' ? null : 'prayed')
-                        }
+                        marked={status === 'prayed'}
+                        onPress={() => {
+                          markPrayer(selected, entry.name, status === 'prayed' ? null : 'prayed');
+                          setOpenPrayer(null);
+                        }}
                       />
-                    ) : (
-                      <View style={{ width: 44 }} />
                     )}
                   </View>
                 );
