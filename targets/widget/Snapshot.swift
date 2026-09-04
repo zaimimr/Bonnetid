@@ -133,6 +133,9 @@ struct PrayerSnapshot: Codable, Hashable {
 /// What every surface renders: which prayer is running, which is next, and the window between them.
 struct PrayerMoment: Hashable {
   let current: PrayerEntry?
+  /// The prayer whose window is open right now: Fajr stops running at sunrise, Isha at midnight.
+  let running: PrayerEntry?
+  let runningEnd: Date?
   let next: PrayerEntry
   let windowStart: Date
   let windowEnd: Date
@@ -163,8 +166,15 @@ struct PrayerMoment: Hashable {
     let nowWindow: TimeInterval = 20 * 60
     let current = previous.flatMap { date.timeIntervalSince($0.at) < nowWindow ? $0 : nil }
 
+    let openNow = snapshot.currentPrayer(at: date).flatMap { entry -> PrayerEntry? in
+      if let end = entry.end, date >= end { return nil }
+      return entry
+    }
+
     return PrayerMoment(
       current: current,
+      running: openNow,
+      runningEnd: openNow.map { $0.end ?? next.at },
       next: next,
       windowStart: previous?.at ?? date,
       windowEnd: next.at,
@@ -184,6 +194,20 @@ enum PrayerFormat {
 
   static func time(_ date: Date) -> String {
     clock.string(from: date)
+  }
+
+  /// "1t 32m igjen" / "4 min igjen" - what is left of a window that is already running.
+  static func remaining(to date: Date, from now: Date = Date()) -> String {
+    let seconds = max(0, Int(date.timeIntervalSince(now)))
+    let hours = seconds / 3600
+    let minutes = (seconds % 3600) / 60
+    if hours > 0 {
+      return "\(hours)t \(minutes)m igjen"
+    }
+    if minutes > 0 {
+      return "\(minutes) min igjen"
+    }
+    return "under 1 min igjen"
   }
 
   /// "om 1t 32m" / "om 4 min" - Norwegian bokmål, no seconds, safe for a static render.

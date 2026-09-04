@@ -143,7 +143,7 @@ struct PrayerWidgetView: View {
           SmallPrayerView(
             moment: moment,
             now: entry.date,
-            status: moment.headline.status(in: entry.statuses)
+            status: (moment.running ?? moment.next).status(in: entry.statuses)
           )
         }
       } else {
@@ -154,22 +154,26 @@ struct PrayerWidgetView: View {
   }
 }
 
+/// The small widget answers one question: which prayer is running, and how long is left of it.
+/// Between sunrise and Dhuhr no prayer is running, so it counts down to the next one instead.
 private struct SmallPrayerView: View {
   let moment: PrayerMoment
   let now: Date
   let status: String?
 
+  private var shown: PrayerEntry { moment.running ?? moment.next }
+
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
-      Text(moment.stateLabel)
+      Text(moment.running == nil ? "Neste" : "Nå")
         .font(.caption)
         .foregroundStyle(PrayerColor.inkMuted)
 
       HStack(spacing: 5) {
-        Image(systemName: PrayerFormat.symbol(for: moment.headline.kind))
+        Image(systemName: PrayerFormat.symbol(for: shown.kind))
           .font(.caption)
           .foregroundStyle(PrayerColor.brand)
-        Text(moment.headline.printedLabel)
+        Text(shown.printedLabel)
           .font(.headline)
           .foregroundStyle(PrayerColor.brand)
           .lineLimit(1)
@@ -178,7 +182,7 @@ private struct SmallPrayerView: View {
       }
       .padding(.top, 1)
 
-      Text(PrayerFormat.time(moment.headline.printedAt(showJamat: false)))
+      Text(PrayerFormat.time(shown.printedAt(showJamat: false)))
         .prayerTime(.system(.largeTitle, design: .default).weight(.bold))
         .foregroundStyle(PrayerColor.ink)
         .minimumScaleFactor(0.7)
@@ -198,10 +202,10 @@ private struct SmallPrayerView: View {
   }
 
   private var countdownLine: String {
-    if moment.isNow {
-      return "\(moment.next.label) \(PrayerFormat.countdown(to: moment.next.at, from: now))"
+    if let end = moment.runningEnd, moment.running != nil {
+      return PrayerFormat.remaining(to: end, from: now)
     }
-    return PrayerFormat.countdown(to: moment.next.at, from: now)
+    return "\(moment.next.printedLabel) \(PrayerFormat.countdown(to: moment.next.at, from: now))"
   }
 }
 
