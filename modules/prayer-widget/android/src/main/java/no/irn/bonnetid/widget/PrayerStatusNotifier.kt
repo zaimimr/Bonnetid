@@ -159,8 +159,11 @@ object PrayerStatusNotifier {
 
     builder
       .setSmallIcon(R.drawable.prayer_widget_status_icon)
-      .setContentTitle("$label har begynt · ${PrayerFormat.time(prayer.at)}")
-      .setContentText("Har du bedt $label?")
+      .setContentTitle("$label · ${PrayerFormat.time(prayer.at)}")
+      .setContentText(
+        if (endsAt != null) "Går ut ${PrayerFormat.time(endsAt)} · har du bedt $label?"
+        else "Har du bedt $label?",
+      )
       .setWhen(prayer.at)
       .setShowWhen(true)
       .setOngoing(true)
@@ -178,6 +181,12 @@ object PrayerStatusNotifier {
 
     if (endsAt != null) {
       builder.setSubText("Varer til ${PrayerFormat.time(endsAt)}")
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        builder
+          .setWhen(endsAt)
+          .setUsesChronometer(true)
+          .setChronometerCountDown(true)
+      }
       alarmManager(context)?.let { scheduleWakeup(it, endsAt, endIntent(context, date, kind)) }
     }
 

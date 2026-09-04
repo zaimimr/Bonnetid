@@ -170,9 +170,11 @@ private struct LockScreenActivityView: View {
           .foregroundStyle(PrayerColor.ink)
       }
 
-      Text(phase.question)
-        .font(.subheadline)
-        .foregroundStyle(PrayerColor.inkSecondary)
+      if phase.showMarkButtons {
+        Text(phase.question)
+          .font(.subheadline)
+          .foregroundStyle(PrayerColor.inkSecondary)
+      }
 
       if !phase.windowOver {
         ProgressView(

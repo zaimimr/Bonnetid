@@ -58,9 +58,12 @@ export default function DayScreen() {
     jamatPeriod && 'jummah' in jamatPeriod && jamatPeriod.jummah && jamatPeriod.jummah.length > 0
       ? jamatPeriod.jummah
       : (mosqueDetails.data?.jummah ?? []);
-  const jamatTimes = mosqueInLocation
-    ? jamatTimesForDate(jamatPeriod, isoDate ?? '', adhanTimesFromSchedule(schedule), jummahTimes)
-    : {};
+  const jamatTimes = jamatTimesForDate(
+    mosqueInLocation ? jamatPeriod : null,
+    isoDate ?? '',
+    mosqueInLocation ? adhanTimesFromSchedule(schedule) : {},
+    jummahTimes,
+  );
 
   const goToDay = (delta: number) => {
     const next = new Date(date);
@@ -123,9 +126,13 @@ export default function DayScreen() {
           <PrayerTimesCard
             schedule={schedule}
             mosqueName={mosque?.name}
-            mosqueNote={mosqueInLocation ? undefined : 'Moskeen er i en annen kommune'}
+            mosqueNote={
+              mosqueInLocation
+                ? undefined
+                : `Moskeen er i en annen kommune, så bare jummah kommer fra ${mosque?.name ?? 'moskeen'}`
+            }
             jamatTimes={jamatTimes}
-            jummah={mosqueInLocation && isFriday ? jummahTimes : []}
+            jummah={isFriday ? jummahTimes : []}
             statusDate={isoDate}
             now={now}
             onPressMosque={() =>

@@ -42,14 +42,13 @@ export default function HomeScreen() {
 
   const mosqueIso = mosqueDetails.data?.location_iso;
   const mosqueInLocation = mosqueIso == null || mosqueIso === location.iso;
-  const jamatTimes = mosqueInLocation
-    ? jamatTimesForDate(
-        mosqueDetails.data?.jamat,
-        todayIso,
-        adhanTimesFromSchedule(todaySchedule),
-        mosqueDetails.data?.jummah ?? [],
-      )
-    : {};
+  const jummahTimes = mosqueDetails.data?.jummah ?? [];
+  const jamatTimes = jamatTimesForDate(
+    mosqueInLocation ? mosqueDetails.data?.jamat : null,
+    todayIso,
+    mosqueInLocation ? adhanTimesFromSchedule(todaySchedule) : {},
+    jummahTimes,
+  );
 
   const upcomingEvents = useMemo(() => {
     const all = [...(specialsThisYear.data ?? []), ...(specialsNextYear.data ?? [])];
@@ -101,11 +100,13 @@ export default function HomeScreen() {
               schedule={todaySchedule}
               highlightedName={nextPrayer?.current?.name}
               mosqueName={mosque?.name}
-              mosqueNote={mosqueInLocation ? undefined : 'Moskeen er i en annen kommune'}
-              jamatTimes={jamatTimes}
-              jummah={
-                mosqueInLocation && isoDateIsFriday(todayIso) ? (mosqueDetails.data?.jummah ?? []) : []
+              mosqueNote={
+                mosqueInLocation
+                  ? undefined
+                  : `Moskeen er i en annen kommune, så bare jummah kommer fra ${mosque?.name ?? 'moskeen'}`
               }
+              jamatTimes={jamatTimes}
+              jummah={isoDateIsFriday(todayIso) ? jummahTimes : []}
               onPressMosque={() => {
                 if (!mosque) return;
                 if (mosqueInLocation) {

@@ -134,7 +134,11 @@ struct PrayerWidgetView: View {
         case .accessoryCircular:
           CircularPrayerView(moment: moment, now: entry.date)
         case .accessoryInline:
-          InlinePrayerView(moment: moment, status: moment.headline.status(in: entry.statuses))
+          InlinePrayerView(
+            moment: moment,
+            now: entry.date,
+            status: moment.headline.status(in: entry.statuses)
+          )
         default:
           SmallPrayerView(
             moment: moment,
@@ -369,13 +373,19 @@ private struct CircularPrayerView: View {
   let moment: PrayerMoment
   let now: Date
 
+  private var target: Date { moment.isNow ? moment.next.at : moment.headline.at }
+
   var body: some View {
     Gauge(value: moment.progress(at: now)) {
-      Image(systemName: PrayerFormat.symbol(for: moment.headline.kind))
+      Text(moment.headline.printedLabel)
+        .font(.system(size: 10, weight: .semibold))
+        .lineLimit(1)
+        .minimumScaleFactor(0.6)
     } currentValueLabel: {
-      Text(PrayerFormat.time(moment.headline.at))
-        .prayerTime(.system(size: 13, weight: .semibold))
-        .minimumScaleFactor(0.7)
+      Text(timerInterval: PrayerFormat.countdownRange(to: target, from: now), countsDown: true)
+        .prayerTime(.system(size: 12, weight: .semibold))
+        .lineLimit(1)
+        .minimumScaleFactor(0.6)
     }
     .gaugeStyle(.accessoryCircular)
     .containerBackground(.clear, for: .widget)
@@ -384,11 +394,19 @@ private struct CircularPrayerView: View {
 
 private struct InlinePrayerView: View {
   let moment: PrayerMoment
+  let now: Date
   let status: String?
+
+  private var text: String {
+    if moment.isNow {
+      return "\(moment.headline.printedLabel) nå · \(moment.next.label) \(PrayerFormat.countdown(to: moment.next.at, from: now))"
+    }
+    return "\(moment.headline.printedLabel) \(PrayerFormat.countdown(to: moment.headline.at, from: now))"
+  }
 
   var body: some View {
     Label(
-      "\(moment.headline.printedLabel) \(PrayerFormat.time(moment.headline.at))",
+      text,
       systemImage: status == "prayed"
         ? "checkmark.circle.fill"
         : PrayerFormat.symbol(for: moment.headline.kind)

@@ -13,6 +13,7 @@ import { useUserCoords } from '@/hooks/useUserCoords';
 import { distanceKm } from '@/lib/geo';
 import { useTheme } from '@/theme';
 import { fontSize, opacity, radius, spacing } from '@/theme/tokens';
+import { useSettings } from '@/store/settings';
 
 type ViewMode = 'list' | 'map';
 type SortMode = 'distance' | 'name';
@@ -32,6 +33,8 @@ export default function MosquesScreen() {
   const [query, setQuery] = useState('');
   const { refreshing, onRefresh } = useRefresh();
   const isEidPeriod = useIsEidPeriod();
+  const selected = useSettings((state) => state.mosque);
+  const selectedOrgNr = selected?.orgNr;
 
   const visible: MosqueWithDistance[] = useMemo(() => {
     if (!mosques) return [];
@@ -51,11 +54,15 @@ export default function MosquesScreen() {
           (mosque.post?.city.toLowerCase().includes(normalized) ?? false),
       );
 
-    if (sort === 'name') {
-      return withDistance.sort((a, b) => a.mosque.name.localeCompare(b.mosque.name, 'nb'));
-    }
-    return withDistance.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
-  }, [mosques, query, sort, coords.lat, coords.lon]);
+    const sorted =
+      sort === 'name'
+        ? withDistance.sort((a, b) => a.mosque.name.localeCompare(b.mosque.name, 'nb'))
+        : withDistance.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
+
+    const mine = sorted.findIndex((item) => item.mosque.org_nr === selectedOrgNr);
+    if (mine <= 0) return sorted;
+    return [sorted[mine], ...sorted.slice(0, mine), ...sorted.slice(mine + 1)];
+  }, [mosques, query, sort, coords.lat, coords.lon, selectedOrgNr]);
 
   const openMosque = (orgNr: string) =>
     router.push({ pathname: '/mosque/[orgNr]', params: { orgNr } });
@@ -168,6 +175,7 @@ export default function MosquesScreen() {
               mosque={item.mosque}
               distanceKm={item.distance ?? undefined}
               showEid={isEidPeriod}
+              selected={item.mosque.org_nr === selectedOrgNr}
               onPress={() => openMosque(item.mosque.org_nr)}
             />
           )}
