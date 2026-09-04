@@ -298,11 +298,11 @@ export default function SettingsScreen() {
           <SectionHeader title="Widget" />
           <Card padding="sm" rounded="xl">
             <ListRow
-              title="Vis jamat-tider"
+              title="Vis jamaat-tider"
               subtitle={
                 mosque
-                  ? `Widgeten viser jamat-tidene til ${mosque.name} under bønnetidene`
-                  : 'Velg en moské for å vise jamat-tider i widgeten'
+                  ? `Widgeten viser jamaat-tidene til ${mosque.name} under bønnetidene`
+                  : 'Velg en moské for å vise jamaat-tider i widgeten'
               }
               leading={<Ionicons name="people-outline" size={20} color={theme.colors.primary} />}
               trailing={

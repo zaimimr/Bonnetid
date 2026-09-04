@@ -86,7 +86,7 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
         return {
           kind: entry.name,
           label: entry.label,
-          displayLabel: jummah ? 'Jummah' : entry.label,
+          displayLabel: jummah ? 'Jumuah' : entry.label,
           at: entry.date.toISOString(),
           isPrayer: entry.isPrayer,
           jamat,

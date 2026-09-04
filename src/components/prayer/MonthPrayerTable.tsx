@@ -8,7 +8,7 @@ import type { AsrMethodPreference } from '@/store/settings';
 import { asrTimeFor } from '@/lib/prayerSchedule';
 import { osloDayKey, osloTimeToLocalClock, parseDayKey } from '@/lib/time';
 
-const COLUMNS = ['Fajr', 'Sol', 'Duhr', 'Asr', 'Maghrib', 'Isha'];
+const COLUMNS = ['Fajr', 'Sol', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 const DATE_COLUMN_WIDTH = 40;
 const TIME_COLUMN_WIDTH = 52;
 const MAX_TABLE_FONT_SCALE = 1.3;

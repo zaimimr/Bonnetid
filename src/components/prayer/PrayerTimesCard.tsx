@@ -92,7 +92,7 @@ export function PrayerTimesCard({
             tone="textMuted"
             align="right"
             style={{ width: columnWidth }}>
-            Jamat
+            Jamaat
           </AppText>
         </View>
       )}
@@ -123,7 +123,7 @@ export function PrayerTimesCard({
             {hasJamat && (
               <TimeCell
                 value={jamatTime ?? '–'}
-                label="Jamat"
+                label="Jamaat"
                 stacked={stacked}
                 width={columnWidth}
                 weight={isHighlighted ? 'semibold' : 'regular'}
@@ -233,7 +233,7 @@ export function PrayerTimesCard({
               }}>
               <Ionicons name="people-outline" size={18} color={theme.colors.primary} />
               <AppText weight="medium" style={{ flexShrink: 1 }}>
-                {jummah.length > 1 ? `Jummah ${index + 1}` : 'Jummah'}
+                {jummah.length > 1 ? `Jumuah ${index + 1}` : 'Jumuah'}
               </AppText>
               <AppText weight="semibold" tone="primary" tabular style={{ marginLeft: 'auto' }}>
                 {(statusDate && osloTimeToLocalClock(statusDate, entry.jummah)) ?? entry.jummah}
@@ -260,7 +260,7 @@ export function PrayerTimesCard({
           ]}>
           <Ionicons name="business-outline" size={15} color={theme.colors.textMuted} />
           <AppText size="xs" tone="textMuted" style={{ flex: 1 }} numberOfLines={2}>
-            {mosqueNote ?? `Jamat-tider fra ${mosqueName}`}
+            {mosqueNote ?? `Jamaat-tider fra ${mosqueName}`}
           </AppText>
           <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} />
         </Pressable>
@@ -281,7 +281,7 @@ export function PrayerTimesCard({
           ]}>
           <Ionicons name="business-outline" size={18} color={theme.colors.primary} />
           <AppText size="sm" weight="medium" tone="primary" style={{ flex: 1 }}>
-            Velg din moské for å se jamat- og jummah-tider
+            Velg din moské for å se jamaat- og jumuah-tider
           </AppText>
           <Ionicons name="chevron-forward" size={16} color={theme.colors.primary} />
         </Pressable>

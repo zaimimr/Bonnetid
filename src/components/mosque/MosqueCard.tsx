@@ -42,7 +42,7 @@ export function MosqueCard({ mosque, distanceKm, showEid, selected, onPress }: M
             {selected && <Badge label="Min moské" variant="primary" />}
             {distanceKm != null && <Badge label={formatDistance(distanceKm)} variant="neutral" />}
             {eidTimes.length > 0 && <Badge label={`Eid ${eidTimes.join(' · ')}`} variant="primary" />}
-            {nextJummah && <Badge label={`Jummah ${nextJummah}`} variant="primary" />}
+            {nextJummah && <Badge label={`Jumuah ${nextJummah}`} variant="primary" />}
           </View>
         </View>
 

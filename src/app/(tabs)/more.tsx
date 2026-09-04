@@ -31,7 +31,7 @@ const FEATURES: Feature[] = [
     href: '/mosques',
     icon: 'business-outline',
     title: 'Moskeer',
-    description: 'Finn moskeer i nærheten, med kart og jamat-tider',
+    description: 'Finn moskeer i nærheten, med kart og jamaat-tider',
   },
   {
     href: '/settings',
