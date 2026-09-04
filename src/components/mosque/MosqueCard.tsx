@@ -1,7 +1,6 @@
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText, Badge, Card } from '@/components/ui';
-import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import type { Mosque } from '@/api/types';
@@ -11,10 +10,11 @@ export type MosqueCardProps = {
   mosque: Mosque;
   distanceKm?: number;
   showEid?: boolean;
+  selected?: boolean;
   onPress: () => void;
 };
 
-export function MosqueCard({ mosque, distanceKm, showEid, onPress }: MosqueCardProps) {
+export function MosqueCard({ mosque, distanceKm, showEid, selected, onPress }: MosqueCardProps) {
   const theme = useTheme();
   const nextJummah = mosque.jummah[0]?.jummah;
   const eidTimes = showEid && mosque.show_eid ? mosque.eid_prayers : [];
@@ -22,8 +22,6 @@ export function MosqueCard({ mosque, distanceKm, showEid, onPress }: MosqueCardP
   return (
     <Card onPress={onPress} rounded="xl">
       <View style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'center' }}>
-        <MosqueLogo uri={mosque.logo} size="md" />
-
         <View style={{ flex: 1, gap: spacing.xxs }}>
           <AppText weight="semibold" numberOfLines={2}>
             {mosque.name}
@@ -41,6 +39,7 @@ export function MosqueCard({ mosque, distanceKm, showEid, onPress }: MosqueCardP
               rowGap: spacing.xs,
               marginTop: spacing.xxs,
             }}>
+            {selected && <Badge label="Min moské" variant="primary" />}
             {distanceKm != null && <Badge label={formatDistance(distanceKm)} variant="neutral" />}
             {eidTimes.length > 0 && <Badge label={`Eid ${eidTimes.join(' · ')}`} variant="primary" />}
             {nextJummah && <Badge label={`Jummah ${nextJummah}`} variant="primary" />}

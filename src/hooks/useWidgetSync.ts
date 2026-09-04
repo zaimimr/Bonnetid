@@ -69,21 +69,19 @@ export function useWidgetSync(now: Date) {
       const schedule = buildDaySchedule(row, date, asrMethod);
       const iso = isoDateKey(date);
       const hijriRow = hijriRows.find((entry) => entry.gregorian_date === iso);
-      const jamatTimes = mosqueInLocation
-        ? jamatTimesForDate(
-            mosqueDetails.data?.jamat,
-            iso,
-            adhanTimesFromSchedule(schedule),
-            mosqueDetails.data?.jummah ?? [],
-          )
-        : {};
+      const jamatTimes = jamatTimesForDate(
+        mosqueInLocation ? mosqueDetails.data?.jamat : null,
+        iso,
+        mosqueInLocation ? adhanTimesFromSchedule(schedule) : {},
+        mosqueDetails.data?.jummah ?? [],
+      );
 
       return {
         date,
         schedule,
         hijriText: hijriRow ? formatHijri(hijriRow.hijri_date, hijriRow.hijri_month_text) : '',
         jamatTimes,
-        hasJummah: mosqueInLocation && (mosqueDetails.data?.jummah?.length ?? 0) > 0,
+        hasJummah: (mosqueDetails.data?.jummah?.length ?? 0) > 0,
       };
     });
 
@@ -104,13 +102,13 @@ export function useWidgetSync(now: Date) {
     () =>
       buildSnapshot({
         locationName: location.name,
-        mosqueName: mosqueInLocation ? (mosque?.name ?? null) : null,
+        mosqueName: mosque?.name ?? null,
         showJamat,
         lockScreenEnabled,
         generatedAt: now,
         days,
       }),
-    [location.name, mosque, mosqueInLocation, showJamat, lockScreenEnabled, days, now],
+    [location.name, mosque, showJamat, lockScreenEnabled, days, now],
   );
 
   // `now` ticks every second in the app; the payload only matters when the times change.

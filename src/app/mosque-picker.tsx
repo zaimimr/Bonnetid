@@ -4,7 +4,6 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useMosques } from '@/api/queries';
 import type { Mosque } from '@/api/types';
-import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { AppText, ErrorState, ListRow, Screen, Skeleton } from '@/components/ui';
 import { useDevicePosition } from '@/hooks/useNearestLocation';
 import { useRefresh } from '@/hooks/useRefresh';
@@ -38,8 +37,12 @@ export default function MosquePickerScreen() {
     const matches = normalized
       ? withDistance.filter(({ mosque }) => mosque.name.toLowerCase().includes(normalized))
       : withDistance;
-    return matches.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
-  }, [mosques, query, coords.lat, coords.lon]);
+    const sorted = matches.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
+
+    const mine = sorted.findIndex((item) => item.mosque.org_nr === selected?.orgNr);
+    if (mine <= 0) return sorted;
+    return [sorted[mine], ...sorted.slice(0, mine), ...sorted.slice(mine + 1)];
+  }, [mosques, query, coords.lat, coords.lon, selected?.orgNr]);
 
   const choose = (mosque: Mosque) => {
     setMosque({ orgNr: mosque.org_nr, name: mosque.name });
@@ -196,7 +199,6 @@ export default function MosquePickerScreen() {
               ]
                 .filter(Boolean)
                 .join(' · ')}
-              leading={<MosqueLogo uri={item.mosque.logo} size="sm" />}
               trailing={
                 selected?.orgNr === item.mosque.org_nr ? (
                   <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
