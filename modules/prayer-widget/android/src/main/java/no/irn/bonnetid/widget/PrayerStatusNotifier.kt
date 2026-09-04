@@ -17,15 +17,16 @@ import org.json.JSONArray
 object PrayerStatusNotifier {
   const val ACTION_PRAYER_START = "no.irn.bonnetid.widget.PRAYER_START"
   const val ACTION_PRAYER_MARK = "no.irn.bonnetid.widget.PRAYER_MARK"
+  const val ACTION_PRAYER_END = "no.irn.bonnetid.widget.PRAYER_END"
   const val CHANNEL_ID = "prayer-status"
 
   private const val NOTIFICATION_ID = 8021
   private const val SCHEDULED_KEY = "prayer_status_alarms_v1"
   private const val POSTED_KEY = "prayer_status_posted_v1"
-  private const val ALARM_WINDOW_MS = 60 * 1000L
   private const val SCHEME = "bonnetid-prayer"
   private const val START_HOST = "start"
   private const val MARK_HOST = "mark"
+  private const val END_HOST = "end"
 
   fun sync(context: Context) {
     val snapshot = PrayerSnapshot.load(context)
@@ -43,15 +44,12 @@ object PrayerStatusNotifier {
     for (day in snapshot.days) {
       for (prayer in day.prayers) {
         if (!prayer.isPrayer || prayer.at <= now) continue
-        alarms.setWindow(
-          AlarmManager.RTC_WAKEUP,
-          prayer.at,
-          ALARM_WINDOW_MS,
-          startIntent(context, day.date, prayer.kind),
-        )
+        scheduleWakeup(alarms, prayer.at, startIntent(context, day.date, prayer.kind))
         scheduled.put("${day.date}|${prayer.kind}")
       }
     }
+
+    rearmEndAlarm(context, snapshot, alarms, now)
 
     context
       .getSharedPreferences(SNAPSHOT_PREFS, Context.MODE_PRIVATE)
@@ -68,6 +66,39 @@ object PrayerStatusNotifier {
     when (intent.action) {
       ACTION_PRAYER_START -> post(context, date, kind)
       ACTION_PRAYER_MARK -> mark(context, date, kind, segments.getOrNull(2) ?: return)
+      ACTION_PRAYER_END -> end(context, date, kind)
+    }
+  }
+
+  private fun end(context: Context, date: String, kind: String) {
+    val posted = context
+      .getSharedPreferences(SNAPSHOT_PREFS, Context.MODE_PRIVATE)
+      .getString(POSTED_KEY, null)
+    if (posted == "$date|$kind") clear(context)
+  }
+
+  private fun rearmEndAlarm(context: Context, snapshot: PrayerSnapshot, alarms: AlarmManager, now: Long) {
+    val posted = context
+      .getSharedPreferences(SNAPSHOT_PREFS, Context.MODE_PRIVATE)
+      .getString(POSTED_KEY, null)
+      ?: return
+    val parts = posted.split("|")
+    if (parts.size != 2) return
+    val day = snapshot.days.firstOrNull { it.date == parts[0] } ?: return clear(context)
+    val prayer = day.prayers.firstOrNull { it.kind == parts[1] && it.isPrayer } ?: return clear(context)
+    val endsAt = snapshot.windowEnd(prayer) ?: return
+    if (endsAt <= now) return clear(context)
+    scheduleWakeup(alarms, endsAt, endIntent(context, parts[0], parts[1]))
+  }
+
+  private fun scheduleWakeup(alarms: AlarmManager, at: Long, operation: PendingIntent) {
+    val exactAllowed = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarms.canScheduleExactAlarms()
+    when {
+      exactAllowed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
+        alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, operation)
+      Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
+        alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, operation)
+      else -> alarms.setExact(AlarmManager.RTC_WAKEUP, at, operation)
     }
   }
 
@@ -145,7 +176,10 @@ object PrayerStatusNotifier {
         action(context, R.drawable.prayer_widget_skip, "Hopp over", date, kind, PrayerLogStore.STATUS_SKIPPED),
       )
 
-    if (endsAt != null) builder.setSubText("Varer til ${PrayerFormat.time(endsAt)}")
+    if (endsAt != null) {
+      builder.setSubText("Varer til ${PrayerFormat.time(endsAt)}")
+      alarmManager(context)?.let { scheduleWakeup(it, endsAt, endIntent(context, date, kind)) }
+    }
 
     manager.notify(NOTIFICATION_ID, builder.build())
     context
@@ -206,6 +240,7 @@ object PrayerStatusNotifier {
       val parts = keys.optString(index).split("|")
       if (parts.size != 2) continue
       alarms.cancel(startIntent(context, parts[0], parts[1]))
+      alarms.cancel(endIntent(context, parts[0], parts[1]))
     }
     prefs.edit().remove(SCHEDULED_KEY).apply()
   }
@@ -214,6 +249,14 @@ object PrayerStatusNotifier {
     val uri = Uri.parse("$SCHEME://$START_HOST/$date/$kind")
     val intent = Intent(context, PrayerStatusReceiver::class.java)
       .setAction(ACTION_PRAYER_START)
+      .setData(uri)
+    return PendingIntent.getBroadcast(context, uri.hashCode(), intent, immutableFlags())
+  }
+
+  private fun endIntent(context: Context, date: String, kind: String): PendingIntent {
+    val uri = Uri.parse("$SCHEME://$END_HOST/$date/$kind")
+    val intent = Intent(context, PrayerStatusReceiver::class.java)
+      .setAction(ACTION_PRAYER_END)
       .setData(uri)
     return PendingIntent.getBroadcast(context, uri.hashCode(), intent, immutableFlags())
   }

@@ -89,6 +89,15 @@ export default function SettingsScreen() {
     setNotificationsEnabled(granted);
   };
 
+  const toggleLockScreen = async (value: boolean) => {
+    if (!value || Platform.OS !== 'android') {
+      setLiveActivityEnabled(value);
+      return;
+    }
+    const granted = await requestNotificationPermission();
+    setLiveActivityEnabled(granted);
+  };
+
   return (
     <Screen scroll edges={[]}>
       <SectionHeader
@@ -233,7 +242,7 @@ export default function SettingsScreen() {
               trailing={
                 <Switch
                   value={liveActivityEnabled}
-                  onValueChange={setLiveActivityEnabled}
+                  onValueChange={toggleLockScreen}
                   trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
                   thumbColor={theme.colors.surface}
                 />

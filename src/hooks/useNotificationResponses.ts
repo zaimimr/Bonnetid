@@ -27,10 +27,17 @@ export function useNotificationResponses() {
         else remove = unsubscribe;
       })
       .catch(() => {});
-    consumeLastPrayerAction(handle).catch(() => {});
+    const consume = () => {
+      if (cancelled) return;
+      consumeLastPrayerAction(handle).catch(() => {});
+    };
+    let stopHydration: (() => void) | null = null;
+    if (usePrayerLog.persist.hasHydrated()) consume();
+    else stopHydration = usePrayerLog.persist.onFinishHydration(consume);
 
     return () => {
       cancelled = true;
+      stopHydration?.();
       remove?.();
     };
   }, [setStatus]);

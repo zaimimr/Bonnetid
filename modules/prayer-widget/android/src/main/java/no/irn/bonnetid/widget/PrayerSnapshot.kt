@@ -16,6 +16,7 @@ data class PrayerEntry(
   val isPrayer: Boolean,
   val jamat: Long?,
   val isJummah: Boolean,
+  val end: Long? = null,
 ) {
   fun printedAt(showJamat: Boolean): Long {
     if (!showJamat && isJummah && jamat != null) return jamat
@@ -59,7 +60,7 @@ data class PrayerSnapshot(
   }
 
   fun windowEnd(prayer: PrayerEntry): Long? {
-    return allPrayers.firstOrNull { it.at > prayer.at }?.at
+    return prayer.end ?: allPrayers.firstOrNull { it.at > prayer.at }?.at
   }
 
   fun currentPrayer(at: Long): PrayerEntry? {
@@ -102,6 +103,7 @@ data class PrayerSnapshot(
                 isPrayer = prayerJson.optBoolean("isPrayer", true),
                 jamat = parseInstant(optStringOrNull(prayerJson, "jamat")),
                 isJummah = prayerJson.optBoolean("isJummah", false),
+                end = parseInstant(optStringOrNull(prayerJson, "end")),
               ),
             )
           }
@@ -157,6 +159,7 @@ data class PrayerSnapshot(
 
     fun dayKey(at: Long): String {
       val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+      formatter.timeZone = TimeZone.getTimeZone("Europe/Oslo")
       return formatter.format(Date(at))
     }
   }

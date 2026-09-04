@@ -12,6 +12,7 @@ struct PrayerEntry: Codable, Hashable {
   /// Optional so a snapshot written by an older build still decodes.
   let displayLabel: String?
   let isJummah: Bool?
+  let end: Date?
 
   /// What a widget prints: "Jummah" on Friday when the mosque has one.
   var printedLabel: String { displayLabel ?? label }

@@ -266,12 +266,11 @@ class PrayerAppWidget : AppWidgetProvider() {
       val alarms = alarmManager(context) ?: return
       val now = System.currentTimeMillis()
       val target = nextBoundary(context, now)
-      alarms.setWindow(
-        AlarmManager.RTC,
-        target,
-        ALARM_WINDOW_MS,
-        refreshIntent(context),
-      )
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        alarms.setAndAllowWhileIdle(AlarmManager.RTC, target, refreshIntent(context))
+      } else {
+        alarms.setWindow(AlarmManager.RTC, target, ALARM_WINDOW_MS, refreshIntent(context))
+      }
     }
 
     private fun nextBoundary(context: Context, now: Long): Long {

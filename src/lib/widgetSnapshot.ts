@@ -35,6 +35,7 @@ export type SnapshotPrayer = {
   jamat: string | null;
   /** True when `jamat` is this Friday's jummah time rather than an ordinary jamat time. */
   isJummah: boolean;
+  end: string | null;
 };
 
 export type SnapshotDay = {
@@ -90,6 +91,7 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
           isPrayer: entry.isPrayer,
           jamat,
           isJummah: jummah,
+          end: entry.end?.date.toISOString() ?? null,
         };
       }),
     })),
