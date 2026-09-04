@@ -1,7 +1,7 @@
 /** @type {(config: any) => import('@bacons/apple-targets/app.plugin').Config} */
 module.exports = (config) => ({
   type: 'widget',
-  name: 'bonnetid_widget',
+  name: 'bonnetidwidget',
   displayName: 'Bønnetid',
   icon: '../../assets/images/icon.png',
   deploymentTarget: '17.0',
