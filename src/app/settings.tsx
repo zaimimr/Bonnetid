@@ -218,7 +218,7 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Marker bønner"
-          subtitle="Egen side under Mer"
+          subtitle="Hold oversikt over bønnene dine"
           leading={<Ionicons name="checkmark-done-outline" size={20} color={theme.colors.primary} />}
           trailing={
             <Switch
