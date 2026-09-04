@@ -87,7 +87,7 @@
         "@sentry/react-native/expo",
         {
           "organization": "zaim-imran",
-          "project": "react-native"
+          "project": "bonnetid"
         }
       ]
     ],
