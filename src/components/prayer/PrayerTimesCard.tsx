@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { AppText, Badge, Card } from '@/components/ui';
@@ -13,7 +12,7 @@ import type { JamatTimes, PrayerEntry, PrayerName } from '@/lib/prayerSchedule';
 import type { MosqueJummah } from '@/api/types';
 import { usePrayerLog } from '@/store/prayerLog';
 import { usePrayerTrackerEnabled } from '@/store/settings';
-import { PrayerPrayedButton, PrayerStatusMark } from './PrayerStatusControl';
+import { CHECK_TARGET, PrayerCheck } from './PrayerStatusControl';
 import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from './TimeCell';
 
 export type { JamatTimes };
@@ -55,7 +54,6 @@ export function PrayerTimesCard({
   const theme = useTheme();
   const log = usePrayerLog((state) => state.log);
   const markPrayer = usePrayerMark();
-  const [openKey, setOpenKey] = useState<string | null>(null);
   const { scale, isStacked } = useFontScale();
   const { isWide } = useResponsive();
   const stacked = isStacked && !isWide;
@@ -106,10 +104,7 @@ export function PrayerTimesCard({
           entry.isPrayer && (now ? entry.date.getTime() <= now.getTime() : false);
         const active =
           started && now != null && entry.end != null && now.getTime() < entry.end.date.getTime();
-        const entryKey = `${statusDate}|${entry.name}`;
-        const choiceOpen = openKey === entryKey;
         const markable = showStatus && started && statusDate != null;
-        const showPrayedButton = markable && status === null && (active || choiceOpen);
         const times = (
           <>
             <TimeCell
@@ -142,40 +137,16 @@ export function PrayerTimesCard({
               borderBottomWidth: index === schedule.length - 1 || isHighlighted ? 0 : 1,
               borderBottomColor: theme.colors.border,
             }}>
-            <Pressable
-              disabled={!markable}
-              onPress={() => {
-                if (!statusDate) return;
-                if (status === 'prayed') {
-                  markPrayer(statusDate, entry.name, null);
-                  setOpenKey(null);
-                  return;
-                }
-                if (active) {
-                  markPrayer(statusDate, entry.name, 'prayed');
-                  return;
-                }
-                setOpenKey(choiceOpen ? null : entryKey);
-              }}
-              accessibilityRole={markable ? 'button' : undefined}
-              accessibilityLabel={
-                markable
-                  ? status === 'prayed'
-                    ? `${entry.label}, markert som bedt. Trykk for å fjerne markeringen`
-                    : `${entry.label}, trykk for å markere som bedt`
-                  : undefined
-              }
-              accessibilityState={markable ? { checked: status === 'prayed' } : undefined}
-              style={({ pressed }) => [
-                {
-                  flexDirection: 'row',
-                  alignItems: stacked ? 'flex-start' : 'center',
-                  gap: stacked ? spacing.sm : spacing.md,
-                  paddingVertical: spacing.md,
-                  paddingHorizontal: spacing.md,
-                },
-                pressed && markable && { opacity: opacity.pressed },
-              ]}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: stacked ? 'flex-start' : 'center',
+                gap: stacked ? spacing.sm : spacing.md,
+                paddingVertical: showStatus ? spacing.xs : spacing.md,
+                paddingLeft: spacing.md,
+                paddingRight: showStatus ? spacing.xs : spacing.md,
+                minHeight: showStatus ? CHECK_TARGET + spacing.sm : undefined,
+              }}>
               {entry.name === 'fajr_endtime' ? (
                 <Feather name="sunrise" size={20} color={theme.colors.textMuted} />
               ) : (
@@ -203,21 +174,25 @@ export function PrayerTimesCard({
                     </AppText>
                   )}
                   {isHighlighted && <Badge label="Nå" variant="primary" />}
-                  {markable && status === 'prayed' && <PrayerStatusMark label={entry.label} />}
                 </View>
                 {stacked && <TimeCellRow>{times}</TimeCellRow>}
               </View>
               {!stacked && times}
-            </Pressable>
-            {showPrayedButton && statusDate && (
-              <PrayerPrayedButton
-                label={entry.label}
-                onPress={() => {
-                  markPrayer(statusDate, entry.name, 'prayed');
-                  setOpenKey(null);
-                }}
-              />
-            )}
+              {showStatus && (
+                <View style={{ width: CHECK_TARGET, alignItems: 'center' }}>
+                  {markable && statusDate && (
+                    <PrayerCheck
+                      label={entry.label}
+                      prayed={status === 'prayed'}
+                      emphasis={active ? 'active' : 'quiet'}
+                      onToggle={() =>
+                        markPrayer(statusDate, entry.name, status === 'prayed' ? null : 'prayed')
+                      }
+                    />
+                  )}
+                </View>
+              )}
+            </View>
           </View>
         );
       })}

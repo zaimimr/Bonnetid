@@ -1,65 +1,51 @@
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText } from '@/components/ui';
 import { useTheme } from '@/theme';
-import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
+import { opacity, radius } from '@/theme/tokens';
 
-export const STATUS_MARK_SIZE = 14;
+export const CHECK_TARGET = 44;
+const CHECK_SIZE = 26;
 
-export type PrayerStatusMarkProps = {
+export type PrayerCheckProps = {
   label: string;
+  prayed: boolean;
+  emphasis: 'active' | 'quiet';
+  onToggle: () => void;
 };
 
-export function PrayerStatusMark({ label }: PrayerStatusMarkProps) {
+export function PrayerCheck({ label, prayed, emphasis, onToggle }: PrayerCheckProps) {
   const theme = useTheme();
+  const active = emphasis === 'active';
 
   return (
-    <Ionicons
-      name="checkmark"
-      size={STATUS_MARK_SIZE}
-      color={theme.colors.textMuted}
-      accessibilityLabel={`${label} er markert som bedt`}
-    />
-  );
-}
-
-export type PrayerPrayedButtonProps = {
-  label: string;
-  onPress: () => void;
-};
-
-export function PrayerPrayedButton({ label, onPress }: PrayerPrayedButtonProps) {
-  const theme = useTheme();
-
-  return (
-    <View style={{ paddingHorizontal: spacing.md, paddingBottom: spacing.md }}>
-      <Pressable
-        onPress={onPress}
-        hitSlop={hitSlop}
-        accessibilityRole="button"
-        accessibilityLabel={`Marker ${label} som bedt`}
-        style={({ pressed }) => [
-          {
-            alignSelf: 'flex-start',
-            minHeight: 44,
-            minWidth: 140,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: spacing.xs,
-            paddingHorizontal: spacing.lg,
-            borderRadius: radius.full,
-            backgroundColor: theme.colors.surface,
-            borderWidth: 1,
-            borderColor: theme.colors.primary,
-          },
-          pressed && { opacity: opacity.pressed },
-        ]}>
-        <Ionicons name="checkmark" size={18} color={theme.colors.primary} />
-        <AppText size="sm" weight="semibold" tone="primary" maxFontSizeMultiplier={1.4}>
-          Bedt
-        </AppText>
-      </Pressable>
-    </View>
+    <Pressable
+      onPress={onToggle}
+      accessibilityRole="checkbox"
+      accessibilityLabel={label}
+      accessibilityHint={prayed ? 'Fjerner markeringen' : 'Markerer bønnen som bedt'}
+      accessibilityState={{ checked: prayed }}
+      style={({ pressed }) => [
+        {
+          width: CHECK_TARGET,
+          height: CHECK_TARGET,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        pressed && { opacity: opacity.pressed },
+      ]}>
+      <View
+        style={{
+          width: CHECK_SIZE,
+          height: CHECK_SIZE,
+          borderRadius: radius.full,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: prayed ? theme.colors.primary : 'transparent',
+          borderWidth: prayed ? 0 : 1.5,
+          borderColor: active ? theme.colors.primary : theme.colors.borderStrong,
+        }}>
+        {prayed && <Ionicons name="checkmark" size={16} color={theme.colors.onPrimary} />}
+      </View>
+    </Pressable>
   );
 }
