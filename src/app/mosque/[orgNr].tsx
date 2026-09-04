@@ -172,7 +172,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
             title="Bønnetider i dag"
             subtitle={
               jamat?.start_date && jamat.end_date
-                ? `Jamat gjelder ${jamat.start_date} til ${jamat.end_date}`
+                ? `Jamaat gjelder ${jamat.start_date} til ${jamat.end_date}`
                 : undefined
             }
           />
@@ -202,7 +202,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                   tone="textMuted"
                   align="right"
                   style={{ width: columnWidth }}>
-                  Jamat
+                  Jamaat
                 </AppText>
               </View>
             )}
@@ -217,7 +217,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                   />
                   <TimeCell
                     value={row.jamat ?? '–'}
-                    label="Jamat"
+                    label="Jamaat"
                     stacked={stacked}
                     width={columnWidth}
                     weight="semibold"
@@ -275,12 +275,12 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
 
       {mosque.jummah.length > 0 && (
         <View>
-          <SectionHeader title="Jummah" />
+          <SectionHeader title="Jumuah" />
           <Card padding="sm" rounded="xl">
             {mosque.jummah.map((entry, index) => (
               <ListRow
                 key={entry.id}
-                title={mosque.jummah.length > 1 ? `Jummah ${index + 1}` : 'Fredagsbønn'}
+                title={mosque.jummah.length > 1 ? `Jumuah ${index + 1}` : 'Fredagsbønn'}
                 trailing={
                   <AppText weight="semibold" tabular>
                     {osloTimeToLocalClock(today, entry.jummah) ?? entry.jummah}

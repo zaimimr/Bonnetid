@@ -1,146 +1,236 @@
-import { useMemo } from 'react';
-import { View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText, Card, EmptyState, ErrorState, Screen, SectionHeader, Skeleton } from '@/components/ui';
-import { PrayerStatusChoice } from '@/components/prayer/PrayerStatusControl';
-import { PrayerTodoCard } from '@/components/prayer/PrayerTodoCard';
-import { WeekStrip } from '@/components/prayer/WeekStrip';
+import { usePrayerTimes } from '@/api/queries';
+import { AppText, Card, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
+import { PrayerActionButton, PrayerStatusMark } from '@/components/prayer/PrayerStatusControl';
+import { WeekOverview } from '@/components/prayer/WeekOverview';
+import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { useFontScale } from '@/hooks/useFontScale';
 import { useNow } from '@/hooks/useNow';
-import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { usePrayerMark } from '@/hooks/usePrayerMark';
+import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { useRefresh } from '@/hooks/useRefresh';
-import { statusOf } from '@/lib/prayerLog';
-import { formatTimeOfDay } from '@/lib/prayerReminders';
-import type { PrayerEntry } from '@/lib/prayerSchedule';
-import { osloDateKey } from '@/lib/time';
+import { formatGregorianLong } from '@/lib/hijri';
+import { statusOf, weekColumns, weekDayKeys } from '@/lib/prayerLog';
+import { buildDaySchedule } from '@/lib/prayerSchedule';
+import { isoDateKey, osloDateKey, todayKey } from '@/lib/time';
 import { useTheme } from '@/theme';
-import { spacing } from '@/theme/tokens';
+import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import { usePrayerLog } from '@/store/prayerLog';
+import { useActiveLocation } from '@/store/settings';
+
+const MINUTE_MS = 60 * 1000;
+
+function parseIso(isoDate: string): Date {
+  const [year, month, day] = isoDate.split('-').map(Number);
+  return new Date(year, month - 1, day, 12);
+}
+
+function shiftIso(isoDate: string, days: number): string {
+  const date = parseIso(isoDate);
+  date.setDate(date.getDate() + days);
+  return isoDateKey(date);
+}
 
 export default function TrackerScreen() {
   const now = useNow();
   const theme = useTheme();
+  const location = useActiveLocation();
+  const asrMethod = useEffectiveAsrMethod();
   const log = usePrayerLog((state) => state.log);
   const markPrayer = usePrayerMark();
   const { isStacked } = useFontScale();
   const { todaySchedule, isLoading, isError, refetch } = usePrayerDay(now);
   const { refreshing, onRefresh } = useRefresh();
-  const todayIso = osloDateKey(now);
 
-  const prayers = useMemo(
-    () => todaySchedule.filter((entry) => entry.isPrayer),
-    [todaySchedule],
+  const todayIso = osloDateKey(now);
+  const [selectedIso, setSelectedIso] = useState(todayIso);
+  const [openPrayer, setOpenPrayer] = useState<string | null>(null);
+  const selected = selectedIso > todayIso ? todayIso : selectedIso;
+  const isToday = selected === todayIso;
+
+  const minute = Math.floor(now.getTime() / MINUTE_MS);
+  const at = useMemo(() => new Date(minute * MINUTE_MS), [minute]);
+
+  const selectedDate = useMemo(() => parseIso(selected), [selected]);
+  const month = usePrayerTimes(
+    location.iso,
+    selectedDate.getFullYear(),
+    selectedDate.getMonth() + 1,
   );
+  const row = month.data?.find((day) => day.date === todayKey(selectedDate));
+
+  const schedule = useMemo(() => {
+    if (isToday) return todaySchedule.filter((entry) => entry.isPrayer);
+    if (!row) return [];
+    return buildDaySchedule(row, selectedDate, asrMethod).filter((entry) => entry.isPrayer);
+  }, [isToday, todaySchedule, row, selectedDate, asrMethod]);
+
+  const columns = useMemo(
+    () => weekColumns(weekDayKeys(selectedDate), todayIso, todaySchedule, log, at),
+    [selectedDate, todayIso, todaySchedule, log, at],
+  );
+
+  const dayLabel = isToday ? 'I dag' : formatGregorianLong(selectedDate);
+  const loading = isLoading || (!isToday && month.isLoading);
+  const failed = isError || (!isToday && month.isError);
 
   return (
     <Screen scroll edges={[]} refreshing={refreshing} onRefresh={onRefresh}>
-      {isLoading && <Skeleton height={220} rounded="xl" />}
-      {isError && <ErrorState onRetry={refetch} />}
-      {!isLoading && !isError && prayers.length === 0 && (
-        <EmptyState message="Ingen bønnetider for dette stedet i dag" icon="time-outline" />
-      )}
+      <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
+        <WeekOverview
+          columns={columns}
+          selectedIso={selected}
+          onSelect={(isoDate) => {
+            setOpenPrayer(null);
+            setSelectedIso(isoDate);
+          }}
+        />
 
-      {prayers.length > 0 && (
-        <>
-          <View style={{ marginTop: spacing.md }}>
-            <PrayerTodoCard now={now} todaySchedule={todaySchedule} />
-          </View>
-
-          <SectionHeader title="I dag" />
-          <Card padding="sm" rounded="xl">
-            {prayers.map((entry, index) => (
-              <TrackerRow
-                key={entry.name}
-                entry={entry}
-                now={now}
-                stacked={isStacked}
-                status={statusOf(log, todayIso, entry.name)}
-                last={index === prayers.length - 1}
-                onSelect={(next) => markPrayer(todayIso, entry.name, next)}
-              />
-            ))}
-          </Card>
-
-          <View style={{ marginTop: spacing.lg }}>
-            <WeekStrip now={now} todaySchedule={todaySchedule} />
-          </View>
-
+        <View>
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               gap: spacing.sm,
-              marginTop: spacing.md,
+              marginBottom: spacing.sm,
             }}>
-            <Ionicons name="lock-closed-outline" size={14} color={theme.colors.textMuted} />
-            <AppText size="xs" tone="textMuted" style={{ flex: 1 }}>
-              Markeringene blir bare hos deg
+            <DayArrow
+              direction="back"
+              onPress={() => {
+                setOpenPrayer(null);
+                setSelectedIso(shiftIso(selected, -1));
+              }}
+              disabled={false}
+            />
+            <AppText weight="semibold" align="center" style={{ flex: 1 }} numberOfLines={1}>
+              {dayLabel}
             </AppText>
+            <DayArrow
+              direction="forward"
+              onPress={() => {
+                setOpenPrayer(null);
+                setSelectedIso(shiftIso(selected, 1));
+              }}
+              disabled={isToday}
+            />
           </View>
-        </>
-      )}
+
+          {loading && <Skeleton height={240} rounded="xl" />}
+          {!loading && failed && <ErrorState onRetry={refetch} />}
+          {!loading && !failed && schedule.length === 0 && (
+            <EmptyState message="Ingen bønnetider for denne dagen" icon="time-outline" />
+          )}
+
+          {!loading && !failed && schedule.length > 0 && (
+            <Card padding="sm" rounded="xl">
+              {schedule.map((entry, index) => {
+                const status = statusOf(log, selected, entry.name);
+                const started = !isToday || entry.date.getTime() <= now.getTime();
+                const open = openPrayer === entry.name;
+                return (
+                  <View
+                    key={entry.name}
+                    style={{
+                      borderTopWidth: index === 0 ? 0 : 1,
+                      borderTopColor: theme.colors.border,
+                    }}>
+                    <Pressable
+                      disabled={!started}
+                      onPress={() => setOpenPrayer(open ? null : entry.name)}
+                      accessibilityRole={started ? 'button' : undefined}
+                      accessibilityLabel={
+                        started
+                          ? status === 'prayed'
+                            ? `${entry.label}, markert som bedt`
+                            : `${entry.label}, ikke markert`
+                          : undefined
+                      }
+                      accessibilityState={started ? { expanded: open } : undefined}
+                      style={({ pressed }) => [
+                        {
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: spacing.sm,
+                          paddingHorizontal: spacing.md,
+                          paddingVertical: spacing.md,
+                          minHeight: 52,
+                        },
+                        pressed && started && { opacity: opacity.pressed },
+                      ]}>
+                      <AppText
+                        weight="medium"
+                        tone={started ? 'textPrimary' : 'textMuted'}
+                        numberOfLines={1}>
+                        {entry.label}
+                      </AppText>
+                      {status === 'prayed' && <PrayerStatusMark label={entry.label} />}
+                      <AppText
+                        size={isStacked ? 'sm' : 'md'}
+                        tone={started ? 'textSecondary' : 'textMuted'}
+                        tabular
+                        style={{ marginLeft: 'auto' }}>
+                        {entry.time}
+                      </AppText>
+                    </Pressable>
+                    {started && open && (
+                      <PrayerActionButton
+                        label={entry.label}
+                        marked={status === 'prayed'}
+                        onPress={() => {
+                          markPrayer(selected, entry.name, status === 'prayed' ? null : 'prayed');
+                          setOpenPrayer(null);
+                        }}
+                      />
+                    )}
+                  </View>
+                );
+              })}
+            </Card>
+          )}
+        </View>
+      </View>
     </Screen>
   );
 }
 
-function TrackerRow({
-  entry,
-  now,
-  stacked,
-  status,
-  last,
-  onSelect,
+function DayArrow({
+  direction,
+  onPress,
+  disabled,
 }: {
-  entry: PrayerEntry;
-  now: Date;
-  stacked: boolean;
-  status: 'prayed' | 'skipped' | null;
-  last: boolean;
-  onSelect: (status: 'prayed' | 'skipped' | null) => void;
+  direction: 'back' | 'forward';
+  onPress: () => void;
+  disabled: boolean;
 }) {
   const theme = useTheme();
-  const started = entry.date.getTime() <= now.getTime();
-  const ended = entry.end != null && now.getTime() >= entry.end.date.getTime();
-  const note = !started
-    ? ''
-    : ended
-      ? 'Tiden er over'
-      : entry.end
-        ? `Går ut kl. ${formatTimeOfDay(entry.end.date)}`
-        : 'Pågår nå';
 
   return (
-    <View
-      style={{
-        borderBottomWidth: last ? 0 : 1,
-        borderBottomColor: theme.colors.border,
-      }}>
-      <View
-        style={{
-          flexDirection: stacked ? 'column' : 'row',
-          alignItems: stacked ? 'flex-start' : 'center',
-          gap: stacked ? spacing.xxs : spacing.md,
-          paddingTop: spacing.md,
-          paddingBottom: started ? spacing.sm : spacing.md,
-          paddingHorizontal: spacing.md,
-        }}>
-        <AppText weight="medium" style={{ flex: stacked ? undefined : 1 }}>
-          {entry.label}
-        </AppText>
-        <AppText size="sm" tone="textMuted" tabular>
-          {entry.time}
-        </AppText>
-        {!stacked && <View style={{ width: spacing.xs }} />}
-        {note !== '' && (
-          <AppText size="xs" tone="textMuted" numberOfLines={1}>
-            {note}
-          </AppText>
-        )}
-      </View>
-      {started && (
-        <PrayerStatusChoice label={entry.label} status={status} onSelect={onSelect} />
-      )}
-    </View>
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      hitSlop={hitSlop}
+      accessibilityRole="button"
+      accessibilityLabel={direction === 'back' ? 'Forrige dag' : 'Neste dag'}
+      accessibilityState={{ disabled }}
+      style={({ pressed }) => [
+        {
+          width: 40,
+          height: 40,
+          borderRadius: radius.full,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: theme.colors.surfaceSunken,
+          opacity: disabled ? opacity.disabled : 1,
+        },
+        pressed && !disabled && { opacity: opacity.pressed },
+      ]}>
+      <Ionicons
+        name={direction === 'back' ? 'chevron-back' : 'chevron-forward'}
+        size={20}
+        color={theme.colors.textSecondary}
+      />
+    </Pressable>
   );
 }

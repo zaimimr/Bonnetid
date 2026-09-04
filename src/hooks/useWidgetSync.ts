@@ -182,7 +182,7 @@ function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now
       }
 
       const day = days.find((entry) => isoDateKey(entry.date) === window.isoDate);
-      const label = day && isJummahCell(day, window.prayer.name) ? 'Jummah' : window.prayer.label;
+      const label = day && isJummahCell(day, window.prayer.name) ? 'Jumuah' : window.prayer.label;
 
       const state = {
         locationName,

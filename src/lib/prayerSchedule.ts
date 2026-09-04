@@ -27,7 +27,7 @@ export type PrayerEntry = {
 export const PRAYER_LABELS: Record<PrayerName, string> = {
   fajr: 'Fajr',
   fajr_endtime: 'Soloppgang',
-  duhr: 'Duhr',
+  duhr: 'Dhuhr',
   asr: 'Asr',
   maghrib: 'Maghrib',
   isha: 'Isha',

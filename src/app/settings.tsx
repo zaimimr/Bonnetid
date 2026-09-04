@@ -11,28 +11,28 @@ import { AppText, Card, Divider, ListRow, Screen, SectionHeader } from '@/compon
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import { notificationsSupported, requestNotificationPermission } from '@/lib/notifications';
-import { liveActivitiesEnabled, prayerWidgetAvailable } from '../../modules/prayer-widget';
+import {
+  dynamicIslandAvailable,
+  liveActivitiesEnabled,
+  prayerWidgetAvailable,
+} from '../../modules/prayer-widget';
 import { openStoreReview } from '@/lib/review';
 import { getNotificationSound } from '@/lib/notificationSounds';
+import { asrMethodLabel } from '@/lib/asrMethods';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
 import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
 import { useRamadanStatus } from '@/hooks/useRamadanStatus';
 import { track, trackError } from '@/lib/telemetry';
-import {
-  NOTIFIABLE_PRAYERS,
-  useActiveLocation,
-  useSettings,
-  type AsrMethodPreference,
-} from '@/store/settings';
+import { NOTIFIABLE_PRAYERS, useActiveLocation, useSettings } from '@/store/settings';
 
-const storeName = Platform.OS === 'ios' ? 'App Store' : 'Google Play';
 const lockScreenSupported =
   prayerWidgetAvailable && (Platform.OS === 'android' || liveActivitiesEnabled());
-const lockScreenSubtitle =
-  Platform.OS === 'android'
-    ? 'Varsel på låseskjermen når bønnetiden starter, med Bedt / Hopp over'
-    : 'Nedtelling på låseskjermen og i Dynamic Island mens appen er åpnet';
+const hasIsland = Platform.OS === 'ios' && dynamicIslandAvailable();
+const lockScreenTitle =
+  Platform.OS === 'android' ? 'Varsel på låseskjermen' : 'Nedtelling på låseskjermen';
+const lockScreenSubtitle = hasIsland ? 'Også i Dynamic Island' : undefined;
 const widgetJamatSupported = Platform.OS === 'android' && prayerWidgetAvailable;
+const ROW = { paddingHorizontal: spacing.md } as const;
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -43,7 +43,6 @@ export default function SettingsScreen() {
   const [locating, setLocating] = useState(false);
   const mosque = useSettings((state) => state.mosque);
   const asrMethod = useSettings((state) => state.asrMethod);
-  const setAsrMethod = useSettings((state) => state.setAsrMethod);
   const themePreference = useSettings((state) => state.themePreference);
   const setThemePreference = useSettings((state) => state.setThemePreference);
   const notificationsEnabled = useSettings((state) => state.notificationsEnabled);
@@ -54,7 +53,6 @@ export default function SettingsScreen() {
   const widgetShowJamat = useSettings((state) => state.widgetShowJamat);
   const setWidgetShowJamat = useSettings((state) => state.setWidgetShowJamat);
   const setLiveActivityEnabled = useSettings((state) => state.setLiveActivityEnabled);
-  const toggleNotificationPrayer = useSettings((state) => state.toggleNotificationPrayer);
   const endReminderEnabled = useSettings((state) => state.endReminderEnabled);
   const setEndReminderEnabled = useSettings((state) => state.setEndReminderEnabled);
   const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled);
@@ -64,7 +62,7 @@ export default function SettingsScreen() {
   const ramadanRemindersEnabled = useSettings((state) => state.ramadanRemindersEnabled);
   const setRamadanRemindersEnabled = useSettings((state) => state.setRamadanRemindersEnabled);
   const ramadan = useRamadanStatus(new Date());
-  const showRamadanSection = ramadan.isRamadan || ramadan.daysUntilRamadan != null;
+  const showRamadan = ramadan.isRamadan || ramadan.daysUntilRamadan != null;
 
   const detectLocation = async () => {
     if (!locations || locating) return;
@@ -107,12 +105,17 @@ export default function SettingsScreen() {
     setLiveActivityEnabled(granted);
   };
 
+  const chosenPrayers = NOTIFIABLE_PRAYERS.filter((prayer) => notificationPrayers[prayer]);
+  const prayerSummary =
+    chosenPrayers.length === NOTIFIABLE_PRAYERS.length
+      ? 'Alle bønner'
+      : chosenPrayers.length === 0
+        ? 'Ingen valgt'
+        : chosenPrayers.map((prayer) => PRAYER_LABELS[prayer]).join(', ');
+
   return (
     <Screen scroll edges={[]}>
-      <SectionHeader
-        title="Bønnetider"
-        subtitle="Stedet finnes automatisk fra posisjonen din"
-      />
+      <SectionHeader title="Bønnetider" />
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Sted"
@@ -120,7 +123,7 @@ export default function SettingsScreen() {
           leading={<Ionicons name="location-outline" size={20} color={theme.colors.primary} />}
           trailing={<Ionicons name="navigate-outline" size={18} color={theme.colors.primary} />}
           onPress={detectLocation}
-          style={{ paddingHorizontal: spacing.md }}
+          style={ROW}
         />
         <Divider />
         <ListRow
@@ -129,16 +132,20 @@ export default function SettingsScreen() {
           leading={<Ionicons name="business-outline" size={20} color={theme.colors.primary} />}
           chevron
           onPress={() => router.push('/mosque-picker')}
-          style={{ paddingHorizontal: spacing.md }}
+          style={ROW}
         />
         <Divider />
-        <AsrMethodDropdown
-          value={asrOverride ?? asrMethod ?? asrLocationDefault ?? 'shadow_1x'}
-          onChange={(method) => {
-            setAsrMethod(method);
-            track('asr_method_changed', { method });
-          }}
-          overrideNote={asrOverride && mosque ? `Styres av ${mosque.name}` : null}
+        <ListRow
+          title="Asr-metode"
+          subtitle={
+            asrOverride && mosque
+              ? `Styres av ${mosque.name}`
+              : asrMethodLabel(asrMethod ?? asrLocationDefault ?? 'shadow_1x')
+          }
+          leading={<Ionicons name="partly-sunny-outline" size={20} color={theme.colors.primary} />}
+          chevron
+          onPress={() => router.push('/asr-method')}
+          style={ROW}
         />
       </Card>
 
@@ -146,14 +153,8 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Varsle ved bønnetid"
-          subtitle={
-            notificationsSupported
-              ? 'Få beskjed når bønnen starter i ditt sted'
-              : 'Ikke tilgjengelig i Expo Go på Android'
-          }
-          leading={
-            <Ionicons name="notifications-outline" size={20} color={theme.colors.primary} />
-          }
+          subtitle={notificationsSupported ? undefined : 'Ikke tilgjengelig i Expo Go på Android'}
+          leading={<Ionicons name="notifications-outline" size={20} color={theme.colors.primary} />}
           trailing={
             <Switch
               value={notificationsEnabled}
@@ -163,66 +164,47 @@ export default function SettingsScreen() {
               thumbColor={theme.colors.surface}
             />
           }
-          style={{ paddingHorizontal: spacing.md }}
+          style={ROW}
         />
         {notificationsEnabled && (
           <>
             <Divider />
             <ListRow
+              title="Bønner"
+              subtitle={prayerSummary}
+              leading={<Ionicons name="list-outline" size={20} color={theme.colors.primary} />}
+              chevron
+              onPress={() => router.push('/notification-prayers')}
+              style={ROW}
+            />
+            <Divider />
+            <ListRow
               title="Varsellyd"
+              subtitle={getNotificationSound(notificationSound).label}
               leading={
                 <Ionicons name="musical-notes-outline" size={20} color={theme.colors.primary} />
               }
-              trailing={
-                <AppText size="sm" tone="textMuted" numberOfLines={1}>
-                  {getNotificationSound(notificationSound).label}
-                </AppText>
-              }
               chevron
               onPress={() => router.push('/notification-sound')}
-              style={{ paddingHorizontal: spacing.md }}
+              style={ROW}
             />
-            {NOTIFIABLE_PRAYERS.map((prayer) => (
-              <View key={prayer}>
-                <Divider />
-                <ListRow
-                  title={PRAYER_LABELS[prayer]}
-                  trailing={
-                    <Switch
-                      value={notificationPrayers[prayer]}
-                      onValueChange={() => {
-                        toggleNotificationPrayer(prayer);
-                        track('notification_prayer_toggled', {
-                          prayer,
-                          enabled: !notificationPrayers[prayer],
-                        });
-                      }}
-                      trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
-                      thumbColor={theme.colors.surface}
-                    />
-                  }
-                  style={{ paddingHorizontal: spacing.md }}
-                />
-              </View>
-            ))}
-            {trackerEnabled && (
+            {showRamadan && (
               <>
                 <Divider />
                 <ListRow
-                  title="Påminnelse før tiden går ut"
-                  subtitle="30 minutter før bønnetiden er over, hvis du ikke har markert bønnen som bedt"
-                  leading={
-                    <Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />
-                  }
+                  title="Suhoor-påminnelse"
+                  subtitle="45 minutter før Fajr"
+                  leading={<Ionicons name="moon-outline" size={20} color={theme.colors.primary} />}
                   trailing={
                     <Switch
-                      value={endReminderEnabled}
-                      onValueChange={setEndReminderEnabled}
+                      value={ramadanRemindersEnabled}
+                      onValueChange={setRamadanRemindersEnabled}
+                      disabled={!notificationsSupported}
                       trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
                       thumbColor={theme.colors.surface}
                     />
                   }
-                  style={{ paddingHorizontal: spacing.md }}
+                  style={ROW}
                 />
               </>
             )}
@@ -234,8 +216,9 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Marker bønner"
-          subtitle="Hold oversikt over bønnene dine"
-          leading={<Ionicons name="checkmark-done-outline" size={20} color={theme.colors.primary} />}
+          leading={
+            <Ionicons name="checkmark-done-outline" size={20} color={theme.colors.primary} />
+          }
           trailing={
             <Switch
               value={trackerEnabled}
@@ -244,39 +227,32 @@ export default function SettingsScreen() {
               thumbColor={theme.colors.surface}
             />
           }
-          style={{ paddingHorizontal: spacing.md }}
+          style={ROW}
         />
-      </Card>
-
-      {showRamadanSection && (
-        <>
-          <SectionHeader title="Ramadan" />
-          <Card padding="sm" rounded="xl">
+        {trackerEnabled && notificationsEnabled && (
+          <>
+            <Divider />
             <ListRow
-              title="Suhoor-påminnelse"
-              subtitle="45 minutter før Fajr i Ramadan"
-              leading={<Ionicons name="moon-outline" size={20} color={theme.colors.primary} />}
+              title="Påminnelse før tiden går ut"
+              subtitle="30 minutter før tiden er ute"
+              leading={<Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />}
               trailing={
                 <Switch
-                  value={ramadanRemindersEnabled}
-                  onValueChange={setRamadanRemindersEnabled}
-                  disabled={!notificationsSupported}
+                  value={endReminderEnabled}
+                  onValueChange={setEndReminderEnabled}
                   trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
                   thumbColor={theme.colors.surface}
                 />
               }
-              style={{ paddingHorizontal: spacing.md }}
+              style={ROW}
             />
-          </Card>
-        </>
-      )}
-
-      {lockScreenSupported && (Platform.OS !== 'android' || trackerEnabled) && (
-        <>
-          <SectionHeader title="Låseskjerm" />
-          <Card padding="sm" rounded="xl">
+          </>
+        )}
+        {lockScreenSupported && (Platform.OS !== 'android' || trackerEnabled) && (
+          <>
+            <Divider />
             <ListRow
-              title="Følg neste bønn"
+              title={lockScreenTitle}
               subtitle={lockScreenSubtitle}
               leading={<Ionicons name="timer-outline" size={20} color={theme.colors.primary} />}
               trailing={
@@ -287,23 +263,16 @@ export default function SettingsScreen() {
                   thumbColor={theme.colors.surface}
                 />
               }
-              style={{ paddingHorizontal: spacing.md }}
+              style={ROW}
             />
-          </Card>
-        </>
-      )}
-
-      {widgetJamatSupported && (
-        <>
-          <SectionHeader title="Widget" />
-          <Card padding="sm" rounded="xl">
+          </>
+        )}
+        {widgetJamatSupported && (
+          <>
+            <Divider />
             <ListRow
-              title="Vis jamat-tider"
-              subtitle={
-                mosque
-                  ? `Widgeten viser jamat-tidene til ${mosque.name} under bønnetidene`
-                  : 'Velg en moské for å vise jamat-tider i widgeten'
-              }
+              title="Jamaat-tider i widgeten"
+              subtitle={mosque ? mosque.name : 'Velg en moské først'}
               leading={<Ionicons name="people-outline" size={20} color={theme.colors.primary} />}
               trailing={
                 <Switch
@@ -314,20 +283,16 @@ export default function SettingsScreen() {
                   thumbColor={theme.colors.surface}
                 />
               }
-              style={{ paddingHorizontal: spacing.md }}
+              style={ROW}
             />
-          </Card>
-        </>
-      )}
+          </>
+        )}
+      </Card>
 
       <SectionHeader title="Utseende" />
       <Card padding="sm" rounded="xl">
-        <ListRow
-          title="Tema"
-          leading={<Ionicons name="contrast-outline" size={20} color={theme.colors.primary} />}
-          style={{ paddingHorizontal: spacing.md }}
-        />
-        <View style={{ paddingHorizontal: spacing.md, paddingBottom: spacing.sm }}>
+        <View style={{ padding: spacing.md, gap: spacing.sm }}>
+          <AppText weight="medium">Tema</AppText>
           <SegmentedRow
             value={themePreference}
             onChange={(preference) => {
@@ -347,11 +312,28 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Vurder Bønnetid"
-          subtitle={`Gi appen stjerner og tilbakemelding i ${storeName}`}
           leading={<Ionicons name="star-outline" size={20} color={theme.colors.primary} />}
           trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
           onPress={() => openStoreReview()}
-          style={{ paddingHorizontal: spacing.md }}
+          style={ROW}
+        />
+        <Divider />
+        <ListRow
+          title="Islamsk Råd Norge"
+          leading={
+            <Image
+              source={
+                theme.scheme === 'dark'
+                  ? require('../../assets/images/irn-logo-dark.png')
+                  : require('../../assets/images/irn-logo.png')
+              }
+              style={{ width: 20, height: 22 }}
+              contentFit="contain"
+            />
+          }
+          chevron
+          onPress={() => router.push('/irn')}
+          style={ROW}
         />
       </Card>
 
@@ -369,92 +351,7 @@ export default function SettingsScreen() {
           Laget av Zaim Imran
         </AppText>
       </View>
-
-      <View style={{ alignItems: 'center', gap: spacing.sm, marginTop: spacing.xl }}>
-        <Image
-          source={
-            theme.scheme === 'dark'
-              ? require('../../assets/images/irn-logo-dark.png')
-              : require('../../assets/images/irn-logo.png')
-          }
-          style={{ width: 44, height: 49 }}
-          contentFit="contain"
-        />
-        <AppText size="xs" tone="textMuted" align="center">
-          Data og støtte fra Islamsk Råd Norge
-        </AppText>
-      </View>
     </Screen>
-  );
-}
-
-const ASR_METHOD_OPTIONS: { value: AsrMethodPreference; label: string; description: string }[] = [
-  { value: 'irn', label: 'IRN standard', description: 'Standardmetoden fra IRN' },
-  { value: 'shadow_1x', label: '1x skygge', description: 'Øvrige lovskoler' },
-  { value: 'shadow_2x', label: '2x skygge', description: 'Hanafi' },
-  { value: 'wusta', label: 'Wusta', description: 'Midtpunkt mellom soltider og solnedgang' },
-];
-
-function AsrMethodDropdown({
-  value,
-  onChange,
-  overrideNote,
-}: {
-  value: AsrMethodPreference;
-  onChange: (value: AsrMethodPreference) => void;
-  overrideNote: string | null;
-}) {
-  const theme = useTheme();
-  const [open, setOpen] = useState(false);
-  const disabled = overrideNote != null;
-  const current = ASR_METHOD_OPTIONS.find((option) => option.value === value);
-  const expanded = open && !disabled;
-
-  return (
-    <View>
-      <ListRow
-        title="Asr-metode"
-        subtitle={overrideNote ?? undefined}
-        leading={<Ionicons name="partly-sunny-outline" size={20} color={theme.colors.primary} />}
-        trailing={
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-            <AppText size="sm" tone="textMuted" numberOfLines={1}>
-              {current?.label}
-            </AppText>
-            <Ionicons
-              name={expanded ? 'chevron-up' : 'chevron-down'}
-              size={18}
-              color={theme.colors.textMuted}
-            />
-          </View>
-        }
-        onPress={disabled ? undefined : () => setOpen((prev) => !prev)}
-        style={{ paddingHorizontal: spacing.md }}
-      />
-      {expanded &&
-        ASR_METHOD_OPTIONS.map((option) => {
-          const isActive = option.value === value;
-          return (
-            <View key={option.value}>
-              <Divider />
-              <ListRow
-                title={option.label}
-                subtitle={option.description}
-                trailing={
-                  isActive ? (
-                    <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
-                  ) : undefined
-                }
-                onPress={() => {
-                  onChange(option.value);
-                  setOpen(false);
-                }}
-                style={{ paddingHorizontal: spacing.md }}
-              />
-            </View>
-          );
-        })}
-    </View>
   );
 }
 

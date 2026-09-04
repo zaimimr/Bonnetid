@@ -13,7 +13,7 @@ import type { JamatTimes, PrayerEntry, PrayerName } from '@/lib/prayerSchedule';
 import type { MosqueJummah } from '@/api/types';
 import { usePrayerLog } from '@/store/prayerLog';
 import { usePrayerTrackerEnabled } from '@/store/settings';
-import { PrayerStatusChoice, PrayerStatusMark } from './PrayerStatusControl';
+import { PrayerActionButton, PrayerStatusMark } from './PrayerStatusControl';
 import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from './TimeCell';
 
 export type { JamatTimes };
@@ -92,7 +92,7 @@ export function PrayerTimesCard({
             tone="textMuted"
             align="right"
             style={{ width: columnWidth }}>
-            Jamat
+            Jamaat
           </AppText>
         </View>
       )}
@@ -104,12 +104,9 @@ export function PrayerTimesCard({
         const status = statusDate ? statusOf(log, statusDate, entry.name) : null;
         const started =
           entry.isPrayer && (now ? entry.date.getTime() <= now.getTime() : false);
-        const active =
-          started && now != null && entry.end != null && now.getTime() < entry.end.date.getTime();
-        const entryKey = `${statusDate}|${entry.name}`;
-        const choiceOpen = openKey === entryKey;
         const markable = showStatus && started && statusDate != null;
-        const showChoice = markable && (choiceOpen || (active && status === null));
+        const entryKey = `${statusDate}|${entry.name}`;
+        const actionOpen = markable && openKey === entryKey;
         const times = (
           <>
             <TimeCell
@@ -123,7 +120,7 @@ export function PrayerTimesCard({
             {hasJamat && (
               <TimeCell
                 value={jamatTime ?? '–'}
-                label="Jamat"
+                label="Jamaat"
                 stacked={stacked}
                 width={columnWidth}
                 weight={isHighlighted ? 'semibold' : 'regular'}
@@ -144,12 +141,17 @@ export function PrayerTimesCard({
             }}>
             <Pressable
               disabled={!markable}
-              onPress={() => setOpenKey(choiceOpen ? null : entryKey)}
+              onPress={() => setOpenKey(actionOpen ? null : entryKey)}
               accessibilityRole={markable ? 'button' : undefined}
               accessibilityLabel={
-                markable ? `${entry.label}, marker som bedt eller hoppet over` : undefined
+                markable
+                  ? status === 'prayed'
+                    ? `${entry.label}, markert som bedt`
+                    : `${entry.label}, ikke markert`
+                  : undefined
               }
-              accessibilityState={markable ? { expanded: showChoice } : undefined}
+              accessibilityHint={markable ? 'Viser knappen for å markere bønnen' : undefined}
+              accessibilityState={markable ? { expanded: actionOpen } : undefined}
               style={({ pressed }) => [
                 {
                   flexDirection: 'row',
@@ -193,12 +195,12 @@ export function PrayerTimesCard({
               </View>
               {!stacked && times}
             </Pressable>
-            {showChoice && statusDate && (
-              <PrayerStatusChoice
+            {actionOpen && statusDate && (
+              <PrayerActionButton
                 label={entry.label}
-                status={status}
-                onSelect={(next) => {
-                  markPrayer(statusDate, entry.name, next);
+                marked={status === 'prayed'}
+                onPress={() => {
+                  markPrayer(statusDate, entry.name, status === 'prayed' ? null : 'prayed');
                   setOpenKey(null);
                 }}
               />
@@ -233,7 +235,7 @@ export function PrayerTimesCard({
               }}>
               <Ionicons name="people-outline" size={18} color={theme.colors.primary} />
               <AppText weight="medium" style={{ flexShrink: 1 }}>
-                {jummah.length > 1 ? `Jummah ${index + 1}` : 'Jummah'}
+                {jummah.length > 1 ? `Jumuah ${index + 1}` : 'Jumuah'}
               </AppText>
               <AppText weight="semibold" tone="primary" tabular style={{ marginLeft: 'auto' }}>
                 {(statusDate && osloTimeToLocalClock(statusDate, entry.jummah)) ?? entry.jummah}
@@ -260,7 +262,7 @@ export function PrayerTimesCard({
           ]}>
           <Ionicons name="business-outline" size={15} color={theme.colors.textMuted} />
           <AppText size="xs" tone="textMuted" style={{ flex: 1 }} numberOfLines={2}>
-            {mosqueNote ?? `Jamat-tider fra ${mosqueName}`}
+            {mosqueNote ?? `Jamaat-tider fra ${mosqueName}`}
           </AppText>
           <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} />
         </Pressable>
@@ -281,7 +283,7 @@ export function PrayerTimesCard({
           ]}>
           <Ionicons name="business-outline" size={18} color={theme.colors.primary} />
           <AppText size="sm" weight="medium" tone="primary" style={{ flex: 1 }}>
-            Velg din moské for å se jamat- og jummah-tider
+            Velg din moské for å se jamaat- og jumuah-tider
           </AppText>
           <Ionicons name="chevron-forward" size={16} color={theme.colors.primary} />
         </Pressable>
