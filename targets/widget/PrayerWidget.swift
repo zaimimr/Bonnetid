@@ -181,7 +181,6 @@ private struct SmallPrayerView: View {
       Text(PrayerFormat.time(moment.headline.printedAt(showJamat: false)))
         .prayerTime(.system(.largeTitle, design: .default).weight(.bold))
         .foregroundStyle(PrayerColor.ink)
-        .strikethrough(status == "skipped")
         .minimumScaleFactor(0.7)
         .lineLimit(1)
 
@@ -295,7 +294,6 @@ private struct PrayerColumn: View {
       Text(PrayerFormat.time(prayer.printedAt(showJamat: showJamat)))
         .prayerTime(.system(.subheadline, design: .default).weight(isCurrent ? .bold : .medium))
         .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.ink)
-        .strikethrough(status == "skipped")
         .lineLimit(1)
         .minimumScaleFactor(0.7)
       if showJamat, let jamat = prayer.jamat {
@@ -346,7 +344,6 @@ private struct RectangularPrayerView: View {
           .lineLimit(1)
         Text(PrayerFormat.time(moment.headline.at))
           .prayerTime(.headline)
-          .strikethrough(status == "skipped")
         if status == "prayed" {
           Image(systemName: "checkmark.circle.fill")
             .font(.caption2)
