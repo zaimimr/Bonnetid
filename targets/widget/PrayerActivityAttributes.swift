@@ -12,6 +12,7 @@ struct PrayerActivityAttributes: ActivityAttributes {
     var prayerKind: String
     var prayerAt: Date
     var windowEnd: Date
+    var showMarkButtons: Bool?
   }
 
   var locationName: String

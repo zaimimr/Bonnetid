@@ -128,12 +128,20 @@ type PlannedNotification = {
   date: Date;
   sound: string | boolean;
   channelId: string | undefined;
+  category: string | undefined;
   isoDate: string;
   prayer: string;
 };
 
 function signatureOf(item: PlannedNotification): string {
-  return [item.date.getTime(), item.title, item.body, item.sound, item.channelId ?? ''].join('|');
+  return [
+    item.date.getTime(),
+    item.title,
+    item.body,
+    item.sound,
+    item.channelId ?? '',
+    item.category ?? '',
+  ].join('|');
 }
 
 export type ScheduledPrayer = {
@@ -146,6 +154,7 @@ export type PrayerNotificationPlan = {
   reminders: PrayerReminder[];
   locationName: string;
   soundKey: NotificationSoundKey;
+  markActions: boolean;
 };
 
 let pending: Promise<unknown> = Promise.resolve();
@@ -163,7 +172,7 @@ export function syncPrayerNotifications(plan: PrayerNotificationPlan): Promise<n
 
 async function runSync(plan: PrayerNotificationPlan): Promise<number> {
   const Notifications = await getNotifications();
-  await ensurePrayerCategory(Notifications);
+  if (plan.markActions) await ensurePrayerCategory(Notifications);
 
   const sound = getNotificationSound(plan.soundKey);
   const adhanChannel = await ensureAdhanChannel(Notifications, plan.soundKey);
@@ -183,6 +192,7 @@ async function runSync(plan: PrayerNotificationPlan): Promise<number> {
       date: entry.date,
       sound: sound.fileName ?? true,
       channelId: adhanChannel,
+      category: plan.markActions ? PRAYER_CATEGORY : undefined,
       isoDate,
       prayer: entry.name,
     });
@@ -199,6 +209,7 @@ async function runSync(plan: PrayerNotificationPlan): Promise<number> {
       date: reminder.fireAt,
       sound: true,
       channelId: reminderChannel,
+      category: plan.markActions ? PRAYER_CATEGORY : undefined,
       isoDate: reminder.isoDate,
       prayer: reminder.prayer,
     });
@@ -229,7 +240,7 @@ async function runSync(plan: PrayerNotificationPlan): Promise<number> {
         title: item.title,
         body: item.body,
         sound: item.sound,
-        categoryIdentifier: PRAYER_CATEGORY,
+        categoryIdentifier: item.category,
         data: { isoDate: item.isoDate, prayer: item.prayer },
       },
       trigger: {

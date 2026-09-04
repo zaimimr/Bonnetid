@@ -4,12 +4,20 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppText, Card, Screen } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
+import { usePrayerTrackerEnabled } from '@/store/settings';
 
 type Feature = {
   href: Href;
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
   description: string;
+};
+
+const TRACKER_FEATURE: Feature = {
+  href: '/tracker',
+  icon: 'checkmark-done-outline',
+  title: 'Bønnesporing',
+  description: 'Marker bønner som bedt, og se uken din',
 };
 
 const FEATURES: Feature[] = [
@@ -36,6 +44,8 @@ const FEATURES: Feature[] = [
 export default function MoreScreen() {
   const router = useRouter();
   const theme = useTheme();
+  const trackerEnabled = usePrayerTrackerEnabled();
+  const features = trackerEnabled ? [TRACKER_FEATURE, ...FEATURES] : FEATURES;
 
   return (
     <Screen scroll>
@@ -46,7 +56,7 @@ export default function MoreScreen() {
       </View>
 
       <View style={{ gap: spacing.md }}>
-        {FEATURES.map((feature) => (
+        {features.map((feature) => (
           <Card key={feature.title} rounded="xl" onPress={() => router.push(feature.href)}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
               <View

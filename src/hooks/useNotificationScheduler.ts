@@ -17,6 +17,7 @@ export function useNotificationScheduler() {
   const sound = useSettings((state) => state.notificationSound);
   const notificationPrayers = useSettings((state) => state.notificationPrayers);
   const endReminderEnabled = useSettings((state) => state.endReminderEnabled);
+  const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled);
   const log = usePrayerLog((state) => state.log);
   const asrMethod = useEffectiveAsrMethod();
   const location = useActiveLocation();
@@ -44,6 +45,7 @@ export function useNotificationScheduler() {
       sound,
       prayersKey,
       endReminderEnabled,
+      trackerEnabled,
       marksKey,
       todayIso,
       location.iso,
@@ -82,21 +84,22 @@ export function useNotificationScheduler() {
         .map((entry) => ({ isoDate: day.isoDate, entry })),
     );
 
-    const reminders = endReminderEnabled
-      ? buildPrayerReminders(days, log, now, isEnabled)
-      : [];
+    const reminders =
+      trackerEnabled && endReminderEnabled ? buildPrayerReminders(days, log, now, isEnabled) : [];
 
     syncPrayerNotifications({
       adhan,
       reminders,
       locationName: location.name,
       soundKey: sound,
+      markActions: trackerEnabled,
     }).catch(() => {});
   }, [
     enabled,
     sound,
     notificationPrayers,
     endReminderEnabled,
+    trackerEnabled,
     log,
     todayIso,
     asrMethod,

@@ -12,6 +12,7 @@ private struct ActivityPhase {
   let prayerAt: Date
   let windowEnd: Date
   let windowOver: Bool
+  let showMarkButtons: Bool
 
   init(state: PrayerActivityAttributes.ContentState, isStale: Bool) {
     isoDate = state.isoDate
@@ -20,6 +21,7 @@ private struct ActivityPhase {
     prayerAt = state.prayerAt
     windowEnd = state.windowEnd
     windowOver = isStale || Date() >= state.windowEnd
+    showMarkButtons = state.showMarkButtons ?? true
   }
 
   var question: String { "Har du bedt \(label)?" }
@@ -79,7 +81,9 @@ struct PrayerLiveActivity: Widget {
               }
             }
 
-            MarkButtons(phase: phase)
+            if phase.showMarkButtons {
+              MarkButtons(phase: phase)
+            }
           }
         }
       } compactLeading: {
@@ -197,8 +201,10 @@ private struct LockScreenActivityView: View {
           .lineLimit(1)
       }
 
-      MarkButtons(phase: phase)
-        .padding(.top, 2)
+      if phase.showMarkButtons {
+        MarkButtons(phase: phase)
+          .padding(.top, 2)
+      }
     }
     .padding(14)
   }

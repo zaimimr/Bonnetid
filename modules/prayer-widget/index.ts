@@ -10,6 +10,7 @@ export type PrayerActivityState = {
   prayerAt: number;
   /** End of the prayer's window, also the activity's stale date. */
   windowEnd: number;
+  showMarkButtons: boolean;
 };
 
 type PrayerWidgetNativeModule = {

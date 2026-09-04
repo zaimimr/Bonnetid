@@ -12,7 +12,8 @@ import { statusOf } from '@/lib/prayerLog';
 import type { JamatTimes, PrayerEntry, PrayerName } from '@/lib/prayerSchedule';
 import type { MosqueJummah } from '@/api/types';
 import { usePrayerLog } from '@/store/prayerLog';
-import { PrayerStatusChoice, PrayerStatusControl, STATUS_CONTROL_SIZE } from './PrayerStatusControl';
+import { usePrayerTrackerEnabled } from '@/store/settings';
+import { PrayerStatusChoice, PrayerStatusMark } from './PrayerStatusControl';
 import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from './TimeCell';
 
 export type { JamatTimes };
@@ -59,10 +60,8 @@ export function PrayerTimesCard({
   const { isWide } = useResponsive();
   const stacked = isStacked && !isWide;
   const hasJamat = Object.values(jamatTimes).some(Boolean);
-  const showStatus =
-    statusDate != null &&
-    now != null &&
-    schedule.some((entry) => entry.isPrayer && entry.date.getTime() <= now.getTime());
+  const trackerEnabled = usePrayerTrackerEnabled();
+  const showStatus = trackerEnabled && statusDate != null && now != null;
   const hasMosque = Boolean(mosqueName);
   const columnWidth = scaleWidth(TIME_COLUMN_WIDTH, scale);
 
@@ -105,8 +104,12 @@ export function PrayerTimesCard({
         const status = statusDate ? statusOf(log, statusDate, entry.name) : null;
         const started =
           entry.isPrayer && (now ? entry.date.getTime() <= now.getTime() : false);
+        const active =
+          started && now != null && entry.end != null && now.getTime() < entry.end.date.getTime();
         const entryKey = `${statusDate}|${entry.name}`;
         const choiceOpen = openKey === entryKey;
+        const markable = showStatus && started && statusDate != null;
+        const showChoice = markable && (choiceOpen || (active && status === null));
         const times = (
           <>
             <TimeCell
@@ -139,14 +142,24 @@ export function PrayerTimesCard({
               borderBottomWidth: index === schedule.length - 1 || isHighlighted ? 0 : 1,
               borderBottomColor: theme.colors.border,
             }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: stacked ? 'flex-start' : 'center',
-                gap: stacked ? spacing.sm : spacing.md,
-                paddingVertical: spacing.md,
-                paddingHorizontal: spacing.md,
-              }}>
+            <Pressable
+              disabled={!markable}
+              onPress={() => setOpenKey(choiceOpen ? null : entryKey)}
+              accessibilityRole={markable ? 'button' : undefined}
+              accessibilityLabel={
+                markable ? `${entry.label}, marker som bedt eller hoppet over` : undefined
+              }
+              accessibilityState={markable ? { expanded: showChoice } : undefined}
+              style={({ pressed }) => [
+                {
+                  flexDirection: 'row',
+                  alignItems: stacked ? 'flex-start' : 'center',
+                  gap: stacked ? spacing.sm : spacing.md,
+                  paddingVertical: spacing.md,
+                  paddingHorizontal: spacing.md,
+                },
+                pressed && markable && { opacity: opacity.pressed },
+              ]}>
               {entry.name === 'fajr_endtime' ? (
                 <Feather name="sunrise" size={20} color={theme.colors.textMuted} />
               ) : (
@@ -174,30 +187,13 @@ export function PrayerTimesCard({
                     </AppText>
                   )}
                   {isHighlighted && <Badge label="Nå" variant="primary" />}
+                  {markable && status === 'prayed' && <PrayerStatusMark label={entry.label} />}
                 </View>
                 {stacked && <TimeCellRow>{times}</TimeCellRow>}
               </View>
               {!stacked && times}
-              {showStatus && (
-                <View style={{ width: STATUS_CONTROL_SIZE, alignItems: 'flex-end' }}>
-                  {started && statusDate && (
-                    <PrayerStatusControl
-                      label={entry.label}
-                      status={status}
-                      expanded={choiceOpen}
-                      onPress={() => {
-                        if (status === null && !choiceOpen) {
-                          markPrayer(statusDate, entry.name, 'prayed');
-                          return;
-                        }
-                        setOpenKey(choiceOpen ? null : entryKey);
-                      }}
-                    />
-                  )}
-                </View>
-              )}
-            </View>
-            {showStatus && started && choiceOpen && statusDate && (
+            </Pressable>
+            {showChoice && statusDate && (
               <PrayerStatusChoice
                 label={entry.label}
                 status={status}

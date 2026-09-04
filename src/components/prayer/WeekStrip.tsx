@@ -96,12 +96,7 @@ function describe(column: WeekColumn): string {
 function Dot({ cell }: { cell: WeekCell }) {
   const theme = useTheme();
 
-  const filled =
-    cell.status === 'prayed'
-      ? theme.colors.primary
-      : cell.status === 'skipped'
-        ? theme.colors.borderStrong
-        : null;
+  const filled = cell.status === 'prayed' ? theme.colors.primary : null;
 
   return (
     <View

@@ -4,8 +4,6 @@ import { useRouter } from 'expo-router';
 import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
 import { NextPrayerHero } from '@/components/prayer/NextPrayerHero';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
-import { PrayerTodoCard } from '@/components/prayer/PrayerTodoCard';
-import { WeekStrip } from '@/components/prayer/WeekStrip';
 import { EventCard } from '@/components/calendar/EventCard';
 import { RamadanCard } from '@/components/ramadan/RamadanCard';
 import { AppText, EmptyState, ErrorState, Screen, SectionHeader, Skeleton } from '@/components/ui';
@@ -85,8 +83,6 @@ export default function HomeScreen() {
 
         <RamadanCard />
 
-        {todaySchedule.length > 0 && <PrayerTodoCard now={now} todaySchedule={todaySchedule} />}
-
         {todaySchedule.length > 0 && (
           <View>
             <SectionHeader
@@ -122,9 +118,6 @@ export default function HomeScreen() {
               statusDate={todayIso}
               now={now}
             />
-            <View style={{ marginTop: spacing.md }}>
-              <WeekStrip now={now} todaySchedule={todaySchedule} />
-            </View>
           </View>
         )}
 

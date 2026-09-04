@@ -5,62 +5,22 @@ import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import type { PrayerStatus } from '@/lib/prayerLog';
 
-export const STATUS_CONTROL_SIZE = 30;
+export const STATUS_MARK_SIZE = 14;
 
-export type PrayerStatusControlProps = {
+export type PrayerStatusMarkProps = {
   label: string;
-  status: PrayerStatus | null;
-  expanded: boolean;
-  onPress: () => void;
 };
 
-export function PrayerStatusControl({
-  label,
-  status,
-  expanded,
-  onPress,
-}: PrayerStatusControlProps) {
+export function PrayerStatusMark({ label }: PrayerStatusMarkProps) {
   const theme = useTheme();
 
-  const accessibilityLabel =
-    status === 'prayed'
-      ? `${label} er markert som bedt`
-      : status === 'skipped'
-        ? `${label} er hoppet over`
-        : `Marker ${label} som bedt`;
-
   return (
-    <Pressable
-      onPress={onPress}
-      hitSlop={hitSlop}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      accessibilityState={{ expanded }}
-      style={({ pressed }) => [
-        {
-          width: STATUS_CONTROL_SIZE,
-          height: STATUS_CONTROL_SIZE,
-          borderRadius: radius.full,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor:
-            status === 'prayed'
-              ? theme.colors.primary
-              : status === 'skipped'
-                ? theme.colors.surfaceSunken
-                : 'transparent',
-          borderWidth: status === 'prayed' ? 0 : 1.5,
-          borderColor: status === 'skipped' ? theme.colors.border : theme.colors.borderStrong,
-        },
-        pressed && { opacity: opacity.pressed },
-      ]}>
-      {status === 'prayed' && (
-        <Ionicons name="checkmark" size={18} color={theme.colors.onPrimary} />
-      )}
-      {status === 'skipped' && (
-        <Ionicons name="remove" size={16} color={theme.colors.textMuted} />
-      )}
-    </Pressable>
+    <Ionicons
+      name="checkmark"
+      size={STATUS_MARK_SIZE}
+      color={theme.colors.textMuted}
+      accessibilityLabel={`${label} er markert som bedt`}
+    />
   );
 }
 
@@ -99,28 +59,15 @@ export function PrayerStatusChoice({ label, status, onSelect }: PrayerStatusChoi
           text="Bedt"
           active={status === 'prayed'}
           accessibilityLabel={`Marker ${label} som bedt`}
-          onPress={() => onSelect('prayed')}
+          onPress={() => onSelect(status === 'prayed' ? null : 'prayed')}
         />
         <ChoiceSegment
           text="Hopp over"
           active={status === 'skipped'}
           accessibilityLabel={`Hopp over ${label}`}
-          onPress={() => onSelect('skipped')}
+          onPress={() => onSelect(status === 'skipped' ? null : 'skipped')}
         />
       </View>
-      <Pressable
-        onPress={() => onSelect(null)}
-        hitSlop={hitSlop}
-        accessibilityRole="button"
-        accessibilityLabel={`Fjern markeringen for ${label}`}
-        style={({ pressed }) => [
-          { paddingVertical: spacing.sm, paddingHorizontal: spacing.sm },
-          pressed && { opacity: opacity.pressed },
-        ]}>
-        <AppText size="sm" weight="medium" tone="textMuted" maxFontSizeMultiplier={1.4}>
-          Fjern
-        </AppText>
-      </Pressable>
     </View>
   );
 }
@@ -140,6 +87,7 @@ function ChoiceSegment({
   return (
     <Pressable
       onPress={onPress}
+      hitSlop={hitSlop}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ selected: active }}
