@@ -40,7 +40,9 @@ export function useWidgetSync(now: Date) {
   const asrMethod = useEffectiveAsrMethod();
   const mosque = useSettings((state) => state.mosque);
   const showJamat = useSettings((state) => state.widgetShowJamat);
-  const lockScreenEnabled = useSettings((state) => state.liveActivityEnabled);
+  const liveActivityEnabled = useSettings((state) => state.liveActivityEnabled);
+  const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled);
+  const lockScreenEnabled = liveActivityEnabled && trackerEnabled;
   const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
 
   const dayKey = osloDayKey(now);
@@ -145,6 +147,7 @@ export function useWidgetSync(now: Date) {
  */
 function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now: Date) {
   const enabled = useSettings((state) => state.liveActivityEnabled);
+  const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled);
   const log = usePrayerLog((state) => state.log);
   const applied = useRef<string | null>(null);
 
@@ -153,10 +156,13 @@ function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now
     [days],
   );
 
-  const window = useMemo(
-    () => (enabled ? resolveActivityWindow(activityDays, log, now) : null),
-    [enabled, activityDays, log, now],
-  );
+  const window = useMemo(() => {
+    if (!enabled) return null;
+    const resolved = resolveActivityWindow(activityDays, log, now);
+    if (!resolved) return null;
+    if (!trackerEnabled && resolved.windowOver) return null;
+    return resolved;
+  }, [enabled, trackerEnabled, activityDays, log, now]);
 
   return useMemo(() => {
     return () => {
@@ -187,9 +193,10 @@ function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now
         prayerKind: window.prayer.name,
         prayerAt: window.prayer.date.getTime() / 1000,
         windowEnd: window.windowEnd.getTime() / 1000,
+        showMarkButtons: trackerEnabled,
       };
 
       apply(JSON.stringify(state), () => void startOrUpdatePrayerActivity(state));
     };
-  }, [window, locationName, days]);
+  }, [window, locationName, days, trackerEnabled]);
 }

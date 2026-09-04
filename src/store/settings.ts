@@ -40,6 +40,7 @@ type SettingsState = {
   notificationSound: NotificationSoundKey;
   notificationPrayers: Record<NotifiablePrayer, boolean>;
   endReminderEnabled: boolean;
+  prayerTrackerEnabled: boolean;
   liveActivityEnabled: boolean;
   widgetShowJamat: boolean;
   ramadanRemindersEnabled: boolean;
@@ -55,6 +56,7 @@ type SettingsState = {
   setNotificationSound: (sound: NotificationSoundKey) => void;
   toggleNotificationPrayer: (prayer: NotifiablePrayer) => void;
   setEndReminderEnabled: (enabled: boolean) => void;
+  setPrayerTrackerEnabled: (enabled: boolean) => void;
   setLiveActivityEnabled: (enabled: boolean) => void;
   setWidgetShowJamat: (enabled: boolean) => void;
   setRamadanRemindersEnabled: (enabled: boolean) => void;
@@ -78,6 +80,7 @@ export const useSettings = create<SettingsState>()(
       notificationSound: 'default',
       notificationPrayers: ALL_PRAYERS_ENABLED,
       endReminderEnabled: true,
+      prayerTrackerEnabled: false,
       liveActivityEnabled: true,
       widgetShowJamat: false,
       ramadanRemindersEnabled: true,
@@ -95,6 +98,7 @@ export const useSettings = create<SettingsState>()(
       setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),
       setNotificationSound: (notificationSound) => set({ notificationSound }),
       setEndReminderEnabled: (endReminderEnabled) => set({ endReminderEnabled }),
+      setPrayerTrackerEnabled: (prayerTrackerEnabled) => set({ prayerTrackerEnabled }),
       setLiveActivityEnabled: (liveActivityEnabled) => set({ liveActivityEnabled }),
       setWidgetShowJamat: (widgetShowJamat) => set({ widgetShowJamat }),
       setRamadanRemindersEnabled: (ramadanRemindersEnabled) => set({ ramadanRemindersEnabled }),
@@ -123,6 +127,10 @@ export const useSettings = create<SettingsState>()(
 
 export function useActiveLocation(): SavedLocation {
   return useSettings((state) => state.location) ?? DEFAULT_LOCATION;
+}
+
+export function usePrayerTrackerEnabled(): boolean {
+  return useSettings((state) => state.prayerTrackerEnabled);
 }
 
 export function useHasChosenLocation(): boolean {

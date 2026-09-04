@@ -14,6 +14,7 @@ struct PrayerActivityState: Record {
   /// Epoch seconds, so no date coercion happens across the bridge.
   @Field var prayerAt: Double = 0
   @Field var windowEnd: Double = 0
+  @Field var showMarkButtons: Bool = true
 }
 
 @available(iOS 16.2, *)
@@ -108,7 +109,8 @@ private extension PrayerActivityState {
       prayerLabel: prayerLabel,
       prayerKind: prayerKind,
       prayerAt: Date(timeIntervalSince1970: prayerAt),
-      windowEnd: Date(timeIntervalSince1970: windowEnd)
+      windowEnd: Date(timeIntervalSince1970: windowEnd),
+      showMarkButtons: showMarkButtons
     )
   }
 }

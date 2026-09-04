@@ -85,6 +85,17 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="tracker"
+          options={{
+            headerShown: true,
+            title: 'Bønnesporing',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
           name="settings"
           options={{
             headerShown: true,

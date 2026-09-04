@@ -56,6 +56,8 @@ export default function SettingsScreen() {
   const toggleNotificationPrayer = useSettings((state) => state.toggleNotificationPrayer);
   const endReminderEnabled = useSettings((state) => state.endReminderEnabled);
   const setEndReminderEnabled = useSettings((state) => state.setEndReminderEnabled);
+  const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled);
+  const setTrackerEnabled = useSettings((state) => state.setPrayerTrackerEnabled);
   const asrOverride = useMosqueAsrOverride();
   const asrLocationDefault = useLocationAsrDefault();
   const ramadanRemindersEnabled = useSettings((state) => state.ramadanRemindersEnabled);
@@ -187,25 +189,47 @@ export default function SettingsScreen() {
                 />
               </View>
             ))}
-            <Divider />
-            <ListRow
-              title="Påminnelse før tiden går ut"
-              subtitle="30 minutter før bønnetiden er over, hvis du ikke har markert bønnen som bedt"
-              leading={
-                <Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />
-              }
-              trailing={
-                <Switch
-                  value={endReminderEnabled}
-                  onValueChange={setEndReminderEnabled}
-                  trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
-                  thumbColor={theme.colors.surface}
+            {trackerEnabled && (
+              <>
+                <Divider />
+                <ListRow
+                  title="Påminnelse før tiden går ut"
+                  subtitle="30 minutter før bønnetiden er over, hvis du ikke har markert bønnen som bedt"
+                  leading={
+                    <Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />
+                  }
+                  trailing={
+                    <Switch
+                      value={endReminderEnabled}
+                      onValueChange={setEndReminderEnabled}
+                      trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
+                      thumbColor={theme.colors.surface}
+                    />
+                  }
+                  style={{ paddingHorizontal: spacing.md }}
                 />
-              }
-              style={{ paddingHorizontal: spacing.md }}
-            />
+              </>
+            )}
           </>
         )}
+      </Card>
+
+      <SectionHeader title="Bønnesporing" />
+      <Card padding="sm" rounded="xl">
+        <ListRow
+          title="Marker bønner"
+          subtitle="Hold oversikt over bønnene dine"
+          leading={<Ionicons name="checkmark-done-outline" size={20} color={theme.colors.primary} />}
+          trailing={
+            <Switch
+              value={trackerEnabled}
+              onValueChange={setTrackerEnabled}
+              trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
+              thumbColor={theme.colors.surface}
+            />
+          }
+          style={{ paddingHorizontal: spacing.md }}
+        />
       </Card>
 
       {showRamadanSection && (
@@ -231,7 +255,7 @@ export default function SettingsScreen() {
         </>
       )}
 
-      {lockScreenSupported && (
+      {lockScreenSupported && (Platform.OS !== 'android' || trackerEnabled) && (
         <>
           <SectionHeader title="Låseskjerm" />
           <Card padding="sm" rounded="xl">
