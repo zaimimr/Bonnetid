@@ -45,7 +45,7 @@ const persister = createAsyncStoragePersister({
 const persistOptions = {
   persister,
   maxAge: 60 * DAY,
-  buster: 'v9',
+  buster: 'v10',
 };
 
 configureNotificationHandler();
@@ -171,6 +171,39 @@ function RootNavigator() {
         />
         <Stack.Screen
           name="day/[date]"
+          options={{
+            headerShown: true,
+            title: '',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="scanner"
+          options={{
+            headerShown: true,
+            title: 'Halal-skanner',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="scan-history"
+          options={{
+            headerShown: true,
+            title: 'Skanninger',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="scan/[barcode]"
           options={{
             headerShown: true,
             title: '',

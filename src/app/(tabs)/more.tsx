@@ -22,6 +22,12 @@ const TRACKER_FEATURE: Feature = {
 
 const FEATURES: Feature[] = [
   {
+    href: '/scanner',
+    icon: 'barcode-outline',
+    title: 'Halal-skanner',
+    description: 'Skann en strekkode og les hva ingredienslisten sier',
+  },
+  {
     href: '/timetable',
     icon: 'grid-outline',
     title: 'Månedsoversikt',

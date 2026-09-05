@@ -68,7 +68,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Bønnetid bruker kameraet til å vise retningen mot Qibla i AR-visning."
+          "cameraPermission": "Bønnetid bruker kameraet til å vise retningen mot Qibla i AR-visning og til å skanne strekkoder i halal-skanneren."
         }
       ],
       [

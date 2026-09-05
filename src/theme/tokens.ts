@@ -13,6 +13,13 @@ export const palette = {
   gold400: '#D9B84F',
   gold600: '#8F7112',
 
+  amber50: '#FBF3E2',
+  amber100: '#F5E6C6',
+  amber200: '#E8D19B',
+  amber400: '#C79A32',
+  amber600: '#8A6512',
+  amber700: '#6B4E0D',
+
   neutral0: '#FFFFFF',
   neutral50: '#F6F8F7',
   neutral100: '#EDF1EF',
@@ -34,8 +41,12 @@ export const palette = {
 
   black: '#000000',
 
-  red600: '#B23B31',
+  red50: '#FBEDEB',
+  red100: '#F6DAD7',
+  red200: '#E9B3AD',
   red400: '#D96A61',
+  red600: '#B23B31',
+  red700: '#8C2C24',
   blue600: '#2A6497',
 } as const;
 

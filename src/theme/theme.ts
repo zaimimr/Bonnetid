@@ -20,6 +20,15 @@ export type ThemeColors = {
   danger: string;
   info: string;
   success: string;
+  verdictClear: string;
+  verdictClearSurface: string;
+  onVerdictClearSurface: string;
+  verdictUncertain: string;
+  verdictUncertainSurface: string;
+  onVerdictUncertainSurface: string;
+  verdictAvoid: string;
+  verdictAvoidSurface: string;
+  onVerdictAvoidSurface: string;
   tabBarBackground: string;
   tabBarActive: string;
   tabBarInactive: string;
@@ -54,6 +63,15 @@ export const lightTheme: Theme = {
     danger: palette.red600,
     info: palette.blue600,
     success: palette.emerald500,
+    verdictClear: palette.emerald600,
+    verdictClearSurface: palette.emerald50,
+    onVerdictClearSurface: palette.emerald700,
+    verdictUncertain: palette.amber600,
+    verdictUncertainSurface: palette.amber50,
+    onVerdictUncertainSurface: palette.amber700,
+    verdictAvoid: palette.red600,
+    verdictAvoidSurface: palette.red50,
+    onVerdictAvoidSurface: palette.red700,
     tabBarBackground: palette.neutral0,
     tabBarActive: palette.emerald600,
     tabBarInactive: palette.neutral500,
@@ -84,6 +102,15 @@ export const darkTheme: Theme = {
     danger: palette.red400,
     info: palette.blue600,
     success: palette.emerald400,
+    verdictClear: palette.emerald400,
+    verdictClearSurface: palette.night700,
+    onVerdictClearSurface: palette.emerald200,
+    verdictUncertain: palette.amber400,
+    verdictUncertainSurface: palette.night700,
+    onVerdictUncertainSurface: palette.amber200,
+    verdictAvoid: palette.red400,
+    verdictAvoidSurface: palette.night700,
+    onVerdictAvoidSurface: palette.red200,
     tabBarBackground: palette.night900,
     tabBarActive: palette.emerald400,
     tabBarInactive: palette.mist500,
