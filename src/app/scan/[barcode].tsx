@@ -21,6 +21,7 @@ import {
   OFF_ADD_PRODUCT_URL,
   OFF_EDIT_PRODUCT_URL,
   ProductNotFoundError,
+  RateLimitedError,
   type ScannedProduct,
 } from '@/api/openFoodFacts';
 import { useScannedProduct } from '@/api/queries';
@@ -80,12 +81,13 @@ export default function ScanResultScreen() {
   if (isError && error instanceof ProductNotFoundError) return <UnknownProductView barcode={code} />;
 
   if (isError || !data || !result) {
+    const message =
+      error instanceof RateLimitedError
+        ? 'Vi spør produktdatabasen for ofte akkurat nå. Vent et minutt og prøv igjen.'
+        : 'Vi fikk ikke kontakt med produktdatabasen. Sjekk nettet og prøv igjen.';
     return (
       <Screen scroll>
-        <ErrorState
-          message="Vi fikk ikke kontakt med produktdatabasen. Sjekk nettet og prøv igjen."
-          onRetry={() => refetch()}
-        />
+        <ErrorState message={message} onRetry={() => refetch()} />
       </Screen>
     );
   }
@@ -158,6 +160,8 @@ function ResultView({
         <ProductSummary product={product} />
 
         <VerdictHeader result={result} />
+
+        <Disclaimer compact />
 
         {result.findings.length > 0 ? (
           <View>

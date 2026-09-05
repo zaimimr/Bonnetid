@@ -8,6 +8,7 @@ Prayer times app for Muslims in Norway. Built with Expo, React Native and TypeSc
 - Nearby mosques with jamat and jummah times, list and map view
 - Hijri calendar with upcoming Islamic events
 - Qibla compass with distance to Mekka
+- Halal scanner that reads a product barcode and reports what the ingredient list says
 
 ## Getting started
 

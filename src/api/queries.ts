@@ -8,7 +8,12 @@ import {
   fetchMosques,
   fetchPrayerTimes,
 } from './endpoints';
-import { fetchScannedProduct, isValidBarcode, ProductNotFoundError } from './openFoodFacts';
+import {
+  fetchScannedProduct,
+  isValidBarcode,
+  ProductNotFoundError,
+  RateLimitedError,
+} from './openFoodFacts';
 import type { HijriDay } from './types';
 
 const HOUR = 60 * 60 * 1000;
@@ -104,7 +109,9 @@ export function useScannedProduct(barcode: string) {
     enabled: isValidBarcode(barcode),
     staleTime: 7 * DAY,
     gcTime: 30 * DAY,
-    retry: (failureCount, error) =>
-      error instanceof ProductNotFoundError ? false : failureCount < 2,
+    retry: (failureCount, error) => {
+      if (error instanceof ProductNotFoundError || error instanceof RateLimitedError) return false;
+      return failureCount < 2;
+    },
   });
 }

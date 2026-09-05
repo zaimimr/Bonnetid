@@ -18,7 +18,6 @@ const FIELDS = [
   'ingredients_text_sv',
   'ingredients_text_en',
   'ingredients_tags',
-  'labels_tags',
 ].join(',');
 
 export const OFF_ADD_PRODUCT_URL = 'https://world.openfoodfacts.org/cgi/product.pl?type=add&code=';
@@ -33,7 +32,6 @@ export type ScannedProduct = {
   ingredientsText: string;
   ingredientsLanguage: string | null;
   ingredientTags: string[];
-  labelTags: string[];
 };
 
 type ProductRow = {
@@ -50,13 +48,19 @@ type ProductRow = {
   ingredients_text_sv?: string;
   ingredients_text_en?: string;
   ingredients_tags?: string[];
-  labels_tags?: string[];
 };
 
 type ProductResponse = {
   status?: string;
   product?: ProductRow;
 };
+
+export class RateLimitedError extends Error {
+  constructor() {
+    super('Open Food Facts rate limit reached');
+    this.name = 'RateLimitedError';
+  }
+}
 
 export class ProductNotFoundError extends Error {
   constructor(public barcode: string) {
@@ -101,7 +105,6 @@ function toScannedProduct(barcode: string, row: ProductRow): ScannedProduct {
     ingredientsText: ingredients.text,
     ingredientsLanguage: ingredients.language,
     ingredientTags: row.ingredients_tags ?? [],
-    labelTags: row.labels_tags ?? [],
   };
 }
 
@@ -122,6 +125,7 @@ export async function fetchScannedProduct(barcode: string): Promise<ScannedProdu
     });
 
     if (response.status === 404) throw new ProductNotFoundError(barcode);
+    if (response.status === 429) throw new RateLimitedError();
     if (!response.ok) throw new Error(`Open Food Facts svarte ${response.status}`);
 
     const body = (await response.json()) as ProductResponse;
