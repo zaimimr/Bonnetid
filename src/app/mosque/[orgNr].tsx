@@ -273,6 +273,18 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
         </View>
       )}
 
+      {mosque.jummah.length === 0 && (
+        <View>
+          <SectionHeader title="Jumuah" />
+          <Card rounded="xl">
+            <AppText size="sm" tone="textSecondary">
+              Vi har ingen registrert fredagstid for denne moskeen. Det betyr ikke at de ikke
+              holder jummah, bare at tiden ikke er registrert hos oss.
+            </AppText>
+          </Card>
+        </View>
+      )}
+
       {mosque.jummah.length > 0 && (
         <View>
           <SectionHeader title="Jumuah" />

@@ -19,8 +19,14 @@ export function JummahHomeCard() {
 
   if (!finder.isFriday || finder.isLoading || finder.isError) return null;
 
-  const preview = finder.ranked.slice(0, PREVIEW_COUNT);
+  const worthShowing = finder.ranked.filter((item) => item.reach !== 'far');
+  const preview = worthShowing.slice(0, PREVIEW_COUNT);
   const open = () => router.push('/jummah');
+
+  const emptyMessage =
+    finder.ranked.length === 0
+      ? 'Vi har ingen registrerte fredagstider i nærheten. Det betyr ikke at moskeene mangler jummah, bare at tiden ikke er registrert hos oss.'
+      : 'Alle moskeene med registrert fredagstid ligger for langt unna deg akkurat nå.';
 
   return (
     <Card rounded="xl" elevated>
@@ -39,8 +45,7 @@ export function JummahHomeCard() {
 
       {preview.length === 0 ? (
         <AppText size="sm" tone="textSecondary">
-          Vi har ingen registrerte fredagstider i nærheten. Det betyr ikke at moskeene mangler
-          jummah, bare at tiden ikke er registrert hos oss.
+          {emptyMessage}
         </AppText>
       ) : (
         <View>
@@ -72,7 +77,7 @@ export function JummahHomeCard() {
           pressed && { opacity: opacity.pressed },
         ]}>
         <AppText size="sm" weight="semibold" tone="primary">
-          {finder.ranked.length > PREVIEW_COUNT
+          {worthShowing.length > PREVIEW_COUNT
             ? `Se alle ${finder.ranked.length} fredagstider`
             : 'Se alle fredagstider'}
         </AppText>
