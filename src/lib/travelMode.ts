@@ -1,7 +1,7 @@
 import type { ApiLocation } from '@/api/types';
 import { distanceKm } from './geo';
 
-export const NORWAY_COVERAGE_RADIUS_KM = 150;
+export const NORWAY_COVERAGE_RADIUS_KM = 100;
 
 const NORWAY_BOUNDS = { minLat: 57.5, maxLat: 71.5, minLon: 4, maxLon: 31.5 };
 const PROMPT_KEY_PRECISION = 1;
@@ -60,8 +60,7 @@ export function evaluateTravel(input: TravelInput): TravelSignal {
   const covered =
     isInsideNorwayBounds(lat, lon) && isCoveredByLocationData(input.locations, lat, lon);
 
-  if (!covered) return 'abroad';
-  return offsetsDiffer ? 'abroad' : 'home';
+  return covered ? 'home' : 'abroad';
 }
 
 export function travelPromptKey(coords: Coords | null, deviceOffsetMinutes: number): string {
