@@ -8,6 +8,7 @@ import androidx.car.app.model.Pane
 import androidx.car.app.model.PaneTemplate
 import androidx.car.app.model.Row
 import androidx.car.app.model.Template
+import no.irn.bonnetid.widget.PrayerEntry
 import no.irn.bonnetid.widget.PrayerFormat
 import no.irn.bonnetid.widget.PrayerMoment
 import no.irn.bonnetid.widget.PrayerSnapshot
@@ -46,18 +47,19 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
         .setHeaderAction(Action.APP_ICON)
         .build()
 
-    val headline = moment.headline
+    val running = snapshot.currentPrayer(now)
+    val headline = running ?: moment.next
     val pane = Pane.Builder()
       .addRow(
         Row.Builder()
           .setTitle("${headline.displayLabel} ${PrayerFormat.time(headline.printedAt(false))}")
-          .addText(secondary(moment, now))
+          .addText(secondary(moment, running, now))
           .build(),
       )
       .addRow(
         Row.Builder()
           .setTitle(moment.locationName)
-          .addText(jamatText(snapshot, moment) ?: moment.hijriText)
+          .addText(jamatText(snapshot, headline) ?: moment.hijriText)
           .build(),
       )
       .addAction(
@@ -99,16 +101,16 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
     }.start()
   }
 
-  private fun secondary(moment: PrayerMoment, now: Long): String {
+  private fun secondary(moment: PrayerMoment, running: PrayerEntry?, now: Long): String {
     val countdown = PrayerFormat.countdown(moment.next.at, now)
-    if (!moment.isNow) return "Starter $countdown"
+    if (running == null) return "Starter $countdown"
     return "${moment.next.displayLabel} $countdown"
   }
 
-  private fun jamatText(snapshot: PrayerSnapshot, moment: PrayerMoment): String? {
+  private fun jamatText(snapshot: PrayerSnapshot, headline: PrayerEntry): String? {
     if (!snapshot.hasJamatTimes) return null
-    val jamat = moment.headline.jamat ?: return null
-    val label = if (moment.headline.isJummah) "Jumuah" else "Jamaat"
+    val jamat = headline.jamat ?: return null
+    val label = if (headline.isJummah) "Jumuah" else "Jamaat"
     val mosque = snapshot.mosqueName ?: return "$label ${PrayerFormat.time(jamat)}"
     return "$label ${PrayerFormat.time(jamat)} · $mosque"
   }
