@@ -6,6 +6,7 @@ import { ReachPill } from '@/components/mosque/JummahMosqueCard';
 import { useFontScale } from '@/hooks/useFontScale';
 import { useJummahFinder } from '@/hooks/useJummahFinder';
 import { formatDistance } from '@/lib/geo';
+import { JUMMAH_ALL_TOO_FAR, JUMMAH_MISSING_NEARBY } from '@/lib/jummahCopy';
 import type { RankedJummah } from '@/lib/jummahFinder';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, spacing } from '@/theme/tokens';
@@ -25,8 +26,8 @@ export function JummahHomeCard() {
 
   const emptyMessage =
     finder.ranked.length === 0
-      ? 'Vi har ingen registrerte fredagstider i nærheten. Det betyr ikke at moskeene mangler jummah, bare at tiden ikke er registrert hos oss.'
-      : 'Alle moskeene med registrert fredagstid ligger for langt unna deg akkurat nå.';
+      ? JUMMAH_MISSING_NEARBY
+      : JUMMAH_ALL_TOO_FAR;
 
   return (
     <Card rounded="xl" elevated>

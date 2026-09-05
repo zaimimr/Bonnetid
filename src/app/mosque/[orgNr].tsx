@@ -19,6 +19,7 @@ import {
   jamatTimesForDate,
   PRAYER_LABELS,
 } from '@/lib/prayerSchedule';
+import { JUMMAH_MISSING_FOR_MOSQUE } from '@/lib/jummahCopy';
 import { osloDateKey, osloDayKey, osloDayStart, osloTimeToLocalClock } from '@/lib/time';
 import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from '@/components/prayer/TimeCell';
 
@@ -278,8 +279,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
           <SectionHeader title="Jumuah" />
           <Card rounded="xl">
             <AppText size="sm" tone="textSecondary">
-              Vi har ingen registrert fredagstid for denne moskeen. Det betyr ikke at de ikke
-              holder jummah, bare at tiden ikke er registrert hos oss.
+              {JUMMAH_MISSING_FOR_MOSQUE}
             </AppText>
           </Card>
         </View>

@@ -11,6 +11,11 @@ export type ThemeColors = {
   onPrimarySoft: string;
   accent: string;
   onAccent: string;
+  filterSurface: string;
+  filterBorder: string;
+  filterActiveSurface: string;
+  filterActiveBorder: string;
+  filterActiveText: string;
   textPrimary: string;
   textSecondary: string;
   textMuted: string;
@@ -45,6 +50,11 @@ export const lightTheme: Theme = {
     onPrimarySoft: palette.emerald700,
     accent: palette.gold600,
     onAccent: palette.neutral0,
+    filterSurface: palette.neutral0,
+    filterBorder: palette.neutral300,
+    filterActiveSurface: palette.gold50,
+    filterActiveBorder: palette.gold600,
+    filterActiveText: palette.gold700,
     textPrimary: palette.neutral900,
     textSecondary: palette.neutral700,
     textMuted: palette.neutral500,
@@ -75,6 +85,11 @@ export const darkTheme: Theme = {
     onPrimarySoft: palette.emerald200,
     accent: palette.gold400,
     onAccent: palette.night950,
+    filterSurface: palette.night800,
+    filterBorder: palette.night600,
+    filterActiveSurface: palette.night700,
+    filterActiveBorder: palette.gold400,
+    filterActiveText: palette.gold400,
     textPrimary: palette.mist100,
     textSecondary: palette.mist300,
     textMuted: palette.mist500,

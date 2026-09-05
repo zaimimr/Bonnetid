@@ -5,22 +5,35 @@ import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import type { Mosque } from '@/api/types';
 import { formatDistance } from '@/lib/geo';
+import { JUMMAH_MISSING_SHORT } from '@/lib/jummahCopy';
 
 export type MosqueCardProps = {
   mosque: Mosque;
   distanceKm?: number;
   showEid?: boolean;
+  showMissingJummah?: boolean;
+  place?: string;
   selected?: boolean;
   onPress: () => void;
 };
 
-export function MosqueCard({ mosque, distanceKm, showEid, selected, onPress }: MosqueCardProps) {
+export function MosqueCard({
+  mosque,
+  distanceKm,
+  showEid,
+  showMissingJummah = false,
+  place,
+  selected,
+  onPress,
+}: MosqueCardProps) {
   const theme = useTheme();
   const jummahLabel = mosque.jummah
     .slice(0, 2)
     .map((entry) => entry.jummah)
     .join(' · ');
   const eidTimes = showEid && mosque.show_eid ? mosque.eid_prayers : [];
+  const missingJummah = showMissingJummah && !jummahLabel;
+  const subtitle = [mosque.address, place].filter(Boolean).join(' · ');
 
   return (
     <Card onPress={onPress} rounded="xl">
@@ -29,9 +42,9 @@ export function MosqueCard({ mosque, distanceKm, showEid, selected, onPress }: M
           <AppText weight="semibold" numberOfLines={2}>
             {mosque.name}
           </AppText>
-          {mosque.address ? (
-            <AppText size="sm" tone="textMuted" numberOfLines={1}>
-              {mosque.address}
+          {subtitle ? (
+            <AppText size="sm" tone="textMuted" numberOfLines={2}>
+              {subtitle}
             </AppText>
           ) : null}
           <View
@@ -47,6 +60,11 @@ export function MosqueCard({ mosque, distanceKm, showEid, selected, onPress }: M
             {eidTimes.length > 0 && <Badge label={`Eid ${eidTimes.join(' · ')}`} variant="primary" />}
             {jummahLabel ? <Badge label={`Jumuah ${jummahLabel}`} variant="primary" /> : null}
           </View>
+          {missingJummah ? (
+            <AppText size="xs" tone="textMuted" style={{ marginTop: spacing.xxs }}>
+              {JUMMAH_MISSING_SHORT}
+            </AppText>
+          ) : null}
         </View>
 
         <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />

@@ -7,12 +7,18 @@ import type { Mosque } from '@/api/types';
 import { MosqueCard } from '@/components/mosque/MosqueCard';
 import { MosqueMap, type MosqueMapPin } from '@/components/mosque/MosqueMap';
 import { AppText, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
+import { useFontScale } from '@/hooks/useFontScale';
 import { useIsEidPeriod } from '@/hooks/useIsEidPeriod';
+import { usePlaces } from '@/hooks/usePlaces';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useUserCoords } from '@/hooks/useUserCoords';
 import { distanceKm } from '@/lib/geo';
+import { jummahMissingForPlace } from '@/lib/jummahCopy';
+import { placeCountLabel, placeSearchText, type Place } from '@/lib/places';
+import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { fontSize, opacity, radius, spacing } from '@/theme/tokens';
+import { usePlaceFilter } from '@/store/placeFilter';
 import { useSettings } from '@/store/settings';
 
 type ViewMode = 'list' | 'map';
@@ -27,7 +33,10 @@ export default function MosquesScreen() {
   const router = useRouter();
   const theme = useTheme();
   const coords = useUserCoords();
+  const { isStacked } = useFontScale();
   const { data: mosques, isLoading, isError, refetch } = useMosques();
+  const { places, byIso, selected: place } = usePlaces();
+  const setPlaceIso = usePlaceFilter((state) => state.setPlaceIso);
   const [mode, setMode] = useState<ViewMode>('list');
   const [sort, setSort] = useState<SortMode>('distance');
   const [query, setQuery] = useState('');
@@ -35,11 +44,17 @@ export default function MosquesScreen() {
   const isEidPeriod = useIsEidPeriod();
   const selected = useSettings((state) => state.mosque);
   const selectedOrgNr = selected?.orgNr;
+  const placeIso = place?.iso ?? null;
+
+  const inPlace = useMemo(() => {
+    if (!mosques) return [];
+    if (!placeIso) return mosques;
+    return mosques.filter((mosque) => mosque.location_iso === placeIso);
+  }, [mosques, placeIso]);
 
   const visible: MosqueWithDistance[] = useMemo(() => {
-    if (!mosques) return [];
     const normalized = query.trim().toLowerCase();
-    const withDistance = mosques
+    const withDistance = inPlace
       .map((mosque) => ({
         mosque,
         distance:
@@ -47,12 +62,13 @@ export default function MosquesScreen() {
             ? distanceKm(coords.lat, coords.lon, Number(mosque.lat), Number(mosque.lon))
             : null,
       }))
-      .filter(
-        ({ mosque }) =>
-          !normalized ||
-          mosque.name.toLowerCase().includes(normalized) ||
-          (mosque.post?.city.toLowerCase().includes(normalized) ?? false),
-      );
+      .filter(({ mosque }) => {
+        if (!normalized) return true;
+        if (mosque.name.toLowerCase().includes(normalized)) return true;
+        if (mosque.post?.city.toLowerCase().includes(normalized)) return true;
+        const home = mosque.location_iso ? byIso.get(mosque.location_iso) : undefined;
+        return home ? placeSearchText(home).includes(normalized) : false;
+      });
 
     const sorted =
       sort === 'name'
@@ -62,10 +78,22 @@ export default function MosquesScreen() {
     const mine = sorted.findIndex((item) => item.mosque.org_nr === selectedOrgNr);
     if (mine <= 0) return sorted;
     return [sorted[mine], ...sorted.slice(0, mine), ...sorted.slice(mine + 1)];
-  }, [mosques, query, sort, coords.lat, coords.lon, selectedOrgNr]);
+  }, [inPlace, byIso, query, sort, coords.lat, coords.lon, selectedOrgNr]);
+
+  const withJummah = useMemo(
+    () => inPlace.filter((mosque) => mosque.jummah.length > 0).length,
+    [inPlace],
+  );
 
   const openMosque = (orgNr: string) =>
     router.push({ pathname: '/mosque/[orgNr]', params: { orgNr } });
+
+  const openPlacePicker = () => router.push('/place-picker');
+
+  const clearPlace = () => {
+    setPlaceIso(null);
+    track('mosque_place_cleared');
+  };
 
   const pins: MosqueMapPin[] = useMemo(
     () =>
@@ -80,6 +108,16 @@ export default function MosquesScreen() {
         })),
     [visible],
   );
+
+  const mapCenter = place ? { lat: place.lat, lon: place.lon } : { lat: coords.lat, lon: coords.lon };
+
+  const emptyMessage = place
+    ? query.trim()
+      ? `Ingen moskeer i ${place.name} matcher «${query.trim()}»`
+      : `Vi har ingen registrerte moskeer i ${place.name}`
+    : query.trim()
+      ? `Ingen moskeer matcher «${query.trim()}»`
+      : 'Ingen moskeer funnet i nærheten';
 
   return (
     <Screen padded={false} edges={[]} maxWidth={mode === 'map' ? null : undefined}>
@@ -99,7 +137,7 @@ export default function MosquesScreen() {
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Søk etter moské eller by"
+              placeholder="Søk etter moské, sted eller kommune"
               placeholderTextColor={theme.colors.textMuted}
               autoCorrect={false}
               maxFontSizeMultiplier={1.6}
@@ -121,25 +159,50 @@ export default function MosquesScreen() {
 
         <View
           style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
+            flexDirection: isStacked ? 'column' : 'row',
+            alignItems: isStacked ? 'stretch' : 'center',
+            flexWrap: isStacked ? 'nowrap' : 'wrap',
             columnGap: spacing.sm,
             rowGap: spacing.sm,
             paddingBottom: spacing.md,
           }}>
-          <SortChip
-            label="Nærmest meg"
-            icon="navigate-outline"
-            active={sort === 'distance'}
-            onPress={() => setSort('distance')}
+          <PlaceFilterButton
+            place={place}
+            disabled={places.length === 0}
+            onPress={openPlacePicker}
+            onClear={clearPlace}
           />
-          <SortChip
-            label="Navn A–Å"
-            icon="text-outline"
-            active={sort === 'name'}
-            onPress={() => setSort('name')}
-          />
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              columnGap: spacing.sm,
+              rowGap: spacing.sm,
+            }}>
+            <SortChip
+              label="Nærmest meg"
+              icon="navigate-outline"
+              active={sort === 'distance'}
+              onPress={() => setSort('distance')}
+            />
+            <SortChip
+              label="Navn A–Å"
+              icon="text-outline"
+              active={sort === 'name'}
+              onPress={() => setSort('name')}
+            />
+          </View>
         </View>
+
+        {place && !isLoading && !isError && (
+          <AppText size="sm" tone="textSecondary" style={{ paddingBottom: spacing.md }}>
+            {`${placeCountLabel(place.mosqueCount)} i ${place.name}. ${
+              withJummah > 0
+                ? `${withJummah} har registrert fredagstid.`
+                : 'Ingen av dem har registrert fredagstid hos oss.'
+            }`}
+          </AppText>
+        )}
       </View>
 
       {isLoading && (
@@ -175,23 +238,92 @@ export default function MosquesScreen() {
               mosque={item.mosque}
               distanceKm={item.distance ?? undefined}
               showEid={isEidPeriod}
+              showMissingJummah={place != null}
+              place={place ? undefined : (item.mosque.post?.city ?? undefined)}
               selected={item.mosque.org_nr === selectedOrgNr}
               onPress={() => openMosque(item.mosque.org_nr)}
             />
           )}
-          ListEmptyComponent={
-            <EmptyState
-              message={query ? `Ingen moskeer matcher «${query}»` : 'Ingen moskeer funnet i nærheten'}
-            />
+          ListFooterComponent={
+            place && withJummah === 0 && visible.length > 0 ? (
+              <AppText size="xs" tone="textMuted" style={{ marginTop: spacing.lg }}>
+                {jummahMissingForPlace(place.name)}
+              </AppText>
+            ) : null
           }
+          ListEmptyComponent={<EmptyState message={emptyMessage} />}
         />
       )}
 
       {!isLoading && !isError && mode === 'map' && (
-        <MosqueMap pins={pins} center={{ lat: coords.lat, lon: coords.lon }} onSelect={openMosque} />
+        <MosqueMap
+          key={placeIso ?? 'all'}
+          pins={pins}
+          center={mapCenter}
+          onSelect={openMosque}
+        />
       )}
-
     </Screen>
+  );
+}
+
+function PlaceFilterButton({
+  place,
+  disabled,
+  onPress,
+  onClear,
+}: {
+  place: Place | null;
+  disabled: boolean;
+  onPress: () => void;
+  onClear: () => void;
+}) {
+  const theme = useTheme();
+  const active = place != null;
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={active ? `Filtrer på sted, ${place.name}` : 'Filtrer på sted'}
+      style={({ pressed }) => [
+        {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: spacing.xs,
+          paddingVertical: spacing.sm,
+          paddingHorizontal: spacing.md,
+          borderRadius: radius.md,
+          backgroundColor: active ? theme.colors.filterActiveSurface : theme.colors.filterSurface,
+          borderWidth: 1,
+          borderColor: active ? theme.colors.filterActiveBorder : theme.colors.filterBorder,
+          minHeight: 40,
+          opacity: disabled ? opacity.disabled : 1,
+        },
+        pressed && { opacity: opacity.pressed },
+      ]}>
+      <Ionicons
+        name="funnel-outline"
+        size={15}
+        color={active ? theme.colors.filterActiveText : theme.colors.textMuted}
+      />
+      <AppText
+        size="sm"
+        weight={active ? 'semibold' : 'regular'}
+        color={active ? theme.colors.filterActiveText : theme.colors.textSecondary}
+        numberOfLines={1}
+        style={{ flexShrink: 1 }}>
+        {active ? place.name : 'Alle steder'}
+      </AppText>
+      {active ? (
+        <Pressable onPress={onClear} hitSlop={8} accessibilityLabel="Fjern stedsfilter">
+          <Ionicons name="close-circle" size={16} color={theme.colors.filterActiveText} />
+        </Pressable>
+      ) : (
+        <Ionicons name="chevron-down" size={14} color={theme.colors.textMuted} />
+      )}
+    </Pressable>
   );
 }
 
