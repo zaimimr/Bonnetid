@@ -22,6 +22,8 @@ export type ThemeColors = {
   textInverse: string;
   border: string;
   borderStrong: string;
+  track: string;
+  trackMarker: string;
   danger: string;
   info: string;
   success: string;
@@ -64,6 +66,8 @@ export const lightTheme: Theme = {
     textInverse: palette.neutral0,
     border: palette.neutral200,
     borderStrong: palette.neutral300,
+    track: palette.neutral100,
+    trackMarker: palette.neutral300,
     danger: palette.red600,
     info: palette.blue600,
     success: palette.emerald500,
@@ -102,6 +106,8 @@ export const darkTheme: Theme = {
     textInverse: palette.neutral900,
     border: palette.night700,
     borderStrong: palette.night600,
+    track: palette.night700,
+    trackMarker: palette.night600,
     danger: palette.red400,
     info: palette.blue600,
     success: palette.emerald400,
