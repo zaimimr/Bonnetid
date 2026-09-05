@@ -102,7 +102,7 @@ export const useSettings = create<SettingsState>()(
       liveActivityEnabled: true,
       widgetShowJamat: false,
       ramadanRemindersEnabled: true,
-      dhulHijjahRemindersEnabled: false,
+      dhulHijjahRemindersEnabled: true,
       voluntaryFasts: NO_VOLUNTARY_FASTS,
       launchCount: 0,
       reviewRequested: false,
