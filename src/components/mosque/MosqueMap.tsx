@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Platform } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
-import { WebView } from 'react-native-webview';
+import { LeafletMap, type LeafletMapHandle } from '@/components/map/LeafletMap';
+import { MapView, Marker, NATIVE_MAPS_AVAILABLE } from '@/components/map/nativeMaps';
+import { buildLeafletHtml } from '@/lib/leafletHtml';
 import { useTheme } from '@/theme';
 
 export type MosqueMapPin = {
@@ -19,7 +19,7 @@ export type MosqueMapProps = {
 };
 
 export function MosqueMap({ pins, center, onSelect }: MosqueMapProps) {
-  if (Platform.OS === 'android') {
+  if (!NATIVE_MAPS_AVAILABLE) {
     return <OsmMosqueMap pins={pins} center={center} onSelect={onSelect} />;
   }
   return <NativeMosqueMap pins={pins} center={center} onSelect={onSelect} />;
@@ -54,42 +54,37 @@ function NativeMosqueMap({ pins, center, onSelect }: MosqueMapProps) {
 
 function OsmMosqueMap({ pins, center, onSelect }: MosqueMapProps) {
   const theme = useTheme();
-  const webViewRef = useRef<WebView>(null);
+  const mapRef = useRef<LeafletMapHandle>(null);
 
   const html = useMemo(
-    () => `<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<style>
-  html, body, #map { height: 100%; margin: 0; }
-  .leaflet-div-icon { background: transparent; border: 0; }
+    () =>
+      buildLeafletHtml({
+        background: theme.colors.surfaceSunken,
+        styles: `
   .pin {
     width: 18px; height: 18px; border-radius: 50%;
-    background: ${theme.colors.primary}; border: 3px solid #ffffff;
+    background: ${theme.colors.primary}; border: 3px solid ${theme.colors.mapPinRing};
     box-shadow: 0 1px 4px rgba(0,0,0,0.4);
   }
-  .popup-name { font: 600 15px -apple-system, system-ui, sans-serif; margin-bottom: 2px; }
-  .popup-address { font: 400 13px -apple-system, system-ui, sans-serif; color: #5F6E67; }
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+    background: ${theme.colors.surface}; color: ${theme.colors.textPrimary};
+  }
+  .popup-name { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+  .popup-address { font-size: 13px; color: ${theme.colors.textSecondary}; }
   .popup-open {
     display: inline-block; margin-top: 8px; padding: 6px 12px; border-radius: 999px;
-    background: ${theme.colors.primary}; color: #ffffff; border: 0;
-    font: 600 13px -apple-system, system-ui, sans-serif;
-  }
-</style>
-</head>
-<body>
-<div id="map"></div>
-<script>
-  var map = L.map('map', { zoomControl: false }).setView([${center.lat}, ${center.lon}], 11);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap'
-  }).addTo(map);
-
+    background: ${theme.colors.primary}; color: ${theme.colors.onPrimary}; border: 0;
+    font-weight: 600; font-size: 13px;
+  }`,
+        script: `
+  var map = createMap(${center.lat}, ${center.lon}, 11);
   var pinLayer = L.layerGroup().addTo(map);
+  var pinIcon = L.divIcon({
+    className: '',
+    html: '<div class="pin"></div>',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+  });
 
   function popupContent(pin) {
     var wrap = document.createElement('div');
@@ -116,28 +111,29 @@ function OsmMosqueMap({ pins, center, onSelect }: MosqueMapProps) {
   window.setPins = function (pins) {
     pinLayer.clearLayers();
     pins.forEach(function (pin) {
-      L.marker([pin.lat, pin.lon], {
-        icon: L.divIcon({
-          className: '',
-          html: '<div class="pin"></div>',
-          iconSize: [24, 24],
-          iconAnchor: [12, 12]
+      L.marker([pin.lat, pin.lon], { icon: pinIcon })
+        .bindPopup(function () {
+          return popupContent(pin);
         })
-      })
-        .bindPopup(popupContent(pin))
         .addTo(pinLayer);
     });
-  };
-</script>
-</body>
-</html>`,
-    [center.lat, center.lon, theme.colors.primary],
+  };`,
+      }),
+    [
+      center.lat,
+      center.lon,
+      theme.colors.mapPinRing,
+      theme.colors.onPrimary,
+      theme.colors.primary,
+      theme.colors.surface,
+      theme.colors.surfaceSunken,
+      theme.colors.textPrimary,
+      theme.colors.textSecondary,
+    ],
   );
 
   const pushPins = useCallback(() => {
-    webViewRef.current?.injectJavaScript(
-      `window.setPins && window.setPins(${JSON.stringify(pins)}); true;`,
-    );
+    mapRef.current?.run(`window.setPins && window.setPins(${JSON.stringify(pins)});`);
   }, [pins]);
 
   useEffect(() => {
@@ -145,18 +141,12 @@ function OsmMosqueMap({ pins, center, onSelect }: MosqueMapProps) {
   }, [pushPins]);
 
   return (
-    <WebView
-      ref={webViewRef}
-      style={{ flex: 1 }}
-      source={{ html }}
-      originWhitelist={['*']}
-      setSupportMultipleWindows={false}
-      overScrollMode="never"
-      onLoadEnd={pushPins}
-      onMessage={(event) => {
-        const orgNr = event.nativeEvent.data;
-        if (orgNr) onSelect(orgNr);
-      }}
+    <LeafletMap
+      ref={mapRef}
+      html={html}
+      onReady={pushPins}
+      onMessage={onSelect}
+      fallbackMessage="Kartet ble avsluttet av systemet. Bruk listevisningen hvis det skjer igjen."
     />
   );
 }

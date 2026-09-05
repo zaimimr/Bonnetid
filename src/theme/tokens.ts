@@ -37,6 +37,7 @@ export const palette = {
   red600: '#B23B31',
   red400: '#D96A61',
   blue600: '#2A6497',
+  mapBlue: '#1A73E8',
 } as const;
 
 export const spacing = {
