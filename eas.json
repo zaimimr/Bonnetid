@@ -12,7 +12,17 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "android": {
+        "gradleCommand": ":app:bundleMobileRelease"
+      }
+    },
+    "production-automotive": {
+      "extends": "production",
+      "autoIncrement": true,
+      "android": {
+        "gradleCommand": ":app:bundleAutomotiveRelease"
+      }
     }
   },
   "submit": {
@@ -22,6 +32,12 @@
       },
       "android": {
         "track": "production",
+        "releaseStatus": "completed"
+      }
+    },
+    "production-automotive": {
+      "android": {
+        "track": "automotive:production",
         "releaseStatus": "completed"
       }
     }

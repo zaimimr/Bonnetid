@@ -2,7 +2,7 @@
   "expo": {
     "name": "Bønnetid",
     "slug": "bonnetid",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "bonnetid",
@@ -89,7 +89,8 @@
           "organization": "zaim-imran",
           "project": "bonnetid"
         }
-      ]
+      ],
+      "./plugins/withCarFormFactors"
     ],
     "experiments": {
       "typedRoutes": true,

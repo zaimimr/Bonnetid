@@ -16,6 +16,11 @@ android {
     buildConfig true
   }
 
+  defaultConfig {
+    buildConfigField "String", "SUPABASE_URL", "\"${System.getenv('EXPO_PUBLIC_SUPABASE_URL') ?: ''}\""
+    buildConfigField "String", "SUPABASE_KEY", "\"${System.getenv('EXPO_PUBLIC_SUPABASE_KEY') ?: ''}\""
+  }
+
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_17
     targetCompatibility JavaVersion.VERSION_17
@@ -34,5 +39,4 @@ dependencies {
   implementation project(':expo-modules-core')
   implementation "org.jetbrains.kotlin:kotlin-stdlib:${safeExtGet('kotlinVersion', '2.0.21')}"
   implementation "androidx.car.app:app:${safeExtGet('carAppVersion', '1.4.0')}"
-  implementation "androidx.car.app:app-projected:${safeExtGet('carAppVersion', '1.4.0')}"
 }
