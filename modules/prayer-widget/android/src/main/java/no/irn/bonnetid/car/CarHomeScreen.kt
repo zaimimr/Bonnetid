@@ -17,6 +17,9 @@ import no.irn.bonnetid.widget.PrayerSnapshot
  * places a driver can go from here.
  */
 class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
+  private var fetching = false
+  private var fetchFailed = false
+
   init {
     lifecycle.addObserver(CarMinuteTicker { invalidate() })
   }
@@ -24,8 +27,20 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
   override fun onGetTemplate(): Template {
     val snapshot = PrayerSnapshot.load(carContext)
     val now = System.currentTimeMillis()
+
+    // Automotive OS has no phone app behind it, so the car fills its own snapshot.
+    if (CarDataSource.needsRefresh(snapshot, now) && CarDataSource.configured()) {
+      startRefresh()
+      if (fetching) {
+        return MessageTemplate.Builder(LOADING)
+          .setTitle(TITLE)
+          .setHeaderAction(Action.APP_ICON)
+          .build()
+      }
+    }
+
     val moment = snapshot?.let { PrayerMoment.resolve(it, now) }
-      ?: return MessageTemplate.Builder(NO_DATA)
+      ?: return MessageTemplate.Builder(if (fetchFailed) OFFLINE else NO_DATA)
         .setTitle(TITLE)
         .setHeaderAction(Action.APP_ICON)
         .build()
@@ -63,6 +78,22 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
       .build()
   }
 
+  private fun startRefresh() {
+    if (fetching) return
+    fetching = true
+    fetchFailed = false
+    val appContext = carContext.applicationContext
+    val origin = CarPlaces.origin(carContext, PrayerSnapshot.load(carContext))
+    Thread {
+      val ok = CarDataSource.refresh(appContext, origin)
+      carContext.mainExecutor.execute {
+        fetching = false
+        fetchFailed = !ok
+        invalidate()
+      }
+    }.start()
+  }
+
   private fun secondary(moment: PrayerMoment, now: Long): String {
     val countdown = PrayerFormat.countdown(moment.next.at, now)
     if (!moment.isNow) return "Starter $countdown"
@@ -80,5 +111,7 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
   private companion object {
     const val TITLE = "Bønnetid"
     const val NO_DATA = "Åpne Bønnetid på telefonen én gang, så henter bilen bønnetidene herfra."
+    const val LOADING = "Henter bønnetider …"
+    const val OFFLINE = "Fant ingen bønnetider. Sjekk at bilen har nett og posisjon."
   }
 }
