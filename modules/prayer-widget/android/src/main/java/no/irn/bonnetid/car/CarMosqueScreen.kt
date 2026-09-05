@@ -3,11 +3,15 @@ package no.irn.bonnetid.car
 import android.Manifest
 import android.content.Intent
 import android.net.Uri
+import android.text.SpannableString
+import android.text.Spanned
 import androidx.car.app.CarContext
 import androidx.car.app.CarToast
 import androidx.car.app.Screen
 import androidx.car.app.model.Action
 import androidx.car.app.model.CarLocation
+import androidx.car.app.model.Distance
+import androidx.car.app.model.DistanceSpan
 import androidx.car.app.model.ItemList
 import androidx.car.app.model.MessageTemplate
 import androidx.car.app.model.Metadata
@@ -35,6 +39,10 @@ class CarMosqueScreen(carContext: CarContext) : Screen(carContext) {
     requestLocationOnce()
 
     val origin = CarPlaces.origin(carContext, snapshot)
+      ?: return MessageTemplate.Builder(NO_ORIGIN)
+        .setTitle(TITLE)
+        .setHeaderAction(Action.BACK)
+        .build()
     val nearby = CarPlaces.nearest(mosques, origin)
     val list = ItemList.Builder()
     nearby.forEachIndexed { index, entry ->
@@ -42,13 +50,10 @@ class CarMosqueScreen(carContext: CarContext) : Screen(carContext) {
       val place = Place.Builder(CarLocation.create(mosque.lat, mosque.lon))
         .setMarker(PlaceMarker.Builder().setLabel("${index + 1}").build())
         .build()
-      val detail = listOfNotNull(CarPlaces.formatDistance(entry.distanceKm), mosque.address)
-        .joinToString(" · ")
-
       list.addItem(
         Row.Builder()
           .setTitle(mosque.name)
-          .addText(detail.ifEmpty { " " })
+          .addText(detail(entry.distanceKm, mosque.address))
           .setMetadata(Metadata.Builder().setPlace(place).build())
           .setBrowsable(false)
           .setOnClickListener { navigateTo(mosque.name, mosque.lat, mosque.lon) }
@@ -68,6 +73,23 @@ class CarMosqueScreen(carContext: CarContext) : Screen(carContext) {
       .setHeaderAction(Action.BACK)
       .setCurrentLocationEnabled(CarPlaces.hasLocationPermission(carContext))
       .build()
+  }
+
+  /**
+   * PlaceListMapTemplate rejects a non-browsable row unless a DistanceSpan sits on its title or
+   * one of its texts, so the distance is a span over a placeholder the host replaces, never text
+   * we format ourselves.
+   */
+  private fun detail(km: Double, address: String?): CharSequence {
+    val distance = if (km < 1) {
+      Distance.create(Math.round(km * 1000).toDouble(), Distance.UNIT_METERS)
+    } else {
+      Distance.create(km, Distance.UNIT_KILOMETERS)
+    }
+    val suffix = address?.takeIf { it.isNotBlank() }?.let { " · $it" }.orEmpty()
+    val text = SpannableString(" $suffix")
+    text.setSpan(DistanceSpan.create(distance), 0, 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+    return text
   }
 
   private fun navigateTo(name: String, lat: Double, lon: Double) {
@@ -97,5 +119,6 @@ class CarMosqueScreen(carContext: CarContext) : Screen(carContext) {
 
   private companion object {
     const val TITLE = "Moskeer"
+    const val NO_ORIGIN = "Slå på posisjon i bilen for å se moskeene nærmest deg."
   }
 }

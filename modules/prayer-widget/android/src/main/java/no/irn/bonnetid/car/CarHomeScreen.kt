@@ -19,6 +19,7 @@ import no.irn.bonnetid.widget.PrayerSnapshot
 class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
   private var fetching = false
   private var fetchFailed = false
+  private var lastAttemptAt = 0L
 
   init {
     lifecycle.addObserver(CarMinuteTicker { invalidate() })
@@ -29,14 +30,14 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
     val now = System.currentTimeMillis()
 
     // Automotive OS has no phone app behind it, so the car fills its own snapshot.
-    if (CarDataSource.needsRefresh(snapshot, now) && CarDataSource.configured()) {
-      startRefresh()
-      if (fetching) {
-        return MessageTemplate.Builder(LOADING)
-          .setTitle(TITLE)
-          .setHeaderAction(Action.APP_ICON)
-          .build()
-      }
+    if (CarDataSource.needsRefresh(snapshot, now) && CarDataSource.configured() && mayRetry(now)) {
+      startRefresh(now)
+    }
+    if (fetching) {
+      return MessageTemplate.Builder(LOADING)
+        .setTitle(TITLE)
+        .setHeaderAction(Action.APP_ICON)
+        .build()
     }
 
     val moment = snapshot?.let { PrayerMoment.resolve(it, now) }
@@ -78,10 +79,14 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
       .build()
   }
 
-  private fun startRefresh() {
+  private fun mayRetry(now: Long): Boolean =
+    !fetchFailed || now - lastAttemptAt >= RETRY_AFTER_MS
+
+  private fun startRefresh(now: Long) {
     if (fetching) return
     fetching = true
     fetchFailed = false
+    lastAttemptAt = now
     val appContext = carContext.applicationContext
     val origin = CarPlaces.origin(carContext, PrayerSnapshot.load(carContext))
     Thread {
@@ -109,6 +114,7 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
   }
 
   private companion object {
+    const val RETRY_AFTER_MS = 5 * 60 * 1000L
     const val TITLE = "Bønnetid"
     const val NO_DATA = "Åpne Bønnetid på telefonen én gang, så henter bilen bønnetidene herfra."
     const val LOADING = "Henter bønnetider …"
