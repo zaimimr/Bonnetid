@@ -32,12 +32,17 @@ const AUTOMOTIVE_MANIFEST = `<manifest xmlns:android="http://schemas.android.com
 
   <uses-feature
       android:name="android.hardware.type.automotive"
-      android:required="true"
-      tools:replace="android:required" />
+      android:required="true" />
 
   <application>
     <activity
         android:name=".MainActivity"
+        tools:node="remove" />
+
+    <!-- Play rejects a bundle that declares the automotive feature and the Android Auto
+         template metadata at the same time, so the projected declaration goes here. -->
+    <meta-data
+        android:name="com.google.android.gms.car.application"
         tools:node="remove" />
 
     <activity
