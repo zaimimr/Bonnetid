@@ -5,6 +5,7 @@ import WidgetKit
 struct BonnetidWidgetBundle: WidgetBundle {
   var body: some Widget {
     PrayerWidget()
+    PrayerTimelineWidget()
     PrayerLiveActivity()
   }
 }
