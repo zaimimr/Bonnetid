@@ -107,3 +107,16 @@ export async function resolvePlaceName(coords: Coords): Promise<string> {
     return FALLBACK_PLACE_NAME;
   }
 }
+
+export async function requestCoords(): Promise<Coords | null> {
+  try {
+    const permission = await Location.requestForegroundPermissionsAsync();
+    if (!permission.granted) return null;
+    const position = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Balanced,
+    });
+    return { lat: position.coords.latitude, lon: position.coords.longitude };
+  } catch {
+    return null;
+  }
+}

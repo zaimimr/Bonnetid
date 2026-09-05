@@ -53,7 +53,11 @@ data class PrayerSnapshot(
   val days: List<PrayerDaySnapshot>,
   val origin: SnapshotCoords? = null,
   val mosques: List<SnapshotMosque> = emptyList(),
+  val mode: String? = null,
 ) {
+  val usesDeviceTimeZone: Boolean
+    get() = mode == "calculated"
+
   val allPrayers: List<PrayerEntry>
     get() = days.flatMap { it.prayers }.sortedBy { it.at }
 
@@ -167,7 +171,8 @@ data class PrayerSnapshot(
           days = days,
           origin = origin,
           mosques = mosques,
-        )
+          mode = optStringOrNull(root, "mode"),
+        ).also { dayKeyZone = if (it.usesDeviceTimeZone) TimeZone.getDefault() else osloZone }
       } catch (error: Exception) {
         null
       }
@@ -199,9 +204,13 @@ data class PrayerSnapshot(
       "yyyy-MM-dd'T'HH:mm:ss'Z'",
     )
 
+    private val osloZone: TimeZone = TimeZone.getTimeZone("Europe/Oslo")
+
+    private var dayKeyZone: TimeZone = osloZone
+
     fun dayKey(at: Long): String {
       val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-      formatter.timeZone = TimeZone.getTimeZone("Europe/Oslo")
+      formatter.timeZone = dayKeyZone
       return formatter.format(Date(at))
     }
   }

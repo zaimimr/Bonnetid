@@ -6,11 +6,11 @@ import { ASR_METHOD_OPTIONS, type AsrMethodOption } from '@/lib/asrMethods';
 import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { opacity, spacing } from '@/theme/tokens';
-import { useSettings } from '@/store/settings';
+import { useActiveMosque, useSettings } from '@/store/settings';
 
 export default function AsrMethodScreen() {
   const theme = useTheme();
-  const mosque = useSettings((state) => state.mosque);
+  const mosque = useActiveMosque();
   const asrMethod = useSettings((state) => state.asrMethod);
   const setAsrMethod = useSettings((state) => state.setAsrMethod);
   const asrOverride = useMosqueAsrOverride();

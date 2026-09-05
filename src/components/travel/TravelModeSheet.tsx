@@ -3,9 +3,8 @@ import { ActivityIndicator, Modal, Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/components/ui';
-import { resolvePlaceName, useTravelPrompt } from '@/hooks/useTravelDetection';
+import { requestCoords, resolvePlaceName, useTravelPrompt } from '@/hooks/useTravelDetection';
 import { track, trackError } from '@/lib/telemetry';
-import type { Coords } from '@/lib/travelMode';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import { calculatedLocation, useSettings } from '@/store/settings';
@@ -44,37 +43,39 @@ export function TravelModeSheet() {
   const { visible, state, dismiss } = useTravelPrompt();
   const setLocation = useSettings((settings) => settings.setLocation);
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
-  const applyLocalTimes = async (coords: Coords) => {
+  const applyLocalTimes = async () => {
     setBusy(true);
+    setFailed(false);
     try {
+      const coords = state.coords ?? (await requestCoords());
+      if (!coords) {
+        setFailed(true);
+        return;
+      }
       const name = await resolvePlaceName(coords);
       setLocation(calculatedLocation(name, coords.lat, coords.lon));
       track('travel_mode_chosen', { choice: 'calculated' });
+      dismiss();
     } catch (error) {
+      setFailed(true);
       trackError(error, 'travel-mode');
     } finally {
       setBusy(false);
-      dismiss();
     }
   };
 
   const choose = (choice: Choice) => {
     if (busy) return;
     if (choice.key === 'calculated') {
-      if (!state.coords) {
-        dismiss();
-        return;
-      }
-      applyLocalTimes(state.coords).catch(() => {});
+      applyLocalTimes().catch(() => {});
       return;
     }
     track('travel_mode_chosen', { choice: choice.key });
     dismiss();
     if (choice.key === 'city') router.push('/location-picker');
   };
-
-  const choices = state.coords ? CHOICES : CHOICES.filter((choice) => choice.key !== 'calculated');
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={dismiss}>
@@ -99,7 +100,7 @@ export function TravelModeSheet() {
           </View>
 
           <View style={{ gap: spacing.sm }}>
-            {choices.map((choice) => (
+            {CHOICES.map((choice) => (
               <Pressable
                 key={choice.key}
                 onPress={() => choose(choice)}
@@ -133,6 +134,12 @@ export function TravelModeSheet() {
               </Pressable>
             ))}
           </View>
+
+          {failed && (
+            <AppText size="sm" tone="danger" align="center">
+              Fant ikke posisjonen din. Gi appen tilgang til posisjon, eller velg en norsk by.
+            </AppText>
+          )}
 
           <AppText size="xs" tone="textMuted" align="center">
             Appen bytter aldri på egen hånd. Du kan endre valget i Innstillinger.

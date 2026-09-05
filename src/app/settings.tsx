@@ -19,7 +19,7 @@ import { asrMethodLabel } from '@/lib/asrMethods';
 import { calculationMethodLabel } from '@/lib/calculationMethods';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
 import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
-import { resolvePlaceName, useTravelState } from '@/hooks/useTravelDetection';
+import { requestCoords, resolvePlaceName, useTravelState } from '@/hooks/useTravelDetection';
 import { track, trackError } from '@/lib/telemetry';
 import {
   calculatedLocation,
@@ -74,11 +74,13 @@ export default function SettingsScreen() {
   const voluntaryFasts = useSettings((state) => state.voluntaryFasts);
 
   const switchToCalculated = async () => {
-    if (!travel.coords || switching) return;
+    if (switching) return;
     setSwitching(true);
     try {
-      const name = await resolvePlaceName(travel.coords);
-      setLocation(calculatedLocation(name, travel.coords.lat, travel.coords.lon));
+      const coords = travel.coords ?? (await requestCoords());
+      if (!coords) return;
+      const name = await resolvePlaceName(coords);
+      setLocation(calculatedLocation(name, coords.lat, coords.lon));
       track('travel_mode_chosen', { choice: 'calculated' });
     } catch (error) {
       trackError(error, 'travel-mode-settings');
@@ -208,11 +210,7 @@ export default function SettingsScreen() {
         <ListRow
           title="Lokale tider"
           subtitle={
-            switching
-              ? 'Finner posisjonen din…'
-              : travel.coords
-                ? 'Regnes ut der du er nå. Uten jamaat og moskeer'
-                : 'Krever tilgang til posisjon'
+            switching ? 'Finner posisjonen din…' : 'Regnes ut der du er nå. Uten jamaat og moskeer'
           }
           leading={<Ionicons name="navigate-outline" size={20} color={theme.colors.primary} />}
           trailing={
@@ -220,7 +218,7 @@ export default function SettingsScreen() {
               <Ionicons name="checkmark" size={22} color={theme.colors.primary} />
             ) : undefined
           }
-          onPress={calculated || !travel.coords ? undefined : () => void switchToCalculated()}
+          onPress={calculated ? undefined : () => void switchToCalculated()}
           style={ROW}
         />
       </Card>

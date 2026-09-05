@@ -36,7 +36,10 @@ struct PrayerSnapshot: Codable, Hashable {
   let generatedAt: Date
   let locationName: String
   let mosqueName: String?
+  let mode: String?
   let days: [PrayerDaySnapshot]
+
+  var usesDeviceTimeZone: Bool { mode == "calculated" }
 
   /// True when at least one prayer has a jamat time, i.e. a mosque is selected.
   var hasJamatTimes: Bool {
@@ -48,6 +51,7 @@ struct PrayerSnapshot: Codable, Hashable {
     generatedAt: Date(),
     locationName: "Oslo",
     mosqueName: nil,
+    mode: nil,
     days: []
   )
 
@@ -69,7 +73,9 @@ struct PrayerSnapshot: Codable, Hashable {
       }
       return date
     }
-    return try? decoder.decode(PrayerSnapshot.self, from: data)
+    guard let decoded = try? decoder.decode(PrayerSnapshot.self, from: data) else { return nil }
+    dayKeyZone = decoded.usesDeviceTimeZone ? TimeZone.current : osloTimeZone
+    return decoded
   }
 
   /// Accepts both `2026-09-02T01:44:00Z` and `2026-09-02T01:44:00.000Z`.
@@ -117,15 +123,20 @@ struct PrayerSnapshot: Codable, Hashable {
     return day?.prayers.filter(\.isPrayer) ?? []
   }
 
+  private static var dayKeyZone = osloTimeZone
+
+  private static let osloTimeZone = TimeZone(identifier: "Europe/Oslo") ?? TimeZone(identifier: "UTC")!
+
   static func dayKey(for date: Date) -> String {
-    dayKeyFormatter.string(from: date)
+    let formatter = dayKeyFormatter
+    formatter.timeZone = dayKeyZone
+    return formatter.string(from: date)
   }
 
   private static let dayKeyFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.calendar = Calendar(identifier: .gregorian)
     formatter.dateFormat = "yyyy-MM-dd"
-    formatter.timeZone = TimeZone(identifier: "Europe/Oslo")
     return formatter
   }()
 }
