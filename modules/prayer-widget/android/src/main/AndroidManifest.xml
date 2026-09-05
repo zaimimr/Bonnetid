@@ -3,7 +3,26 @@
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
   <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
 
+  <uses-feature android:name="android.hardware.type.automotive" android:required="false" />
+
   <application>
+    <meta-data
+      android:name="com.google.android.gms.car.application"
+      android:resource="@xml/automotive_app_desc" />
+
+    <meta-data
+      android:name="androidx.car.app.minCarApiLevel"
+      android:value="1" />
+
+    <service
+      android:name="no.irn.bonnetid.car.BonnetidCarAppService"
+      android:exported="true">
+      <intent-filter>
+        <action android:name="androidx.car.app.CarAppService" />
+        <category android:name="androidx.car.app.category.POI" />
+      </intent-filter>
+    </service>
+
     <receiver
       android:name="no.irn.bonnetid.widget.PrayerAppWidget"
       android:exported="false"

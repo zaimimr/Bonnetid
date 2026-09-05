@@ -6,12 +6,12 @@ import {
   setPrayerSnapshot,
   startOrUpdatePrayerActivity,
 } from '../../modules/prayer-widget';
-import { useHijriMonth, useMosque, usePrayerTimes } from '@/api/queries';
+import { useHijriMonth, useMosque, useMosques, usePrayerTimes } from '@/api/queries';
 import type { PrayerDay } from '@/api/types';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { formatHijri } from '@/lib/hijri';
 import { resolveActivityWindow } from '@/lib/liveActivityWindow';
-import { isJummahCell, type SnapshotDayInput } from '@/lib/widgetSnapshot';
+import { isJummahCell, type SnapshotDayInput, type SnapshotMosqueInput } from '@/lib/widgetSnapshot';
 import { adhanTimesFromSchedule, buildDaySchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
 import { isoDateKey, osloDayKey, parseDayKey, todayKey } from '@/lib/time';
 import { buildSnapshot, snapshotIsEmpty } from '@/lib/widgetSnapshot';
@@ -44,6 +44,7 @@ export function useWidgetSync(now: Date) {
   const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled);
   const lockScreenEnabled = liveActivityEnabled && trackerEnabled;
   const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
+  const mosqueList = useMosques();
 
   const dayKey = osloDayKey(now);
   const dayStart = useMemo(() => parseDayKey(dayKey), [dayKey]);
@@ -98,23 +99,38 @@ export function useWidgetSync(now: Date) {
     mosqueDetails.data?.jummah,
   ]);
 
+  // The car app ranks these against its own position, so every mosque with coordinates ships.
+  const mosques = useMemo<SnapshotMosqueInput[]>(() => {
+    return (mosqueList.data ?? [])
+      .filter((entry) => entry.lat != null && entry.lon != null)
+      .map((entry) => ({
+        orgNr: entry.org_nr,
+        name: entry.name,
+        address: entry.address,
+        lat: Number(entry.lat),
+        lon: Number(entry.lon),
+      }));
+  }, [mosqueList.data]);
+
   const snapshot = useMemo(
     () =>
       buildSnapshot({
         locationName: location.name,
+        origin: { lat: location.lat, lon: location.lon },
+        mosques,
         mosqueName: mosque?.name ?? null,
         showJamat,
         lockScreenEnabled,
         generatedAt: now,
         days,
       }),
-    [location.name, mosque, showJamat, lockScreenEnabled, days, now],
+    [location.name, location.lat, location.lon, mosques, mosque, showJamat, lockScreenEnabled, days, now],
   );
 
   // `now` ticks every second in the app; the payload only matters when the times change.
   const payloadKey = useMemo(() => {
-    const { generatedAt: _ignored, ...rest } = snapshot;
-    return JSON.stringify(rest);
+    const { generatedAt: _ignored, mosques: written, ...rest } = snapshot;
+    return JSON.stringify({ ...rest, mosques: written.length });
   }, [snapshot]);
 
   const lastWritten = useRef<string | null>(null);

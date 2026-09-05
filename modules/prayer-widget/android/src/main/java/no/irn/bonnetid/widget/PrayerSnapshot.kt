@@ -24,6 +24,19 @@ data class PrayerEntry(
   }
 }
 
+data class SnapshotCoords(
+  val lat: Double,
+  val lon: Double,
+)
+
+data class SnapshotMosque(
+  val orgNr: String,
+  val name: String,
+  val address: String?,
+  val lat: Double,
+  val lon: Double,
+)
+
 data class PrayerDaySnapshot(
   val date: String,
   val hijriText: String,
@@ -38,6 +51,8 @@ data class PrayerSnapshot(
   val showJamat: Boolean,
   val lockScreenEnabled: Boolean,
   val days: List<PrayerDaySnapshot>,
+  val origin: SnapshotCoords? = null,
+  val mosques: List<SnapshotMosque> = emptyList(),
 ) {
   val allPrayers: List<PrayerEntry>
     get() = days.flatMap { it.prayers }.sortedBy { it.at }
@@ -116,6 +131,31 @@ data class PrayerSnapshot(
           )
         }
 
+        val mosques = mutableListOf<SnapshotMosque>()
+        val mosqueArray = root.optJSONArray("mosques")
+        for (index in 0 until (mosqueArray?.length() ?: 0)) {
+          val mosqueJson = mosqueArray!!.getJSONObject(index)
+          val lat = mosqueJson.optDouble("lat", Double.NaN)
+          val lon = mosqueJson.optDouble("lon", Double.NaN)
+          if (lat.isNaN() || lon.isNaN()) continue
+          mosques.add(
+            SnapshotMosque(
+              orgNr = mosqueJson.optString("orgNr"),
+              name = mosqueJson.optString("name"),
+              address = optStringOrNull(mosqueJson, "address"),
+              lat = lat,
+              lon = lon,
+            ),
+          )
+        }
+
+        val originJson = root.optJSONObject("origin")
+        val origin = originJson?.let {
+          val lat = it.optDouble("lat", Double.NaN)
+          val lon = it.optDouble("lon", Double.NaN)
+          if (lat.isNaN() || lon.isNaN()) null else SnapshotCoords(lat, lon)
+        }
+
         PrayerSnapshot(
           version = root.optInt("version", 1),
           generatedAt = parseInstant(optStringOrNull(root, "generatedAt"))
@@ -125,6 +165,8 @@ data class PrayerSnapshot(
           showJamat = root.optBoolean("showJamat", false),
           lockScreenEnabled = root.optBoolean("lockScreenEnabled", false),
           days = days,
+          origin = origin,
+          mosques = mosques,
         )
       } catch (error: Exception) {
         null

@@ -12,6 +12,10 @@ android {
     minSdk safeExtGet('minSdkVersion', 24)
   }
 
+  buildFeatures {
+    buildConfig true
+  }
+
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_17
     targetCompatibility JavaVersion.VERSION_17
@@ -29,4 +33,6 @@ def safeExtGet(prop, fallback) {
 dependencies {
   implementation project(':expo-modules-core')
   implementation "org.jetbrains.kotlin:kotlin-stdlib:${safeExtGet('kotlinVersion', '2.0.21')}"
+  implementation "androidx.car.app:app:${safeExtGet('carAppVersion', '1.4.0')}"
+  implementation "androidx.car.app:app-projected:${safeExtGet('carAppVersion', '1.4.0')}"
 }
