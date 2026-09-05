@@ -273,13 +273,22 @@ type JamatEmbedRow = JamatPeriodRow & { mosque_jummah: JummahRow[] };
 
 type MosqueEmbedRow = MosqueRow & {
   location_postnumber: PostRow | null;
+  mosque_jummah: JummahRow[];
   mosque_jamatperiode: JamatEmbedRow[];
 };
 
-const MOSQUE_EMBED_COLUMNS = `${MOSQUE_COLUMNS}, location_postnumber(post_no, post_name, location_iso), mosque_jamatperiode(${JAMAT_COLUMNS}, mosque_jummah(id, mosque_id, jummah))`;
+const MOSQUE_EMBED_COLUMNS = `${MOSQUE_COLUMNS}, location_postnumber(post_no, post_name, location_iso), mosque_jummah(id, mosque_id, jummah), mosque_jamatperiode(${JAMAT_COLUMNS}, mosque_jummah(id, mosque_id, jummah))`;
+
+function mergeJummah(...lists: MosqueJummah[][]): MosqueJummah[] {
+  const byTime = new Map<string, MosqueJummah>();
+  for (const entry of lists.flat()) {
+    if (!byTime.has(entry.jummah)) byTime.set(entry.jummah, entry);
+  }
+  return [...byTime.values()].sort((a, b) => a.jummah.localeCompare(b.jummah));
+}
 
 function sortedJummah(rows: JummahRow[]): MosqueJummah[] {
-  return [...rows].sort((a, b) => a.jummah.localeCompare(b.jummah)).map(toJummah);
+  return mergeJummah(rows.map(toJummah));
 }
 
 function currentJamat(row: MosqueEmbedRow): MosqueJamat | null {
@@ -291,7 +300,8 @@ function currentJamat(row: MosqueEmbedRow): MosqueJamat | null {
 
 function toEmbeddedMosque(row: MosqueEmbedRow): Mosque {
   const jamat = currentJamat(row);
-  return toMosque(row, row.location_postnumber ?? undefined, jamat, jamat?.jummah ?? []);
+  const jummah = mergeJummah(sortedJummah(row.mosque_jummah), jamat?.jummah ?? []);
+  return toMosque(row, row.location_postnumber ?? undefined, jamat, jummah);
 }
 
 export async function fetchMosques(): Promise<Mosque[]> {
