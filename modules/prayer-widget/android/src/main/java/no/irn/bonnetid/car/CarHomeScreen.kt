@@ -1,0 +1,84 @@
+package no.irn.bonnetid.car
+
+import androidx.car.app.CarContext
+import androidx.car.app.Screen
+import androidx.car.app.model.Action
+import androidx.car.app.model.MessageTemplate
+import androidx.car.app.model.Pane
+import androidx.car.app.model.PaneTemplate
+import androidx.car.app.model.Row
+import androidx.car.app.model.Template
+import no.irn.bonnetid.widget.PrayerFormat
+import no.irn.bonnetid.widget.PrayerMoment
+import no.irn.bonnetid.widget.PrayerSnapshot
+
+/**
+ * The launch screen: which prayer is running now, or the next one before Fajr, with the two
+ * places a driver can go from here.
+ */
+class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
+  init {
+    lifecycle.addObserver(CarMinuteTicker { invalidate() })
+  }
+
+  override fun onGetTemplate(): Template {
+    val snapshot = PrayerSnapshot.load(carContext)
+    val now = System.currentTimeMillis()
+    val moment = snapshot?.let { PrayerMoment.resolve(it, now) }
+      ?: return MessageTemplate.Builder(NO_DATA)
+        .setTitle(TITLE)
+        .setHeaderAction(Action.APP_ICON)
+        .build()
+
+    val headline = moment.headline
+    val pane = Pane.Builder()
+      .addRow(
+        Row.Builder()
+          .setTitle("${headline.displayLabel} ${PrayerFormat.time(headline.printedAt(false))}")
+          .addText(secondary(moment, now))
+          .build(),
+      )
+      .addRow(
+        Row.Builder()
+          .setTitle(moment.locationName)
+          .addText(jamatText(snapshot, moment) ?: moment.hijriText)
+          .build(),
+      )
+      .addAction(
+        Action.Builder()
+          .setTitle("Moskeer")
+          .setOnClickListener { screenManager.push(CarMosqueScreen(carContext)) }
+          .build(),
+      )
+      .addAction(
+        Action.Builder()
+          .setTitle("Bønnetider")
+          .setOnClickListener { screenManager.push(CarPrayerTimesScreen(carContext)) }
+          .build(),
+      )
+
+    return PaneTemplate.Builder(pane.build())
+      .setTitle(TITLE)
+      .setHeaderAction(Action.APP_ICON)
+      .build()
+  }
+
+  private fun secondary(moment: PrayerMoment, now: Long): String {
+    val countdown = PrayerFormat.countdown(moment.next.at, now)
+    if (!moment.isNow) return "Starter $countdown"
+    return "${moment.next.displayLabel} $countdown"
+  }
+
+  private fun jamatText(snapshot: PrayerSnapshot, moment: PrayerMoment): String? {
+    if (!snapshot.hasJamatTimes) return null
+    val jamat = moment.headline.jamat ?: return null
+    val label = if (moment.headline.isJummah) "Jumuah" else "Jamaat"
+    val mosque = snapshot.mosqueName ?: return "$label ${PrayerFormat.time(jamat)}"
+    return "$label ${PrayerFormat.time(jamat)} · $mosque"
+  }
+
+  private companion object {
+    const val TITLE = "Bønnetid"
+    const val NO_DATA = "Åpne Bønnetid på telefonen én gang, så henter bilen bønnetidene herfra."
+  }
+}

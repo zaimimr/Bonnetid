@@ -1,7 +1,7 @@
 import type { PrayerEntry } from './prayerSchedule';
 import { isoDateKey, localClockNear } from './time';
 
-export const SNAPSHOT_VERSION = 1;
+export const SNAPSHOT_VERSION = 2;
 const FRIDAY = 5;
 
 export type SnapshotDayInput = {
@@ -13,8 +13,20 @@ export type SnapshotDayInput = {
   hasJummah?: boolean;
 };
 
+export type SnapshotMosqueInput = {
+  orgNr: string;
+  name: string;
+  address: string | null;
+  lat: number;
+  lon: number;
+};
+
 export type SnapshotInput = {
   locationName: string;
+  /** Where the user's chosen kommune is, used when the car has no location fix. */
+  origin?: { lat: number; lon: number } | null;
+  /** Every mosque that has coordinates; the car app ranks them against its own position. */
+  mosques?: SnapshotMosqueInput[];
   mosqueName?: string | null;
   showJamat?: boolean;
   /** Android only: post the ongoing "har du bedt?" notification when a prayer starts. */
@@ -44,10 +56,14 @@ export type SnapshotDay = {
   prayers: SnapshotPrayer[];
 };
 
+export type SnapshotMosque = SnapshotMosqueInput;
+
 export type Snapshot = {
   version: number;
   generatedAt: string;
   locationName: string;
+  origin: { lat: number; lon: number } | null;
+  mosques: SnapshotMosque[];
   mosqueName: string | null;
   showJamat: boolean;
   lockScreenEnabled: boolean;
@@ -73,6 +89,8 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
     version: SNAPSHOT_VERSION,
     generatedAt: input.generatedAt.toISOString(),
     locationName: input.locationName,
+    origin: input.origin ?? null,
+    mosques: input.mosques ?? [],
     mosqueName: input.mosqueName ?? null,
     showJamat: input.showJamat ?? false,
     lockScreenEnabled: input.lockScreenEnabled ?? false,
