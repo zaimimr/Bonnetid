@@ -57,3 +57,6 @@ modules/*/android/.gradle/
 
 # Agent worktrees
 .claude/worktrees/
+
+# halal engine case runner output
+.halal-check
