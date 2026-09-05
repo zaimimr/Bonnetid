@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Pressable, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useHijriMonth, useMosque, useMosqueJamatPeriods, usePrayerTimes } from '@/api/queries';
+import { useHijriMonth, useMosque, useMosqueJamatPeriods } from '@/api/queries';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { AppText, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -17,9 +17,10 @@ import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { isoDateKey, todayKey } from '@/lib/time';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { useNow } from '@/hooks/useNow';
+import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useTimezoneNote } from '@/hooks/useTimezoneNote';
-import { useActiveLocation, useSettings } from '@/store/settings';
+import { useActiveLocation, useActiveMosque } from '@/store/settings';
 
 const FRIDAY = 5;
 
@@ -28,7 +29,9 @@ export default function DayScreen() {
   const router = useRouter();
   const location = useActiveLocation();
   const asrMethod = useEffectiveAsrMethod();
-  const mosque = useSettings((state) => state.mosque);
+  const zone = zoneFor(location);
+  const calculated = location.mode === 'calculated';
+  const mosque = useActiveMosque();
   const { refreshing, onRefresh } = useRefresh();
   const now = useNow(30_000);
 
@@ -36,7 +39,7 @@ export default function DayScreen() {
   const valid = !Number.isNaN(date.getTime());
   const timezoneNote = useTimezoneNote(date);
 
-  const month = usePrayerTimes(location.iso, date.getFullYear(), date.getMonth() + 1);
+  const month = usePrayerMonth(location, date.getFullYear(), date.getMonth() + 1);
   const hijriMonth = useHijriMonth(date.getFullYear(), date.getMonth() + 1);
   const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
   const jamatPeriods = useMosqueJamatPeriods(mosque?.orgNr ?? '', { enabled: mosque != null });
@@ -45,8 +48,8 @@ export default function DayScreen() {
   const hijriDay = hijriMonth.data?.find((row) => row.gregorian_date === isoDate);
 
   const schedule = useMemo(
-    () => (day ? buildDaySchedule(day, date, asrMethod) : []),
-    [day, date, asrMethod],
+    () => (day ? buildDaySchedule(day, date, asrMethod, zone) : []),
+    [day, date, asrMethod, zone],
   );
 
   const isFriday = date.getDay() === FRIDAY;
@@ -139,7 +142,7 @@ export default function DayScreen() {
               mosque &&
               router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } })
             }
-            onSelectMosque={() => router.push('/mosque-picker')}
+            onSelectMosque={calculated ? undefined : () => router.push('/mosque-picker')}
           />
         )}
       </View>

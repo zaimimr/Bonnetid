@@ -1,12 +1,9 @@
 import { useState } from 'react';
-import { Linking, Platform, Pressable, Switch, View } from 'react-native';
+import { Platform, Pressable, Switch, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
-import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
-import { useLocations } from '@/api/queries';
-import { detectNearestLocation } from '@/hooks/useAutoLocation';
 import { AppText, Card, Divider, ListRow, Screen, SectionHeader } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
@@ -19,13 +16,19 @@ import {
 import { openStoreReview } from '@/lib/review';
 import { getNotificationSound } from '@/lib/notificationSounds';
 import { asrMethodLabel } from '@/lib/asrMethods';
+import { calculationMethodLabel } from '@/lib/calculationMethods';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
 import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
+import { resolvePlaceName, useTravelState } from '@/hooks/useTravelDetection';
 import { track, trackError } from '@/lib/telemetry';
 import {
+  calculatedLocation,
+  DEFAULT_LOCATION,
   NOTIFIABLE_PRAYERS,
   VOLUNTARY_FAST_KINDS,
   useActiveLocation,
+  useActiveMosque,
+  useHomeLocation,
   useSettings,
 } from '@/store/settings';
 
@@ -43,9 +46,12 @@ export default function SettingsScreen() {
   const theme = useTheme();
   const location = useActiveLocation();
   const setLocation = useSettings((state) => state.setLocation);
-  const { data: locations } = useLocations();
-  const [locating, setLocating] = useState(false);
-  const mosque = useSettings((state) => state.mosque);
+  const homeLocation = useHomeLocation();
+  const calculationMethod = useSettings((state) => state.calculationMethod);
+  const travel = useTravelState();
+  const [switching, setSwitching] = useState(false);
+  const calculated = location.mode === 'calculated';
+  const mosque = useActiveMosque();
   const asrMethod = useSettings((state) => state.asrMethod);
   const themePreference = useSettings((state) => state.themePreference);
   const setThemePreference = useSettings((state) => state.setThemePreference);
@@ -67,25 +73,24 @@ export default function SettingsScreen() {
   const dhulHijjahRemindersEnabled = useSettings((state) => state.dhulHijjahRemindersEnabled);
   const voluntaryFasts = useSettings((state) => state.voluntaryFasts);
 
-  const detectLocation = async () => {
-    if (!locations || locating) return;
-    const permission = await Location.getForegroundPermissionsAsync();
-    if (!permission.granted && !permission.canAskAgain) {
-      Linking.openSettings().catch(() => {});
-      return;
-    }
-    setLocating(true);
+  const switchToCalculated = async () => {
+    if (!travel.coords || switching) return;
+    setSwitching(true);
     try {
-      const detected = await detectNearestLocation(locations);
-      if (detected) {
-        setLocation(detected);
-        track('location_detected', { iso: detected.iso, source: 'settings' });
-      }
+      const name = await resolvePlaceName(travel.coords);
+      setLocation(calculatedLocation(name, travel.coords.lat, travel.coords.lon));
+      track('travel_mode_chosen', { choice: 'calculated' });
     } catch (error) {
-      trackError(error, 'location-detect');
+      trackError(error, 'travel-mode-settings');
     } finally {
-      setLocating(false);
+      setSwitching(false);
     }
+  };
+
+  const switchToNorway = () => {
+    const target = homeLocation ?? DEFAULT_LOCATION;
+    setLocation(target);
+    track('travel_mode_chosen', { choice: 'norway' });
   };
 
   const toggleNotifications = async (value: boolean) => {
@@ -134,21 +139,25 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Sted"
-          subtitle={locating ? 'Finner posisjonen din…' : location.name}
+          subtitle={calculated ? `${location.name} · lokale tider` : location.name}
           leading={<Ionicons name="location-outline" size={20} color={theme.colors.primary} />}
-          trailing={<Ionicons name="navigate-outline" size={18} color={theme.colors.primary} />}
-          onPress={detectLocation}
-          style={ROW}
-        />
-        <Divider />
-        <ListRow
-          title="Min moské"
-          subtitle={mosque?.name ?? 'Ikke valgt'}
-          leading={<Ionicons name="business-outline" size={20} color={theme.colors.primary} />}
           chevron
-          onPress={() => router.push('/mosque-picker')}
+          onPress={() => router.push('/location-picker')}
           style={ROW}
         />
+        {!calculated && (
+          <>
+            <Divider />
+            <ListRow
+              title="Min moské"
+              subtitle={mosque?.name ?? 'Ikke valgt'}
+              leading={<Ionicons name="business-outline" size={20} color={theme.colors.primary} />}
+              chevron
+              onPress={() => router.push('/mosque-picker')}
+              style={ROW}
+            />
+          </>
+        )}
         <Divider />
         <ListRow
           title="Asr-metode"
@@ -160,6 +169,58 @@ export default function SettingsScreen() {
           leading={<Ionicons name="partly-sunny-outline" size={20} color={theme.colors.primary} />}
           chevron
           onPress={() => router.push('/asr-method')}
+          style={ROW}
+        />
+        {calculated && (
+          <>
+            <Divider />
+            <ListRow
+              title="Beregningsmetode"
+              subtitle={calculationMethodLabel(calculationMethod)}
+              leading={<Ionicons name="calculator-outline" size={20} color={theme.colors.primary} />}
+              chevron
+              onPress={() => router.push('/calculation-method')}
+              style={ROW}
+            />
+          </>
+        )}
+      </Card>
+
+      <SectionHeader title="Reisemodus" />
+      <Card padding="sm" rounded="xl">
+        <ListRow
+          title="Norsk tid"
+          subtitle={
+            homeLocation
+              ? `${homeLocation.name}, vist i din lokale klokke`
+              : 'Bønnetider fra en norsk by'
+          }
+          leading={<Ionicons name="flag-outline" size={20} color={theme.colors.primary} />}
+          trailing={
+            calculated ? undefined : (
+              <Ionicons name="checkmark" size={22} color={theme.colors.primary} />
+            )
+          }
+          onPress={calculated ? switchToNorway : undefined}
+          style={ROW}
+        />
+        <Divider />
+        <ListRow
+          title="Lokale tider"
+          subtitle={
+            switching
+              ? 'Finner posisjonen din…'
+              : travel.coords
+                ? 'Regnes ut der du er nå. Uten jamaat og moskeer'
+                : 'Krever tilgang til posisjon'
+          }
+          leading={<Ionicons name="navigate-outline" size={20} color={theme.colors.primary} />}
+          trailing={
+            calculated ? (
+              <Ionicons name="checkmark" size={22} color={theme.colors.primary} />
+            ) : undefined
+          }
+          onPress={calculated || !travel.coords ? undefined : () => void switchToCalculated()}
           style={ROW}
         />
       </Card>
@@ -271,7 +332,7 @@ export default function SettingsScreen() {
             />
           </>
         )}
-        {widgetJamatSupported && (
+        {widgetJamatSupported && !calculated && (
           <>
             <Divider />
             <ListRow

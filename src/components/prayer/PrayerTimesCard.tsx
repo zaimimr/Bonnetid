@@ -245,7 +245,7 @@ export function PrayerTimesCard({
         </View>
       )}
 
-      {hasMosque ? (
+      {hasMosque && (
         <Pressable
           onPress={onPressMosque}
           style={({ pressed }) => [
@@ -266,7 +266,9 @@ export function PrayerTimesCard({
           </AppText>
           <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} />
         </Pressable>
-      ) : (
+      )}
+
+      {!hasMosque && onSelectMosque && (
         <Pressable
           onPress={onSelectMosque}
           style={({ pressed }) => [

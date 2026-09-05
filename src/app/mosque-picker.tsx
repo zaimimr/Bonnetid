@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useMosques } from '@/api/queries';
 import type { Mosque } from '@/api/types';
-import { AppText, ErrorState, ListRow, Screen, Skeleton } from '@/components/ui';
+import { AppText, EmptyState, ErrorState, ListRow, Screen, Skeleton } from '@/components/ui';
 import { useDevicePosition } from '@/hooks/useNearestLocation';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useUserCoords } from '@/hooks/useUserCoords';
@@ -12,7 +12,7 @@ import { distanceKm, formatDistance } from '@/lib/geo';
 import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { fontSize, opacity, radius, spacing } from '@/theme/tokens';
-import { useSettings } from '@/store/settings';
+import { useIsCalculatedMode, useSettings } from '@/store/settings';
 
 export default function MosquePickerScreen() {
   const router = useRouter();
@@ -24,6 +24,7 @@ export default function MosquePickerScreen() {
   const [query, setQuery] = useState('');
   const { status: gpsStatus, getPosition } = useDevicePosition();
   const { refreshing, onRefresh } = useRefresh();
+  const calculated = useIsCalculatedMode();
 
   const filtered = useMemo(() => {
     if (!mosques) return [];
@@ -67,6 +68,17 @@ export default function MosquePickerScreen() {
     }
     if (best) choose(best, 'gps');
   };
+
+  if (calculated) {
+    return (
+      <Screen edges={[]}>
+        <EmptyState
+          message="Moskeer er norske. Bytt til norsk tid i Innstillinger for å velge en moské."
+          icon="business-outline"
+        />
+      </Screen>
+    );
+  }
 
   return (
     <Screen edges={[]} padded={false}>

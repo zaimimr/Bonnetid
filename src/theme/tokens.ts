@@ -40,6 +40,11 @@ export const palette = {
   red400: '#D96A61',
   blue600: '#2A6497',
   mapBlue: '#1A73E8',
+
+  sky50: '#EAF1F7',
+  sky200: '#B7CFE3',
+  sky700: '#1F4C74',
+  sky900: '#12293D',
 } as const;
 
 export const spacing = {

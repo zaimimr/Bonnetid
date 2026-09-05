@@ -26,6 +26,9 @@ export type ThemeColors = {
   track: string;
   trackMarker: string;
   danger: string;
+  notice: string;
+  noticeSoft: string;
+  onNoticeSoft: string;
   info: string;
   success: string;
   tabBarBackground: string;
@@ -71,6 +74,9 @@ export const lightTheme: Theme = {
     track: palette.neutral100,
     trackMarker: palette.neutral300,
     danger: palette.red600,
+    notice: palette.blue600,
+    noticeSoft: palette.sky50,
+    onNoticeSoft: palette.sky700,
     info: palette.blue600,
     success: palette.emerald500,
     tabBarBackground: palette.neutral0,
@@ -112,6 +118,9 @@ export const darkTheme: Theme = {
     track: palette.night700,
     trackMarker: palette.night600,
     danger: palette.red400,
+    notice: palette.sky200,
+    noticeSoft: palette.sky900,
+    onNoticeSoft: palette.sky200,
     info: palette.blue600,
     success: palette.emerald400,
     tabBarBackground: palette.night900,
