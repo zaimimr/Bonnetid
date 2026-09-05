@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { usePrayerTimes } from '@/api/queries';
 import { useHijriLookahead } from '@/hooks/useHijriSeason';
+import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import {
   fastOccasionsFrom,
   mergeFastingReminders,
@@ -20,8 +20,8 @@ import {
   isoDateKey,
   osloDateKey,
   osloDayStart,
-  osloWallClockToDate,
   parseDayKey,
+  wallClockToDate,
 } from '@/lib/time';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
@@ -31,14 +31,15 @@ export function useFastingReminders(now: Date) {
   const arafahEnabled = useSettings((state) => state.dhulHijjahRemindersEnabled);
   const voluntaryFasts = useSettings((state) => state.voluntaryFasts);
   const location = useActiveLocation();
+  const zone = zoneFor(location);
 
   const today = osloDayStart(now);
   const todayIso = osloDateKey(now);
   const nextMonthStart = new Date(today.getFullYear(), today.getMonth() + 1, 1);
 
-  const currentMonth = usePrayerTimes(location.iso, today.getFullYear(), today.getMonth() + 1);
-  const nextMonth = usePrayerTimes(
-    location.iso,
+  const currentMonth = usePrayerMonth(location, today.getFullYear(), today.getMonth() + 1);
+  const nextMonth = usePrayerMonth(
+    location,
     nextMonthStart.getFullYear(),
     nextMonthStart.getMonth() + 1,
   );
@@ -70,7 +71,7 @@ export function useFastingReminders(now: Date) {
         if (seenDates.has(isoDate)) continue;
         const dayOfRamadan = ramadanDays.get(isoDate);
         if (dayOfRamadan == null) continue;
-        const fajrAt = osloWallClockToDate(dayStart, row.fajr);
+        const fajrAt = wallClockToDate(dayStart, row.fajr, zone);
         if (Number.isNaN(fajrAt.getTime())) continue;
         seenDates.add(isoDate);
         fastingDays.push({
@@ -94,6 +95,7 @@ export function useFastingReminders(now: Date) {
     hijriRows,
     toggles,
     todayIso,
+    zone,
     currentMonth.data,
     nextMonth.data,
     location.name,
