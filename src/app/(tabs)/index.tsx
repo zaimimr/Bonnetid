@@ -7,7 +7,8 @@ import { PrayerTimelineCard } from '@/components/prayer/PrayerTimelineCard';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { EventCard } from '@/components/calendar/EventCard';
 import { JummahHomeCard } from '@/components/mosque/JummahHomeCard';
-import { RamadanCard } from '@/components/ramadan/RamadanCard';
+import { SeasonCard } from '@/components/season/SeasonCard';
+import { NightCard } from '@/components/season/NightCard';
 import { AppText, EmptyState, ErrorState, Screen, SectionHeader, Skeleton } from '@/components/ui';
 import { useNow } from '@/hooks/useNow';
 import { useTimezoneNote } from '@/hooks/useTimezoneNote';
@@ -90,9 +91,17 @@ export default function HomeScreen() {
             now={now}
           />
         )}
+
         <JummahHomeCard />
 
-        <RamadanCard />
+        <SeasonCard />
+
+        <NightCard
+          now={now}
+          onPress={(isoDate) =>
+            router.push({ pathname: '/day/[date]', params: { date: isoDate } })
+          }
+        />
 
         {todaySchedule.length > 0 && (
           <View>

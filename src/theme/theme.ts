@@ -16,6 +16,7 @@ export type ThemeColors = {
   filterActiveSurface: string;
   filterActiveBorder: string;
   filterActiveText: string;
+  seasonHighlight: string;
   textPrimary: string;
   textSecondary: string;
   textMuted: string;
@@ -60,6 +61,7 @@ export const lightTheme: Theme = {
     filterActiveSurface: palette.gold50,
     filterActiveBorder: palette.gold600,
     filterActiveText: palette.gold700,
+    seasonHighlight: palette.gold600,
     textPrimary: palette.neutral900,
     textSecondary: palette.neutral700,
     textMuted: palette.neutral500,
@@ -100,6 +102,7 @@ export const darkTheme: Theme = {
     filterActiveSurface: palette.night700,
     filterActiveBorder: palette.gold400,
     filterActiveText: palette.gold400,
+    seasonHighlight: palette.gold400,
     textPrimary: palette.mist100,
     textSecondary: palette.mist300,
     textMuted: palette.mist500,

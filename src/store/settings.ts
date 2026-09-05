@@ -23,6 +23,20 @@ export type NotifiablePrayer = Exclude<PrayerName, 'fajr_endtime'>;
 
 export const NOTIFIABLE_PRAYERS: NotifiablePrayer[] = ['fajr', 'duhr', 'asr', 'maghrib', 'isha'];
 
+export type VoluntaryFastKind = 'ashura' | 'whiteDays' | 'mondayThursday';
+
+export const VOLUNTARY_FAST_KINDS: VoluntaryFastKind[] = [
+  'ashura',
+  'whiteDays',
+  'mondayThursday',
+];
+
+const NO_VOLUNTARY_FASTS: Record<VoluntaryFastKind, boolean> = {
+  ashura: false,
+  whiteDays: false,
+  mondayThursday: false,
+};
+
 const ALL_PRAYERS_ENABLED: Record<NotifiablePrayer, boolean> = {
   fajr: true,
   duhr: true,
@@ -44,6 +58,8 @@ type SettingsState = {
   liveActivityEnabled: boolean;
   widgetShowJamat: boolean;
   ramadanRemindersEnabled: boolean;
+  dhulHijjahRemindersEnabled: boolean;
+  voluntaryFasts: Record<VoluntaryFastKind, boolean>;
   launchCount: number;
   reviewRequested: boolean;
   registerLaunch: () => void;
@@ -60,6 +76,8 @@ type SettingsState = {
   setLiveActivityEnabled: (enabled: boolean) => void;
   setWidgetShowJamat: (enabled: boolean) => void;
   setRamadanRemindersEnabled: (enabled: boolean) => void;
+  setDhulHijjahRemindersEnabled: (enabled: boolean) => void;
+  toggleVoluntaryFast: (kind: VoluntaryFastKind) => void;
 };
 
 export const DEFAULT_LOCATION: SavedLocation = {
@@ -84,6 +102,8 @@ export const useSettings = create<SettingsState>()(
       liveActivityEnabled: true,
       widgetShowJamat: false,
       ramadanRemindersEnabled: true,
+      dhulHijjahRemindersEnabled: false,
+      voluntaryFasts: NO_VOLUNTARY_FASTS,
       launchCount: 0,
       reviewRequested: false,
       registerLaunch: () => set((state) => ({ launchCount: state.launchCount + 1 })),
@@ -102,6 +122,15 @@ export const useSettings = create<SettingsState>()(
       setLiveActivityEnabled: (liveActivityEnabled) => set({ liveActivityEnabled }),
       setWidgetShowJamat: (widgetShowJamat) => set({ widgetShowJamat }),
       setRamadanRemindersEnabled: (ramadanRemindersEnabled) => set({ ramadanRemindersEnabled }),
+      setDhulHijjahRemindersEnabled: (dhulHijjahRemindersEnabled) =>
+        set({ dhulHijjahRemindersEnabled }),
+      toggleVoluntaryFast: (kind) =>
+        set((state) => ({
+          voluntaryFasts: {
+            ...state.voluntaryFasts,
+            [kind]: !state.voluntaryFasts[kind],
+          },
+        })),
       toggleNotificationPrayer: (prayer) =>
         set((state) => ({
           notificationPrayers: {
@@ -118,6 +147,9 @@ export const useSettings = create<SettingsState>()(
         const state = persisted as Partial<SettingsState> | undefined;
         if (state?.location && typeof (state.location as { iso?: unknown }).iso !== 'string') {
           state.location = null;
+        }
+        if (state) {
+          state.voluntaryFasts = { ...NO_VOLUNTARY_FASTS, ...(state.voluntaryFasts ?? {}) };
         }
         return state as SettingsState;
       },

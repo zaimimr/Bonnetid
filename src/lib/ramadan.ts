@@ -1,9 +1,8 @@
 import type { HijriDay } from '@/api/types';
-import { parseHijriDate } from './hijri';
-import { daysBetweenIso } from './time';
+import { RAMADAN_SEASON, seasonDayNumbers, seasonStatusFrom } from './hijriSeason';
 
-export const RAMADAN_MONTH = 9;
-export const RAMADAN_COUNTDOWN_DAYS = 10;
+export const RAMADAN_MONTH = RAMADAN_SEASON.month;
+export const RAMADAN_COUNTDOWN_DAYS = RAMADAN_SEASON.countdownDays;
 export const SUHOOR_REMINDER_MINUTES = 45;
 
 export type RamadanStatus = {
@@ -25,47 +24,18 @@ export function ramadanStatusFrom(
   todayIso: string,
   lookaheadDays: number = RAMADAN_COUNTDOWN_DAYS,
 ): RamadanStatus {
-  const todayRow = rows.find((row) => row.gregorian_date === todayIso);
-  const today = todayRow ? parseHijriDate(todayRow.hijri_date) : null;
-
-  if (today && today.month === RAMADAN_MONTH) {
-    return {
-      isRamadan: true,
-      dayOfRamadan: today.day,
-      hijriYear: today.year,
-      daysUntilRamadan: null,
-    };
-  }
-
-  let soonest: { days: number; year: number } | null = null;
-  for (const row of rows) {
-    if (row.gregorian_date <= todayIso) continue;
-    const parsed = parseHijriDate(row.hijri_date);
-    if (!parsed || parsed.month !== RAMADAN_MONTH || parsed.day !== 1) continue;
-    const days = daysBetweenIso(todayIso, row.gregorian_date);
-    if (days == null || days <= 0 || days > lookaheadDays) continue;
-    if (!soonest || days < soonest.days) soonest = { days, year: parsed.year };
-  }
-
-  if (soonest) {
-    return {
-      isRamadan: false,
-      dayOfRamadan: null,
-      hijriYear: soonest.year,
-      daysUntilRamadan: soonest.days,
-    };
-  }
-
-  return NOT_RAMADAN;
+  const status = seasonStatusFrom(RAMADAN_SEASON, rows, todayIso, lookaheadDays);
+  if (!status) return NOT_RAMADAN;
+  return {
+    isRamadan: status.isActive,
+    dayOfRamadan: status.dayOfSeason,
+    hijriYear: status.hijriYear,
+    daysUntilRamadan: status.daysUntilStart,
+  };
 }
 
 export function ramadanDayNumbers(rows: HijriDay[]): Map<string, number> {
-  const days = new Map<string, number>();
-  for (const row of rows) {
-    const parsed = parseHijriDate(row.hijri_date);
-    if (parsed && parsed.month === RAMADAN_MONTH) days.set(row.gregorian_date, parsed.day);
-  }
-  return days;
+  return seasonDayNumbers(rows, RAMADAN_SEASON);
 }
 
 export function fastingProgress(now: Date, fajr: Date, maghrib: Date): number {

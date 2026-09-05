@@ -4,7 +4,7 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useMosque, usePrayerTimes } from '@/api/queries';
 import { toPreference, useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
-import { useIsEidPeriod } from '@/hooks/useIsEidPeriod';
+import { useEidPeriod } from '@/hooks/useEidPeriod';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -19,6 +19,8 @@ import {
   jamatTimesForDate,
   PRAYER_LABELS,
 } from '@/lib/prayerSchedule';
+import { eidPrayerTitle } from '@/lib/hijri';
+import { MOON_SIGHTING_NOTE } from '@/lib/hijriSeason';
 import { JUMMAH_MISSING_FOR_MOSQUE } from '@/lib/jummahCopy';
 import { osloDateKey, osloDayKey, osloDayStart, osloTimeToLocalClock } from '@/lib/time';
 import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from '@/components/prayer/TimeCell';
@@ -63,8 +65,10 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
   const stacked = isStacked && !isWide;
   const columnWidth = scaleWidth(TIME_COLUMN_WIDTH, scale);
   const jamat = mosque.jamat;
-  const isEidPeriod = useIsEidPeriod();
-  const eidTimes = isEidPeriod && mosque.show_eid ? mosque.eid_prayers : [];
+  const eidPeriod = useEidPeriod();
+  const showEidSection = eidPeriod != null && mosque.show_eid;
+  const eidTimes = showEidSection ? mosque.eid_prayers : [];
+  const eidTitle = eidPeriod ? eidPrayerTitle(eidPeriod) : '';
 
   const today = useMemo(() => osloDayStart(new Date()), []);
   const month = usePrayerTimes(
@@ -249,28 +253,41 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
         </View>
       )}
 
-      {eidTimes.length > 0 && (
+      {showEidSection && (
         <View>
-          <SectionHeader title="Eid-bønn" />
-          <Card padding="sm" rounded="xl">
-            {eidTimes.map((time, index) => (
-              <ListRow
-                key={`${time}-${index}`}
-                title={eidTimes.length > 1 ? `Eid-bønn ${index + 1}` : 'Eid-bønn'}
-                leading={<Ionicons name="sparkles-outline" size={20} color={theme.colors.primary} />}
-                trailing={
-                  <AppText weight="semibold" tabular>
-                    {time}
-                  </AppText>
-                }
-                style={{
-                  paddingHorizontal: spacing.md,
-                  borderBottomWidth: index === eidTimes.length - 1 ? 0 : 1,
-                  borderBottomColor: theme.colors.border,
-                }}
-              />
-            ))}
-          </Card>
+          <SectionHeader title={eidTitle} />
+          {eidTimes.length === 0 ? (
+            <Card padding="lg" rounded="xl">
+              <AppText size="sm" tone="textSecondary">
+                {`${mosque.name} har ikke lagt inn tider for Eid-bønnen ennå.`}
+              </AppText>
+            </Card>
+          ) : (
+            <Card padding="sm" rounded="xl">
+              {eidTimes.map((time, index) => (
+                <ListRow
+                  key={`${time}-${index}`}
+                  title={eidTimes.length > 1 ? `${eidTitle} ${index + 1}` : eidTitle}
+                  leading={
+                    <Ionicons name="sparkles-outline" size={20} color={theme.colors.primary} />
+                  }
+                  trailing={
+                    <AppText weight="semibold" tabular>
+                      {time}
+                    </AppText>
+                  }
+                  style={{
+                    paddingHorizontal: spacing.md,
+                    borderBottomWidth: index === eidTimes.length - 1 ? 0 : 1,
+                    borderBottomColor: theme.colors.border,
+                  }}
+                />
+              ))}
+            </Card>
+          )}
+          <AppText size="xs" tone="textMuted" style={{ marginTop: spacing.sm }}>
+            {MOON_SIGHTING_NOTE}
+          </AppText>
         </View>
       )}
 

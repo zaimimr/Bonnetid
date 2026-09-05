@@ -11,8 +11,22 @@ export function parseHijriDate(hijriDate: string): ParsedHijri | null {
   return { year, month, day };
 }
 
-export function isEidPrayerPeriod(hijri: ParsedHijri): boolean {
-  return hijri.month === 9 || (hijri.month === 10 && hijri.day === 1);
+export type EidPeriod = 'fitr' | 'adha';
+
+const EID_AL_ADHA_LEAD_DAYS = 10;
+
+export function eidPeriodOf(hijri: ParsedHijri): EidPeriod | null {
+  if (hijri.month === 9 || (hijri.month === 10 && hijri.day === 1)) return 'fitr';
+  if (hijri.month === 12 && hijri.day <= EID_AL_ADHA_LEAD_DAYS) return 'adha';
+  return null;
+}
+
+export function eidPrayerTitle(period: EidPeriod): string {
+  return period === 'adha' ? 'Eid al-Adha-bønn' : 'Eid al-Fitr-bønn';
+}
+
+export function eidBadgeLabel(period: EidPeriod): string {
+  return period === 'adha' ? 'Eid al-Adha' : 'Eid';
 }
 
 export function formatHijri(hijriDate: string, monthText: string): string {

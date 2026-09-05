@@ -7,8 +7,8 @@ import type { Mosque } from '@/api/types';
 import { MosqueCard } from '@/components/mosque/MosqueCard';
 import { MosqueMap, type MosqueMapPin } from '@/components/mosque/MosqueMap';
 import { AppText, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
+import { useEidPeriod } from '@/hooks/useEidPeriod';
 import { useFontScale } from '@/hooks/useFontScale';
-import { useIsEidPeriod } from '@/hooks/useIsEidPeriod';
 import { usePlaces } from '@/hooks/usePlaces';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useUserCoords } from '@/hooks/useUserCoords';
@@ -41,7 +41,7 @@ export default function MosquesScreen() {
   const [sort, setSort] = useState<SortMode>('distance');
   const [query, setQuery] = useState('');
   const { refreshing, onRefresh } = useRefresh();
-  const isEidPeriod = useIsEidPeriod();
+  const eidPeriod = useEidPeriod();
   const selected = useSettings((state) => state.mosque);
   const selectedOrgNr = selected?.orgNr;
   const placeIso = place?.iso ?? null;
@@ -227,7 +227,7 @@ export default function MosquesScreen() {
             <MosqueCard
               mosque={item.mosque}
               distanceKm={item.distance ?? undefined}
-              showEid={isEidPeriod}
+              eidPeriod={eidPeriod}
               showMissingJummah={place != null}
               place={place ? undefined : (item.mosque.post?.city ?? undefined)}
               selected={item.mosque.org_nr === selectedOrgNr}

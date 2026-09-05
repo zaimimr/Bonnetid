@@ -5,12 +5,13 @@ import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import type { Mosque } from '@/api/types';
 import { formatDistance } from '@/lib/geo';
+import { eidBadgeLabel, type EidPeriod } from '@/lib/hijri';
 import { JUMMAH_MISSING_SHORT } from '@/lib/jummahCopy';
 
 export type MosqueCardProps = {
   mosque: Mosque;
   distanceKm?: number;
-  showEid?: boolean;
+  eidPeriod?: EidPeriod | null;
   showMissingJummah?: boolean;
   place?: string;
   selected?: boolean;
@@ -20,7 +21,7 @@ export type MosqueCardProps = {
 export function MosqueCard({
   mosque,
   distanceKm,
-  showEid,
+  eidPeriod,
   showMissingJummah = false,
   place,
   selected,
@@ -31,7 +32,7 @@ export function MosqueCard({
     .slice(0, 2)
     .map((entry) => entry.jummah)
     .join(' · ');
-  const eidTimes = showEid && mosque.show_eid ? mosque.eid_prayers : [];
+  const eidTimes = eidPeriod && mosque.show_eid ? mosque.eid_prayers : [];
   const missingJummah = showMissingJummah && !jummahLabel;
   const subtitle = [mosque.address, place].filter(Boolean).join(' · ');
 
@@ -57,7 +58,9 @@ export function MosqueCard({
             }}>
             {selected && <Badge label="Min moské" variant="primary" />}
             {distanceKm != null && <Badge label={formatDistance(distanceKm)} variant="neutral" />}
-            {eidTimes.length > 0 && <Badge label={`Eid ${eidTimes.join(' · ')}`} variant="primary" />}
+            {eidPeriod && eidTimes.length > 0 && (
+              <Badge label={`${eidBadgeLabel(eidPeriod)} ${eidTimes.join(' · ')}`} variant="primary" />
+            )}
             {jummahLabel ? <Badge label={`Jumuah ${jummahLabel}`} variant="primary" /> : null}
           </View>
           {missingJummah ? (
