@@ -8,6 +8,7 @@ import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import { monthName } from '@/lib/hijri';
 import { isoDateKey, parseDayKey } from '@/lib/time';
+import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { usePrayerMonth } from '@/hooks/usePrayerMonth';
 import { useRefresh } from '@/hooks/useRefresh';
@@ -21,6 +22,7 @@ export default function TimetableScreen() {
   const { refreshing, onRefresh } = useRefresh();
 
   const today = new Date();
+  const { dayKey: todayDayKey } = useActiveDayKeys(today);
   const [cursor, setCursor] = useState(() => ({
     year: today.getFullYear(),
     monthIndex: today.getMonth(),
@@ -91,6 +93,7 @@ export default function TimetableScreen() {
           <MonthPrayerTable
             days={month.data}
             asrMethod={asrMethod}
+            todayDayKey={todayDayKey}
             onDayPress={(day) =>
               router.push({
                 pathname: '/day/[date]',

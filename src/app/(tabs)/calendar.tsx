@@ -8,6 +8,7 @@ import { EventCard } from '@/components/calendar/EventCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import { AppText, EmptyState, ErrorState, SectionHeader, Skeleton } from '@/components/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTheme } from '@/theme';
@@ -24,6 +25,7 @@ export default function CalendarScreen() {
   const { refreshing, onRefresh } = useRefresh();
 
   const today = useMemo(() => new Date(), []);
+  const { isoDate: todayIso } = useActiveDayKeys(today);
   const [cursor, setCursor] = useState(() => ({
     year: today.getFullYear(),
     monthIndex: today.getMonth(),
@@ -159,6 +161,7 @@ export default function CalendarScreen() {
               monthIndex={cursor.monthIndex}
               days={month.data}
               selectedIso={selectedIso}
+              todayIso={todayIso}
               onDayPress={onDayPress}
             />
           )}

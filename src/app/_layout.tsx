@@ -13,6 +13,7 @@ import { initTelemetry, navigationIntegration, Sentry, trackError } from '@/lib/
 import { useNotificationScheduler } from '@/hooks/useNotificationScheduler';
 import { useNotificationResponses } from '@/hooks/useNotificationResponses';
 import { useAutoLocation } from '@/hooks/useAutoLocation';
+import { useCalculatedLocationSync } from '@/hooks/useTravelDetection';
 import { useFastingReminders } from '@/hooks/useFastingReminders';
 import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 import { useWidgetSync } from '@/hooks/useWidgetSync';
@@ -55,6 +56,7 @@ function RootNavigator() {
   const theme = useTheme();
   const now = useNow(60_000);
   useAutoLocation();
+  useCalculatedLocationSync();
   useNotificationScheduler();
   useNotificationResponses();
   useFastingReminders(now);
