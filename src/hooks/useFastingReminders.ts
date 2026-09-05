@@ -26,6 +26,7 @@ import {
 import { useActiveLocation, useSettings } from '@/store/settings';
 
 export function useFastingReminders(now: Date) {
+  const notificationsEnabled = useSettings((state) => state.notificationsEnabled);
   const ramadanEnabled = useSettings((state) => state.ramadanRemindersEnabled);
   const arafahEnabled = useSettings((state) => state.dhulHijjahRemindersEnabled);
   const voluntaryFasts = useSettings((state) => state.voluntaryFasts);
@@ -45,16 +46,17 @@ export function useFastingReminders(now: Date) {
 
   const toggles = useMemo<FastToggles>(
     () => ({
-      arafah: arafahEnabled,
-      ashura: voluntaryFasts.ashura,
-      whiteDays: voluntaryFasts.whiteDays,
-      mondayThursday: voluntaryFasts.mondayThursday,
+      arafah: notificationsEnabled && arafahEnabled,
+      ashura: notificationsEnabled && voluntaryFasts.ashura,
+      whiteDays: notificationsEnabled && voluntaryFasts.whiteDays,
+      mondayThursday: notificationsEnabled && voluntaryFasts.mondayThursday,
     }),
-    [arafahEnabled, voluntaryFasts],
+    [notificationsEnabled, arafahEnabled, voluntaryFasts],
   );
 
   const reminders = useMemo<FastingReminder[]>(() => {
-    const ramadanDays = ramadanEnabled
+    const suhoorEnabled = notificationsEnabled && ramadanEnabled;
+    const ramadanDays = suhoorEnabled
       ? seasonDayNumbers(hijriRows, RAMADAN_SEASON)
       : new Map<string, number>();
     const fastingDays: RamadanFastingDay[] = [];
@@ -87,6 +89,7 @@ export function useFastingReminders(now: Date) {
       occasionFastingReminders(occasions),
     );
   }, [
+    notificationsEnabled,
     ramadanEnabled,
     hijriRows,
     toggles,

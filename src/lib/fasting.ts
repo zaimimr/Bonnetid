@@ -54,7 +54,7 @@ function occasionFor(
     return {
       isoDate: row.gregorian_date,
       kind: 'arafah',
-      title: 'Arafah i morgen',
+      title: 'I morgen er det Arafah',
       body: 'Den 9. Dhul Hijjah etter kalenderen til IRN. Husk suhoor hvis du vil faste.',
     };
   }
@@ -63,7 +63,8 @@ function occasionFor(
     return {
       isoDate: row.gregorian_date,
       kind: 'ashura',
-      title: hijri.day === 10 ? 'Ashura i morgen' : 'Dagen før Ashura i morgen',
+      title:
+        hijri.day === 10 ? 'I morgen er det Ashura' : 'I morgen er det dagen før Ashura',
       body: `Den ${hijri.day}. Muharram. Husk suhoor hvis du vil faste.`,
     };
   }
@@ -72,7 +73,7 @@ function occasionFor(
     return {
       isoDate: row.gregorian_date,
       kind: 'whiteDays',
-      title: 'Hvit dag i morgen',
+      title: 'I morgen er det en hvit dag',
       body: `Den ${hijri.day}. ${row.hijri_month_text}. Husk suhoor hvis du vil faste.`,
     };
   }
@@ -82,8 +83,8 @@ function occasionFor(
     return {
       isoDate: row.gregorian_date,
       kind: 'mondayThursday',
-      title: 'Faste i morgen',
-      body: `I morgen er det ${WEEKDAY_NAMES[weekday]}. Husk suhoor hvis du vil faste.`,
+      title: `I morgen er det ${WEEKDAY_NAMES[weekday]}`,
+      body: 'Husk suhoor hvis du vil faste.',
     };
   }
 
