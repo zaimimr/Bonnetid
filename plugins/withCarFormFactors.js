@@ -34,6 +34,18 @@ const AUTOMOTIVE_MANIFEST = `<manifest xmlns:android="http://schemas.android.com
       android:name="android.hardware.type.automotive"
       android:required="true" />
 
+  <uses-feature
+      android:name="android.software.car.templates_host"
+      android:required="true" />
+
+  <uses-feature
+      android:name="android.hardware.screen.portrait"
+      android:required="false" />
+
+  <uses-feature
+      android:name="android.hardware.screen.landscape"
+      android:required="false" />
+
   <application>
     <activity
         android:name=".MainActivity"
