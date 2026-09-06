@@ -5,7 +5,6 @@ import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
 import { NextPrayerHero } from '@/components/prayer/NextPrayerHero';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { EventCard } from '@/components/calendar/EventCard';
-import { JummahHomeCard } from '@/components/mosque/JummahHomeCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import { NightCard } from '@/components/season/NightCard';
 import { ReturnHomeCard } from '@/components/travel/ReturnHomeCard';
@@ -94,8 +93,6 @@ export default function HomeScreen() {
         )}
 
         <ReturnHomeCard />
-
-        {!calculated && <JummahHomeCard />}
 
         <SeasonCard />
 
