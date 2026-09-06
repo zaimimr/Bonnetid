@@ -11,6 +11,12 @@ export type PrayerActivityState = {
   /** End of the prayer's window, also the activity's stale date. */
   windowEnd: number;
   showMarkButtons: boolean;
+  /** The prayer after this one, rendered once the activity goes stale. Empty kind means none. */
+  nextIsoDate: string;
+  nextLabel: string;
+  nextKind: string;
+  nextAt: number;
+  nextWindowEnd: number;
 };
 
 type PrayerWidgetNativeModule = {

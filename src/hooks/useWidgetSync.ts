@@ -14,7 +14,12 @@ import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { formatHijri } from '@/lib/hijri';
 import { resolveActivityWindow } from '@/lib/liveActivityWindow';
 import { isJummahCell, type SnapshotDayInput, type SnapshotMosqueInput } from '@/lib/widgetSnapshot';
-import { adhanTimesFromSchedule, buildDaySchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
+import {
+  adhanTimesFromSchedule,
+  buildDaySchedule,
+  jamatTimesForDate,
+  type PrayerEntry,
+} from '@/lib/prayerSchedule';
 import { isoDateKey, parseDayKey, todayKey } from '@/lib/time';
 import { buildSnapshot, snapshotIsEmpty } from '@/lib/widgetSnapshot';
 import { usePrayerLog } from '@/store/prayerLog';
@@ -214,17 +219,26 @@ function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now
         return;
       }
 
-      const day = days.find((entry) => isoDateKey(entry.date) === window.isoDate);
-      const label = day && isJummahCell(day, window.prayer.name) ? 'Jumuah' : window.prayer.label;
+      const labelFor = (isoDate: string, prayer: PrayerEntry) => {
+        const day = days.find((entry) => isoDateKey(entry.date) === isoDate);
+        return day && isJummahCell(day, prayer.name) ? 'Jumuah' : prayer.label;
+      };
+
+      const { next } = window;
 
       const state = {
         locationName,
         isoDate: window.isoDate,
-        prayerLabel: label,
+        prayerLabel: labelFor(window.isoDate, window.prayer),
         prayerKind: window.prayer.name,
         prayerAt: window.prayer.date.getTime() / 1000,
         windowEnd: window.windowEnd.getTime() / 1000,
         showMarkButtons: trackerEnabled,
+        nextIsoDate: next?.isoDate ?? '',
+        nextLabel: next ? labelFor(next.isoDate, next.prayer) : '',
+        nextKind: next?.prayer.name ?? '',
+        nextAt: next ? next.prayer.date.getTime() / 1000 : 0,
+        nextWindowEnd: next ? next.windowEnd.getTime() / 1000 : 0,
       };
 
       apply(JSON.stringify(state), () => void startOrUpdatePrayerActivity(state));
