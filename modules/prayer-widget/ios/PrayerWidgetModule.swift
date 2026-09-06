@@ -15,6 +15,12 @@ struct PrayerActivityState: Record {
   @Field var prayerAt: Double = 0
   @Field var windowEnd: Double = 0
   @Field var showMarkButtons: Bool = true
+  /// The prayer after this one. An empty kind means there is nothing to fall forward to.
+  @Field var nextIsoDate: String = ""
+  @Field var nextLabel: String = ""
+  @Field var nextKind: String = ""
+  @Field var nextAt: Double = 0
+  @Field var nextWindowEnd: Double = 0
 }
 
 @available(iOS 16.2, *)
@@ -132,13 +138,19 @@ public class PrayerWidgetModule: Module {
 
 private extension PrayerActivityState {
   func toContentState() -> PrayerActivityAttributes.ContentState {
-    PrayerActivityAttributes.ContentState(
+    let hasNext = !nextKind.isEmpty
+    return PrayerActivityAttributes.ContentState(
       isoDate: isoDate,
       prayerLabel: prayerLabel,
       prayerKind: prayerKind,
       prayerAt: Date(timeIntervalSince1970: prayerAt),
       windowEnd: Date(timeIntervalSince1970: windowEnd),
-      showMarkButtons: showMarkButtons
+      showMarkButtons: showMarkButtons,
+      nextIsoDate: hasNext ? nextIsoDate : nil,
+      nextLabel: hasNext ? nextLabel : nil,
+      nextKind: hasNext ? nextKind : nil,
+      nextAt: hasNext ? Date(timeIntervalSince1970: nextAt) : nil,
+      nextWindowEnd: hasNext ? Date(timeIntervalSince1970: nextWindowEnd) : nil
     )
   }
 }
