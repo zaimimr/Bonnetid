@@ -3,7 +3,6 @@ import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
 import { NextPrayerHero } from '@/components/prayer/NextPrayerHero';
-import { PrayerTimelineCard } from '@/components/prayer/PrayerTimelineCard';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { EventCard } from '@/components/calendar/EventCard';
 import { JummahHomeCard } from '@/components/mosque/JummahHomeCard';
@@ -95,15 +94,6 @@ export default function HomeScreen() {
         )}
 
         <ReturnHomeCard />
-
-        {nextPrayer && todaySchedule.length > 0 && (
-          <PrayerTimelineCard
-            schedule={todaySchedule}
-            dayStart={today}
-            next={nextPrayer.next}
-            now={now}
-          />
-        )}
 
         {!calculated && <JummahHomeCard />}
 
