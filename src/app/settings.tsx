@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Platform, Pressable, Switch, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
@@ -19,16 +18,12 @@ import { asrMethodLabel } from '@/lib/asrMethods';
 import { calculationMethodLabel } from '@/lib/calculationMethods';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
 import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
-import { requestCoords, resolvePlaceName, useTravelState } from '@/hooks/useTravelDetection';
-import { track, trackError } from '@/lib/telemetry';
+import { track } from '@/lib/telemetry';
 import {
-  calculatedLocation,
-  DEFAULT_LOCATION,
   NOTIFIABLE_PRAYERS,
   VOLUNTARY_FAST_KINDS,
   useActiveLocation,
   useActiveMosque,
-  useHomeLocation,
   useSettings,
 } from '@/store/settings';
 
@@ -45,11 +40,7 @@ export default function SettingsScreen() {
   const router = useRouter();
   const theme = useTheme();
   const location = useActiveLocation();
-  const setLocation = useSettings((state) => state.setLocation);
-  const homeLocation = useHomeLocation();
   const calculationMethod = useSettings((state) => state.calculationMethod);
-  const travel = useTravelState();
-  const [switching, setSwitching] = useState(false);
   const calculated = location.mode === 'calculated';
   const mosque = useActiveMosque();
   const asrMethod = useSettings((state) => state.asrMethod);
@@ -72,28 +63,6 @@ export default function SettingsScreen() {
   const ramadanRemindersEnabled = useSettings((state) => state.ramadanRemindersEnabled);
   const dhulHijjahRemindersEnabled = useSettings((state) => state.dhulHijjahRemindersEnabled);
   const voluntaryFasts = useSettings((state) => state.voluntaryFasts);
-
-  const switchToCalculated = async () => {
-    if (switching) return;
-    setSwitching(true);
-    try {
-      const coords = travel.coords ?? (await requestCoords());
-      if (!coords) return;
-      const name = await resolvePlaceName(coords);
-      setLocation(calculatedLocation(name, coords.lat, coords.lon));
-      track('travel_mode_chosen', { choice: 'calculated' });
-    } catch (error) {
-      trackError(error, 'travel-mode-settings');
-    } finally {
-      setSwitching(false);
-    }
-  };
-
-  const switchToNorway = () => {
-    const target = homeLocation ?? DEFAULT_LOCATION;
-    setLocation(target);
-    track('travel_mode_chosen', { choice: 'norway' });
-  };
 
   const toggleNotifications = async (value: boolean) => {
     if (!value) {
@@ -141,10 +110,12 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Sted"
-          subtitle={calculated ? `${location.name} · lokale tider` : location.name}
+          subtitle={
+            calculated
+              ? `${location.name} · lokale tider, følger posisjonen din`
+              : `${location.name} · følger posisjonen din`
+          }
           leading={<Ionicons name="location-outline" size={20} color={theme.colors.primary} />}
-          chevron
-          onPress={() => router.push('/location-picker')}
           style={ROW}
         />
         {!calculated && (
@@ -188,40 +159,6 @@ export default function SettingsScreen() {
         )}
       </Card>
 
-      <SectionHeader title="Reisemodus" />
-      <Card padding="sm" rounded="xl">
-        <ListRow
-          title="Norsk tid"
-          subtitle={
-            homeLocation
-              ? `${homeLocation.name}, vist i din lokale klokke`
-              : 'Bønnetider fra en norsk by'
-          }
-          leading={<Ionicons name="flag-outline" size={20} color={theme.colors.primary} />}
-          trailing={
-            calculated ? undefined : (
-              <Ionicons name="checkmark" size={22} color={theme.colors.primary} />
-            )
-          }
-          onPress={calculated ? switchToNorway : undefined}
-          style={ROW}
-        />
-        <Divider />
-        <ListRow
-          title="Lokale tider"
-          subtitle={
-            switching ? 'Finner posisjonen din…' : 'Regnes ut der du er nå. Uten jamaat og moskeer'
-          }
-          leading={<Ionicons name="navigate-outline" size={20} color={theme.colors.primary} />}
-          trailing={
-            calculated ? (
-              <Ionicons name="checkmark" size={22} color={theme.colors.primary} />
-            ) : undefined
-          }
-          onPress={calculated ? undefined : () => void switchToCalculated()}
-          style={ROW}
-        />
-      </Card>
 
       <SectionHeader title="Varsler" />
       <Card padding="sm" rounded="xl">

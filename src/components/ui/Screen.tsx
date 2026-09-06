@@ -2,6 +2,7 @@ import type { PropsWithChildren } from 'react';
 import { ScrollView, StyleSheet, View, type ViewStyle, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useResponsive } from '@/hooks/useResponsive';
+import { TravelBanner } from '@/components/travel/TravelBanner';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 
@@ -32,10 +33,14 @@ export function Screen({
   const { contentMaxWidth } = useResponsive();
   const cap = maxWidth === null ? undefined : (maxWidth ?? contentMaxWidth);
 
-  const base: ViewStyle = {
+  const shell: ViewStyle = {
     flex: 1,
     backgroundColor: theme.colors.background,
     paddingTop: edges.includes('top') ? insets.top : 0,
+  };
+
+  const base: ViewStyle = {
+    flex: 1,
     paddingBottom: edges.includes('bottom') ? insets.bottom : 0,
   };
 
@@ -50,9 +55,8 @@ export function Screen({
     alignSelf: 'center',
   };
 
-  if (scroll) {
-    return (
-      <ScrollView
+  const body = scroll ? (
+    <ScrollView
         style={[base, style]}
         contentContainerStyle={[padding, styles.scrollContent, contentStyle]}
         showsVerticalScrollIndicator={false}
@@ -65,14 +69,18 @@ export function Screen({
             />
           ) : undefined
         }>
-        <View style={inner}>{children}</View>
-      </ScrollView>
-    );
-  }
-
-  return (
+      <View style={inner}>{children}</View>
+    </ScrollView>
+  ) : (
     <View style={[base, padding, style, contentStyle]}>
       <View style={[inner, { flex: 1 }]}>{children}</View>
+    </View>
+  );
+
+  return (
+    <View style={shell}>
+      <TravelBanner />
+      {body}
     </View>
   );
 }

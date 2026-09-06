@@ -41,6 +41,16 @@ export const palette = {
   blue600: '#2A6497',
   mapBlue: '#1A73E8',
 
+  travel50: '#EBEEF8',
+  travel100: '#D8DEF1',
+  travel200: '#B2BEE3',
+  travel400: '#5E7CC2',
+  travel500: '#41619F',
+  travel600: '#33549A',
+  travel700: '#26406F',
+  travel800: '#1B2E51',
+  travel900: '#131F38',
+
   sky50: '#EAF1F7',
   sky200: '#B7CFE3',
   sky700: '#1F4C74',

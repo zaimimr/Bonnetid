@@ -1,15 +1,11 @@
-import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { AppState } from 'react-native';
 import * as Location from 'expo-location';
 import { useLocations } from '@/api/queries';
-import { distanceKm } from '@/lib/geo';
-import { track } from '@/lib/telemetry';
 import { deviceOffsetMinutes, osloOffsetMinutes } from '@/lib/time';
-import { evaluateTravel, travelPromptKey, type Coords, type TravelSignal } from '@/lib/travelMode';
-import { calculatedLocation, useSettings } from '@/store/settings';
+import { evaluateTravel, type Coords, type TravelSignal } from '@/lib/travelMode';
 
 const MIN_REFRESH_INTERVAL_MS = 60_000;
-const RESYNC_DISTANCE_KM = 75;
 const FALLBACK_PLACE_NAME = 'Din posisjon';
 
 type PositionSnapshot = {
@@ -69,7 +65,6 @@ function refreshPosition(): Promise<void> {
 export type TravelState = {
   signal: TravelSignal;
   coords: Coords | null;
-  promptKey: string;
   permissionDenied: boolean;
 };
 
@@ -97,35 +92,8 @@ export function useTravelState(): TravelState {
   return {
     signal,
     coords: position.coords,
-    promptKey: travelPromptKey(position.coords, device),
     permissionDenied: position.permissionDenied,
   };
-}
-
-export type TravelPrompt = {
-  visible: boolean;
-  state: TravelState;
-  dismiss: () => void;
-};
-
-export function useTravelPrompt(): TravelPrompt {
-  const state = useTravelState();
-  const mode = useSettings((current) => current.location)?.mode ?? 'norway';
-  const answeredKey = useSettings((current) => current.travelPromptKey);
-  const setTravelPromptKey = useSettings((current) => current.setTravelPromptKey);
-
-  const visible = state.signal === 'abroad' && mode === 'norway' && answeredKey !== state.promptKey;
-
-  useEffect(() => {
-    if (state.signal === 'home' && answeredKey != null) setTravelPromptKey(null);
-  }, [state.signal, answeredKey, setTravelPromptKey]);
-
-  const promptKey = state.promptKey;
-  const dismiss = useCallback(() => {
-    setTravelPromptKey(promptKey);
-  }, [promptKey, setTravelPromptKey]);
-
-  return { visible, state, dismiss };
 }
 
 export async function resolvePlaceName(coords: Coords): Promise<string> {
@@ -157,26 +125,3 @@ export async function requestCoords(): Promise<Coords | null> {
   }
 }
 
-export function useCalculatedLocationSync() {
-  const location = useSettings((state) => state.location);
-  const setLocation = useSettings((state) => state.setLocation);
-  const { signal, coords } = useTravelState();
-  const applied = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (!location || location.mode !== 'calculated' || !coords) return;
-    if (signal === 'home') return;
-    if (distanceKm(location.lat, location.lon, coords.lat, coords.lon) < RESYNC_DISTANCE_KM) return;
-
-    const key = travelPromptKey(coords, 0);
-    if (applied.current === key) return;
-    applied.current = key;
-
-    resolvePlaceName(coords)
-      .then((name) => {
-        setLocation(calculatedLocation(name, coords.lat, coords.lon));
-        track('travel_mode_chosen', { choice: 'moved' });
-      })
-      .catch(() => {});
-  }, [location, coords, signal, setLocation]);
-}

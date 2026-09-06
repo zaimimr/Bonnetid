@@ -55,7 +55,6 @@ type SettingsState = {
   location: SavedLocation | null;
   homeLocation: SavedLocation | null;
   calculationMethod: CalculationMethodKey;
-  travelPromptKey: string | null;
   mosque: SavedMosque | null;
   asrMethod: AsrMethodPreference | null;
   themePreference: ThemePreference;
@@ -75,7 +74,6 @@ type SettingsState = {
   markReviewRequested: () => void;
   setLocation: (location: SavedLocation) => void;
   setCalculationMethod: (method: CalculationMethodKey) => void;
-  setTravelPromptKey: (key: string | null) => void;
   setMosque: (mosque: SavedMosque | null) => void;
   setAsrMethod: (method: AsrMethodPreference) => void;
   setThemePreference: (preference: ThemePreference) => void;
@@ -113,7 +111,6 @@ export const useSettings = create<SettingsState>()(
       location: null,
       homeLocation: null,
       calculationMethod: DEFAULT_CALCULATION_METHOD,
-      travelPromptKey: null,
       mosque: null,
       asrMethod: null,
       themePreference: 'system',
@@ -140,7 +137,6 @@ export const useSettings = create<SettingsState>()(
             : { location, homeLocation: home, asrMethod: null };
         }),
       setCalculationMethod: (calculationMethod) => set({ calculationMethod }),
-      setTravelPromptKey: (travelPromptKey) => set({ travelPromptKey }),
       setMosque: (mosque) => set({ mosque }),
       setAsrMethod: (asrMethod) => set({ asrMethod }),
       setThemePreference: (themePreference) => set({ themePreference }),
