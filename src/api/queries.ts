@@ -10,6 +10,8 @@ import {
 } from './endpoints';
 import type { HijriDay } from './types';
 
+const MOSQUE_CACHE_VERSION = 'jummah-v1';
+
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 
@@ -52,7 +54,7 @@ export function usePrayerTimes(
 
 export function useMosques() {
   return useQuery({
-    queryKey: ['mosques'],
+    queryKey: ['mosques', MOSQUE_CACHE_VERSION],
     queryFn: fetchMosques,
     staleTime: 3 * DAY,
     gcTime: 30 * DAY,
@@ -61,7 +63,7 @@ export function useMosques() {
 
 export function useMosque(orgNr: string, options?: { enabled?: boolean }) {
   return useQuery({
-    queryKey: ['mosque', orgNr],
+    queryKey: ['mosque', orgNr, MOSQUE_CACHE_VERSION],
     queryFn: () => fetchMosque(orgNr),
     staleTime: 3 * DAY,
     gcTime: 30 * DAY,

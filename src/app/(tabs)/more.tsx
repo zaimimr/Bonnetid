@@ -20,6 +20,13 @@ const TRACKER_FEATURE: Feature = {
   description: 'Marker bønner som bedt, og se uken din',
 };
 
+const JUMMAH_FEATURE: Feature = {
+  href: '/jummah',
+  icon: 'people-outline',
+  title: 'Nærmeste jummah',
+  description: 'Hvilken fredagsbønn i nærheten du rekker',
+};
+
 const FEATURES: Feature[] = [
   {
     href: '/timetable',
@@ -45,7 +52,9 @@ export default function MoreScreen() {
   const router = useRouter();
   const theme = useTheme();
   const trackerEnabled = usePrayerTrackerEnabled();
-  const features = trackerEnabled ? [TRACKER_FEATURE, ...FEATURES] : FEATURES;
+  const features = trackerEnabled
+    ? [TRACKER_FEATURE, JUMMAH_FEATURE, ...FEATURES]
+    : [JUMMAH_FEATURE, ...FEATURES];
 
   return (
     <Screen scroll>

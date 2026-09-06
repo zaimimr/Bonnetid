@@ -16,7 +16,10 @@ export type MosqueCardProps = {
 
 export function MosqueCard({ mosque, distanceKm, showEid, selected, onPress }: MosqueCardProps) {
   const theme = useTheme();
-  const nextJummah = mosque.jummah[0]?.jummah;
+  const jummahLabel = mosque.jummah
+    .slice(0, 2)
+    .map((entry) => entry.jummah)
+    .join(' · ');
   const eidTimes = showEid && mosque.show_eid ? mosque.eid_prayers : [];
 
   return (
@@ -42,7 +45,7 @@ export function MosqueCard({ mosque, distanceKm, showEid, selected, onPress }: M
             {selected && <Badge label="Min moské" variant="primary" />}
             {distanceKm != null && <Badge label={formatDistance(distanceKm)} variant="neutral" />}
             {eidTimes.length > 0 && <Badge label={`Eid ${eidTimes.join(' · ')}`} variant="primary" />}
-            {nextJummah && <Badge label={`Jumuah ${nextJummah}`} variant="primary" />}
+            {jummahLabel ? <Badge label={`Jumuah ${jummahLabel}`} variant="primary" /> : null}
           </View>
         </View>
 
