@@ -63,12 +63,22 @@ Each Android profile auto-increments its own version code, so the mobile and aut
 ```bash
 eas submit -p ios     --profile production            --id <ios-build-id>        --non-interactive
 eas submit -p android --profile production            --id <android-build-id>    --non-interactive
-eas submit -p android --profile testing               --id <android-build-id>    --non-interactive
 eas submit -p android --profile production-automotive --id <automotive-build-id> --non-interactive
-eas submit -p android --profile testing-automotive    --id <automotive-build-id> --non-interactive
 ```
 
-The same Android bundle is submitted twice, once per track. Play accepts that.
+**One `eas submit` per Android bundle, not one per track.** The Play API refuses the second upload of a version code even when it targets a different track:
+
+> You've already submitted this version of the app. Versions are identified by Android version code
+
+So `--profile testing` and `--profile testing-automotive` fail after the matching production submit has run. Put the bundle on the internal track from the Console instead, which reuses the already-uploaded artifact:
+
+1. Test and release -> Testing -> Internal testing. For the automotive bundle, first switch the form-factor dropdown (top right) from "Phones, Tablets, Chrome OS, Android XR" to **Automotive OS only** - it is a separate track with its own releases.
+2. **Create new release**. If the button is greyed out, a draft release is blocking the track - open it with "Edit release" and reuse it.
+3. **Add from library** -> tick the new version code -> Add to release.
+4. A reused draft can still carry an old bundle, which then fails review with "This APK will not be served to any users because it is completely shadowed by one or more APKs with higher version codes." Remove it: the row's **Manage artifact** menu -> Remove app bundle. It stays in the artifact library.
+5. Set the release name to `<versionCode> (<version>)`, write the Norwegian release notes inside `<no-NO>` tags, **Next**, then **Save and publish**.
+
+A remaining "no deobfuscation file" warning is harmless. A warning that the release "will not be available to any users because you haven't specified any testers" means that track has no tester list - the bundle still lands, but nobody receives it. Tell the user; do not add testers on your own.
 
 iOS needs only one submit: it uploads to App Store Connect, and TestFlight internal testers get it automatically once processing finishes. There is no separate iOS internal-testing submit profile to run.
 
