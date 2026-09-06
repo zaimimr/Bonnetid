@@ -14,7 +14,7 @@ struct PrayerEntry: Codable, Hashable {
   let isJummah: Bool?
   let end: Date?
 
-  /// What a widget prints: "Jummah" on Friday when the mosque has one.
+  /// What a widget prints: "Jumuah" on Friday when the mosque has one.
   var printedLabel: String { displayLabel ?? label }
 
   /// The single time to print when jamat times are hidden. On Friday the congregation time is

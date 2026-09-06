@@ -132,7 +132,7 @@ export default function DayScreen() {
             mosqueNote={
               mosqueInLocation
                 ? undefined
-                : `Moskeen er i en annen kommune, så bare jummah kommer fra ${mosque?.name ?? 'moskeen'}`
+                : `Moskeen er i en annen kommune, så bare Jumuah kommer fra ${mosque?.name ?? 'moskeen'}`
             }
             jamatTimes={jamatTimes}
             jummah={isFriday ? jummahTimes : []}

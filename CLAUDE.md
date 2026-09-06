@@ -29,6 +29,7 @@ bridge is a `requireOptionalNativeModule`, so every call no-ops there.
 
 - All styling reads semantic theme roles via `useTheme()` from `src/theme`. Never hardcode colors in components; add roles to `src/theme/theme.ts` and primitives to `src/theme/tokens.ts`.
 - UI text is Norwegian bokmål.
+- Prayer name spelling, everywhere a human reads it: **Jumuah** (never "jummah", "Jummah" or "jumma") and **Dhuhr** (never "duhr" or "Duhr"). This covers UI strings, comments, commit messages, PR text and docs. The lowercase `duhr` and `jummah` identifiers stay as they are - they are Supabase column names and the app-facing types built on them, so renaming them would break the data layer.
 - API layer: Supabase client in `src/api/supabase.ts`, fetch + row-to-app-type mapping in `endpoints.ts`, react-query hooks in `queries.ts`. Screens only consume hooks. DB rows never leak past `endpoints.ts`.
 - Pure logic (time parsing, qibla bearing, hijri formatting, schedule building) lives in `src/lib` and takes explicit arguments, no hooks.
 - App-facing date formats (kept from the old REST API): `PrayerDay.date` is `dd-mm-yyyy`, `HijriDay.hijri_date` is `yyyy-m-d`, `PrayerDay.hijri_date` is `d-m-yyyy`, `HijriDay.gregorian_date` is ISO `yyyy-mm-dd`. DB dates are ISO; DB times are `HH:MM:SS` and get trimmed to `HH:MM` in `endpoints.ts`.
