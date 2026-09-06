@@ -62,6 +62,19 @@ export function osloWallClockToDate(day: Date | string, time: string): Date {
   return new Date(naive - OSLO_STANDARD_OFFSET * MINUTE_MS);
 }
 
+export function localWallClockToDate(day: Date | string, time: string): Date {
+  const calendar = calendarDayOf(day);
+  const [hours, minutes] = time.split(':').map(Number);
+  if (!calendar || Number.isNaN(hours) || Number.isNaN(minutes)) return new Date(NaN);
+  return new Date(calendar.year, calendar.month - 1, calendar.day, hours, minutes, 0, 0);
+}
+
+export type PrayerTimeZone = 'oslo' | 'device';
+
+export function wallClockToDate(day: Date | string, time: string, zone: PrayerTimeZone): Date {
+  return zone === 'device' ? localWallClockToDate(day, time) : osloWallClockToDate(day, time);
+}
+
 export function parseTimeToDate(time: string, baseDate: Date): Date {
   return osloWallClockToDate(baseDate, time);
 }
@@ -127,6 +140,16 @@ export function formatCountdown(milliseconds: number): string {
   return `${pad(minutes)}:${pad(seconds)}`;
 }
 
+export function formatCountdownUnits(milliseconds: number): string {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 0) return `${hours}t ${minutes}m ${pad(seconds)}s`;
+  if (minutes > 0) return `${minutes}m ${pad(seconds)}s`;
+  return `${seconds}s`;
+}
+
 export function formatDurationShort(milliseconds: number): string {
   const totalMinutes = Math.max(0, Math.round(milliseconds / MINUTE_MS));
   const hours = Math.floor(totalMinutes / 60);
@@ -152,9 +175,13 @@ export function isoDateKey(date: Date = new Date()): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
-export function isoDateIsFriday(isoDate: string): boolean {
+export function isoWeekday(isoDate: string): number {
   const parsed = new Date(`${isoDate}T12:00:00`);
-  return !Number.isNaN(parsed.getTime()) && parsed.getDay() === FRIDAY;
+  return Number.isNaN(parsed.getTime()) ? -1 : parsed.getDay();
+}
+
+export function isoDateIsFriday(isoDate: string): boolean {
+  return isoWeekday(isoDate) === FRIDAY;
 }
 
 export function addIsoDays(isoDate: string, days: number): string {

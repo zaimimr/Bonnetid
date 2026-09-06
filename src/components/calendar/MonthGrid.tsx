@@ -20,10 +20,18 @@ export type MonthGridProps = {
   monthIndex: number;
   days: HijriDay[];
   selectedIso?: string | null;
+  todayIso?: string;
   onDayPress?: (iso: string, day: HijriDay | undefined) => void;
 };
 
-export function MonthGrid({ year, monthIndex, days, selectedIso, onDayPress }: MonthGridProps) {
+export function MonthGrid({
+  year,
+  monthIndex,
+  days,
+  selectedIso,
+  todayIso: todayIsoOverride,
+  onDayPress,
+}: MonthGridProps) {
   const theme = useTheme();
   const { scale } = useFontScale();
   const { isWide } = useResponsive();
@@ -31,7 +39,7 @@ export function MonthGrid({ year, monthIndex, days, selectedIso, onDayPress }: M
   const dayWidth = scaleWidth(isWide ? WIDE_DAY_WIDTH : DAY_WIDTH, gridScale);
   const cellHeight = scaleWidth(CELL_HEIGHT, gridScale);
   const dayHeight = scaleWidth(DAY_HEIGHT, gridScale);
-  const todayIso = osloDateKey();
+  const todayIso = todayIsoOverride ?? osloDateKey();
   const byDate = new Map(days.map((day) => [day.gregorian_date, day]));
 
   const firstOfMonth = new Date(year, monthIndex, 1);

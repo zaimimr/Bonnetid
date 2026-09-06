@@ -1,12 +1,9 @@
 import { useState } from 'react';
-import { Linking, Platform, Pressable, Switch, View } from 'react-native';
+import { Platform, Pressable, Switch, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
-import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
-import { useLocations } from '@/api/queries';
-import { detectNearestLocation } from '@/hooks/useAutoLocation';
 import { AppText, Card, Divider, ListRow, Screen, SectionHeader } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
@@ -19,11 +16,21 @@ import {
 import { openStoreReview } from '@/lib/review';
 import { getNotificationSound } from '@/lib/notificationSounds';
 import { asrMethodLabel } from '@/lib/asrMethods';
+import { calculationMethodLabel } from '@/lib/calculationMethods';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
 import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
-import { useRamadanStatus } from '@/hooks/useRamadanStatus';
+import { requestCoords, resolvePlaceName, useTravelState } from '@/hooks/useTravelDetection';
 import { track, trackError } from '@/lib/telemetry';
-import { NOTIFIABLE_PRAYERS, useActiveLocation, useSettings } from '@/store/settings';
+import {
+  calculatedLocation,
+  DEFAULT_LOCATION,
+  NOTIFIABLE_PRAYERS,
+  VOLUNTARY_FAST_KINDS,
+  useActiveLocation,
+  useActiveMosque,
+  useHomeLocation,
+  useSettings,
+} from '@/store/settings';
 
 const lockScreenSupported =
   prayerWidgetAvailable && (Platform.OS === 'android' || liveActivitiesEnabled());
@@ -39,9 +46,12 @@ export default function SettingsScreen() {
   const theme = useTheme();
   const location = useActiveLocation();
   const setLocation = useSettings((state) => state.setLocation);
-  const { data: locations } = useLocations();
-  const [locating, setLocating] = useState(false);
-  const mosque = useSettings((state) => state.mosque);
+  const homeLocation = useHomeLocation();
+  const calculationMethod = useSettings((state) => state.calculationMethod);
+  const travel = useTravelState();
+  const [switching, setSwitching] = useState(false);
+  const calculated = location.mode === 'calculated';
+  const mosque = useActiveMosque();
   const asrMethod = useSettings((state) => state.asrMethod);
   const themePreference = useSettings((state) => state.themePreference);
   const setThemePreference = useSettings((state) => state.setThemePreference);
@@ -60,29 +70,29 @@ export default function SettingsScreen() {
   const asrOverride = useMosqueAsrOverride();
   const asrLocationDefault = useLocationAsrDefault();
   const ramadanRemindersEnabled = useSettings((state) => state.ramadanRemindersEnabled);
-  const setRamadanRemindersEnabled = useSettings((state) => state.setRamadanRemindersEnabled);
-  const ramadan = useRamadanStatus(new Date());
-  const showRamadan = ramadan.isRamadan || ramadan.daysUntilRamadan != null;
+  const dhulHijjahRemindersEnabled = useSettings((state) => state.dhulHijjahRemindersEnabled);
+  const voluntaryFasts = useSettings((state) => state.voluntaryFasts);
 
-  const detectLocation = async () => {
-    if (!locations || locating) return;
-    const permission = await Location.getForegroundPermissionsAsync();
-    if (!permission.granted && !permission.canAskAgain) {
-      Linking.openSettings().catch(() => {});
-      return;
-    }
-    setLocating(true);
+  const switchToCalculated = async () => {
+    if (switching) return;
+    setSwitching(true);
     try {
-      const detected = await detectNearestLocation(locations);
-      if (detected) {
-        setLocation(detected);
-        track('location_detected', { iso: detected.iso, source: 'settings' });
-      }
+      const coords = travel.coords ?? (await requestCoords());
+      if (!coords) return;
+      const name = await resolvePlaceName(coords);
+      setLocation(calculatedLocation(name, coords.lat, coords.lon));
+      track('travel_mode_chosen', { choice: 'calculated' });
     } catch (error) {
-      trackError(error, 'location-detect');
+      trackError(error, 'travel-mode-settings');
     } finally {
-      setLocating(false);
+      setSwitching(false);
     }
+  };
+
+  const switchToNorway = () => {
+    const target = homeLocation ?? DEFAULT_LOCATION;
+    setLocation(target);
+    track('travel_mode_chosen', { choice: 'norway' });
   };
 
   const toggleNotifications = async (value: boolean) => {
@@ -105,6 +115,18 @@ export default function SettingsScreen() {
     setLiveActivityEnabled(granted);
   };
 
+  const chosenFasts = [
+    ramadanRemindersEnabled,
+    dhulHijjahRemindersEnabled,
+    ...VOLUNTARY_FAST_KINDS.map((kind) => voluntaryFasts[kind]),
+  ].filter(Boolean).length;
+  const fastingSummary =
+    chosenFasts === 0
+      ? 'Ingen påminnelser'
+      : chosenFasts === 1
+        ? '1 påminnelse er på'
+        : `${chosenFasts} påminnelser er på`;
+
   const chosenPrayers = NOTIFIABLE_PRAYERS.filter((prayer) => notificationPrayers[prayer]);
   const prayerSummary =
     chosenPrayers.length === NOTIFIABLE_PRAYERS.length
@@ -119,21 +141,25 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Sted"
-          subtitle={locating ? 'Finner posisjonen din…' : location.name}
+          subtitle={calculated ? `${location.name} · lokale tider` : location.name}
           leading={<Ionicons name="location-outline" size={20} color={theme.colors.primary} />}
-          trailing={<Ionicons name="navigate-outline" size={18} color={theme.colors.primary} />}
-          onPress={detectLocation}
-          style={ROW}
-        />
-        <Divider />
-        <ListRow
-          title="Min moské"
-          subtitle={mosque?.name ?? 'Ikke valgt'}
-          leading={<Ionicons name="business-outline" size={20} color={theme.colors.primary} />}
           chevron
-          onPress={() => router.push('/mosque-picker')}
+          onPress={() => router.push('/location-picker')}
           style={ROW}
         />
+        {!calculated && (
+          <>
+            <Divider />
+            <ListRow
+              title="Min moské"
+              subtitle={mosque?.name ?? 'Ikke valgt'}
+              leading={<Ionicons name="business-outline" size={20} color={theme.colors.primary} />}
+              chevron
+              onPress={() => router.push('/mosque-picker')}
+              style={ROW}
+            />
+          </>
+        )}
         <Divider />
         <ListRow
           title="Asr-metode"
@@ -145,6 +171,54 @@ export default function SettingsScreen() {
           leading={<Ionicons name="partly-sunny-outline" size={20} color={theme.colors.primary} />}
           chevron
           onPress={() => router.push('/asr-method')}
+          style={ROW}
+        />
+        {calculated && (
+          <>
+            <Divider />
+            <ListRow
+              title="Beregningsmetode"
+              subtitle={calculationMethodLabel(calculationMethod)}
+              leading={<Ionicons name="calculator-outline" size={20} color={theme.colors.primary} />}
+              chevron
+              onPress={() => router.push('/calculation-method')}
+              style={ROW}
+            />
+          </>
+        )}
+      </Card>
+
+      <SectionHeader title="Reisemodus" />
+      <Card padding="sm" rounded="xl">
+        <ListRow
+          title="Norsk tid"
+          subtitle={
+            homeLocation
+              ? `${homeLocation.name}, vist i din lokale klokke`
+              : 'Bønnetider fra en norsk by'
+          }
+          leading={<Ionicons name="flag-outline" size={20} color={theme.colors.primary} />}
+          trailing={
+            calculated ? undefined : (
+              <Ionicons name="checkmark" size={22} color={theme.colors.primary} />
+            )
+          }
+          onPress={calculated ? switchToNorway : undefined}
+          style={ROW}
+        />
+        <Divider />
+        <ListRow
+          title="Lokale tider"
+          subtitle={
+            switching ? 'Finner posisjonen din…' : 'Regnes ut der du er nå. Uten jamaat og moskeer'
+          }
+          leading={<Ionicons name="navigate-outline" size={20} color={theme.colors.primary} />}
+          trailing={
+            calculated ? (
+              <Ionicons name="checkmark" size={22} color={theme.colors.primary} />
+            ) : undefined
+          }
+          onPress={calculated ? undefined : () => void switchToCalculated()}
           style={ROW}
         />
       </Card>
@@ -188,26 +262,15 @@ export default function SettingsScreen() {
               onPress={() => router.push('/notification-sound')}
               style={ROW}
             />
-            {showRamadan && (
-              <>
-                <Divider />
-                <ListRow
-                  title="Suhoor-påminnelse"
-                  subtitle="45 minutter før Fajr"
-                  leading={<Ionicons name="moon-outline" size={20} color={theme.colors.primary} />}
-                  trailing={
-                    <Switch
-                      value={ramadanRemindersEnabled}
-                      onValueChange={setRamadanRemindersEnabled}
-                      disabled={!notificationsSupported}
-                      trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
-                      thumbColor={theme.colors.surface}
-                    />
-                  }
-                  style={ROW}
-                />
-              </>
-            )}
+            <Divider />
+            <ListRow
+              title="Faste og merkedager"
+              subtitle={fastingSummary}
+              leading={<Ionicons name="moon-outline" size={20} color={theme.colors.primary} />}
+              chevron
+              onPress={() => router.push('/fasting-reminders')}
+              style={ROW}
+            />
           </>
         )}
       </Card>
@@ -267,7 +330,7 @@ export default function SettingsScreen() {
             />
           </>
         )}
-        {widgetJamatSupported && (
+        {widgetJamatSupported && !calculated && (
           <>
             <Divider />
             <ListRow

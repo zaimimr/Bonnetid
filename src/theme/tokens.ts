@@ -10,8 +10,10 @@ export const palette = {
   emerald800: '#074536',
   emerald900: '#053327',
 
+  gold50: '#FAF3DE',
   gold400: '#D9B84F',
   gold600: '#8F7112',
+  gold700: '#6E570D',
 
   neutral0: '#FFFFFF',
   neutral50: '#F6F8F7',
@@ -37,6 +39,12 @@ export const palette = {
   red600: '#B23B31',
   red400: '#D96A61',
   blue600: '#2A6497',
+  mapBlue: '#1A73E8',
+
+  sky50: '#EAF1F7',
+  sky200: '#B7CFE3',
+  sky700: '#1F4C74',
+  sky900: '#12293D',
 } as const;
 
 export const spacing = {

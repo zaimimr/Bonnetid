@@ -11,6 +11,8 @@ enum PrayerColor {
   static let inkSecondary = dynamic(light: 0x3E4C46, dark: 0xC6D0CB)
   static let inkMuted = dynamic(light: 0x5F6E67, dark: 0x8C9A93)
   static let hairline = dynamic(light: 0xDDE4E0, dark: 0x27362F)
+  static let track = dynamic(light: 0xEDF1EF, dark: 0x27362F)
+  static let trackMarker = dynamic(light: 0xC3CEC8, dark: 0x354740)
 
   private static func dynamic(light: UInt32, dark: UInt32) -> Color {
     Color(UIColor { traits in

@@ -1,5 +1,10 @@
 import { useLocations, useMosque } from '@/api/queries';
-import { useActiveLocation, useSettings, type AsrMethodPreference } from '@/store/settings';
+import {
+  useActiveLocation,
+  useActiveMosque,
+  useSettings,
+  type AsrMethodPreference,
+} from '@/store/settings';
 
 export function toPreference(
   method: 'IRN' | 'SHADOW_1X' | 'SHADOW_2X' | 'WUSTA' | 'NONE' | string | null | undefined,
@@ -12,7 +17,7 @@ export function toPreference(
 }
 
 export function useMosqueAsrOverride(): AsrMethodPreference | null {
-  const mosque = useSettings((state) => state.mosque);
+  const mosque = useActiveMosque();
   const location = useActiveLocation();
   const { data } = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
   if (!mosque || !data) return null;

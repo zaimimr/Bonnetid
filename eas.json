@@ -41,14 +41,19 @@
         "releaseStatus": "completed"
       }
     },
-    "internal": {
+    "testing": {
+      "ios": {
+        "ascAppId": "6792056685"
+      },
       "android": {
-        "track": "internal"
+        "track": "internal",
+        "releaseStatus": "completed"
       }
     },
-    "internal-automotive": {
+    "testing-automotive": {
       "android": {
-        "track": "automotive:internal"
+        "track": "automotive:internal",
+        "releaseStatus": "completed"
       }
     }
   }

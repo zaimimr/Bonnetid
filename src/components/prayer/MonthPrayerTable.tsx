@@ -19,13 +19,19 @@ const FRIDAY = 5;
 export type MonthPrayerTableProps = {
   days: PrayerDay[];
   asrMethod: AsrMethodPreference;
+  todayDayKey?: string;
   onDayPress?: (day: PrayerDay) => void;
 };
 
-export function MonthPrayerTable({ days, asrMethod, onDayPress }: MonthPrayerTableProps) {
+export function MonthPrayerTable({
+  days,
+  asrMethod,
+  todayDayKey,
+  onDayPress,
+}: MonthPrayerTableProps) {
   const theme = useTheme();
   const { scale } = useFontScale();
-  const today = osloDayKey();
+  const today = todayDayKey ?? osloDayKey();
   const tableScale = Math.min(scale, MAX_TABLE_FONT_SCALE);
   const dateColumnWidth = scaleWidth(DATE_COLUMN_WIDTH, tableScale);
   const scrolls = scale >= SCROLL_FROM_SCALE;

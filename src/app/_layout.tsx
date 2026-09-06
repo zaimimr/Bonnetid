@@ -6,13 +6,15 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { Stack, useNavigationContainerRef } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { TravelModeSheet } from '@/components/travel/TravelModeSheet';
 import { ThemeProvider, useTheme } from '@/theme';
 import { configureNotificationHandler } from '@/lib/notifications';
 import { initTelemetry, navigationIntegration, Sentry, trackError } from '@/lib/telemetry';
 import { useNotificationScheduler } from '@/hooks/useNotificationScheduler';
 import { useNotificationResponses } from '@/hooks/useNotificationResponses';
 import { useAutoLocation } from '@/hooks/useAutoLocation';
-import { useRamadanReminders } from '@/hooks/useRamadanReminders';
+import { useCalculatedLocationSync } from '@/hooks/useTravelDetection';
+import { useFastingReminders } from '@/hooks/useFastingReminders';
 import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 import { useWidgetSync } from '@/hooks/useWidgetSync';
 import { useNow } from '@/hooks/useNow';
@@ -54,9 +56,10 @@ function RootNavigator() {
   const theme = useTheme();
   const now = useNow(60_000);
   useAutoLocation();
+  useCalculatedLocationSync();
   useNotificationScheduler();
   useNotificationResponses();
-  useRamadanReminders();
+  useFastingReminders(now);
   useReviewPrompt();
   useWidgetSync(now);
   usePrayerLogSync(now);
@@ -86,6 +89,28 @@ function RootNavigator() {
           options={{
             headerShown: true,
             title: 'Moskeer',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="place-picker"
+          options={{
+            headerShown: true,
+            title: 'Velg sted',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="jummah"
+          options={{
+            headerShown: true,
+            title: 'Fredagsbønn',
             headerBackTitle: 'Tilbake',
             headerStyle: { backgroundColor: theme.colors.surface },
             headerTitleStyle: { color: theme.colors.textPrimary },
@@ -148,6 +173,39 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="fasting-reminders"
+          options={{
+            headerShown: true,
+            title: 'Faste og merkedager',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="calculation-method"
+          options={{
+            headerShown: true,
+            title: 'Beregningsmetode',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="location-picker"
+          options={{
+            presentation: 'modal',
+            headerShown: true,
+            title: 'Velg sted',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
           name="asr-method"
           options={{
             headerShown: true,
@@ -192,6 +250,7 @@ function RootNavigator() {
           }}
         />
       </Stack>
+      <TravelModeSheet />
     </>
   );
 }

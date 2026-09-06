@@ -6,17 +6,24 @@ import {
   setPrayerSnapshot,
   startOrUpdatePrayerActivity,
 } from '../../modules/prayer-widget';
-import { useHijriMonth, useMosque, useMosques, usePrayerTimes } from '@/api/queries';
+import { useHijriMonth, useMosque, useMosques } from '@/api/queries';
 import type { PrayerDay } from '@/api/types';
+import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
+import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { formatHijri } from '@/lib/hijri';
 import { resolveActivityWindow } from '@/lib/liveActivityWindow';
 import { isJummahCell, type SnapshotDayInput, type SnapshotMosqueInput } from '@/lib/widgetSnapshot';
-import { adhanTimesFromSchedule, buildDaySchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
-import { isoDateKey, osloDayKey, parseDayKey, todayKey } from '@/lib/time';
+import {
+  adhanTimesFromSchedule,
+  buildDaySchedule,
+  jamatTimesForDate,
+  type PrayerEntry,
+} from '@/lib/prayerSchedule';
+import { isoDateKey, parseDayKey, todayKey } from '@/lib/time';
 import { buildSnapshot, snapshotIsEmpty } from '@/lib/widgetSnapshot';
 import { usePrayerLog } from '@/store/prayerLog';
-import { useActiveLocation, useSettings } from '@/store/settings';
+import { useActiveLocation, useActiveMosque, useSettings } from '@/store/settings';
 
 const SNAPSHOT_DAYS = 3;
 
@@ -38,20 +45,21 @@ function findDay(rows: PrayerDay[] | undefined, date: Date): PrayerDay | undefin
 export function useWidgetSync(now: Date) {
   const location = useActiveLocation();
   const asrMethod = useEffectiveAsrMethod();
-  const mosque = useSettings((state) => state.mosque);
-  const showJamat = useSettings((state) => state.widgetShowJamat);
+  const zone = zoneFor(location);
+  const mosque = useActiveMosque();
+  const showJamat = useSettings((state) => state.widgetShowJamat) && mosque != null;
   const liveActivityEnabled = useSettings((state) => state.liveActivityEnabled);
   const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled);
   const lockScreenEnabled = liveActivityEnabled && trackerEnabled;
   const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
   const mosqueList = useMosques();
 
-  const dayKey = osloDayKey(now);
+  const { dayKey } = useActiveDayKeys(now);
   const dayStart = useMemo(() => parseDayKey(dayKey), [dayKey]);
   const lastDay = useMemo(() => addDays(dayStart, SNAPSHOT_DAYS - 1), [dayStart]);
 
-  const currentMonth = usePrayerTimes(location.iso, dayStart.getFullYear(), dayStart.getMonth() + 1);
-  const nextMonth = usePrayerTimes(location.iso, lastDay.getFullYear(), lastDay.getMonth() + 1);
+  const currentMonth = usePrayerMonth(location, dayStart.getFullYear(), dayStart.getMonth() + 1);
+  const nextMonth = usePrayerMonth(location, lastDay.getFullYear(), lastDay.getMonth() + 1);
   const currentHijri = useHijriMonth(dayStart.getFullYear(), dayStart.getMonth() + 1);
   const nextHijri = useHijriMonth(lastDay.getFullYear(), lastDay.getMonth() + 1);
 
@@ -67,7 +75,7 @@ export function useWidgetSync(now: Date) {
       const row = findDay(rows, date);
       if (!row) return null;
 
-      const schedule = buildDaySchedule(row, date, asrMethod);
+      const schedule = buildDaySchedule(row, date, asrMethod, zone);
       const iso = isoDateKey(date);
       const hijriRow = hijriRows.find((entry) => entry.gregorian_date === iso);
       const jamatTimes = jamatTimesForDate(
@@ -94,6 +102,7 @@ export function useWidgetSync(now: Date) {
     nextHijri.data,
     dayStart,
     asrMethod,
+    zone,
     mosqueInLocation,
     mosqueDetails.data?.jamat,
     mosqueDetails.data?.jummah,
@@ -101,6 +110,7 @@ export function useWidgetSync(now: Date) {
 
   // The car app ranks these against its own position, so every mosque with coordinates ships.
   const mosques = useMemo<SnapshotMosqueInput[]>(() => {
+    if (location.mode === 'calculated') return [];
     return (mosqueList.data ?? [])
       .filter((entry) => entry.lat != null && entry.lon != null)
       .map((entry) => ({
@@ -110,12 +120,13 @@ export function useWidgetSync(now: Date) {
         lat: Number(entry.lat),
         lon: Number(entry.lon),
       }));
-  }, [mosqueList.data]);
+  }, [mosqueList.data, location.mode]);
 
   const snapshot = useMemo(
     () =>
       buildSnapshot({
         locationName: location.name,
+        mode: location.mode,
         origin: { lat: location.lat, lon: location.lon },
         mosques,
         mosqueName: mosque?.name ?? null,
@@ -124,7 +135,18 @@ export function useWidgetSync(now: Date) {
         generatedAt: now,
         days,
       }),
-    [location.name, location.lat, location.lon, mosques, mosque, showJamat, lockScreenEnabled, days, now],
+    [
+      location.name,
+      location.mode,
+      location.lat,
+      location.lon,
+      mosques,
+      mosque,
+      showJamat,
+      lockScreenEnabled,
+      days,
+      now,
+    ],
   );
 
   // `now` ticks every second in the app; the payload only matters when the times change.
@@ -197,17 +219,26 @@ function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now
         return;
       }
 
-      const day = days.find((entry) => isoDateKey(entry.date) === window.isoDate);
-      const label = day && isJummahCell(day, window.prayer.name) ? 'Jumuah' : window.prayer.label;
+      const labelFor = (isoDate: string, prayer: PrayerEntry) => {
+        const day = days.find((entry) => isoDateKey(entry.date) === isoDate);
+        return day && isJummahCell(day, prayer.name) ? 'Jumuah' : prayer.label;
+      };
+
+      const { next } = window;
 
       const state = {
         locationName,
         isoDate: window.isoDate,
-        prayerLabel: label,
+        prayerLabel: labelFor(window.isoDate, window.prayer),
         prayerKind: window.prayer.name,
         prayerAt: window.prayer.date.getTime() / 1000,
         windowEnd: window.windowEnd.getTime() / 1000,
         showMarkButtons: trackerEnabled,
+        nextIsoDate: next?.isoDate ?? '',
+        nextLabel: next ? labelFor(next.isoDate, next.prayer) : '',
+        nextKind: next?.prayer.name ?? '',
+        nextAt: next ? next.prayer.date.getTime() / 1000 : 0,
+        nextWindowEnd: next ? next.windowEnd.getTime() / 1000 : 0,
       };
 
       apply(JSON.stringify(state), () => void startOrUpdatePrayerActivity(state));

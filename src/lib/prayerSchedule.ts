@@ -5,7 +5,8 @@ import {
   formatLocalClock,
   isoDateIsFriday,
   osloTimeToLocalClock,
-  parseTimeToDate,
+  wallClockToDate,
+  type PrayerTimeZone,
 } from './time';
 
 export type PrayerName = 'fajr' | 'fajr_endtime' | 'duhr' | 'asr' | 'maghrib' | 'isha';
@@ -49,6 +50,7 @@ export function buildDaySchedule(
   day: PrayerDay,
   baseDate: Date,
   asrMethod: AsrMethodPreference,
+  zone: PrayerTimeZone = 'oslo',
 ): PrayerEntry[] {
   const source: { name: PrayerName; time: string | null; isPrayer: boolean }[] = [
     { name: 'fajr', time: day.fajr, isPrayer: true },
@@ -62,7 +64,7 @@ export function buildDaySchedule(
   const entries = source
     .filter((entry): entry is { name: PrayerName; time: string; isPrayer: boolean } => entry.time != null)
     .map((entry) => {
-      const date = parseTimeToDate(entry.time, baseDate);
+      const date = wallClockToDate(baseDate, entry.time, zone);
       return {
         name: entry.name,
         label: PRAYER_LABELS[entry.name],
@@ -76,14 +78,17 @@ export function buildDaySchedule(
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry.name === 'isha') {
-      entry.end = midnightEnd(day, entry.date, baseDate);
+      entry.end = midnightEnd(day, entry.date, baseDate, zone);
       continue;
     }
     if (!entry.isPrayer) continue;
     if (entry.name === 'fajr') {
       const sunrise = day.shuruq_sunrise ?? day.fajr_endtime;
       if (sunrise) {
-        entry.end = { label: PRAYER_LABELS.fajr_endtime, date: parseTimeToDate(sunrise, baseDate) };
+        entry.end = {
+          label: PRAYER_LABELS.fajr_endtime,
+          date: wallClockToDate(baseDate, sunrise, zone),
+        };
         continue;
       }
     }
@@ -94,14 +99,19 @@ export function buildDaySchedule(
   return entries;
 }
 
-function midnightEnd(day: PrayerDay, ishaDate: Date, baseDate: Date): PrayerWindowEnd | null {
+function midnightEnd(
+  day: PrayerDay,
+  ishaDate: Date,
+  baseDate: Date,
+  zone: PrayerTimeZone,
+): PrayerWindowEnd | null {
   if (!day.muntasafallayl_midnight) return null;
-  const sameDay = parseTimeToDate(day.muntasafallayl_midnight, baseDate);
+  const sameDay = wallClockToDate(baseDate, day.muntasafallayl_midnight, zone);
   if (sameDay.getTime() > ishaDate.getTime()) return { label: 'Midnatt', date: sameDay };
 
   const nextDay = new Date(baseDate);
   nextDay.setDate(nextDay.getDate() + 1);
-  return { label: 'Midnatt', date: parseTimeToDate(day.muntasafallayl_midnight, nextDay) };
+  return { label: 'Midnatt', date: wallClockToDate(nextDay, day.muntasafallayl_midnight, zone) };
 }
 
 export type JamatTimes = Partial<Record<PrayerName, string>>;

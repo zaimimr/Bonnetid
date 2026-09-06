@@ -1,14 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { DEFAULT_CALCULATION_METHOD, type CalculationMethodKey } from '@/lib/calculationMethods';
 import type { NotificationSoundKey } from '@/lib/notificationSounds';
 import type { PrayerName } from '@/lib/prayerSchedule';
+
+export type LocationMode = 'norway' | 'calculated';
+
+export const CALCULATED_LOCATION_ISO = 'LOCAL';
 
 export type SavedLocation = {
   iso: string;
   name: string;
   lat: number;
   lon: number;
+  mode: LocationMode;
 };
 
 export type SavedMosque = {
@@ -23,6 +29,20 @@ export type NotifiablePrayer = Exclude<PrayerName, 'fajr_endtime'>;
 
 export const NOTIFIABLE_PRAYERS: NotifiablePrayer[] = ['fajr', 'duhr', 'asr', 'maghrib', 'isha'];
 
+export type VoluntaryFastKind = 'ashura' | 'whiteDays' | 'mondayThursday';
+
+export const VOLUNTARY_FAST_KINDS: VoluntaryFastKind[] = [
+  'ashura',
+  'whiteDays',
+  'mondayThursday',
+];
+
+const NO_VOLUNTARY_FASTS: Record<VoluntaryFastKind, boolean> = {
+  ashura: false,
+  whiteDays: false,
+  mondayThursday: false,
+};
+
 const ALL_PRAYERS_ENABLED: Record<NotifiablePrayer, boolean> = {
   fajr: true,
   duhr: true,
@@ -33,6 +53,9 @@ const ALL_PRAYERS_ENABLED: Record<NotifiablePrayer, boolean> = {
 
 type SettingsState = {
   location: SavedLocation | null;
+  homeLocation: SavedLocation | null;
+  calculationMethod: CalculationMethodKey;
+  travelPromptKey: string | null;
   mosque: SavedMosque | null;
   asrMethod: AsrMethodPreference | null;
   themePreference: ThemePreference;
@@ -44,11 +67,15 @@ type SettingsState = {
   liveActivityEnabled: boolean;
   widgetShowJamat: boolean;
   ramadanRemindersEnabled: boolean;
+  dhulHijjahRemindersEnabled: boolean;
+  voluntaryFasts: Record<VoluntaryFastKind, boolean>;
   launchCount: number;
   reviewRequested: boolean;
   registerLaunch: () => void;
   markReviewRequested: () => void;
   setLocation: (location: SavedLocation) => void;
+  setCalculationMethod: (method: CalculationMethodKey) => void;
+  setTravelPromptKey: (key: string | null) => void;
   setMosque: (mosque: SavedMosque | null) => void;
   setAsrMethod: (method: AsrMethodPreference) => void;
   setThemePreference: (preference: ThemePreference) => void;
@@ -60,6 +87,8 @@ type SettingsState = {
   setLiveActivityEnabled: (enabled: boolean) => void;
   setWidgetShowJamat: (enabled: boolean) => void;
   setRamadanRemindersEnabled: (enabled: boolean) => void;
+  setDhulHijjahRemindersEnabled: (enabled: boolean) => void;
+  toggleVoluntaryFast: (kind: VoluntaryFastKind) => void;
 };
 
 export const DEFAULT_LOCATION: SavedLocation = {
@@ -67,12 +96,24 @@ export const DEFAULT_LOCATION: SavedLocation = {
   name: 'Oslo',
   lat: 59.9139,
   lon: 10.7522,
+  mode: 'norway',
 };
+
+export function calculatedLocation(
+  name: string,
+  lat: number,
+  lon: number,
+): SavedLocation {
+  return { iso: CALCULATED_LOCATION_ISO, name, lat, lon, mode: 'calculated' };
+}
 
 export const useSettings = create<SettingsState>()(
   persist(
     (set) => ({
       location: null,
+      homeLocation: null,
+      calculationMethod: DEFAULT_CALCULATION_METHOD,
+      travelPromptKey: null,
       mosque: null,
       asrMethod: null,
       themePreference: 'system',
@@ -84,14 +125,22 @@ export const useSettings = create<SettingsState>()(
       liveActivityEnabled: true,
       widgetShowJamat: false,
       ramadanRemindersEnabled: true,
+      dhulHijjahRemindersEnabled: true,
+      voluntaryFasts: NO_VOLUNTARY_FASTS,
       launchCount: 0,
       reviewRequested: false,
       registerLaunch: () => set((state) => ({ launchCount: state.launchCount + 1 })),
       markReviewRequested: () => set({ reviewRequested: true }),
       setLocation: (location) =>
-        set((state) =>
-          state.location?.iso === location.iso ? { location } : { location, asrMethod: null },
-        ),
+        set((state) => {
+          const home = location.mode === 'norway' ? location : state.homeLocation;
+          const unchanged = state.location?.iso === location.iso;
+          return unchanged
+            ? { location, homeLocation: home }
+            : { location, homeLocation: home, asrMethod: null };
+        }),
+      setCalculationMethod: (calculationMethod) => set({ calculationMethod }),
+      setTravelPromptKey: (travelPromptKey) => set({ travelPromptKey }),
       setMosque: (mosque) => set({ mosque }),
       setAsrMethod: (asrMethod) => set({ asrMethod }),
       setThemePreference: (themePreference) => set({ themePreference }),
@@ -102,6 +151,15 @@ export const useSettings = create<SettingsState>()(
       setLiveActivityEnabled: (liveActivityEnabled) => set({ liveActivityEnabled }),
       setWidgetShowJamat: (widgetShowJamat) => set({ widgetShowJamat }),
       setRamadanRemindersEnabled: (ramadanRemindersEnabled) => set({ ramadanRemindersEnabled }),
+      setDhulHijjahRemindersEnabled: (dhulHijjahRemindersEnabled) =>
+        set({ dhulHijjahRemindersEnabled }),
+      toggleVoluntaryFast: (kind) =>
+        set((state) => ({
+          voluntaryFasts: {
+            ...state.voluntaryFasts,
+            [kind]: !state.voluntaryFasts[kind],
+          },
+        })),
       toggleNotificationPrayer: (prayer) =>
         set((state) => ({
           notificationPrayers: {
@@ -113,11 +171,18 @@ export const useSettings = create<SettingsState>()(
     {
       name: 'bonnetid-settings',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 1,
+      version: 2,
       migrate: (persisted) => {
         const state = persisted as Partial<SettingsState> | undefined;
-        if (state?.location && typeof (state.location as { iso?: unknown }).iso !== 'string') {
+        if (!state) return persisted as SettingsState;
+        if (state.location && typeof (state.location as { iso?: unknown }).iso !== 'string') {
           state.location = null;
+        }
+        state.voluntaryFasts = { ...NO_VOLUNTARY_FASTS, ...(state.voluntaryFasts ?? {}) };
+        state.location = withMode(state.location);
+        state.homeLocation = withMode(state.homeLocation);
+        if (!state.homeLocation && state.location?.mode === 'norway') {
+          state.homeLocation = state.location;
         }
         return state as SettingsState;
       },
@@ -125,8 +190,32 @@ export const useSettings = create<SettingsState>()(
   ),
 );
 
+function withMode(location: SavedLocation | null | undefined): SavedLocation | null {
+  if (!location) return null;
+  if (location.mode === 'norway' || location.mode === 'calculated') return location;
+  return { ...location, mode: 'norway' };
+}
+
 export function useActiveLocation(): SavedLocation {
   return useSettings((state) => state.location) ?? DEFAULT_LOCATION;
+}
+
+export function useLocationMode(): LocationMode {
+  return useSettings((state) => state.location)?.mode ?? DEFAULT_LOCATION.mode;
+}
+
+export function useIsCalculatedMode(): boolean {
+  return useLocationMode() === 'calculated';
+}
+
+export function useActiveMosque(): SavedMosque | null {
+  const mosque = useSettings((state) => state.mosque);
+  const calculated = useIsCalculatedMode();
+  return calculated ? null : mosque;
+}
+
+export function useHomeLocation(): SavedLocation | null {
+  return useSettings((state) => state.homeLocation);
 }
 
 export function usePrayerTrackerEnabled(): boolean {

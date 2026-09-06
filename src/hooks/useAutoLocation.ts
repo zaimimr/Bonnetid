@@ -5,17 +5,21 @@ import { useLocations } from '@/api/queries';
 import type { ApiLocation } from '@/api/types';
 import { nearestLocation } from './useNearestLocation';
 import { track, trackError } from '@/lib/telemetry';
+import { isCoveredByLocationData, isInsideNorwayBounds } from '@/lib/travelMode';
 import { useSettings, type SavedLocation } from '@/store/settings';
 
-const NORWAY_BOUNDS = { minLat: 57.5, maxLat: 71.5, minLon: 4, maxLon: 31.5 };
-
 export function isInsideNorway(latitude: number, longitude: number): boolean {
-  return (
-    latitude >= NORWAY_BOUNDS.minLat &&
-    latitude <= NORWAY_BOUNDS.maxLat &&
-    longitude >= NORWAY_BOUNDS.minLon &&
-    longitude <= NORWAY_BOUNDS.maxLon
-  );
+  return isInsideNorwayBounds(latitude, longitude);
+}
+
+export function toSavedLocation(location: ApiLocation): SavedLocation {
+  return {
+    iso: location.iso,
+    name: location.name,
+    lat: location.lat,
+    lon: location.lon,
+    mode: 'norway',
+  };
 }
 
 export async function detectNearestLocation(
@@ -28,21 +32,27 @@ export async function detectNearestLocation(
   });
   const { latitude, longitude } = position.coords;
   if (!isInsideNorway(latitude, longitude)) return null;
+
   const kommuneIso = await fetchKommuneIso(latitude, longitude);
   const byKommune = kommuneIso
     ? (locations.find((location) => location.iso === kommuneIso) ?? null)
     : null;
-  const match = byKommune ?? nearestLocation(locations, latitude, longitude);
-  return match ? { iso: match.iso, name: match.name, lat: match.lat, lon: match.lon } : null;
+  if (byKommune) return toSavedLocation(byKommune);
+
+  if (!isCoveredByLocationData(locations, latitude, longitude)) return null;
+  const nearest = nearestLocation(locations, latitude, longitude);
+  return nearest ? toSavedLocation(nearest) : null;
 }
 
 export function useAutoLocation() {
   const { data: locations } = useLocations();
   const setLocation = useSettings((state) => state.setLocation);
+  const mode = useSettings((state) => state.location)?.mode;
   const hasRun = useRef(false);
 
   useEffect(() => {
     if (hasRun.current || !locations) return;
+    if (mode === 'calculated') return;
     hasRun.current = true;
 
     detectNearestLocation(locations)
@@ -53,5 +63,5 @@ export function useAutoLocation() {
         }
       })
       .catch((error) => trackError(error, 'auto-location'));
-  }, [locations, setLocation]);
+  }, [locations, mode, setLocation]);
 }

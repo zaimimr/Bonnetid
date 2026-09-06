@@ -5,19 +5,38 @@ import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import type { Mosque } from '@/api/types';
 import { formatDistance } from '@/lib/geo';
+import { eidBadgeLabel, type EidPeriod } from '@/lib/hijri';
+import { JUMMAH_MISSING_SHORT } from '@/lib/jummahCopy';
 
 export type MosqueCardProps = {
   mosque: Mosque;
   distanceKm?: number;
-  showEid?: boolean;
+  eidPeriod?: EidPeriod | null;
+  showMissingJummah?: boolean;
+  place?: string;
   selected?: boolean;
+  accessory?: 'chevron' | 'check' | 'none';
   onPress: () => void;
 };
 
-export function MosqueCard({ mosque, distanceKm, showEid, selected, onPress }: MosqueCardProps) {
+export function MosqueCard({
+  mosque,
+  distanceKm,
+  eidPeriod,
+  showMissingJummah = false,
+  place,
+  selected,
+  accessory = 'chevron',
+  onPress,
+}: MosqueCardProps) {
   const theme = useTheme();
-  const nextJummah = mosque.jummah[0]?.jummah;
-  const eidTimes = showEid && mosque.show_eid ? mosque.eid_prayers : [];
+  const jummahLabel = mosque.jummah
+    .slice(0, 2)
+    .map((entry) => entry.jummah)
+    .join(' · ');
+  const eidTimes = eidPeriod && mosque.show_eid ? mosque.eid_prayers : [];
+  const missingJummah = showMissingJummah && !jummahLabel;
+  const subtitle = [mosque.address, place].filter(Boolean).join(' · ');
 
   return (
     <Card onPress={onPress} rounded="xl">
@@ -26,9 +45,9 @@ export function MosqueCard({ mosque, distanceKm, showEid, selected, onPress }: M
           <AppText weight="semibold" numberOfLines={2}>
             {mosque.name}
           </AppText>
-          {mosque.address ? (
-            <AppText size="sm" tone="textMuted" numberOfLines={1}>
-              {mosque.address}
+          {subtitle ? (
+            <AppText size="sm" tone="textMuted" numberOfLines={2}>
+              {subtitle}
             </AppText>
           ) : null}
           <View
@@ -41,12 +60,24 @@ export function MosqueCard({ mosque, distanceKm, showEid, selected, onPress }: M
             }}>
             {selected && <Badge label="Min moské" variant="primary" />}
             {distanceKm != null && <Badge label={formatDistance(distanceKm)} variant="neutral" />}
-            {eidTimes.length > 0 && <Badge label={`Eid ${eidTimes.join(' · ')}`} variant="primary" />}
-            {nextJummah && <Badge label={`Jumuah ${nextJummah}`} variant="primary" />}
+            {eidPeriod && eidTimes.length > 0 && (
+              <Badge label={`${eidBadgeLabel(eidPeriod)} ${eidTimes.join(' · ')}`} variant="primary" />
+            )}
+            {jummahLabel ? <Badge label={`Jumuah ${jummahLabel}`} variant="primary" /> : null}
           </View>
+          {missingJummah ? (
+            <AppText size="xs" tone="textMuted" style={{ marginTop: spacing.xxs }}>
+              {JUMMAH_MISSING_SHORT}
+            </AppText>
+          ) : null}
         </View>
 
-        <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
+        {accessory === 'chevron' && (
+          <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
+        )}
+        {accessory === 'check' && (
+          <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
+        )}
       </View>
     </Card>
   );

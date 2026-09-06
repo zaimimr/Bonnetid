@@ -52,7 +52,6 @@ class PrayerAppWidget : AppWidgetProvider() {
     const val ACTION_REFRESH = "no.irn.bonnetid.widget.REFRESH"
 
     private const val MEDIUM_MIN_WIDTH_DP = 250
-    private const val NOW_WINDOW_MS = 20 * 60 * 1000L
     private const val ALARM_WINDOW_MS = 60 * 1000L
     private const val FALLBACK_UPDATE_MS = 30 * 60 * 1000L
 
@@ -150,7 +149,7 @@ class PrayerAppWidget : AppWidgetProvider() {
       views.setFloat(R.id.headline_time, "setAlpha", alpha)
 
       if (moment.isNow) {
-        views.setTextViewText(R.id.countdown_label, moment.next.label)
+        views.setTextViewText(R.id.countdown_label, moment.next.displayLabel)
         views.setViewVisibility(R.id.countdown_label, View.VISIBLE)
       } else {
         views.setViewVisibility(R.id.countdown_label, View.GONE)
@@ -278,8 +277,9 @@ class PrayerAppWidget : AppWidgetProvider() {
       val candidates = mutableListOf<Long>()
       snapshot.allPrayers.forEach { prayer ->
         candidates.add(prayer.at)
-        candidates.add(prayer.at + NOW_WINDOW_MS)
+        prayer.end?.let { candidates.add(it) }
       }
+      candidates.add(PrayerSnapshot.startOfNextDay(now))
       val next = candidates.filter { it > now + 1000 }.minOrNull()
       return next ?: (now + FALLBACK_UPDATE_MS)
     }

@@ -143,7 +143,7 @@ struct PrayerWidgetView: View {
           SmallPrayerView(
             moment: moment,
             now: entry.date,
-            status: (moment.running ?? moment.next).status(in: entry.statuses)
+            status: moment.headline.status(in: entry.statuses)
           )
         }
       } else {
@@ -154,18 +154,18 @@ struct PrayerWidgetView: View {
   }
 }
 
-/// The small widget answers one question: which prayer is running, and how long is left of it.
-/// Between sunrise and Dhuhr no prayer is running, so it counts down to the next one instead.
+/// The small widget answers one question: which prayer is running, with the wait for the next one
+/// underneath. Between sunrise and Dhuhr no prayer is running, so it shows the next one instead.
 private struct SmallPrayerView: View {
   let moment: PrayerMoment
   let now: Date
   let status: String?
 
-  private var shown: PrayerEntry { moment.running ?? moment.next }
+  private var shown: PrayerEntry { moment.headline }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
-      Text(moment.running == nil ? "Neste" : "Nå")
+      Text(moment.stateLabel)
         .font(.caption)
         .foregroundStyle(PrayerColor.inkMuted)
 
@@ -202,10 +202,11 @@ private struct SmallPrayerView: View {
   }
 
   private var countdownLine: String {
-    if let end = moment.runningEnd, moment.running != nil {
-      return PrayerFormat.remaining(to: end, from: now)
+    let countdown = PrayerFormat.countdown(to: moment.next.at, from: now)
+    if moment.isNow {
+      return "\(moment.next.printedLabel) \(countdown)"
     }
-    return "\(moment.next.printedLabel) \(PrayerFormat.countdown(to: moment.next.at, from: now))"
+    return countdown
   }
 }
 
@@ -374,8 +375,6 @@ private struct CircularPrayerView: View {
   let moment: PrayerMoment
   let now: Date
 
-  private var target: Date { moment.isNow ? moment.next.at : moment.headline.at }
-
   var body: some View {
     Gauge(value: moment.progress(at: now)) {
       Text(moment.headline.printedLabel)
@@ -383,7 +382,10 @@ private struct CircularPrayerView: View {
         .lineLimit(1)
         .minimumScaleFactor(0.6)
     } currentValueLabel: {
-      Text(timerInterval: PrayerFormat.countdownRange(to: target, from: now), countsDown: true)
+      Text(
+        timerInterval: PrayerFormat.countdownRange(to: moment.next.at, from: now),
+        countsDown: true
+      )
         .prayerTime(.system(size: 12, weight: .semibold))
         .lineLimit(1)
         .minimumScaleFactor(0.6)

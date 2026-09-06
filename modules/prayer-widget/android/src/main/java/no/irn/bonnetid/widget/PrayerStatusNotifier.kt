@@ -49,6 +49,7 @@ object PrayerStatusNotifier {
       }
     }
 
+    postCurrent(context, snapshot, now)
     rearmEndAlarm(context, snapshot, alarms, now)
 
     context
@@ -75,6 +76,16 @@ object PrayerStatusNotifier {
       .getSharedPreferences(SNAPSHOT_PREFS, Context.MODE_PRIVATE)
       .getString(POSTED_KEY, null)
     if (posted == "$date|$kind") clear(context)
+  }
+
+  private fun postCurrent(context: Context, snapshot: PrayerSnapshot, now: Long) {
+    val prayer = snapshot.currentPrayer(now) ?: return
+    val date = snapshot.dayFor(now)?.date ?: return
+    val posted = context
+      .getSharedPreferences(SNAPSHOT_PREFS, Context.MODE_PRIVATE)
+      .getString(POSTED_KEY, null)
+    if (posted == "$date|${prayer.kind}") return
+    post(context, date, prayer.kind)
   }
 
   private fun rearmEndAlarm(context: Context, snapshot: PrayerSnapshot, alarms: AlarmManager, now: Long) {

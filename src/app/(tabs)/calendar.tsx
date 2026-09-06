@@ -5,8 +5,10 @@ import { useHijriMonth, useSpecialDates } from '@/api/queries';
 import type { HijriDay } from '@/api/types';
 import { MonthGrid } from '@/components/calendar/MonthGrid';
 import { EventCard } from '@/components/calendar/EventCard';
+import { SeasonCard } from '@/components/season/SeasonCard';
 import { AppText, EmptyState, ErrorState, SectionHeader, Skeleton } from '@/components/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTheme } from '@/theme';
@@ -23,6 +25,7 @@ export default function CalendarScreen() {
   const { refreshing, onRefresh } = useRefresh();
 
   const today = useMemo(() => new Date(), []);
+  const { isoDate: todayIso } = useActiveDayKeys(today);
   const [cursor, setCursor] = useState(() => ({
     year: today.getFullYear(),
     monthIndex: today.getMonth(),
@@ -148,6 +151,8 @@ export default function CalendarScreen() {
         </View>
 
         <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
+          {isCurrentMonth && <SeasonCard />}
+
           {month.isLoading && <Skeleton height={320} rounded="xl" />}
           {month.isError && <ErrorState onRetry={month.refetch} />}
           {month.data && (
@@ -156,6 +161,7 @@ export default function CalendarScreen() {
               monthIndex={cursor.monthIndex}
               days={month.data}
               selectedIso={selectedIso}
+              todayIso={todayIso}
               onDayPress={onDayPress}
             />
           )}

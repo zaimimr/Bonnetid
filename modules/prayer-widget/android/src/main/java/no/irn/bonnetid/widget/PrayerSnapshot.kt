@@ -53,7 +53,11 @@ data class PrayerSnapshot(
   val days: List<PrayerDaySnapshot>,
   val origin: SnapshotCoords? = null,
   val mosques: List<SnapshotMosque> = emptyList(),
+  val mode: String? = null,
 ) {
+  val usesDeviceTimeZone: Boolean
+    get() = mode == "calculated"
+
   val allPrayers: List<PrayerEntry>
     get() = days.flatMap { it.prayers }.sortedBy { it.at }
 
@@ -79,12 +83,16 @@ data class PrayerSnapshot(
   }
 
   fun currentPrayer(at: Long): PrayerEntry? {
-    val entries = allPrayers
-    val index = entries.indexOfLast { it.isPrayer && it.at <= at }
-    if (index < 0) return null
-    val next = index + 1
-    if (next < entries.size && at >= entries[next].at) return null
-    return entries[index]
+    val key = dayKey(at)
+    val day = days.firstOrNull { it.date == key } ?: return null
+    val started = day.prayers
+      .filter { it.isPrayer }
+      .sortedBy { it.at }
+      .lastOrNull { it.at <= at }
+      ?: return null
+    val end = started.end
+    if (end != null && at >= end) return null
+    return started
   }
 
   companion object {
@@ -167,7 +175,8 @@ data class PrayerSnapshot(
           days = days,
           origin = origin,
           mosques = mosques,
-        )
+          mode = optStringOrNull(root, "mode"),
+        ).also { dayKeyZone = if (it.usesDeviceTimeZone) TimeZone.getDefault() else osloZone }
       } catch (error: Exception) {
         null
       }
@@ -199,10 +208,25 @@ data class PrayerSnapshot(
       "yyyy-MM-dd'T'HH:mm:ss'Z'",
     )
 
+    private val osloZone: TimeZone = TimeZone.getTimeZone("Europe/Oslo")
+
+    private var dayKeyZone: TimeZone = osloZone
+
     fun dayKey(at: Long): String {
       val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-      formatter.timeZone = TimeZone.getTimeZone("Europe/Oslo")
+      formatter.timeZone = dayKeyZone
       return formatter.format(Date(at))
+    }
+
+    fun startOfNextDay(at: Long): Long {
+      val calendar = Calendar.getInstance(dayKeyZone)
+      calendar.timeInMillis = at
+      calendar.set(Calendar.HOUR_OF_DAY, 0)
+      calendar.set(Calendar.MINUTE, 0)
+      calendar.set(Calendar.SECOND, 0)
+      calendar.set(Calendar.MILLISECOND, 0)
+      calendar.add(Calendar.DAY_OF_MONTH, 1)
+      return calendar.timeInMillis
     }
   }
 }
@@ -225,8 +249,6 @@ data class PrayerMoment(
     get() = if (current == null) "Neste" else "Nå"
 
   companion object {
-    private const val NOW_WINDOW_MS = 20 * 60 * 1000L
-
     fun resolve(snapshot: PrayerSnapshot, at: Long): PrayerMoment? {
       val prayers = snapshot.allPrayers.filter { it.isPrayer }
       val nextIndex = prayers.indexOfFirst { it.at > at }
@@ -234,10 +256,9 @@ data class PrayerMoment(
 
       val next = prayers[nextIndex]
       val previous = if (nextIndex > 0) prayers[nextIndex - 1] else null
-      val current = previous?.takeIf { at - it.at < NOW_WINDOW_MS }
 
       return PrayerMoment(
-        current = current,
+        current = snapshot.currentPrayer(at),
         next = next,
         windowStart = previous?.at ?: at,
         windowEnd = next.at,

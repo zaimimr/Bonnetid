@@ -12,6 +12,7 @@ import { formatDistance, distanceKm, KAABA, qiblaBearing } from '@/lib/geo';
 import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
+import { useIsCalculatedMode } from '@/store/settings';
 
 type QiblaView = 'compass' | 'map' | '3d';
 
@@ -19,6 +20,7 @@ export default function QiblaScreen() {
   const coords = useUserCoords();
   const { heading, permissionDenied } = useCompassHeading();
   const { isLandscape } = useResponsive();
+  const calculated = useIsCalculatedMode();
   const [view, setView] = useState<QiblaView>('compass');
 
   const bearing = qiblaBearing(coords.lat, coords.lon);
@@ -78,7 +80,9 @@ export default function QiblaScreen() {
                     tone="textMuted"
                     align="center"
                     style={{ marginTop: spacing.lg }}>
-                    Basert på valgt sted. Gi posisjonstilgang for mer nøyaktig retning.
+                    {calculated
+                      ? 'Basert på posisjonen du valgte reisemodus for. Gi posisjonstilgang for mer nøyaktig retning.'
+                      : 'Basert på valgt sted. Gi posisjonstilgang for mer nøyaktig retning.'}
                   </AppText>
                 )}
               </>

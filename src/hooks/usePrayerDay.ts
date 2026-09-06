@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import { usePrayerTimes } from '@/api/queries';
 import type { PrayerDay } from '@/api/types';
 import { buildDaySchedule, findNextPrayer, type NextPrayerResult, type PrayerEntry } from '@/lib/prayerSchedule';
-import { osloDayKey, parseDayKey, todayKey } from '@/lib/time';
+import { parseDayKey, todayKey } from '@/lib/time';
+import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
+import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { useActiveLocation } from '@/store/settings';
 
 function addDays(date: Date, days: number): Date {
@@ -30,15 +31,16 @@ export type PrayerDayData = {
 export function usePrayerDay(now: Date): PrayerDayData {
   const location = useActiveLocation();
   const asrMethod = useEffectiveAsrMethod();
+  const zone = zoneFor(location);
 
-  const dayKey = osloDayKey(now);
+  const { dayKey } = useActiveDayKeys(now);
   const dayStart = useMemo(() => parseDayKey(dayKey), [dayKey]);
   const tomorrowStart = useMemo(() => addDays(dayStart, 1), [dayStart]);
 
-  const currentMonth = usePrayerTimes(location.iso, dayStart.getFullYear(), dayStart.getMonth() + 1);
+  const currentMonth = usePrayerMonth(location, dayStart.getFullYear(), dayStart.getMonth() + 1);
   const needsNextMonth = tomorrowStart.getMonth() !== dayStart.getMonth();
-  const nextMonth = usePrayerTimes(
-    location.iso,
+  const nextMonth = usePrayerMonth(
+    location,
     tomorrowStart.getFullYear(),
     tomorrowStart.getMonth() + 1,
   );
@@ -49,13 +51,13 @@ export function usePrayerDay(now: Date): PrayerDayData {
     : findDay(currentMonth.data, tomorrowStart);
 
   const todaySchedule = useMemo(
-    () => (todayRow ? buildDaySchedule(todayRow, dayStart, asrMethod) : []),
-    [todayRow, dayStart, asrMethod],
+    () => (todayRow ? buildDaySchedule(todayRow, dayStart, asrMethod, zone) : []),
+    [todayRow, dayStart, asrMethod, zone],
   );
 
   const tomorrowSchedule = useMemo(
-    () => (tomorrowRow ? buildDaySchedule(tomorrowRow, tomorrowStart, asrMethod) : []),
-    [tomorrowRow, tomorrowStart, asrMethod],
+    () => (tomorrowRow ? buildDaySchedule(tomorrowRow, tomorrowStart, asrMethod, zone) : []),
+    [tomorrowRow, tomorrowStart, asrMethod, zone],
   );
 
   const nextPrayer = useMemo(

@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppText, Card, Screen } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
-import { usePrayerTrackerEnabled } from '@/store/settings';
+import { useIsCalculatedMode, usePrayerTrackerEnabled } from '@/store/settings';
 
 type Feature = {
   href: Href;
@@ -20,32 +20,46 @@ const TRACKER_FEATURE: Feature = {
   description: 'Marker bønner som bedt, og se uken din',
 };
 
-const FEATURES: Feature[] = [
-  {
-    href: '/timetable',
-    icon: 'grid-outline',
-    title: 'Månedsoversikt',
-    description: 'Full tabell med alle tider, dag for dag',
-  },
-  {
-    href: '/mosques',
-    icon: 'business-outline',
-    title: 'Moskeer',
-    description: 'Finn moskeer i nærheten, med kart og jamaat-tider',
-  },
-  {
-    href: '/settings',
-    icon: 'settings-outline',
-    title: 'Innstillinger',
-    description: 'Sted, moské, asr-metode, tema og varsler',
-  },
-];
+const JUMMAH_FEATURE: Feature = {
+  href: '/jummah',
+  icon: 'people-outline',
+  title: 'Nærmeste jummah',
+  description: 'Hvilken fredagsbønn i nærheten du rekker',
+};
+
+const TIMETABLE_FEATURE: Feature = {
+  href: '/timetable',
+  icon: 'grid-outline',
+  title: 'Månedsoversikt',
+  description: 'Full tabell med alle tider, dag for dag',
+};
+
+const MOSQUE_FEATURE: Feature = {
+  href: '/mosques',
+  icon: 'business-outline',
+  title: 'Moskeer',
+  description: 'Finn moskeer i nærheten, med kart og jamaat-tider',
+};
+
+const SETTINGS_FEATURE: Feature = {
+  href: '/settings',
+  icon: 'settings-outline',
+  title: 'Innstillinger',
+  description: 'Sted, moské, asr-metode, tema og varsler',
+};
 
 export default function MoreScreen() {
   const router = useRouter();
   const theme = useTheme();
   const trackerEnabled = usePrayerTrackerEnabled();
-  const features = trackerEnabled ? [TRACKER_FEATURE, ...FEATURES] : FEATURES;
+  const calculated = useIsCalculatedMode();
+  const features = [
+    ...(trackerEnabled ? [TRACKER_FEATURE] : []),
+    ...(calculated ? [] : [JUMMAH_FEATURE]),
+    TIMETABLE_FEATURE,
+    ...(calculated ? [] : [MOSQUE_FEATURE]),
+    SETTINGS_FEATURE,
+  ];
 
   return (
     <Screen scroll>

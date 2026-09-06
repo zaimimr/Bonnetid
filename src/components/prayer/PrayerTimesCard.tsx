@@ -18,7 +18,7 @@ import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from './TimeCell';
 
 export type { JamatTimes };
 
-const PRAYER_ICONS: Record<PrayerName, keyof typeof Ionicons.glyphMap> = {
+export const PRAYER_ICONS: Record<PrayerName, keyof typeof Ionicons.glyphMap> = {
   fajr: 'cloudy-night-outline',
   fajr_endtime: 'sunny-outline',
   duhr: 'sunny',
@@ -245,7 +245,7 @@ export function PrayerTimesCard({
         </View>
       )}
 
-      {hasMosque ? (
+      {hasMosque && (
         <Pressable
           onPress={onPressMosque}
           style={({ pressed }) => [
@@ -266,7 +266,9 @@ export function PrayerTimesCard({
           </AppText>
           <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} />
         </Pressable>
-      ) : (
+      )}
+
+      {!hasMosque && onSelectMosque && (
         <Pressable
           onPress={onSelectMosque}
           style={({ pressed }) => [
