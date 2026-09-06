@@ -10,8 +10,10 @@ export const palette = {
   emerald800: '#074536',
   emerald900: '#053327',
 
+  gold50: '#FAF3DE',
   gold400: '#D9B84F',
   gold600: '#8F7112',
+  gold700: '#6E570D',
 
   neutral0: '#FFFFFF',
   neutral50: '#F6F8F7',

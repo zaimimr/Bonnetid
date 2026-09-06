@@ -93,6 +93,17 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="place-picker"
+          options={{
+            headerShown: true,
+            title: 'Velg sted',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
           name="jummah"
           options={{
             headerShown: true,
