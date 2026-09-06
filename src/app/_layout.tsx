@@ -107,17 +107,6 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
-          name="jummah"
-          options={{
-            headerShown: true,
-            title: 'Fredagsbønn',
-            headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
-          }}
-        />
-        <Stack.Screen
           name="tracker"
           options={{
             headerShown: true,
