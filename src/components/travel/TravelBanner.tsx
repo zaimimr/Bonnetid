@@ -28,7 +28,7 @@ export function TravelBanner() {
           {`Reisemodus · ${location.name}`}
         </AppText>
         <AppText size="xs" style={{ color: theme.colors.travelSurfaceMuted }}>
-          Lokale tider, ingen jamaat-tider
+          Lokale tider
         </AppText>
       </View>
     </View>
