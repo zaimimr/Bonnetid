@@ -121,12 +121,15 @@ async function ensureReminderChannel(
   return REMINDER_CHANNEL_ID;
 }
 
+type InterruptionLevel = 'active' | 'timeSensitive';
+
 type PlannedNotification = {
   identifier: string;
   title: string;
   body: string;
   date: Date;
   sound: string | boolean;
+  interruptionLevel: InterruptionLevel;
   channelId: string | undefined;
   category: string | undefined;
   isoDate: string;
@@ -139,6 +142,7 @@ function signatureOf(item: PlannedNotification): string {
     item.title,
     item.body,
     item.sound,
+    item.interruptionLevel,
     item.channelId ?? '',
     item.category ?? '',
   ].join('|');
@@ -191,6 +195,7 @@ async function runSync(plan: PrayerNotificationPlan): Promise<number> {
       body: `Det er tid for ${entry.label} i ${plan.locationName}.`,
       date: entry.date,
       sound: sound.fileName ?? true,
+      interruptionLevel: 'timeSensitive',
       channelId: adhanChannel,
       category: plan.markActions ? PRAYER_CATEGORY : undefined,
       isoDate,
@@ -208,6 +213,7 @@ async function runSync(plan: PrayerNotificationPlan): Promise<number> {
       body: reminderBody(reminder),
       date: reminder.fireAt,
       sound: true,
+      interruptionLevel: 'active',
       channelId: reminderChannel,
       category: plan.markActions ? PRAYER_CATEGORY : undefined,
       isoDate: reminder.isoDate,
@@ -240,6 +246,7 @@ async function runSync(plan: PrayerNotificationPlan): Promise<number> {
         title: item.title,
         body: item.body,
         sound: item.sound,
+        interruptionLevel: item.interruptionLevel,
         categoryIdentifier: item.category,
         data: { isoDate: item.isoDate, prayer: item.prayer },
       },
