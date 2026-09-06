@@ -9,7 +9,7 @@ export type SnapshotDayInput = {
   schedule: PrayerEntry[];
   hijriText: string;
   jamatTimes?: Partial<Record<string, string>>;
-  /** True when the mosque has a jummah time for this Friday. */
+  /** True when the mosque has a Jumuah time for this Friday. */
   hasJummah?: boolean;
 };
 
@@ -40,13 +40,13 @@ export type SnapshotPrayer = {
   kind: string;
   /** The prayer's own name, used for logic. */
   label: string;
-  /** What a widget prints: "Jummah" instead of "Duhr" on Friday. */
+  /** What a widget prints: "Jumuah" instead of "Dhuhr" on Friday. */
   displayLabel: string;
   /** When the prayer starts, used for "next" and "now". */
   at: string;
   isPrayer: boolean;
   jamat: string | null;
-  /** True when `jamat` is this Friday's jummah time rather than an ordinary jamat time. */
+  /** True when `jamat` is this Friday's Jumuah time rather than an ordinary jamat time. */
   isJummah: boolean;
   end: string | null;
 };

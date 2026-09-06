@@ -34,7 +34,7 @@
       android:textColor="@color/prayer_widget_brand"
       android:maxLines="1"
       android:ellipsize="end"
-      android:text="Duhr" />
+      android:text="Dhuhr" />
 
     <ImageView
       android:id="@+id/headline_check"
