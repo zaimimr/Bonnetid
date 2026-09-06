@@ -1,12 +1,10 @@
 import { useMemo } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useHijriMonth, useMosque, useMosqueJamatPeriods } from '@/api/queries';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
-import { AppText, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
-import { useTheme } from '@/theme';
-import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
+import { AppText, EmptyState, ErrorState, IconButton, Screen, Skeleton } from '@/components/ui';
+import { spacing } from '@/theme/tokens';
 import {
   adhanTimesFromSchedule,
   buildDaySchedule,
@@ -94,7 +92,11 @@ export default function DayScreen() {
           justifyContent: 'space-between',
           gap: spacing.md,
         }}>
-        <DayArrow direction="back" onPress={() => goToDay(-1)} />
+        <IconButton
+          name="chevron-back"
+          accessibilityLabel="Forrige dag"
+          onPress={() => goToDay(-1)}
+        />
         <View style={{ flex: 1, alignItems: 'center', gap: spacing.xxs }}>
           <AppText weight="bold" align="center">
             {formatGregorianLong(date)}
@@ -110,7 +112,11 @@ export default function DayScreen() {
             </AppText>
           )}
         </View>
-        <DayArrow direction="forward" onPress={() => goToDay(1)} />
+        <IconButton
+          name="chevron-forward"
+          accessibilityLabel="Neste dag"
+          onPress={() => goToDay(1)}
+        />
       </View>
 
       {timezoneNote && (
@@ -147,31 +153,5 @@ export default function DayScreen() {
         )}
       </View>
     </Screen>
-  );
-}
-
-function DayArrow({ direction, onPress }: { direction: 'back' | 'forward'; onPress: () => void }) {
-  const theme = useTheme();
-  return (
-    <Pressable
-      onPress={onPress}
-      hitSlop={hitSlop}
-      style={({ pressed }) => [
-        {
-          width: 40,
-          height: 40,
-          borderRadius: radius.full,
-          backgroundColor: theme.colors.surfaceSunken,
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-        pressed && { opacity: opacity.pressed },
-      ]}>
-      <Ionicons
-        name={direction === 'back' ? 'chevron-back' : 'chevron-forward'}
-        size={20}
-        color={theme.colors.textPrimary}
-      />
-    </Pressable>
   );
 }

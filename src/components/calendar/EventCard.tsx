@@ -8,34 +8,22 @@ import { formatHijri, monthName } from '@/lib/hijri';
 
 export type EventCardProps = {
   event: HijriDay;
-  selected?: boolean;
   onPress?: () => void;
 };
 
-export function EventCard({ event, selected = false, onPress }: EventCardProps) {
+export function EventCard({ event, onPress }: EventCardProps) {
   const theme = useTheme();
   const date = new Date(event.gregorian_date);
 
   return (
-    <Card
-      rounded="xl"
-      onPress={onPress}
-      style={
-        selected
-          ? {
-              borderColor: theme.colors.accent,
-              borderWidth: 2,
-              backgroundColor: theme.colors.primarySoft,
-            }
-          : undefined
-      }>
+    <Card rounded="xl" onPress={onPress}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
         <View
           style={{
             minWidth: 48,
             paddingHorizontal: spacing.xs,
             borderRadius: radius.md,
-            backgroundColor: selected ? theme.colors.surface : theme.colors.primarySoft,
+            backgroundColor: theme.colors.primarySoft,
             paddingVertical: spacing.sm,
             alignItems: 'center',
           }}>
@@ -54,11 +42,7 @@ export function EventCard({ event, selected = false, onPress }: EventCardProps) 
             {formatHijri(event.hijri_date, event.hijri_month_text)}
           </AppText>
         </View>
-        <Ionicons
-          name="calendar-outline"
-          size={18}
-          color={selected ? theme.colors.accent : theme.colors.textMuted}
-        />
+        {onPress && <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />}
       </View>
     </Card>
   );
