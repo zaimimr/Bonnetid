@@ -15,6 +15,7 @@ export type MosqueCardProps = {
   showMissingJummah?: boolean;
   place?: string;
   selected?: boolean;
+  accessory?: 'chevron' | 'check' | 'none';
   onPress: () => void;
 };
 
@@ -25,6 +26,7 @@ export function MosqueCard({
   showMissingJummah = false,
   place,
   selected,
+  accessory = 'chevron',
   onPress,
 }: MosqueCardProps) {
   const theme = useTheme();
@@ -70,7 +72,12 @@ export function MosqueCard({
           ) : null}
         </View>
 
-        <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
+        {accessory === 'chevron' && (
+          <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
+        )}
+        {accessory === 'check' && (
+          <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
+        )}
       </View>
     </Card>
   );
