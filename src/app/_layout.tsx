@@ -73,17 +73,6 @@ function RootNavigator() {
         }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
-          name="timetable"
-          options={{
-            headerShown: true,
-            title: 'Bønnetider',
-            headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
-          }}
-        />
-        <Stack.Screen
           name="mosques"
           options={{
             headerShown: true,

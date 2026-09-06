@@ -1,11 +1,19 @@
-import { Platform, Pressable, Switch, View } from 'react-native';
+import { Platform, Switch, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText, Card, Divider, ListRow, Screen, SectionHeader } from '@/components/ui';
+import {
+  AppText,
+  Card,
+  Divider,
+  ListRow,
+  Screen,
+  SectionHeader,
+  SegmentedControl,
+} from '@/components/ui';
 import { useTheme } from '@/theme';
-import { opacity, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import { notificationsSupported, requestNotificationPermission } from '@/lib/notifications';
 import {
   dynamicIslandAvailable,
@@ -293,7 +301,7 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <View style={{ padding: spacing.md, gap: spacing.sm }}>
           <AppText weight="medium">Tema</AppText>
-          <SegmentedRow
+          <SegmentedControl
             value={themePreference}
             onChange={(preference) => {
               setThemePreference(preference);
@@ -355,59 +363,3 @@ export default function SettingsScreen() {
   );
 }
 
-function SegmentedRow<T extends string>({
-  value,
-  onChange,
-  options,
-  disabled = false,
-}: {
-  value: T;
-  onChange: (value: T) => void;
-  options: { value: T; label: string }[];
-  disabled?: boolean;
-}) {
-  const theme = useTheme();
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        backgroundColor: theme.colors.surfaceSunken,
-        borderRadius: radius.md,
-        padding: spacing.xxs,
-        gap: spacing.xxs,
-        opacity: disabled ? opacity.disabled : 1,
-      }}>
-      {options.map((option) => {
-        const isActive = option.value === value;
-        return (
-          <Pressable
-            key={option.value}
-            disabled={disabled}
-            onPress={() => onChange(option.value)}
-            style={({ pressed }) => [
-              {
-                flex: 1,
-                paddingVertical: spacing.md,
-                borderRadius: radius.sm,
-                backgroundColor: isActive ? theme.colors.surface : 'transparent',
-                alignItems: 'center',
-                borderWidth: isActive ? 1 : 0,
-                borderColor: theme.colors.border,
-              },
-              pressed && { opacity: opacity.pressed },
-            ]}>
-            <AppText
-              size="sm"
-              weight={isActive ? 'semibold' : 'regular'}
-              tone={isActive ? 'textPrimary' : 'textMuted'}
-              align="center"
-              maxFontSizeMultiplier={1.4}
-              numberOfLines={1}>
-              {option.label}
-            </AppText>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}

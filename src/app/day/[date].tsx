@@ -1,12 +1,10 @@
 import { useMemo } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useHijriMonth, useMosque, useMosqueJamatPeriods } from '@/api/queries';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
-import { AppText, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
-import { useTheme } from '@/theme';
-import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
+import { AppText, EmptyState, ErrorState, IconButton, Screen, Skeleton } from '@/components/ui';
+import { spacing } from '@/theme/tokens';
 import {
   adhanTimesFromSchedule,
   buildDaySchedule,
@@ -23,6 +21,7 @@ import { useTimezoneNote } from '@/hooks/useTimezoneNote';
 import { useActiveLocation, useActiveMosque } from '@/store/settings';
 
 const FRIDAY = 5;
+const HEADER_HEIGHT = 44;
 
 export default function DayScreen() {
   const { date: isoDate } = useLocalSearchParams<{ date: string }>();
@@ -90,27 +89,48 @@ export default function DayScreen() {
         style={{
           marginTop: spacing.lg,
           flexDirection: 'row',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           justifyContent: 'space-between',
           gap: spacing.md,
         }}>
-        <DayArrow direction="back" onPress={() => goToDay(-1)} />
-        <View style={{ flex: 1, alignItems: 'center', gap: spacing.xxs }}>
-          <AppText weight="bold" align="center">
+        <IconButton
+          name="chevron-back"
+          accessibilityLabel="Forrige dag"
+          onPress={() => goToDay(-1)}
+        />
+        <View
+          style={{
+            flexGrow: 1,
+            flexShrink: 1,
+            flexBasis: 0,
+            minWidth: 0,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: spacing.xxs,
+            minHeight: HEADER_HEIGHT,
+          }}>
+          <AppText
+            weight="bold"
+            align="center"
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.85}>
             {formatGregorianLong(date)}
           </AppText>
-          {hijriDay && (
-            <AppText size="sm" tone="textMuted" align="center">
-              {formatHijri(hijriDay.hijri_date, hijriDay.hijri_month_text)}
-            </AppText>
-          )}
+          <AppText size="sm" tone="textMuted" align="center" numberOfLines={1}>
+            {hijriDay ? formatHijri(hijriDay.hijri_date, hijriDay.hijri_month_text) : ' '}
+          </AppText>
           {hijriDay?.special_date_name && (
             <AppText size="xs" weight="medium" tone="primary" align="center">
               {hijriDay.special_date_name}
             </AppText>
           )}
         </View>
-        <DayArrow direction="forward" onPress={() => goToDay(1)} />
+        <IconButton
+          name="chevron-forward"
+          accessibilityLabel="Neste dag"
+          onPress={() => goToDay(1)}
+        />
       </View>
 
       {timezoneNote && (
@@ -147,31 +167,5 @@ export default function DayScreen() {
         )}
       </View>
     </Screen>
-  );
-}
-
-function DayArrow({ direction, onPress }: { direction: 'back' | 'forward'; onPress: () => void }) {
-  const theme = useTheme();
-  return (
-    <Pressable
-      onPress={onPress}
-      hitSlop={hitSlop}
-      style={({ pressed }) => [
-        {
-          width: 40,
-          height: 40,
-          borderRadius: radius.full,
-          backgroundColor: theme.colors.surfaceSunken,
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-        pressed && { opacity: opacity.pressed },
-      ]}>
-      <Ionicons
-        name={direction === 'back' ? 'chevron-back' : 'chevron-forward'}
-        size={20}
-        color={theme.colors.textPrimary}
-      />
-    </Pressable>
   );
 }

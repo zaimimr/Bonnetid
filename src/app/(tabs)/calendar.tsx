@@ -1,36 +1,49 @@
-import { useMemo, useRef, useState, type RefObject } from 'react';
-import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useMemo, useState } from 'react';
+import { View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useHijriMonth, useSpecialDates } from '@/api/queries';
 import type { HijriDay } from '@/api/types';
 import { MonthGrid } from '@/components/calendar/MonthGrid';
+import { MonthNav } from '@/components/calendar/MonthNav';
 import { EventCard } from '@/components/calendar/EventCard';
+import { MonthPrayerTable } from '@/components/prayer/MonthPrayerTable';
 import { SeasonCard } from '@/components/season/SeasonCard';
-import { AppText, EmptyState, ErrorState, SectionHeader, Skeleton } from '@/components/ui';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  AppText,
+  EmptyState,
+  ErrorState,
+  Screen,
+  SectionHeader,
+  SegmentedControl,
+  Skeleton,
+} from '@/components/ui';
 import { useActiveDayKeys } from '@/hooks/useActiveDay';
+import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
+import { usePrayerMonth } from '@/hooks/usePrayerMonth';
 import { useRefresh } from '@/hooks/useRefresh';
-import { useResponsive } from '@/hooks/useResponsive';
-import { useTheme } from '@/theme';
-import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 import { monthName } from '@/lib/hijri';
+import { isoDateKey, parseDayKey } from '@/lib/time';
+import { useActiveLocation } from '@/store/settings';
+
+type MonthView = 'dates' | 'times';
+
+const VIEW_OPTIONS: { value: MonthView; label: string }[] = [
+  { value: 'dates', label: 'Måned' },
+  { value: 'times', label: 'Bønnetider' },
+];
 
 export default function CalendarScreen() {
-  const theme = useTheme();
-  const insets = useSafeAreaInsets();
-  const { contentMaxWidth } = useResponsive();
-  const scrollRef = useRef<ScrollView>(null);
-  const innerViewRef = useRef<View>(null) as RefObject<View>;
-  const eventCardRefs = useRef(new Map<string, View | null>());
+  const router = useRouter();
   const { refreshing, onRefresh } = useRefresh();
 
   const today = useMemo(() => new Date(), []);
-  const { isoDate: todayIso } = useActiveDayKeys(today);
+  const { isoDate: todayIso, dayKey: todayDayKey } = useActiveDayKeys(today);
+  const [view, setView] = useState<MonthView>('dates');
   const [cursor, setCursor] = useState(() => ({
     year: today.getFullYear(),
     monthIndex: today.getMonth(),
   }));
-  const [selectedIso, setSelectedIso] = useState<string | null>(null);
 
   const isCurrentMonth =
     cursor.year === today.getFullYear() && cursor.monthIndex === today.getMonth();
@@ -39,7 +52,6 @@ export default function CalendarScreen() {
   const specials = useSpecialDates(cursor.year);
 
   const shiftMonth = (delta: number) => {
-    setSelectedIso(null);
     setCursor((current) => {
       const shifted = new Date(current.year, current.monthIndex + delta, 1);
       return { year: shifted.getFullYear(), monthIndex: shifted.getMonth() };
@@ -59,166 +71,163 @@ export default function CalendarScreen() {
     return (specials.data ?? []).filter((event) => event.gregorian_date.startsWith(monthPrefix));
   }, [specials.data, cursor.year, cursor.monthIndex]);
 
-  const jumpToEvent = (event: HijriDay) => {
-    const date = new Date(event.gregorian_date);
-    setCursor({ year: date.getFullYear(), monthIndex: date.getMonth() });
-    setSelectedIso(event.gregorian_date);
-    scrollRef.current?.scrollTo({ y: 0, animated: true });
-  };
+  const specialDates = useMemo(
+    () => new Set(events.map((event) => event.gregorian_date)),
+    [events],
+  );
 
-  const onDayPress = (iso: string, day: HijriDay | undefined) => {
-    if (!day?.special_date_name) {
-      setSelectedIso(null);
-      return;
-    }
-    setSelectedIso(iso);
-    const card = eventCardRefs.current.get(iso);
-    const scrollNode = innerViewRef.current;
-    if (card && scrollNode) {
-      card.measureLayout(scrollNode, (_x, y) => {
-        scrollRef.current?.scrollTo({ y: Math.max(0, y - spacing.xxl), animated: true });
-      });
-    }
+  const openDay = (iso: string) => {
+    router.push({ pathname: '/day/[date]', params: { date: iso } });
   };
-
-  const eventsLoading = specials.isLoading;
 
   return (
-    <ScrollView
-      ref={scrollRef}
-      innerViewRef={innerViewRef}
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
-      contentContainerStyle={{
-        paddingTop: insets.top + spacing.lg,
-        paddingLeft: spacing.lg + insets.left,
-        paddingRight: spacing.lg + insets.right,
-        paddingBottom: spacing.xxxl,
-      }}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor={theme.colors.primary}
+    <Screen scroll refreshing={refreshing} onRefresh={onRefresh}>
+      <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
+        <MonthNav
+          title={`${monthName(cursor.monthIndex)} ${cursor.year}`}
+          subtitle={hijriRange || undefined}
+          onPrev={() => shiftMonth(-1)}
+          onNext={() => shiftMonth(1)}
+          onToday={
+            isCurrentMonth
+              ? undefined
+              : () => setCursor({ year: today.getFullYear(), monthIndex: today.getMonth() })
+          }
         />
-      }>
-      <View style={{ width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center' }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            rowGap: spacing.sm,
-            columnGap: spacing.md,
-          }}>
-          <View style={{ gap: spacing.xxs, flexShrink: 1 }}>
-            <AppText size="xxl" weight="bold" heading>
-              {monthName(cursor.monthIndex)} {cursor.year}
-            </AppText>
-            {hijriRange ? (
-              <AppText size="sm" tone="textMuted">
-                {hijriRange}
-              </AppText>
-            ) : null}
-          </View>
 
-          <View style={{ flexDirection: 'row', gap: spacing.sm, alignItems: 'center' }}>
-            {!isCurrentMonth && (
-              <Pressable
-                onPress={() => {
-                  setSelectedIso(null);
-                  setCursor({ year: today.getFullYear(), monthIndex: today.getMonth() });
-                }}
-                hitSlop={hitSlop}
-                style={({ pressed }) => [
-                  {
-                    paddingVertical: spacing.sm,
-                    paddingHorizontal: spacing.md,
-                    borderRadius: radius.full,
-                    backgroundColor: theme.colors.primarySoft,
-                  },
-                  pressed && { opacity: opacity.pressed },
-                ]}>
-                <AppText size="sm" weight="semibold" tone="onPrimarySoft">
-                  I dag
-                </AppText>
-              </Pressable>
-            )}
-            <MonthArrow direction="back" onPress={() => shiftMonth(-1)} />
-            <MonthArrow direction="forward" onPress={() => shiftMonth(1)} />
-          </View>
-        </View>
+        <SegmentedControl value={view} options={VIEW_OPTIONS} onChange={setView} />
 
-        <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
-          {isCurrentMonth && <SeasonCard />}
-
-          {month.isLoading && <Skeleton height={320} rounded="xl" />}
-          {month.isError && <ErrorState onRetry={month.refetch} />}
-          {month.data && (
-            <MonthGrid
-              year={cursor.year}
-              monthIndex={cursor.monthIndex}
-              days={month.data}
-              selectedIso={selectedIso}
-              todayIso={todayIso}
-              onDayPress={onDayPress}
-            />
-          )}
-
-          <View>
-            <SectionHeader
-              title={`Merkedager i ${monthName(cursor.monthIndex).toLowerCase()}`}
-            />
-            {eventsLoading && <Skeleton height={180} rounded="xl" />}
-            {specials.isError && <ErrorState onRetry={specials.refetch} />}
-            {!eventsLoading && events.length === 0 && (
-              <EmptyState message="Ingen merkedager denne måneden" icon="calendar-clear-outline" />
-            )}
-            <View style={{ gap: spacing.md }}>
-              {events.map((event) => (
-                <View
-                  key={event.gregorian_date + event.special_date_name}
-                  ref={(node) => {
-                    eventCardRefs.current.set(event.gregorian_date, node);
-                  }}>
-                  <EventCard
-                    event={event}
-                    selected={event.gregorian_date === selectedIso}
-                    onPress={() => jumpToEvent(event)}
-                  />
-                </View>
-              ))}
-            </View>
-          </View>
-        </View>
+        {view === 'dates' ? (
+          <DatesView
+            year={cursor.year}
+            monthIndex={cursor.monthIndex}
+            days={month.data}
+            isLoading={month.isLoading}
+            isError={month.isError}
+            onRetry={month.refetch}
+            todayIso={todayIso}
+            isCurrentMonth={isCurrentMonth}
+            events={events}
+            eventsLoading={specials.isLoading}
+            eventsError={specials.isError}
+            onEventsRetry={specials.refetch}
+            onDayPress={openDay}
+          />
+        ) : (
+          <TimesView
+            year={cursor.year}
+            monthIndex={cursor.monthIndex}
+            specialDates={specialDates}
+            todayDayKey={todayDayKey}
+            onDayPress={openDay}
+          />
+        )}
       </View>
-    </ScrollView>
+    </Screen>
   );
 }
 
-function MonthArrow({ direction, onPress }: { direction: 'back' | 'forward'; onPress: () => void }) {
-  const theme = useTheme();
+type DatesViewProps = {
+  year: number;
+  monthIndex: number;
+  days: HijriDay[] | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  onRetry: () => void;
+  todayIso: string;
+  isCurrentMonth: boolean;
+  events: HijriDay[];
+  eventsLoading: boolean;
+  eventsError: boolean;
+  onEventsRetry: () => void;
+  onDayPress: (iso: string) => void;
+};
+
+function DatesView({
+  year,
+  monthIndex,
+  days,
+  isLoading,
+  isError,
+  onRetry,
+  todayIso,
+  isCurrentMonth,
+  events,
+  eventsLoading,
+  eventsError,
+  onEventsRetry,
+  onDayPress,
+}: DatesViewProps) {
   return (
-    <Pressable
-      onPress={onPress}
-      hitSlop={hitSlop}
-      style={({ pressed }) => [
-        {
-          width: 40,
-          height: 40,
-          borderRadius: radius.full,
-          backgroundColor: theme.colors.surfaceSunken,
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-        pressed && { opacity: opacity.pressed },
-      ]}>
-      <Ionicons
-        name={direction === 'back' ? 'chevron-back' : 'chevron-forward'}
-        size={20}
-        color={theme.colors.textPrimary}
-      />
-    </Pressable>
+    <View style={{ gap: spacing.lg }}>
+      {isCurrentMonth && <SeasonCard />}
+
+      {isLoading && <Skeleton height={360} rounded="xl" />}
+      {isError && <ErrorState onRetry={onRetry} />}
+      {days && (
+        <MonthGrid
+          year={year}
+          monthIndex={monthIndex}
+          days={days}
+          todayIso={todayIso}
+          onDayPress={(iso) => onDayPress(iso)}
+        />
+      )}
+
+      <View>
+        <SectionHeader
+          title={`Merkedager i ${monthName(monthIndex).toLowerCase()}`}
+          style={{ marginTop: 0 }}
+        />
+        {eventsLoading && <Skeleton height={180} rounded="xl" />}
+        {eventsError && <ErrorState onRetry={onEventsRetry} />}
+        {!eventsLoading && !eventsError && events.length === 0 && (
+          <EmptyState message="Ingen merkedager denne måneden" icon="calendar-clear-outline" />
+        )}
+        <View style={{ gap: spacing.md }}>
+          {events.map((event) => (
+            <EventCard
+              key={event.gregorian_date + event.special_date_name}
+              event={event}
+              onPress={() => onDayPress(event.gregorian_date)}
+            />
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+type TimesViewProps = {
+  year: number;
+  monthIndex: number;
+  specialDates: ReadonlySet<string>;
+  todayDayKey: string;
+  onDayPress: (iso: string) => void;
+};
+
+function TimesView({ year, monthIndex, specialDates, todayDayKey, onDayPress }: TimesViewProps) {
+  const location = useActiveLocation();
+  const asrMethod = useEffectiveAsrMethod();
+  const month = usePrayerMonth(location, year, monthIndex + 1);
+
+  return (
+    <View style={{ gap: spacing.md }}>
+      <AppText size="sm" tone="textMuted">
+        {location.mode === 'calculated' ? `${location.name} · lokale tider` : location.name}
+      </AppText>
+
+      {month.isLoading && <Skeleton height={480} rounded="xl" />}
+      {month.isError && <ErrorState onRetry={month.refetch} />}
+      {month.data && (
+        <MonthPrayerTable
+          days={month.data}
+          asrMethod={asrMethod}
+          todayDayKey={todayDayKey}
+          specialDates={specialDates}
+          onDayPress={(day) => onDayPress(isoDateKey(parseDayKey(day.date)))}
+        />
+      )}
+    </View>
   );
 }

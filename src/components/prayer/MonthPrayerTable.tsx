@@ -6,7 +6,7 @@ import { opacity, radius, spacing } from '@/theme/tokens';
 import type { PrayerDay } from '@/api/types';
 import type { AsrMethodPreference } from '@/store/settings';
 import { asrTimeFor } from '@/lib/prayerSchedule';
-import { osloDayKey, osloTimeToLocalClock, parseDayKey } from '@/lib/time';
+import { isoDateKey, osloDayKey, osloTimeToLocalClock, parseDayKey } from '@/lib/time';
 
 const COLUMNS = ['Fajr', 'Sol', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 const DATE_COLUMN_WIDTH = 40;
@@ -15,11 +15,13 @@ const MAX_TABLE_FONT_SCALE = 1.3;
 const SCROLL_FROM_SCALE = 1.15;
 const WEEKDAY_LETTERS = ['S', 'M', 'T', 'O', 'T', 'F', 'L'];
 const FRIDAY = 5;
+const MARKER_SIZE = 5;
 
 export type MonthPrayerTableProps = {
   days: PrayerDay[];
   asrMethod: AsrMethodPreference;
   todayDayKey?: string;
+  specialDates?: ReadonlySet<string>;
   onDayPress?: (day: PrayerDay) => void;
 };
 
@@ -27,6 +29,7 @@ export function MonthPrayerTable({
   days,
   asrMethod,
   todayDayKey,
+  specialDates,
   onDayPress,
 }: MonthPrayerTableProps) {
   const theme = useTheme();
@@ -73,7 +76,9 @@ export function MonthPrayerTable({
             tone="textMuted"
             align="center"
             maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}
-            numberOfLines={2}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.85}
             style={timeColumnStyle}>
             {column}
           </AppText>
@@ -84,6 +89,7 @@ export function MonthPrayerTable({
         const date = parseDayKey(day.date);
         const isToday = day.date === today;
         const isFriday = date.getDay() === FRIDAY;
+        const isSpecial = specialDates?.has(isoDateKey(date)) ?? false;
         return (
           <Pressable
             key={day.date}
@@ -121,6 +127,25 @@ export function MonthPrayerTable({
                 maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}>
                 {WEEKDAY_LETTERS[date.getDay()]}
               </AppText>
+              {isSpecial && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    justifyContent: 'center',
+                  }}>
+                  <View
+                    style={{
+                      width: MARKER_SIZE,
+                      height: MARKER_SIZE,
+                      borderRadius: radius.full,
+                      backgroundColor: theme.colors.accent,
+                    }}
+                  />
+                </View>
+              )}
             </View>
             {timesFor(day).map((time, index) => (
               <AppText

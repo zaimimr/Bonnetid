@@ -20,13 +20,6 @@ const TRACKER_FEATURE: Feature = {
   description: 'Marker bønner som bedt, og se uken din',
 };
 
-const TIMETABLE_FEATURE: Feature = {
-  href: '/timetable',
-  icon: 'grid-outline',
-  title: 'Månedsoversikt',
-  description: 'Full tabell med alle tider, dag for dag',
-};
-
 const MOSQUE_FEATURE: Feature = {
   href: '/mosques',
   icon: 'business-outline',
@@ -48,7 +41,6 @@ export default function MoreScreen() {
   const calculated = useIsCalculatedMode();
   const features = [
     ...(trackerEnabled ? [TRACKER_FEATURE] : []),
-    TIMETABLE_FEATURE,
     ...(calculated ? [] : [MOSQUE_FEATURE]),
     SETTINGS_FEATURE,
   ];

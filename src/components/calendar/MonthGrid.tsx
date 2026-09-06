@@ -9,17 +9,17 @@ import { parseHijriDate } from '@/lib/hijri';
 import { isoDateKey, osloDateKey } from '@/lib/time';
 
 const WEEKDAY_LABELS = ['man', 'tir', 'ons', 'tor', 'fre', 'lør', 'søn'];
-const CELL_HEIGHT = 52;
-const DAY_HEIGHT = 44;
+const CELL_HEIGHT = 56;
+const DAY_HEIGHT = 48;
 const DAY_WIDTH = 40;
 const WIDE_DAY_WIDTH = 56;
 const MAX_GRID_FONT_SCALE = 1.25;
+const MARKER_SIZE = 5;
 
 export type MonthGridProps = {
   year: number;
   monthIndex: number;
   days: HijriDay[];
-  selectedIso?: string | null;
   todayIso?: string;
   onDayPress?: (iso: string, day: HijriDay | undefined) => void;
 };
@@ -28,7 +28,6 @@ export function MonthGrid({
   year,
   monthIndex,
   days,
-  selectedIso,
   todayIso: todayIsoOverride,
   onDayPress,
 }: MonthGridProps) {
@@ -79,20 +78,19 @@ export function MonthGrid({
             return <View key={`blank-${index}`} style={{ width: '14.28%', height: cellHeight }} />;
 
           const isToday = cell.iso === todayIso;
-          const isSelected = cell.iso === selectedIso;
           const isSpecial = Boolean(cell.hijri?.special_date_name);
           const hijriDay = cell.hijri ? parseHijriDate(cell.hijri.hijri_date)?.day : undefined;
-
-          const textColor = isToday
-            ? theme.colors.onPrimary
-            : isSpecial
-              ? theme.colors.onPrimarySoft
-              : theme.colors.textPrimary;
+          const label = isSpecial
+            ? `${cell.dayOfMonth}. ${cell.hijri?.special_date_name}`
+            : String(cell.dayOfMonth);
 
           return (
             <Pressable
               key={cell.iso}
               onPress={onDayPress ? () => onDayPress(cell.iso, cell.hijri) : undefined}
+              accessibilityRole="button"
+              accessibilityLabel={label}
+              accessibilityState={{ selected: isToday }}
               style={({ pressed }) => [
                 {
                   width: '14.28%',
@@ -109,30 +107,37 @@ export function MonthGrid({
                   borderRadius: radius.md,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: isToday
-                    ? theme.colors.primary
-                    : isSpecial
-                      ? theme.colors.primarySoft
-                      : 'transparent',
-                  borderWidth: isSelected ? 2 : 0,
-                  borderColor: theme.colors.accent,
+                  backgroundColor: isToday ? theme.colors.primary : 'transparent',
                   gap: 1,
                 }}>
                 <AppText
                   size="sm"
-                  weight={isToday || isSelected ? 'bold' : 'medium'}
-                  color={textColor}
+                  weight={isToday ? 'bold' : 'medium'}
+                  color={isToday ? theme.colors.onPrimary : theme.colors.textPrimary}
                   maxFontSizeMultiplier={MAX_GRID_FONT_SCALE}>
                   {cell.dayOfMonth}
                 </AppText>
                 {hijriDay != null && (
                   <AppText
                     size="xs"
-                    color={isToday ? theme.colors.onPrimary : isSpecial ? theme.colors.onPrimarySoft : theme.colors.textMuted}
+                    color={isToday ? theme.colors.onPrimary : theme.colors.textMuted}
                     maxFontSizeMultiplier={MAX_GRID_FONT_SCALE}>
                     {hijriDay}
                   </AppText>
                 )}
+                <View
+                  style={{
+                    width: MARKER_SIZE,
+                    height: MARKER_SIZE,
+                    borderRadius: radius.full,
+                    marginTop: 1,
+                    backgroundColor: isSpecial
+                      ? isToday
+                        ? theme.colors.onPrimary
+                        : theme.colors.accent
+                      : 'transparent',
+                  }}
+                />
               </View>
             </Pressable>
           );
