@@ -29,8 +29,11 @@ struct DayTimelineProvider: TimelineProvider {
     }
     if let snapshot {
       let horizonEnd = now.addingTimeInterval(Double(horizonMinutes) * 60)
-      for prayer in snapshot.allPrayers where prayer.at > now && prayer.at <= horizonEnd {
-        dates.insert(prayer.at)
+      for prayer in snapshot.allPrayers {
+        for boundary in [prayer.at, prayer.end].compactMap({ $0 })
+        where boundary > now && boundary <= horizonEnd {
+          dates.insert(boundary)
+        }
       }
     }
 
@@ -74,21 +77,30 @@ private struct DayTimelineCard: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 10) {
-      Text("Tid igjen til neste salah:")
-        .font(.caption)
-        .foregroundStyle(PrayerColor.inkMuted)
-        .lineLimit(1)
-        .minimumScaleFactor(0.8)
-        .frame(maxWidth: .infinity, alignment: .center)
+      HStack(alignment: .top, spacing: 8) {
+        Text(moment.isNow ? "Nåværende bønn" : "Neste bønn")
+          .font(.caption)
+          .foregroundStyle(PrayerColor.inkMuted)
+          .lineLimit(1)
+          .minimumScaleFactor(0.8)
+
+        Spacer(minLength: 4)
+
+        Text("Tid igjen til neste salah")
+          .font(.caption)
+          .foregroundStyle(PrayerColor.inkMuted)
+          .lineLimit(1)
+          .minimumScaleFactor(0.7)
+      }
 
       HStack(alignment: .firstTextBaseline, spacing: 8) {
         VStack(alignment: .leading, spacing: 1) {
-          Text(moment.next.printedLabel)
+          Text(moment.headline.printedLabel)
             .font(.system(.title2, design: .default).weight(.bold))
             .foregroundStyle(PrayerColor.brand)
             .lineLimit(1)
             .minimumScaleFactor(0.7)
-          Text(PrayerFormat.time(moment.next.printedAt(showJamat: false)))
+          Text(PrayerFormat.time(moment.headline.printedAt(showJamat: false)))
             .prayerTime(.subheadline)
             .foregroundStyle(PrayerColor.inkSecondary)
             .lineLimit(1)
@@ -96,15 +108,25 @@ private struct DayTimelineCard: View {
 
         Spacer(minLength: 4)
 
-        Text(
-          timerInterval: PrayerFormat.countdownRange(to: moment.next.at, from: now),
-          countsDown: true
-        )
-        .prayerTime(.system(.title2, design: .default).weight(.bold))
-        .foregroundStyle(PrayerColor.ink)
-        .multilineTextAlignment(.trailing)
-        .lineLimit(1)
-        .minimumScaleFactor(0.6)
+        VStack(alignment: .trailing, spacing: 1) {
+          Text(
+            timerInterval: PrayerFormat.countdownRange(to: moment.next.at, from: now),
+            countsDown: true
+          )
+          .prayerTime(.system(.title2, design: .default).weight(.bold))
+          .foregroundStyle(PrayerColor.ink)
+          .multilineTextAlignment(.trailing)
+          .lineLimit(1)
+          .minimumScaleFactor(0.6)
+
+          if moment.isNow {
+            Text("\(moment.next.printedLabel) \(PrayerFormat.time(moment.next.at))")
+              .prayerTime(.subheadline)
+              .foregroundStyle(PrayerColor.inkSecondary)
+              .lineLimit(1)
+              .minimumScaleFactor(0.7)
+          }
+        }
       }
 
       TimelineBar(timeline: timeline, now: now, marker: marker)
