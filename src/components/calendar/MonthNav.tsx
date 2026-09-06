@@ -3,6 +3,8 @@ import { AppText, IconButton } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 
+const CONTROL_SIZE = 44;
+
 export type MonthNavProps = {
   title: string;
   subtitle?: string;
@@ -18,24 +20,35 @@ export function MonthNav({ title, subtitle, onPrev, onNext, onToday }: MonthNavP
     <View
       style={{
         flexDirection: 'row',
-        flexWrap: 'wrap',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'space-between',
-        rowGap: spacing.sm,
-        columnGap: spacing.md,
+        gap: spacing.md,
       }}>
-      <View style={{ gap: spacing.xxs, flexShrink: 1 }}>
-        <AppText size="xxl" weight="bold" heading>
+      <View
+        style={{
+          flexGrow: 1,
+          flexShrink: 1,
+          flexBasis: 0,
+          minWidth: 0,
+          gap: spacing.xxs,
+          minHeight: CONTROL_SIZE,
+          justifyContent: 'center',
+        }}>
+        <AppText size="xl" weight="bold" heading numberOfLines={1}>
           {title}
         </AppText>
-        {subtitle ? (
-          <AppText size="sm" tone="textMuted">
-            {subtitle}
-          </AppText>
-        ) : null}
+        <AppText size="sm" tone="textMuted" numberOfLines={1}>
+          {subtitle ?? ' '}
+        </AppText>
       </View>
 
-      <View style={{ flexDirection: 'row', gap: spacing.sm, alignItems: 'center' }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          gap: spacing.sm,
+          alignItems: 'center',
+          height: CONTROL_SIZE,
+        }}>
         {onToday && (
           <Pressable
             onPress={onToday}
@@ -44,7 +57,7 @@ export function MonthNav({ title, subtitle, onPrev, onNext, onToday }: MonthNavP
             accessibilityLabel="Gå til denne måneden"
             style={({ pressed }) => [
               {
-                minHeight: 44,
+                height: CONTROL_SIZE,
                 justifyContent: 'center',
                 paddingHorizontal: spacing.md,
                 borderRadius: radius.full,
