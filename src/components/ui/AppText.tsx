@@ -22,6 +22,7 @@ export type TextTone = keyof Pick<
   | 'success'
   | 'onPrimary'
   | 'onPrimarySoft'
+  | 'onNoticeSoft'
 >;
 
 export type AppTextProps = TextProps & {

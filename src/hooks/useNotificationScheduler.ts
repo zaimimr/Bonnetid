@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { usePrayerTimes } from '@/api/queries';
 import { buildDaySchedule, type PrayerName } from '@/lib/prayerSchedule';
 import {
   cancelPrayerNotifications,
@@ -9,6 +8,7 @@ import {
 import { buildPrayerReminders, type ScheduleDay } from '@/lib/prayerReminders';
 import { isoDateKey, parseDayKey } from '@/lib/time';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
+import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { usePrayerLog } from '@/store/prayerLog';
 import { NOTIFIABLE_PRAYERS, useActiveLocation, useSettings } from '@/store/settings';
 
@@ -18,15 +18,17 @@ export function useNotificationScheduler() {
   const notificationPrayers = useSettings((state) => state.notificationPrayers);
   const endReminderEnabled = useSettings((state) => state.endReminderEnabled);
   const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled);
+  const calculationMethod = useSettings((state) => state.calculationMethod);
   const log = usePrayerLog((state) => state.log);
   const asrMethod = useEffectiveAsrMethod();
   const location = useActiveLocation();
+  const zone = zoneFor(location);
 
   const today = new Date();
   const todayIso = isoDateKey(today);
   const nextMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-  const currentMonth = usePrayerTimes(location.iso, today.getFullYear(), today.getMonth() + 1);
-  const nextMonth = usePrayerTimes(location.iso, nextMonthDate.getFullYear(), nextMonthDate.getMonth() + 1);
+  const currentMonth = usePrayerMonth(location, today.getFullYear(), today.getMonth() + 1);
+  const nextMonth = usePrayerMonth(location, nextMonthDate.getFullYear(), nextMonthDate.getMonth() + 1);
 
   const lastSyncKey = useRef('');
 
@@ -49,6 +51,10 @@ export function useNotificationScheduler() {
       marksKey,
       todayIso,
       location.iso,
+      location.lat,
+      location.lon,
+      zone,
+      calculationMethod,
       asrMethod,
       currentMonth.dataUpdatedAt,
       nextMonth.dataUpdatedAt,
@@ -67,7 +73,7 @@ export function useNotificationScheduler() {
         const dayStart = parseDayKey(day.date);
         return {
           isoDate: isoDateKey(dayStart),
-          schedule: buildDaySchedule(day, dayStart, asrMethod),
+          schedule: buildDaySchedule(day, dayStart, asrMethod, zone),
         };
       },
     );
@@ -103,8 +109,12 @@ export function useNotificationScheduler() {
     log,
     todayIso,
     asrMethod,
+    zone,
+    calculationMethod,
     location.iso,
     location.name,
+    location.lat,
+    location.lon,
     currentMonth.data,
     currentMonth.dataUpdatedAt,
     nextMonth.data,

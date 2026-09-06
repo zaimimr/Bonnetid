@@ -23,6 +23,7 @@ export type SnapshotMosqueInput = {
 
 export type SnapshotInput = {
   locationName: string;
+  mode?: 'norway' | 'calculated';
   /** Where the user's chosen kommune is, used when the car has no location fix. */
   origin?: { lat: number; lon: number } | null;
   /** Every mosque that has coordinates; the car app ranks them against its own position. */
@@ -62,6 +63,7 @@ export type Snapshot = {
   version: number;
   generatedAt: string;
   locationName: string;
+  mode: 'norway' | 'calculated';
   origin: { lat: number; lon: number } | null;
   mosques: SnapshotMosque[];
   mosqueName: string | null;
@@ -89,6 +91,7 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
     version: SNAPSHOT_VERSION,
     generatedAt: input.generatedAt.toISOString(),
     locationName: input.locationName,
+    mode: input.mode ?? 'norway',
     origin: input.origin ?? null,
     mosques: input.mosques ?? [],
     mosqueName: input.mosqueName ?? null,

@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { usePrayerTimes } from '@/api/queries';
 import { MonthPrayerTable } from '@/components/prayer/MonthPrayerTable';
 import { AppText, ErrorState, Screen, Skeleton } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import { monthName } from '@/lib/hijri';
 import { isoDateKey, parseDayKey } from '@/lib/time';
+import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
+import { usePrayerMonth } from '@/hooks/usePrayerMonth';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useActiveLocation } from '@/store/settings';
 
@@ -21,12 +22,13 @@ export default function TimetableScreen() {
   const { refreshing, onRefresh } = useRefresh();
 
   const today = new Date();
+  const { dayKey: todayDayKey } = useActiveDayKeys(today);
   const [cursor, setCursor] = useState(() => ({
     year: today.getFullYear(),
     monthIndex: today.getMonth(),
   }));
 
-  const month = usePrayerTimes(location.iso, cursor.year, cursor.monthIndex + 1);
+  const month = usePrayerMonth(location, cursor.year, cursor.monthIndex + 1);
   const isCurrentMonth =
     cursor.year === today.getFullYear() && cursor.monthIndex === today.getMonth();
 
@@ -54,7 +56,7 @@ export default function TimetableScreen() {
             {monthName(cursor.monthIndex)} {cursor.year}
           </AppText>
           <AppText size="sm" tone="textMuted">
-            {location.name}
+            {location.mode === 'calculated' ? `${location.name} · lokale tider` : location.name}
           </AppText>
         </View>
 
@@ -91,6 +93,7 @@ export default function TimetableScreen() {
           <MonthPrayerTable
             days={month.data}
             asrMethod={asrMethod}
+            todayDayKey={todayDayKey}
             onDayPress={(day) =>
               router.push({
                 pathname: '/day/[date]',

@@ -9,16 +9,26 @@ import { EventCard } from '@/components/calendar/EventCard';
 import { JummahHomeCard } from '@/components/mosque/JummahHomeCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import { NightCard } from '@/components/season/NightCard';
-import { AppText, EmptyState, ErrorState, Screen, SectionHeader, Skeleton } from '@/components/ui';
+import { ReturnHomeCard } from '@/components/travel/ReturnHomeCard';
+import {
+  AppText,
+  Badge,
+  EmptyState,
+  ErrorState,
+  Screen,
+  SectionHeader,
+  Skeleton,
+} from '@/components/ui';
+import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useNow } from '@/hooks/useNow';
 import { useTimezoneNote } from '@/hooks/useTimezoneNote';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { useRefresh } from '@/hooks/useRefresh';
 import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
-import { isoDateIsFriday, osloDateKey, osloDayStart } from '@/lib/time';
+import { isoDateIsFriday, parseDayKey } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
-import { useActiveLocation, useSettings } from '@/store/settings';
+import { useActiveLocation, useActiveMosque } from '@/store/settings';
 
 const UPCOMING_EVENT_COUNT = 3;
 
@@ -26,12 +36,13 @@ export default function HomeScreen() {
   const router = useRouter();
   const now = useNow();
   const location = useActiveLocation();
-  const mosque = useSettings((state) => state.mosque);
+  const calculated = location.mode === 'calculated';
+  const mosque = useActiveMosque();
   const { todaySchedule, nextPrayer, isLoading, isError, refetch } = usePrayerDay(now);
   const { refreshing, onRefresh } = useRefresh();
   const timezoneNote = useTimezoneNote(now);
-  const today = osloDayStart(now);
-  const todayIso = osloDateKey(now);
+  const { dayKey, isoDate: todayIso } = useActiveDayKeys(now);
+  const today = useMemo(() => parseDayKey(dayKey), [dayKey]);
 
   const hijriMonth = useHijriMonth(today.getFullYear(), today.getMonth() + 1);
   const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
@@ -83,6 +94,8 @@ export default function HomeScreen() {
           />
         )}
 
+        <ReturnHomeCard />
+
         {nextPrayer && todaySchedule.length > 0 && (
           <PrayerTimelineCard
             schedule={todaySchedule}
@@ -92,7 +105,7 @@ export default function HomeScreen() {
           />
         )}
 
-        <JummahHomeCard />
+        {!calculated && <JummahHomeCard />}
 
         <SeasonCard />
 
@@ -110,6 +123,7 @@ export default function HomeScreen() {
               subtitle={
                 mosque && mosqueInLocation ? `${location.name} · ${mosque.name}` : location.name
               }
+              trailing={calculated ? <Badge label="Lokale tider" variant="neutral" /> : undefined}
               style={timezoneNote ? { marginBottom: spacing.xs } : undefined}
             />
             {timezoneNote && (
@@ -136,7 +150,7 @@ export default function HomeScreen() {
                   router.push('/mosque-picker');
                 }
               }}
-              onSelectMosque={() => router.push('/mosque-picker')}
+              onSelectMosque={calculated ? undefined : () => router.push('/mosque-picker')}
               statusDate={todayIso}
               now={now}
             />

@@ -62,6 +62,19 @@ export function osloWallClockToDate(day: Date | string, time: string): Date {
   return new Date(naive - OSLO_STANDARD_OFFSET * MINUTE_MS);
 }
 
+export function localWallClockToDate(day: Date | string, time: string): Date {
+  const calendar = calendarDayOf(day);
+  const [hours, minutes] = time.split(':').map(Number);
+  if (!calendar || Number.isNaN(hours) || Number.isNaN(minutes)) return new Date(NaN);
+  return new Date(calendar.year, calendar.month - 1, calendar.day, hours, minutes, 0, 0);
+}
+
+export type PrayerTimeZone = 'oslo' | 'device';
+
+export function wallClockToDate(day: Date | string, time: string, zone: PrayerTimeZone): Date {
+  return zone === 'device' ? localWallClockToDate(day, time) : osloWallClockToDate(day, time);
+}
+
 export function parseTimeToDate(time: string, baseDate: Date): Date {
   return osloWallClockToDate(baseDate, time);
 }

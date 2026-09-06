@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { usePrayerTimes } from '@/api/queries';
 import { AppText, Card, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
 import { PrayerActionButton, PrayerStatusMark } from '@/components/prayer/PrayerStatusControl';
 import { WeekOverview } from '@/components/prayer/WeekOverview';
+import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
+import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { useFontScale } from '@/hooks/useFontScale';
 import { useNow } from '@/hooks/useNow';
 import { usePrayerMark } from '@/hooks/usePrayerMark';
@@ -14,7 +15,7 @@ import { useRefresh } from '@/hooks/useRefresh';
 import { formatGregorianLong } from '@/lib/hijri';
 import { statusOf, weekColumns, weekDayKeys } from '@/lib/prayerLog';
 import { buildDaySchedule } from '@/lib/prayerSchedule';
-import { isoDateKey, osloDateKey, todayKey } from '@/lib/time';
+import { isoDateKey, todayKey } from '@/lib/time';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import { usePrayerLog } from '@/store/prayerLog';
@@ -38,13 +39,14 @@ export default function TrackerScreen() {
   const theme = useTheme();
   const location = useActiveLocation();
   const asrMethod = useEffectiveAsrMethod();
+  const zone = zoneFor(location);
   const log = usePrayerLog((state) => state.log);
   const markPrayer = usePrayerMark();
   const { isStacked } = useFontScale();
   const { todaySchedule, isLoading, isError, refetch } = usePrayerDay(now);
   const { refreshing, onRefresh } = useRefresh();
 
-  const todayIso = osloDateKey(now);
+  const { isoDate: todayIso } = useActiveDayKeys(now);
   const [selectedIso, setSelectedIso] = useState(todayIso);
   const [openPrayer, setOpenPrayer] = useState<string | null>(null);
   const selected = selectedIso > todayIso ? todayIso : selectedIso;
@@ -54,18 +56,14 @@ export default function TrackerScreen() {
   const at = useMemo(() => new Date(minute * MINUTE_MS), [minute]);
 
   const selectedDate = useMemo(() => parseIso(selected), [selected]);
-  const month = usePrayerTimes(
-    location.iso,
-    selectedDate.getFullYear(),
-    selectedDate.getMonth() + 1,
-  );
+  const month = usePrayerMonth(location, selectedDate.getFullYear(), selectedDate.getMonth() + 1);
   const row = month.data?.find((day) => day.date === todayKey(selectedDate));
 
   const schedule = useMemo(() => {
     if (isToday) return todaySchedule.filter((entry) => entry.isPrayer);
     if (!row) return [];
-    return buildDaySchedule(row, selectedDate, asrMethod).filter((entry) => entry.isPrayer);
-  }, [isToday, todaySchedule, row, selectedDate, asrMethod]);
+    return buildDaySchedule(row, selectedDate, asrMethod, zone).filter((entry) => entry.isPrayer);
+  }, [isToday, todaySchedule, row, selectedDate, asrMethod, zone]);
 
   const columns = useMemo(
     () => weekColumns(weekDayKeys(selectedDate), todayIso, todaySchedule, log, at),

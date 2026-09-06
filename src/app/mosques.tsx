@@ -19,7 +19,7 @@ import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { fontSize, opacity, radius, spacing } from '@/theme/tokens';
 import { usePlaceFilter } from '@/store/placeFilter';
-import { useSettings } from '@/store/settings';
+import { useIsCalculatedMode, useSettings } from '@/store/settings';
 
 type ViewMode = 'list' | 'map';
 type SortMode = 'distance' | 'name';
@@ -44,6 +44,7 @@ export default function MosquesScreen() {
   const eidPeriod = useEidPeriod();
   const selected = useSettings((state) => state.mosque);
   const selectedOrgNr = selected?.orgNr;
+  const calculated = useIsCalculatedMode();
   const placeIso = place?.iso ?? null;
 
   const inPlace = useMemo(() => {
@@ -118,6 +119,17 @@ export default function MosquesScreen() {
     : query.trim()
       ? `Ingen moskeer matcher «${query.trim()}»`
       : 'Ingen moskeer funnet i nærheten';
+
+  if (calculated) {
+    return (
+      <Screen edges={[]}>
+        <EmptyState
+          message="Moskeoversikten gjelder Norge. Bytt til norsk tid i Innstillinger for å se den."
+          icon="business-outline"
+        />
+      </Screen>
+    );
+  }
 
   return (
     <Screen padded={false} edges={[]} maxWidth={mode === 'map' ? null : undefined}>
