@@ -101,19 +101,19 @@ struct PrayerSnapshot: Codable, Hashable {
     return days.first(where: { $0.date == key })?.hijriText ?? days.first?.hijriText ?? ""
   }
 
-  /// The prayer that is currently running, using the same boundaries as the app: the last
-  /// prayer that has started, until the next entry begins. Sunrise counts as a boundary, so
-  /// Fajr stops being current at sunrise rather than lingering until Duhr.
+  /// The prayer that is currently running, using the same rule as the app: the last prayer of
+  /// today that has started, until its own window end passes. Sunrise ends Fajr and midnight
+  /// ends Isha, so neither lingers into the next prayer's window.
   func currentPrayer(at date: Date) -> PrayerEntry? {
-    let entries = allPrayers
-    guard let index = entries.lastIndex(where: { $0.isPrayer && $0.at <= date }) else {
-      return nil
-    }
-    let next = entries.index(after: index)
-    if entries.indices.contains(next), date >= entries[next].at {
-      return nil
-    }
-    return entries[index]
+    let key = PrayerSnapshot.dayKey(for: date)
+    guard let day = days.first(where: { $0.date == key }) else { return nil }
+    let started = day.prayers
+      .filter(\.isPrayer)
+      .sorted { $0.at < $1.at }
+      .last { $0.at <= date }
+    guard let started else { return nil }
+    if let end = started.end, date >= end { return nil }
+    return started
   }
 
   /// The five daily prayers for the calendar day containing `date`, sunrise excluded.
@@ -143,10 +143,8 @@ struct PrayerSnapshot: Codable, Hashable {
 
 /// What every surface renders: which prayer is running, which is next, and the window between them.
 struct PrayerMoment: Hashable {
-  let current: PrayerEntry?
   /// The prayer whose window is open right now: Fajr stops running at sunrise, Isha at midnight.
-  let running: PrayerEntry?
-  let runningEnd: Date?
+  let current: PrayerEntry?
   let next: PrayerEntry
   let windowStart: Date
   let windowEnd: Date
@@ -172,20 +170,8 @@ struct PrayerMoment: Hashable {
     let next = prayers[nextIndex]
     let previous = nextIndex > prayers.startIndex ? prayers[nextIndex - 1] : nil
 
-    // A prayer counts as running for its first 20 minutes; after that the countdown to the
-    // next one is the more useful number in a glance.
-    let nowWindow: TimeInterval = 20 * 60
-    let current = previous.flatMap { date.timeIntervalSince($0.at) < nowWindow ? $0 : nil }
-
-    let openNow = snapshot.currentPrayer(at: date).flatMap { entry -> PrayerEntry? in
-      if let end = entry.end, date >= end { return nil }
-      return entry
-    }
-
     return PrayerMoment(
-      current: current,
-      running: openNow,
-      runningEnd: openNow.map { $0.end ?? next.at },
+      current: snapshot.currentPrayer(at: date),
       next: next,
       windowStart: previous?.at ?? date,
       windowEnd: next.at,
@@ -205,20 +191,6 @@ enum PrayerFormat {
 
   static func time(_ date: Date) -> String {
     clock.string(from: date)
-  }
-
-  /// "1t 32m igjen" / "4 min igjen" - what is left of a window that is already running.
-  static func remaining(to date: Date, from now: Date = Date()) -> String {
-    let seconds = max(0, Int(date.timeIntervalSince(now)))
-    let hours = seconds / 3600
-    let minutes = (seconds % 3600) / 60
-    if hours > 0 {
-      return "\(hours)t \(minutes)m igjen"
-    }
-    if minutes > 0 {
-      return "\(minutes) min igjen"
-    }
-    return "under 1 min igjen"
   }
 
   /// "om 1t 32m" / "om 4 min" - Norwegian bokmål, no seconds, safe for a static render.
