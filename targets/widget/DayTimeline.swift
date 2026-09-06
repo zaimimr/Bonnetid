@@ -48,7 +48,7 @@ struct DayTimeline {
   }
 
   static func build(snapshot: PrayerSnapshot, at now: Date) -> DayTimeline? {
-    let calendar = osloCalendar
+    let calendar = snapshot.usesDeviceTimeZone ? deviceCalendar : osloCalendar
     let dayStart = calendar.startOfDay(for: now)
     guard let nextDayStart = calendar.date(byAdding: .day, value: 1, to: dayStart) else {
       return nil
@@ -133,4 +133,10 @@ struct DayTimeline {
     if let zone = TimeZone(identifier: "Europe/Oslo") { calendar.timeZone = zone }
     return calendar
   }()
+
+  private static var deviceCalendar: Calendar {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone.current
+    return calendar
+  }
 }
