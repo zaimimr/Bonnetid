@@ -40,6 +40,15 @@
         "track": "automotive:production",
         "releaseStatus": "completed"
       }
+    },
+    "testing": {
+      "ios": {
+        "ascAppId": "6792056685"
+      },
+      "android": {
+        "track": "internal",
+        "releaseStatus": "completed"
+      }
     }
   }
 }
