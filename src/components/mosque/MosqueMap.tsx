@@ -15,12 +15,15 @@ export type MosqueMapPin = {
 export type MosqueMapProps = {
   pins: MosqueMapPin[];
   center: { lat: number; lon: number };
+  actionLabel?: string;
   onSelect: (orgNr: string) => void;
 };
 
-export function MosqueMap({ pins, center, onSelect }: MosqueMapProps) {
+export function MosqueMap({ pins, center, actionLabel = 'Vis moské', onSelect }: MosqueMapProps) {
   if (!NATIVE_MAPS_AVAILABLE) {
-    return <OsmMosqueMap pins={pins} center={center} onSelect={onSelect} />;
+    return (
+      <OsmMosqueMap pins={pins} center={center} actionLabel={actionLabel} onSelect={onSelect} />
+    );
   }
   return <NativeMosqueMap pins={pins} center={center} onSelect={onSelect} />;
 }
@@ -52,7 +55,7 @@ function NativeMosqueMap({ pins, center, onSelect }: MosqueMapProps) {
   );
 }
 
-function OsmMosqueMap({ pins, center, onSelect }: MosqueMapProps) {
+function OsmMosqueMap({ pins, center, actionLabel, onSelect }: MosqueMapProps) {
   const theme = useTheme();
   const mapRef = useRef<LeafletMapHandle>(null);
 
@@ -100,7 +103,7 @@ function OsmMosqueMap({ pins, center, onSelect }: MosqueMapProps) {
     }
     var button = document.createElement('button');
     button.className = 'popup-open';
-    button.textContent = 'Vis moské';
+    button.textContent = ${JSON.stringify(actionLabel ?? 'Vis moské')};
     button.addEventListener('click', function () {
       window.ReactNativeWebView.postMessage(pin.orgNr);
     });
@@ -120,6 +123,7 @@ function OsmMosqueMap({ pins, center, onSelect }: MosqueMapProps) {
   };`,
       }),
     [
+      actionLabel,
       center.lat,
       center.lon,
       theme.colors.mapPinRing,
