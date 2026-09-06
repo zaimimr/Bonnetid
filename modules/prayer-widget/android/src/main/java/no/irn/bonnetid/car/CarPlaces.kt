@@ -48,13 +48,6 @@ object CarPlaces {
       .take(limit)
   }
 
-  fun formatDistance(km: Double): String? {
-    if (km.isNaN()) return null
-    if (km < 1) return "${Math.round(km * 1000)} m"
-    if (km < 10) return String.format(java.util.Locale.forLanguageTag("nb-NO"), "%.1f km", km)
-    return "${Math.round(km)} km"
-  }
-
   private fun lastKnown(context: Context): SnapshotCoords? {
     if (!hasLocationPermission(context)) return null
     val manager = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager ?: return null

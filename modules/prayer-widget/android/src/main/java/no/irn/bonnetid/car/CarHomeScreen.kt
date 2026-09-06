@@ -8,6 +8,7 @@ import androidx.car.app.model.Pane
 import androidx.car.app.model.PaneTemplate
 import androidx.car.app.model.Row
 import androidx.car.app.model.Template
+import no.irn.bonnetid.widget.PrayerEntry
 import no.irn.bonnetid.widget.PrayerFormat
 import no.irn.bonnetid.widget.PrayerMoment
 import no.irn.bonnetid.widget.PrayerSnapshot
@@ -19,6 +20,7 @@ import no.irn.bonnetid.widget.PrayerSnapshot
 class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
   private var fetching = false
   private var fetchFailed = false
+  private var lastAttemptAt = 0L
 
   init {
     lifecycle.addObserver(CarMinuteTicker { invalidate() })
@@ -29,14 +31,14 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
     val now = System.currentTimeMillis()
 
     // Automotive OS has no phone app behind it, so the car fills its own snapshot.
-    if (CarDataSource.needsRefresh(snapshot, now) && CarDataSource.configured()) {
-      startRefresh()
-      if (fetching) {
-        return MessageTemplate.Builder(LOADING)
-          .setTitle(TITLE)
-          .setHeaderAction(Action.APP_ICON)
-          .build()
-      }
+    if (CarDataSource.needsRefresh(snapshot, now) && CarDataSource.configured() && mayRetry(now)) {
+      startRefresh(now)
+    }
+    if (fetching) {
+      return MessageTemplate.Builder(LOADING)
+        .setTitle(TITLE)
+        .setHeaderAction(Action.APP_ICON)
+        .build()
     }
 
     val moment = snapshot?.let { PrayerMoment.resolve(it, now) }
@@ -45,18 +47,19 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
         .setHeaderAction(Action.APP_ICON)
         .build()
 
-    val headline = moment.headline
+    val running = snapshot.currentPrayer(now)
+    val headline = running ?: moment.next
     val pane = Pane.Builder()
       .addRow(
         Row.Builder()
           .setTitle("${headline.displayLabel} ${PrayerFormat.time(headline.printedAt(false))}")
-          .addText(secondary(moment, now))
+          .addText(secondary(moment, running, now))
           .build(),
       )
       .addRow(
         Row.Builder()
           .setTitle(moment.locationName)
-          .addText(jamatText(snapshot, moment) ?: moment.hijriText)
+          .addText(jamatText(snapshot, headline) ?: moment.hijriText)
           .build(),
       )
       .addAction(
@@ -78,10 +81,14 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
       .build()
   }
 
-  private fun startRefresh() {
+  private fun mayRetry(now: Long): Boolean =
+    !fetchFailed || now - lastAttemptAt >= RETRY_AFTER_MS
+
+  private fun startRefresh(now: Long) {
     if (fetching) return
     fetching = true
     fetchFailed = false
+    lastAttemptAt = now
     val appContext = carContext.applicationContext
     val origin = CarPlaces.origin(carContext, PrayerSnapshot.load(carContext))
     Thread {
@@ -94,21 +101,22 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
     }.start()
   }
 
-  private fun secondary(moment: PrayerMoment, now: Long): String {
+  private fun secondary(moment: PrayerMoment, running: PrayerEntry?, now: Long): String {
     val countdown = PrayerFormat.countdown(moment.next.at, now)
-    if (!moment.isNow) return "Starter $countdown"
+    if (running == null) return "Starter $countdown"
     return "${moment.next.displayLabel} $countdown"
   }
 
-  private fun jamatText(snapshot: PrayerSnapshot, moment: PrayerMoment): String? {
+  private fun jamatText(snapshot: PrayerSnapshot, headline: PrayerEntry): String? {
     if (!snapshot.hasJamatTimes) return null
-    val jamat = moment.headline.jamat ?: return null
-    val label = if (moment.headline.isJummah) "Jumuah" else "Jamaat"
+    val jamat = headline.jamat ?: return null
+    val label = if (headline.isJummah) "Jumuah" else "Jamaat"
     val mosque = snapshot.mosqueName ?: return "$label ${PrayerFormat.time(jamat)}"
     return "$label ${PrayerFormat.time(jamat)} · $mosque"
   }
 
   private companion object {
+    const val RETRY_AFTER_MS = 5 * 60 * 1000L
     const val TITLE = "Bønnetid"
     const val NO_DATA = "Åpne Bønnetid på telefonen én gang, så henter bilen bønnetidene herfra."
     const val LOADING = "Henter bønnetider …"

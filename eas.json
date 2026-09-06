@@ -49,6 +49,12 @@
         "track": "internal",
         "releaseStatus": "completed"
       }
+    },
+    "testing-automotive": {
+      "android": {
+        "track": "automotive:internal",
+        "releaseStatus": "completed"
+      }
     }
   }
 }

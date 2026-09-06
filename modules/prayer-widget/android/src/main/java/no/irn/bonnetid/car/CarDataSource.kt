@@ -1,6 +1,7 @@
 package no.irn.bonnetid.car
 
 import android.content.Context
+import android.util.Log
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
@@ -21,6 +22,7 @@ import org.json.JSONObject
  * phone's snapshot is missing or older than today.
  */
 object CarDataSource {
+  private const val TAG = "BonnetidCar"
   private const val SNAPSHOT_DAYS = 3
   private const val OSLO = "Europe/Oslo"
 
@@ -52,10 +54,19 @@ object CarDataSource {
     if (!configured()) return false
     return try {
       val locations = fetchLocations()
-      val origin = from ?: return false
-      val location = locations.minByOrNull { distanceKm(origin, it) } ?: return false
+      val origin = from ?: run {
+        Log.w(TAG, "Ingen posisjon å regne kommune fra")
+        return false
+      }
+      val location = locations.minByOrNull { distanceKm(origin, it) } ?: run {
+        Log.w(TAG, "Fant ingen kommuner (${locations.size} rader)")
+        return false
+      }
       val days = fetchPrayerDays(location.iso)
-      if (days.length() == 0) return false
+      if (days.length() == 0) {
+        Log.w(TAG, "Ingen bønnetider for ${location.iso}")
+        return false
+      }
       val mosques = fetchMosques()
 
       val payload = JSONObject()
@@ -76,6 +87,7 @@ object CarDataSource {
         .apply()
       true
     } catch (error: Exception) {
+      Log.w(TAG, "Klarte ikke hente bønnetider til bilen", error)
       false
     }
   }
@@ -87,6 +99,10 @@ object CarDataSource {
     val lon: Double,
     val asrMethod: Int,
   )
+
+  /** org.json turns a JSON null into the string "null", which would defeat every fallback. */
+  private fun text(row: JSONObject, key: String): String =
+    if (row.isNull(key)) "" else row.optString(key).trim()
 
   private fun fetchLocations(): List<RemoteLocation> {
     val rows = getJson("location_t?select=location_iso,location_name,lat_n_s,long_e_w,asr_method")
@@ -137,10 +153,10 @@ object CarDataSource {
       val lat = row.optDouble("lat", Double.NaN)
       val lon = row.optDouble("lon", Double.NaN)
       if (lat.isNaN() || lon.isNaN()) continue
-      val name = row.optString("org_name2").trim().ifEmpty { row.optString("reg_navn") }
+      val name = text(row, "org_name2").ifEmpty { text(row, "reg_navn") }
       mosques.put(
         JSONObject()
-          .put("orgNr", row.optString("organisasjonsnummer"))
+          .put("orgNr", text(row, "organisasjonsnummer"))
           .put("name", name)
           .put("address", row.opt("address") ?: JSONObject.NULL)
           .put("lat", lat)
