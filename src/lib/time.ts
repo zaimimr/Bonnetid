@@ -127,6 +127,16 @@ export function formatCountdown(milliseconds: number): string {
   return `${pad(minutes)}:${pad(seconds)}`;
 }
 
+export function formatCountdownUnits(milliseconds: number): string {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 0) return `${hours}t ${minutes}m ${pad(seconds)}s`;
+  if (minutes > 0) return `${minutes}m ${pad(seconds)}s`;
+  return `${seconds}s`;
+}
+
 export function formatDurationShort(milliseconds: number): string {
   const totalMinutes = Math.max(0, Math.round(milliseconds / MINUTE_MS));
   const hours = Math.floor(totalMinutes / 60);

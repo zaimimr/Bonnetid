@@ -18,7 +18,7 @@ import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from './TimeCell';
 
 export type { JamatTimes };
 
-const PRAYER_ICONS: Record<PrayerName, keyof typeof Ionicons.glyphMap> = {
+export const PRAYER_ICONS: Record<PrayerName, keyof typeof Ionicons.glyphMap> = {
   fajr: 'cloudy-night-outline',
   fajr_endtime: 'sunny-outline',
   duhr: 'sunny',
