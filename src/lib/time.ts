@@ -162,9 +162,13 @@ export function isoDateKey(date: Date = new Date()): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
-export function isoDateIsFriday(isoDate: string): boolean {
+export function isoWeekday(isoDate: string): number {
   const parsed = new Date(`${isoDate}T12:00:00`);
-  return !Number.isNaN(parsed.getTime()) && parsed.getDay() === FRIDAY;
+  return Number.isNaN(parsed.getTime()) ? -1 : parsed.getDay();
+}
+
+export function isoDateIsFriday(isoDate: string): boolean {
+  return isoWeekday(isoDate) === FRIDAY;
 }
 
 export function addIsoDays(isoDate: string, days: number): string {

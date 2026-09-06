@@ -12,7 +12,7 @@ import { initTelemetry, navigationIntegration, Sentry, trackError } from '@/lib/
 import { useNotificationScheduler } from '@/hooks/useNotificationScheduler';
 import { useNotificationResponses } from '@/hooks/useNotificationResponses';
 import { useAutoLocation } from '@/hooks/useAutoLocation';
-import { useRamadanReminders } from '@/hooks/useRamadanReminders';
+import { useFastingReminders } from '@/hooks/useFastingReminders';
 import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 import { useWidgetSync } from '@/hooks/useWidgetSync';
 import { useNow } from '@/hooks/useNow';
@@ -56,7 +56,7 @@ function RootNavigator() {
   useAutoLocation();
   useNotificationScheduler();
   useNotificationResponses();
-  useRamadanReminders();
+  useFastingReminders(now);
   useReviewPrompt();
   useWidgetSync(now);
   usePrayerLogSync(now);
@@ -163,6 +163,17 @@ function RootNavigator() {
           options={{
             headerShown: true,
             title: 'Bønner',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="fasting-reminders"
+          options={{
+            headerShown: true,
+            title: 'Faste og merkedager',
             headerBackTitle: 'Tilbake',
             headerStyle: { backgroundColor: theme.colors.surface },
             headerTitleStyle: { color: theme.colors.textPrimary },

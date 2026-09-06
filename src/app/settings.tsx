@@ -21,9 +21,13 @@ import { getNotificationSound } from '@/lib/notificationSounds';
 import { asrMethodLabel } from '@/lib/asrMethods';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
 import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
-import { useRamadanStatus } from '@/hooks/useRamadanStatus';
 import { track, trackError } from '@/lib/telemetry';
-import { NOTIFIABLE_PRAYERS, useActiveLocation, useSettings } from '@/store/settings';
+import {
+  NOTIFIABLE_PRAYERS,
+  VOLUNTARY_FAST_KINDS,
+  useActiveLocation,
+  useSettings,
+} from '@/store/settings';
 
 const lockScreenSupported =
   prayerWidgetAvailable && (Platform.OS === 'android' || liveActivitiesEnabled());
@@ -60,9 +64,8 @@ export default function SettingsScreen() {
   const asrOverride = useMosqueAsrOverride();
   const asrLocationDefault = useLocationAsrDefault();
   const ramadanRemindersEnabled = useSettings((state) => state.ramadanRemindersEnabled);
-  const setRamadanRemindersEnabled = useSettings((state) => state.setRamadanRemindersEnabled);
-  const ramadan = useRamadanStatus(new Date());
-  const showRamadan = ramadan.isRamadan || ramadan.daysUntilRamadan != null;
+  const dhulHijjahRemindersEnabled = useSettings((state) => state.dhulHijjahRemindersEnabled);
+  const voluntaryFasts = useSettings((state) => state.voluntaryFasts);
 
   const detectLocation = async () => {
     if (!locations || locating) return;
@@ -104,6 +107,18 @@ export default function SettingsScreen() {
     const granted = await requestNotificationPermission();
     setLiveActivityEnabled(granted);
   };
+
+  const chosenFasts = [
+    ramadanRemindersEnabled,
+    dhulHijjahRemindersEnabled,
+    ...VOLUNTARY_FAST_KINDS.map((kind) => voluntaryFasts[kind]),
+  ].filter(Boolean).length;
+  const fastingSummary =
+    chosenFasts === 0
+      ? 'Ingen påminnelser'
+      : chosenFasts === 1
+        ? '1 påminnelse er på'
+        : `${chosenFasts} påminnelser er på`;
 
   const chosenPrayers = NOTIFIABLE_PRAYERS.filter((prayer) => notificationPrayers[prayer]);
   const prayerSummary =
@@ -188,26 +203,15 @@ export default function SettingsScreen() {
               onPress={() => router.push('/notification-sound')}
               style={ROW}
             />
-            {showRamadan && (
-              <>
-                <Divider />
-                <ListRow
-                  title="Suhoor-påminnelse"
-                  subtitle="45 minutter før Fajr"
-                  leading={<Ionicons name="moon-outline" size={20} color={theme.colors.primary} />}
-                  trailing={
-                    <Switch
-                      value={ramadanRemindersEnabled}
-                      onValueChange={setRamadanRemindersEnabled}
-                      disabled={!notificationsSupported}
-                      trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
-                      thumbColor={theme.colors.surface}
-                    />
-                  }
-                  style={ROW}
-                />
-              </>
-            )}
+            <Divider />
+            <ListRow
+              title="Faste og merkedager"
+              subtitle={fastingSummary}
+              leading={<Ionicons name="moon-outline" size={20} color={theme.colors.primary} />}
+              chevron
+              onPress={() => router.push('/fasting-reminders')}
+              style={ROW}
+            />
           </>
         )}
       </Card>

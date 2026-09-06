@@ -1,66 +1,48 @@
 import { View } from 'react-native';
 import { AppText, Card } from '@/components/ui';
+import { SeasonCountdownCard } from '@/components/season/SeasonCountdownCard';
 import { useFontScale } from '@/hooks/useFontScale';
-import { useNow } from '@/hooks/useNow';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
-import { useRamadanStatus } from '@/hooks/useRamadanStatus';
+import type { SeasonStatus } from '@/lib/hijriSeason';
 import type { PrayerEntry } from '@/lib/prayerSchedule';
 import { fastingProgress, ramadanCountdown, ramadanCountdownText } from '@/lib/ramadan';
 import { formatDurationShort } from '@/lib/time';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
 
-const TICK_MS = 30_000;
 const TRACK_HEIGHT = 6;
 
 function entryFor(schedule: PrayerEntry[], name: PrayerEntry['name']): PrayerEntry | null {
   return schedule.find((entry) => entry.name === name) ?? null;
 }
 
-export function RamadanCard() {
-  const now = useNow(TICK_MS);
-  const status = useRamadanStatus(now);
+export type RamadanCardProps = {
+  now: Date;
+  status: SeasonStatus;
+};
+
+export function RamadanCard({ now, status }: RamadanCardProps) {
   const { todaySchedule, tomorrowSchedule } = usePrayerDay(now);
 
-  if (status.isRamadan) {
+  if (!status.isActive) {
     return (
-      <FastingDayCard
-        now={now}
-        dayOfRamadan={status.dayOfRamadan}
+      <SeasonCountdownCard
+        text={ramadanCountdownText(status.daysUntilStart ?? 0)}
         hijriYear={status.hijriYear}
-        fajr={entryFor(todaySchedule, 'fajr')}
-        maghrib={entryFor(todaySchedule, 'maghrib')}
-        tomorrowFajr={entryFor(tomorrowSchedule, 'fajr')}
       />
     );
   }
 
-  if (status.daysUntilRamadan != null) {
-    return (
-      <Card rounded="xl" padding="md">
-        <View
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'baseline',
-            justifyContent: 'space-between',
-            columnGap: spacing.md,
-            rowGap: spacing.xxs,
-          }}>
-          <AppText size="sm" weight="medium" tone="textSecondary">
-            {ramadanCountdownText(status.daysUntilRamadan)}
-          </AppText>
-          {status.hijriYear != null && (
-            <AppText size="sm" tone="textMuted" tabular>
-              {status.hijriYear}
-            </AppText>
-          )}
-        </View>
-      </Card>
-    );
-  }
-
-  return null;
+  return (
+    <FastingDayCard
+      now={now}
+      dayOfRamadan={status.dayOfSeason}
+      hijriYear={status.hijriYear}
+      fajr={entryFor(todaySchedule, 'fajr')}
+      maghrib={entryFor(todaySchedule, 'maghrib')}
+      tomorrowFajr={entryFor(tomorrowSchedule, 'fajr')}
+    />
+  );
 }
 
 type FastingDayCardProps = {
