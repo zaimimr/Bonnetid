@@ -40,6 +40,16 @@
         "track": "automotive:production",
         "releaseStatus": "completed"
       }
+    },
+    "internal": {
+      "android": {
+        "track": "internal"
+      }
+    },
+    "internal-automotive": {
+      "android": {
+        "track": "automotive:internal"
+      }
     }
   }
 }
