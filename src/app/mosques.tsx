@@ -14,7 +14,7 @@ import { useRefresh } from '@/hooks/useRefresh';
 import { useUserCoords } from '@/hooks/useUserCoords';
 import { distanceKm } from '@/lib/geo';
 import { jummahMissingForPlace } from '@/lib/jummahCopy';
-import { placeCountLabel, placeSearchText, type Place } from '@/lib/places';
+import { placeSearchText, type Place } from '@/lib/places';
 import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { fontSize, opacity, radius, spacing } from '@/theme/tokens';
@@ -193,16 +193,6 @@ export default function MosquesScreen() {
             />
           </View>
         </View>
-
-        {place && !isLoading && !isError && (
-          <AppText size="sm" tone="textSecondary" style={{ paddingBottom: spacing.md }}>
-            {`${placeCountLabel(place.mosqueCount)} i ${place.name}. ${
-              withJummah > 0
-                ? `${withJummah} har registrert fredagstid.`
-                : 'Ingen av dem har registrert fredagstid hos oss.'
-            }`}
-          </AppText>
-        )}
       </View>
 
       {isLoading && (
