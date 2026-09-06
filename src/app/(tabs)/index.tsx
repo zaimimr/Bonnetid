@@ -7,7 +7,6 @@ import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { EventCard } from '@/components/calendar/EventCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import { NightCard } from '@/components/season/NightCard';
-import { ReturnHomeCard } from '@/components/travel/ReturnHomeCard';
 import {
   AppText,
   Badge,
@@ -91,8 +90,6 @@ export default function HomeScreen() {
             }
           />
         )}
-
-        <ReturnHomeCard />
 
         <SeasonCard />
 

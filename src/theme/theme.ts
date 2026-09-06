@@ -39,6 +39,9 @@ export type ThemeColors = {
   mapPinRing: string;
   mapFacing: string;
   mapFacingFill: string;
+  travelSurface: string;
+  onTravelSurface: string;
+  travelSurfaceMuted: string;
 };
 
 export type Theme = {
@@ -87,6 +90,9 @@ export const lightTheme: Theme = {
     mapPinRing: palette.neutral0,
     mapFacing: palette.mapBlue,
     mapFacingFill: 'rgba(26, 115, 232, 0.25)',
+    travelSurface: palette.travel50,
+    onTravelSurface: palette.travel700,
+    travelSurfaceMuted: palette.travel500,
   },
 };
 
@@ -131,5 +137,35 @@ export const darkTheme: Theme = {
     mapPinRing: palette.neutral0,
     mapFacing: palette.mapBlue,
     mapFacingFill: 'rgba(26, 115, 232, 0.25)',
+    travelSurface: palette.travel900,
+    onTravelSurface: palette.travel100,
+    travelSurfaceMuted: palette.travel200,
   },
 };
+
+const TRAVEL_LIGHT: Partial<ThemeColors> = {
+  primary: palette.travel600,
+  primarySoft: palette.travel50,
+  onPrimarySoft: palette.travel700,
+  accent: palette.travel500,
+  tabBarActive: palette.travel600,
+  filterActiveSurface: palette.travel50,
+  filterActiveBorder: palette.travel200,
+  filterActiveText: palette.travel700,
+};
+
+const TRAVEL_DARK: Partial<ThemeColors> = {
+  primary: palette.travel400,
+  primarySoft: palette.travel900,
+  onPrimarySoft: palette.travel100,
+  accent: palette.travel200,
+  tabBarActive: palette.travel400,
+  filterActiveSurface: palette.travel900,
+  filterActiveBorder: palette.travel700,
+  filterActiveText: palette.travel100,
+};
+
+export function travelTheme(theme: Theme): Theme {
+  const overrides = theme.scheme === 'dark' ? TRAVEL_DARK : TRAVEL_LIGHT;
+  return { scheme: theme.scheme, colors: { ...theme.colors, ...overrides } };
+}

@@ -1,7 +1,7 @@
 import { createContext, useContext, useMemo, type PropsWithChildren } from 'react';
 import { useColorScheme } from 'react-native';
-import { darkTheme, lightTheme, type Theme } from './theme';
-import { useSettings } from '@/store/settings';
+import { darkTheme, lightTheme, travelTheme, type Theme } from './theme';
+import { useIsCalculatedMode, useSettings } from '@/store/settings';
 
 type ThemePreference = 'system' | 'light' | 'dark';
 
@@ -18,8 +18,11 @@ export function ThemeProvider({ children }: PropsWithChildren) {
   const preference = useSettings((state) => state.themePreference);
   const setThemePreference = useSettings((state) => state.setThemePreference);
 
+  const travelling = useIsCalculatedMode();
+
   const scheme = preference === 'system' ? (systemScheme ?? 'light') : preference;
-  const theme = scheme === 'dark' ? darkTheme : lightTheme;
+  const base = scheme === 'dark' ? darkTheme : lightTheme;
+  const theme = useMemo(() => (travelling ? travelTheme(base) : base), [travelling, base]);
 
   const value = useMemo(
     () => ({ theme, preference, setPreference: setThemePreference }),
