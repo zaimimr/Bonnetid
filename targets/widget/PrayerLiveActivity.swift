@@ -4,7 +4,13 @@ import SwiftUI
 import WidgetKit
 
 /// The activity has two phases and the view can tell them apart without the app: ActivityKit
-/// reports `isStale` once the stale date - the end of the prayer's window - has passed.
+/// reports `isStale` once the stale date - the end of the prayer's window - has passed, and
+/// re-renders the view when it does.
+///
+/// That re-render is the only one the activity gets for free, so it is spent moving on to the
+/// next prayer rather than on a closing line. Only the app can push a third phase, which is why
+/// the successor keeps the card honest through one more window than the app managed to reach.
+/// Without a successor the stale phase still reads as the old prayer's window being over.
 private struct ActivityPhase {
   let isoDate: String
   let label: String
@@ -15,12 +21,24 @@ private struct ActivityPhase {
   let showMarkButtons: Bool
 
   init(state: PrayerActivityAttributes.ContentState, isStale: Bool) {
-    isoDate = state.isoDate
-    label = state.prayerLabel
-    kind = state.prayerKind
-    prayerAt = state.prayerAt
-    windowEnd = state.windowEnd
-    windowOver = isStale || Date() >= state.windowEnd
+    let successor = isStale ? Successor(state: state) : nil
+
+    if let successor {
+      isoDate = successor.isoDate
+      label = successor.label
+      kind = successor.kind
+      prayerAt = successor.prayerAt
+      windowEnd = successor.windowEnd
+      windowOver = Date() >= successor.windowEnd
+    } else {
+      isoDate = state.isoDate
+      label = state.prayerLabel
+      kind = state.prayerKind
+      prayerAt = state.prayerAt
+      windowEnd = state.windowEnd
+      windowOver = isStale || Date() >= state.windowEnd
+    }
+
     showMarkButtons = state.showMarkButtons ?? true
   }
 
@@ -28,6 +46,30 @@ private struct ActivityPhase {
   var statusLine: String { windowOver ? "\(label)-tiden er over" : "Går ut om" }
   var progress: ClosedRange<Date> { PrayerFormat.progressRange(from: prayerAt, to: windowEnd) }
   var countdown: ClosedRange<Date> { PrayerFormat.countdownRange(to: windowEnd) }
+}
+
+private struct Successor {
+  let isoDate: String
+  let label: String
+  let kind: String
+  let prayerAt: Date
+  let windowEnd: Date
+
+  init?(state: PrayerActivityAttributes.ContentState) {
+    guard
+      let kind = state.nextKind, !kind.isEmpty,
+      let isoDate = state.nextIsoDate,
+      let label = state.nextLabel,
+      let prayerAt = state.nextAt,
+      let windowEnd = state.nextWindowEnd
+    else { return nil }
+
+    self.isoDate = isoDate
+    self.label = label
+    self.kind = kind
+    self.prayerAt = prayerAt
+    self.windowEnd = windowEnd
+  }
 }
 
 struct PrayerLiveActivity: Widget {
