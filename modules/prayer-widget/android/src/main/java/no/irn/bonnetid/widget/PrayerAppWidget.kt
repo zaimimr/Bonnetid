@@ -40,6 +40,7 @@ class PrayerAppWidget : AppWidgetProvider() {
       Intent.ACTION_TIME_CHANGED,
       Intent.ACTION_TIMEZONE_CHANGED,
       Intent.ACTION_DATE_CHANGED,
+      Intent.ACTION_CONFIGURATION_CHANGED,
       -> updateAll(context)
     }
   }
@@ -133,6 +134,7 @@ class PrayerAppWidget : AppWidgetProvider() {
       val showJamat = snapshot.showJamat && snapshot.hasJamatTimes
       val views = RemoteViews(context.packageName, R.layout.prayer_widget_small)
       views.setTextViewText(R.id.state, moment.stateLabel)
+      views.setImageViewResource(R.id.headline_icon, PrayerIcons.drawable(moment.headline.kind))
       views.setTextViewText(R.id.headline_label, moment.headline.displayLabel)
       views.setTextViewText(
         R.id.headline_time,
@@ -214,6 +216,7 @@ class PrayerAppWidget : AppWidgetProvider() {
         }
       }
 
+      views.setImageViewResource(R.id.footer_icon, PrayerIcons.drawable(moment.headline.kind))
       views.setTextViewText(
         R.id.footer_label,
         if (moment.isNow) "${moment.headline.label} nå · ${moment.next.label}" else moment.next.label,

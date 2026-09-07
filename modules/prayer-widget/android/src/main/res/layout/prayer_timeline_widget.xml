@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/root"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  android:background="@drawable/prayer_widget_background"
+  android:gravity="center_vertical"
+  android:padding="14dp">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:baselineAligned="false">
+
+    <TextView
+      android:id="@+id/state"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textSize="12sp"
+      android:textColor="@color/prayer_widget_ink_muted"
+      android:maxLines="1"
+      android:text="Neste bønn" />
+
+    <TextView
+      android:id="@+id/remaining_caption"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:layout_marginStart="6dp"
+      android:gravity="end"
+      android:textSize="12sp"
+      android:textColor="@color/prayer_widget_ink_muted"
+      android:maxLines="1"
+      android:ellipsize="end"
+      android:text="Tid igjen til neste salah" />
+  </LinearLayout>
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="7dp"
+    android:orientation="horizontal"
+    android:baselineAligned="false"
+    android:gravity="center_vertical">
+
+    <LinearLayout
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:orientation="vertical">
+
+      <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+          android:id="@+id/headline_icon"
+          android:layout_width="15dp"
+          android:layout_height="15dp"
+          android:layout_marginEnd="5dp"
+          android:contentDescription="@null"
+          android:tint="@color/prayer_widget_brand"
+          android:src="@drawable/prayer_icon_dhuhr" />
+
+        <TextView
+          android:id="@+id/headline_label"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:textSize="19sp"
+          android:textStyle="bold"
+          android:textColor="@color/prayer_widget_brand"
+          android:maxLines="1"
+          android:ellipsize="end"
+          android:text="Dhuhr" />
+      </LinearLayout>
+
+      <TextView
+        android:id="@+id/headline_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:textSize="14sp"
+        android:textColor="@color/prayer_widget_ink_secondary"
+        android:fontFeatureSettings="tnum"
+        android:maxLines="1"
+        android:text="13:24" />
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="6dp"
+      android:orientation="vertical"
+      android:gravity="end">
+
+      <Chronometer
+        android:id="@+id/countdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:textSize="19sp"
+        android:textStyle="bold"
+        android:textColor="@color/prayer_widget_ink"
+        android:fontFeatureSettings="tnum"
+        android:maxLines="1" />
+
+      <TextView
+        android:id="@+id/next_line"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="1dp"
+        android:textSize="14sp"
+        android:textColor="@color/prayer_widget_ink_secondary"
+        android:fontFeatureSettings="tnum"
+        android:maxLines="1"
+        android:visibility="gone"
+        android:text="Asr 16:48" />
+    </LinearLayout>
+  </LinearLayout>
+
+  <ImageView
+    android:id="@+id/timeline_bar"
+    android:layout_width="match_parent"
+    android:layout_height="46dp"
+    android:layout_marginTop="12dp"
+    android:adjustViewBounds="false"
+    android:scaleType="fitXY"
+    android:src="@drawable/prayer_timeline_preview"
+    android:contentDescription="@string/prayer_timeline_bar_description" />
+</LinearLayout>
