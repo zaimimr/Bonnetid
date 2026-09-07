@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { AppText, Badge, Card } from '@/components/ui';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -13,19 +13,11 @@ import type { JamatTimes, PrayerEntry, PrayerName } from '@/lib/prayerSchedule';
 import type { MosqueJummah } from '@/api/types';
 import { usePrayerLog } from '@/store/prayerLog';
 import { usePrayerTrackerEnabled } from '@/store/settings';
+import { PrayerIcon } from './PrayerIcon';
 import { PrayerActionButton, PrayerStatusMark } from './PrayerStatusControl';
 import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from './TimeCell';
 
 export type { JamatTimes };
-
-export const PRAYER_ICONS: Record<PrayerName, keyof typeof Ionicons.glyphMap> = {
-  fajr: 'cloudy-night-outline',
-  fajr_endtime: 'sunny-outline',
-  duhr: 'sunny',
-  asr: 'partly-sunny-outline',
-  maghrib: 'moon-outline',
-  isha: 'moon',
-};
 
 export type PrayerTimesCardProps = {
   schedule: PrayerEntry[];
@@ -162,15 +154,11 @@ export function PrayerTimesCard({
                 },
                 pressed && markable && { opacity: opacity.pressed },
               ]}>
-              {entry.name === 'fajr_endtime' ? (
-                <Feather name="sunrise" size={20} color={theme.colors.textMuted} />
-              ) : (
-                <Ionicons
-                  name={PRAYER_ICONS[entry.name]}
-                  size={20}
-                  color={isHighlighted ? theme.colors.primary : theme.colors.textMuted}
-                />
-              )}
+              <PrayerIcon
+                name={entry.name}
+                size={20}
+                color={isHighlighted ? theme.colors.primary : theme.colors.textMuted}
+              />
               <View style={{ flex: 1, gap: stacked ? spacing.xs : 0 }}>
                 <View
                   style={{
