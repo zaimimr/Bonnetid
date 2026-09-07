@@ -41,6 +41,7 @@ class PrayerTimelineWidget : AppWidgetProvider() {
       Intent.ACTION_TIME_CHANGED,
       Intent.ACTION_TIMEZONE_CHANGED,
       Intent.ACTION_DATE_CHANGED,
+      Intent.ACTION_CONFIGURATION_CHANGED,
       -> updateAll(context)
     }
   }

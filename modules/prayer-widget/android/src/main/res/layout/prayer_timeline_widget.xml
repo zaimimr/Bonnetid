@@ -63,6 +63,7 @@
           android:layout_height="15dp"
           android:layout_marginEnd="5dp"
           android:contentDescription="@null"
+          android:tint="@color/prayer_widget_brand"
           android:src="@drawable/prayer_icon_dhuhr" />
 
         <TextView

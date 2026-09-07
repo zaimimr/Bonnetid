@@ -70,7 +70,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:textSize="11sp"
-          android:textColor="@color/prayer_widget_ink_muted"
+          android:textColor="@color/prayer_widget_ink_secondary"
           android:maxLines="1"
           android:ellipsize="end"
           android:text="Fajr" />
@@ -136,7 +136,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:textSize="11sp"
-          android:textColor="@color/prayer_widget_ink_muted"
+          android:textColor="@color/prayer_widget_ink_secondary"
           android:maxLines="1"
           android:ellipsize="end"
           android:text="Fajr" />
@@ -202,7 +202,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:textSize="11sp"
-          android:textColor="@color/prayer_widget_ink_muted"
+          android:textColor="@color/prayer_widget_ink_secondary"
           android:maxLines="1"
           android:ellipsize="end"
           android:text="Fajr" />
@@ -268,7 +268,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:textSize="11sp"
-          android:textColor="@color/prayer_widget_ink_muted"
+          android:textColor="@color/prayer_widget_ink_secondary"
           android:maxLines="1"
           android:ellipsize="end"
           android:text="Fajr" />
@@ -334,7 +334,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:textSize="11sp"
-          android:textColor="@color/prayer_widget_ink_muted"
+          android:textColor="@color/prayer_widget_ink_secondary"
           android:maxLines="1"
           android:ellipsize="end"
           android:text="Fajr" />
@@ -390,6 +390,7 @@
       android:layout_height="12dp"
       android:layout_marginEnd="5dp"
       android:contentDescription="@null"
+      android:tint="@color/prayer_widget_brand"
       android:src="@drawable/prayer_icon_dhuhr" />
 
     <TextView

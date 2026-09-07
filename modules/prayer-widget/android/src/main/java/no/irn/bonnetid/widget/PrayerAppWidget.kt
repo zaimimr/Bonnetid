@@ -40,6 +40,7 @@ class PrayerAppWidget : AppWidgetProvider() {
       Intent.ACTION_TIME_CHANGED,
       Intent.ACTION_TIMEZONE_CHANGED,
       Intent.ACTION_DATE_CHANGED,
+      Intent.ACTION_CONFIGURATION_CHANGED,
       -> updateAll(context)
     }
   }
@@ -146,7 +147,6 @@ class PrayerAppWidget : AppWidgetProvider() {
         if (status == PrayerLogStore.STATUS_PRAYED) View.VISIBLE else View.GONE,
       )
       val alpha = if (status == PrayerLogStore.STATUS_SKIPPED) SKIPPED_ALPHA else 1f
-      views.setInt(R.id.headline_icon, "setColorFilter", brandColor(context))
       views.setFloat(R.id.headline_row, "setAlpha", alpha)
       views.setFloat(R.id.headline_time, "setAlpha", alpha)
 
@@ -191,18 +191,6 @@ class PrayerAppWidget : AppWidgetProvider() {
           if (isCurrent) R.drawable.prayer_widget_plate else 0,
         )
         views.setTextViewText(columnLabelIds[index], prayer.displayLabel)
-        views.setTextColor(
-          columnLabelIds[index],
-          if (isCurrent) onPlateColor(context) else mutedColor(context),
-        )
-        views.setTextColor(
-          columnTimeIds[index],
-          if (isCurrent) onPlateColor(context) else inkColor(context),
-        )
-        views.setTextColor(
-          columnJamatIds[index],
-          if (isCurrent) onPlateColor(context) else brandColor(context),
-        )
         views.setTextViewText(
           columnTimeIds[index],
           PrayerFormat.time(prayer.printedAt(showJamat)),
@@ -229,7 +217,6 @@ class PrayerAppWidget : AppWidgetProvider() {
       }
 
       views.setImageViewResource(R.id.footer_icon, PrayerIcons.drawable(moment.headline.kind))
-      views.setInt(R.id.footer_icon, "setColorFilter", brandColor(context))
       views.setTextViewText(
         R.id.footer_label,
         if (moment.isNow) "${moment.headline.label} nå · ${moment.next.label}" else moment.next.label,
@@ -238,18 +225,6 @@ class PrayerAppWidget : AppWidgetProvider() {
       views.setViewVisibility(R.id.footer_jamat, if (showJamat) View.VISIBLE else View.GONE)
       return views
     }
-
-    private fun brandColor(context: Context): Int =
-      context.getColor(R.color.prayer_widget_brand)
-
-    private fun mutedColor(context: Context): Int =
-      context.getColor(R.color.prayer_widget_ink_muted)
-
-    private fun inkColor(context: Context): Int =
-      context.getColor(R.color.prayer_widget_ink)
-
-    private fun onPlateColor(context: Context): Int =
-      context.getColor(R.color.prayer_widget_on_brand_plate)
 
     private fun statusOf(
       context: Context,
