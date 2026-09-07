@@ -10,7 +10,10 @@ import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useResponsive } from '@/hooks/useResponsive';
 import type { Mosque } from '@/api/types';
 import { MosqueLogo } from '@/components/mosque/MosqueLogo';
+import { MosqueSelectAction } from '@/components/mosque/MosqueSelectAction';
 import { AppText, Card, ErrorState, ListRow, Screen, SectionHeader, Skeleton } from '@/components/ui';
+import { track } from '@/lib/telemetry';
+import { useIsCalculatedMode, useSettings } from '@/store/settings';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import {
@@ -65,6 +68,10 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
   const stacked = isStacked && !isWide;
   const columnWidth = scaleWidth(TIME_COLUMN_WIDTH, scale);
   const jamat = mosque.jamat;
+  const selectedMosque = useSettings((state) => state.mosque);
+  const setMosque = useSettings((state) => state.setMosque);
+  const calculated = useIsCalculatedMode();
+  const isMine = selectedMosque?.orgNr === mosque.org_nr;
   const eidPeriod = useEidPeriod();
   const showEidSection = eidPeriod != null && mosque.show_eid;
   const eidTimes = showEidSection ? mosque.eid_prayers : [];
@@ -91,6 +98,11 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
     adhan: adhanTimes[name] ?? null,
     jamat: jamatTimes[name] ?? null,
   })).filter((row) => row.adhan != null || row.jamat != null);
+
+  const chooseMosque = () => {
+    setMosque({ orgNr: mosque.org_nr, name: mosque.name });
+    track('mosque_selected', { orgNr: mosque.org_nr, method: 'detail' });
+  };
 
   const openDirections = async () => {
     if (!mosque.lat || !mosque.lon) return;
@@ -166,6 +178,13 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                   {ASR_METHOD_LABELS[mosque.asr_method]}
                 </AppText>
               </View>
+            )}
+            {!calculated && (
+              <MosqueSelectAction
+                mosqueName={mosque.name}
+                selected={isMine}
+                onSelect={chooseMosque}
+              />
             )}
           </View>
         </View>
