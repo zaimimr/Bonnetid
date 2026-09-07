@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+  android:width="260dp" android:height="46dp"
+  android:viewportWidth="260" android:viewportHeight="46">
+  <path android:fillColor="@color/prayer_widget_track" android:pathData="M0,20h260a4.5,4.5 0 0 1 0,9H0a4.5,4.5 0 0 1 0,-9z" />
+  <path android:fillColor="@color/prayer_widget_brand" android:pathData="M4.5,20h124a4.5,4.5 0 0 1 0,9H4.5a4.5,4.5 0 0 1 0,-9z" />
+  <path android:fillColor="@color/prayer_widget_surface" android:pathData="M128,24.5m-8.5,0a8.5,8.5 0 1 0 17,0a8.5,8.5 0 1 0 -17,0" />
+  <path android:fillColor="@color/prayer_widget_brand" android:pathData="M128,24.5m-6.5,0a6.5,6.5 0 1 0 13,0a6.5,6.5 0 1 0 -13,0" />
+  <path android:fillColor="@color/prayer_widget_track_marker" android:pathData="M60,20h1.5v9H60z M96,20h1.5v9H96z M168,20h1.5v9H168z M204,20h1.5v9H204z" />
+  <path android:fillColor="@color/prayer_widget_ink_muted" android:pathData="M62,38h6v1.4h-6z M126,38h6v1.4h-6z M190,38h6v1.4h-6z" />
+</vector>

@@ -6,4 +6,7 @@
   <color name="prayer_widget_ink">#FFF6F8F7</color>
   <color name="prayer_widget_ink_secondary">#FFC6D0CB</color>
   <color name="prayer_widget_ink_muted">#FF8C9A93</color>
+  <color name="prayer_widget_hairline">#FF27362F</color>
+  <color name="prayer_widget_track">#FF27362F</color>
+  <color name="prayer_widget_track_marker">#FF354740</color>
 </resources>
