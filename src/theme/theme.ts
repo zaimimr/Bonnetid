@@ -25,6 +25,7 @@ export type ThemeColors = {
   borderStrong: string;
   track: string;
   trackMarker: string;
+  switchThumb: string;
   danger: string;
   notice: string;
   noticeSoft: string;
@@ -76,6 +77,7 @@ export const lightTheme: Theme = {
     borderStrong: palette.neutral300,
     track: palette.neutral100,
     trackMarker: palette.neutral300,
+    switchThumb: palette.neutral0,
     danger: palette.red600,
     notice: palette.blue600,
     noticeSoft: palette.sky50,
@@ -123,6 +125,7 @@ export const darkTheme: Theme = {
     borderStrong: palette.night600,
     track: palette.night700,
     trackMarker: palette.night600,
+    switchThumb: palette.neutral0,
     danger: palette.red400,
     notice: palette.sky200,
     noticeSoft: palette.sky900,

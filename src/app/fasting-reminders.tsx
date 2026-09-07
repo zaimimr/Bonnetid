@@ -1,12 +1,11 @@
-import { Switch, View } from 'react-native';
-import { AppText, Card, Divider, ListRow, Screen } from '@/components/ui';
+import { View } from 'react-native';
+import { AppText, Card, Divider, ListRow, Screen, Toggle } from '@/components/ui';
 import { EVENING_REMINDER_CLOCK } from '@/lib/fasting';
 import { FASTING_POOL_LIMIT } from '@/lib/fastingNotifications';
 import { MOON_SIGHTING_NOTE } from '@/lib/hijriSeason';
 import { notificationsSupported } from '@/lib/notifications';
 import { SUHOOR_REMINDER_MINUTES } from '@/lib/ramadan';
 import { track } from '@/lib/telemetry';
-import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { useSettings, type VoluntaryFastKind } from '@/store/settings';
 
@@ -17,18 +16,12 @@ const VOLUNTARY_ROWS: { kind: VoluntaryFastKind; title: string; subtitle: string
 ];
 
 export default function FastingRemindersScreen() {
-  const theme = useTheme();
   const ramadanEnabled = useSettings((state) => state.ramadanRemindersEnabled);
   const setRamadanEnabled = useSettings((state) => state.setRamadanRemindersEnabled);
   const dhulHijjahEnabled = useSettings((state) => state.dhulHijjahRemindersEnabled);
   const setDhulHijjahEnabled = useSettings((state) => state.setDhulHijjahRemindersEnabled);
   const voluntaryFasts = useSettings((state) => state.voluntaryFasts);
   const toggleVoluntaryFast = useSettings((state) => state.toggleVoluntaryFast);
-
-  const switchColors = {
-    trackColor: { true: theme.colors.primary, false: theme.colors.borderStrong },
-    thumbColor: theme.colors.surface,
-  };
 
   return (
     <Screen scroll edges={[]}>
@@ -37,14 +30,13 @@ export default function FastingRemindersScreen() {
           title="Suhoor i ramadan"
           subtitle={`${SUHOOR_REMINDER_MINUTES} minutter før Fajr`}
           trailing={
-            <Switch
+            <Toggle
               value={ramadanEnabled}
               onValueChange={(enabled) => {
                 setRamadanEnabled(enabled);
                 track('fasting_reminder_toggled', { kind: 'ramadan', enabled });
               }}
               disabled={!notificationsSupported}
-              {...switchColors}
             />
           }
           style={{ paddingHorizontal: spacing.md }}
@@ -54,14 +46,13 @@ export default function FastingRemindersScreen() {
           title="Arafah"
           subtitle="Kvelden før den 9. Dhul Hijjah"
           trailing={
-            <Switch
+            <Toggle
               value={dhulHijjahEnabled}
               onValueChange={(enabled) => {
                 setDhulHijjahEnabled(enabled);
                 track('fasting_reminder_toggled', { kind: 'arafah', enabled });
               }}
               disabled={!notificationsSupported}
-              {...switchColors}
             />
           }
           style={{ paddingHorizontal: spacing.md }}
@@ -73,7 +64,7 @@ export default function FastingRemindersScreen() {
               title={row.title}
               subtitle={row.subtitle}
               trailing={
-                <Switch
+                <Toggle
                   value={voluntaryFasts[row.kind]}
                   onValueChange={() => {
                     toggleVoluntaryFast(row.kind);
@@ -83,7 +74,6 @@ export default function FastingRemindersScreen() {
                     });
                   }}
                   disabled={!notificationsSupported}
-                  {...switchColors}
                 />
               }
               style={{ paddingHorizontal: spacing.md }}

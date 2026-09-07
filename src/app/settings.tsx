@@ -1,4 +1,4 @@
-import { Platform, Switch, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
@@ -11,6 +11,7 @@ import {
   Screen,
   SectionHeader,
   SegmentedControl,
+  Toggle,
 } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
@@ -175,12 +176,10 @@ export default function SettingsScreen() {
           subtitle={notificationsSupported ? undefined : 'Ikke tilgjengelig i Expo Go på Android'}
           leading={<Ionicons name="notifications-outline" size={20} color={theme.colors.primary} />}
           trailing={
-            <Switch
+            <Toggle
               value={notificationsEnabled}
               onValueChange={toggleNotifications}
               disabled={!notificationsSupported}
-              trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
-              thumbColor={theme.colors.surface}
             />
           }
           style={ROW}
@@ -228,11 +227,9 @@ export default function SettingsScreen() {
             <Ionicons name="checkmark-done-outline" size={20} color={theme.colors.primary} />
           }
           trailing={
-            <Switch
+            <Toggle
               value={trackerEnabled}
               onValueChange={setTrackerEnabled}
-              trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
-              thumbColor={theme.colors.surface}
             />
           }
           style={ROW}
@@ -245,11 +242,9 @@ export default function SettingsScreen() {
               subtitle="30 minutter før tiden er ute"
               leading={<Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />}
               trailing={
-                <Switch
+                <Toggle
                   value={endReminderEnabled}
                   onValueChange={setEndReminderEnabled}
-                  trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
-                  thumbColor={theme.colors.surface}
                 />
               }
               style={ROW}
@@ -264,11 +259,9 @@ export default function SettingsScreen() {
               subtitle={lockScreenSubtitle}
               leading={<Ionicons name="timer-outline" size={20} color={theme.colors.primary} />}
               trailing={
-                <Switch
+                <Toggle
                   value={liveActivityEnabled}
                   onValueChange={toggleLockScreen}
-                  trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
-                  thumbColor={theme.colors.surface}
                 />
               }
               style={ROW}
@@ -283,12 +276,10 @@ export default function SettingsScreen() {
               subtitle={mosque ? mosque.name : 'Velg en moské først'}
               leading={<Ionicons name="people-outline" size={20} color={theme.colors.primary} />}
               trailing={
-                <Switch
+                <Toggle
                   value={widgetShowJamat}
                   onValueChange={setWidgetShowJamat}
                   disabled={mosque == null}
-                  trackColor={{ true: theme.colors.primary, false: theme.colors.borderStrong }}
-                  thumbColor={theme.colors.surface}
                 />
               }
               style={ROW}
