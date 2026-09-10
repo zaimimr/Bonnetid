@@ -3,7 +3,13 @@ import { Platform } from 'react-native';
 import type { PrayerEntry } from './prayerSchedule';
 import type { PrayerStatus } from './prayerLog';
 import { reminderBody, reminderTitle, type PrayerReminder } from './prayerReminders';
-import { getNotificationSound, type NotificationSoundKey } from './notificationSounds';
+import {
+  NOTIFICATION_SOUNDS,
+  getNotificationSound,
+  type NotificationSoundKey,
+  type NotificationSoundOption,
+} from './notificationSounds';
+import { track } from './telemetry';
 
 const MAX_SCHEDULED = 50;
 
@@ -16,6 +22,8 @@ export const MARK_PRAYED_ACTION = 'prayed';
 export const MARK_SKIPPED_ACTION = 'skipped';
 
 const REMINDER_CHANNEL_ID = 'prayer-reminder';
+const ADHAN_CHANNEL_GENERATION = 2;
+const LEGACY_ADHAN_CHANNEL_IDS = NOTIFICATION_SOUNDS.map((sound) => `prayer-${sound.key}`);
 
 export const notificationsSupported = !(
   Platform.OS === 'android' && Constants.executionEnvironment === ExecutionEnvironment.StoreClient
@@ -95,18 +103,49 @@ async function ensurePrayerCategory(Notifications: NotificationsModule) {
   categoryRegistered = true;
 }
 
+let legacyChannelsRemoved = false;
+
+async function removeLegacyAdhanChannels(Notifications: NotificationsModule) {
+  if (legacyChannelsRemoved) return;
+  legacyChannelsRemoved = true;
+  const channels = await Notifications.getNotificationChannelsAsync();
+  for (const channel of channels) {
+    if (!LEGACY_ADHAN_CHANNEL_IDS.includes(channel.id)) continue;
+    await Notifications.deleteNotificationChannelAsync(channel.id);
+  }
+}
+
+function channelSoundMatches(
+  channelSound: 'default' | 'custom' | null,
+  sound: NotificationSoundOption,
+): boolean {
+  return sound.fileName ? channelSound === 'custom' : channelSound !== null;
+}
+
 async function ensureAdhanChannel(
   Notifications: NotificationsModule,
   soundKey: NotificationSoundKey,
 ): Promise<string | undefined> {
   if (Platform.OS !== 'android') return undefined;
   const sound = getNotificationSound(soundKey);
-  const channelId = `prayer-${sound.key}`;
-  await Notifications.setNotificationChannelAsync(channelId, {
+  const channelId = `prayer-${sound.key}-v${ADHAN_CHANNEL_GENERATION}`;
+  await removeLegacyAdhanChannels(Notifications);
+  const channel = await Notifications.setNotificationChannelAsync(channelId, {
     name: `Bønnetid (${sound.label})`,
     importance: Notifications.AndroidImportance.HIGH,
     sound: sound.fileName ?? undefined,
+    audioAttributes: {
+      usage: Notifications.AndroidAudioUsage.NOTIFICATION,
+      contentType: Notifications.AndroidAudioContentType.SONIFICATION,
+    },
   });
+  if (channel && !channelSoundMatches(channel.sound, sound)) {
+    track('notification_channel_sound_mismatch', {
+      channelId,
+      expected: sound.fileName ?? 'default',
+      actual: channel.sound ?? 'null',
+    });
+  }
   return channelId;
 }
 
