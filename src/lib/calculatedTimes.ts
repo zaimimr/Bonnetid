@@ -21,6 +21,12 @@ const METHOD_FACTORIES: Record<CalculationMethodKey, () => CalculationParameters
   umm_al_qura: CalculationMethod.UmmAlQura,
   karachi: CalculationMethod.Karachi,
   egyptian: CalculationMethod.Egyptian,
+  dubai: CalculationMethod.Dubai,
+  kuwait: CalculationMethod.Kuwait,
+  qatar: CalculationMethod.Qatar,
+  singapore: CalculationMethod.Singapore,
+  tehran: CalculationMethod.Tehran,
+  turkey: CalculationMethod.Turkey,
 };
 
 export type CalculatedDayInput = {

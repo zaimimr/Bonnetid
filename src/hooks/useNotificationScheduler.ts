@@ -8,6 +8,7 @@ import {
 import { buildPrayerReminders, type ScheduleDay } from '@/lib/prayerReminders';
 import { isoDateKey, parseDayKey } from '@/lib/time';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
+import { useEffectiveCalculationMethod } from '@/hooks/useEffectiveCalculationMethod';
 import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { usePrayerLog } from '@/store/prayerLog';
 import { NOTIFIABLE_PRAYERS, useActiveLocation, useSettings } from '@/store/settings';
@@ -18,10 +19,10 @@ export function useNotificationScheduler() {
   const notificationPrayers = useSettings((state) => state.notificationPrayers);
   const endReminderEnabled = useSettings((state) => state.endReminderEnabled);
   const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled);
-  const calculationMethod = useSettings((state) => state.calculationMethod);
   const log = usePrayerLog((state) => state.log);
   const asrMethod = useEffectiveAsrMethod();
   const location = useActiveLocation();
+  const calculationMethod = useEffectiveCalculationMethod(location);
   const zone = zoneFor(location);
 
   const today = new Date();

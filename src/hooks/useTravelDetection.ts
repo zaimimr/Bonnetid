@@ -4,6 +4,7 @@ import * as Location from 'expo-location';
 import { useLocations } from '@/api/queries';
 import { deviceOffsetMinutes, osloOffsetMinutes } from '@/lib/time';
 import { evaluateTravel, type Coords, type TravelSignal } from '@/lib/travelMode';
+import type { PlaceCountry } from '@/store/settings';
 
 const MIN_REFRESH_INTERVAL_MS = 60_000;
 const FALLBACK_PLACE_NAME = 'Din posisjon';
@@ -96,7 +97,15 @@ export function useTravelState(): TravelState {
   };
 }
 
-export async function resolvePlaceName(coords: Coords): Promise<string> {
+export type ResolvedPlace = PlaceCountry & { name: string };
+
+const UNKNOWN_PLACE: ResolvedPlace = {
+  name: FALLBACK_PLACE_NAME,
+  countryCode: null,
+  country: null,
+};
+
+export async function resolvePlace(coords: Coords): Promise<ResolvedPlace> {
   try {
     const places = await Location.reverseGeocodeAsync({
       latitude: coords.lat,
@@ -104,9 +113,13 @@ export async function resolvePlaceName(coords: Coords): Promise<string> {
     });
     const place = places[0];
     const name = place?.city ?? place?.subregion ?? place?.region ?? place?.country;
-    return name?.trim() || FALLBACK_PLACE_NAME;
+    return {
+      name: name?.trim() || FALLBACK_PLACE_NAME,
+      countryCode: place?.isoCountryCode?.trim().toUpperCase() || null,
+      country: place?.country?.trim() || null,
+    };
   } catch {
-    return FALLBACK_PLACE_NAME;
+    return UNKNOWN_PLACE;
   }
 }
 
