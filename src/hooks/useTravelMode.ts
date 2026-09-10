@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useLocations } from '@/api/queries';
 import { detectNearestLocation } from '@/hooks/useAutoLocation';
-import { resolvePlaceName, useTravelState } from '@/hooks/useTravelDetection';
+import { resolvePlace, useTravelState } from '@/hooks/useTravelDetection';
 import { distanceKm } from '@/lib/geo';
 import { track, trackError } from '@/lib/telemetry';
 import { travelPromptKey } from '@/lib/travelMode';
@@ -32,10 +32,13 @@ export function useTravelMode() {
       if (!moved || applied.current === key) return;
       applied.current = key;
 
-      resolvePlaceName(coords)
-        .then((name) => {
-          setLocation(calculatedLocation(name, coords.lat, coords.lon));
-          track('travel_mode_chosen', { choice: travelling ? 'moved' : 'calculated' });
+      resolvePlace(coords)
+        .then((place) => {
+          setLocation(calculatedLocation(place.name, coords.lat, coords.lon, place));
+          track('travel_mode_chosen', {
+            choice: travelling ? 'moved' : 'calculated',
+            country: place.countryCode ?? 'unknown',
+          });
         })
         .catch((error) => trackError(error, 'travel-mode-enter'));
       return;

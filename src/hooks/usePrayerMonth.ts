@@ -3,7 +3,8 @@ import { useHijriMonth, usePrayerTimes } from '@/api/queries';
 import type { PrayerDay } from '@/api/types';
 import { calculatePrayerMonth } from '@/lib/calculatedTimes';
 import type { PrayerTimeZone } from '@/lib/time';
-import { useSettings, type SavedLocation } from '@/store/settings';
+import { useEffectiveCalculationMethod } from '@/hooks/useEffectiveCalculationMethod';
+import type { SavedLocation } from '@/store/settings';
 
 export type PrayerMonthResult = {
   data: PrayerDay[] | undefined;
@@ -23,7 +24,7 @@ export function usePrayerMonth(
   month: number,
 ): PrayerMonthResult {
   const calculated = location.mode === 'calculated';
-  const method = useSettings((state) => state.calculationMethod);
+  const method = useEffectiveCalculationMethod(location);
 
   const fetched = usePrayerTimes(calculated ? '' : location.iso, year, month, {
     enabled: !calculated,

@@ -15,6 +15,13 @@ export type SavedLocation = {
   lat: number;
   lon: number;
   mode: LocationMode;
+  countryCode?: string | null;
+  country?: string | null;
+};
+
+export type PlaceCountry = {
+  countryCode: string | null;
+  country: string | null;
 };
 
 export type SavedMosque = {
@@ -54,7 +61,7 @@ const ALL_PRAYERS_ENABLED: Record<NotifiablePrayer, boolean> = {
 type SettingsState = {
   location: SavedLocation | null;
   homeLocation: SavedLocation | null;
-  calculationMethod: CalculationMethodKey;
+  calculationMethod: CalculationMethodKey | null;
   mosque: SavedMosque | null;
   asrMethod: AsrMethodPreference | null;
   themePreference: ThemePreference;
@@ -73,7 +80,7 @@ type SettingsState = {
   registerLaunch: () => void;
   markReviewRequested: () => void;
   setLocation: (location: SavedLocation) => void;
-  setCalculationMethod: (method: CalculationMethodKey) => void;
+  setCalculationMethod: (method: CalculationMethodKey | null) => void;
   setMosque: (mosque: SavedMosque | null) => void;
   setAsrMethod: (method: AsrMethodPreference) => void;
   setThemePreference: (preference: ThemePreference) => void;
@@ -101,8 +108,22 @@ export function calculatedLocation(
   name: string,
   lat: number,
   lon: number,
+  place: PlaceCountry = { countryCode: null, country: null },
 ): SavedLocation {
-  return { iso: CALCULATED_LOCATION_ISO, name, lat, lon, mode: 'calculated' };
+  return {
+    iso: CALCULATED_LOCATION_ISO,
+    name,
+    lat,
+    lon,
+    mode: 'calculated',
+    countryCode: place.countryCode,
+    country: place.country,
+  };
+}
+
+function countryChanged(previous: SavedLocation | null, next: SavedLocation): boolean {
+  if (next.mode !== 'calculated') return false;
+  return (previous?.countryCode ?? null) !== (next.countryCode ?? null);
 }
 
 export const useSettings = create<SettingsState>()(
@@ -110,7 +131,7 @@ export const useSettings = create<SettingsState>()(
     (set) => ({
       location: null,
       homeLocation: null,
-      calculationMethod: DEFAULT_CALCULATION_METHOD,
+      calculationMethod: null,
       mosque: null,
       asrMethod: null,
       themePreference: 'system',
@@ -132,9 +153,12 @@ export const useSettings = create<SettingsState>()(
         set((state) => {
           const home = location.mode === 'norway' ? location : state.homeLocation;
           const unchanged = state.location?.iso === location.iso;
+          const calculationMethod = countryChanged(state.location, location)
+            ? null
+            : state.calculationMethod;
           return unchanged
-            ? { location, homeLocation: home }
-            : { location, homeLocation: home, asrMethod: null };
+            ? { location, homeLocation: home, calculationMethod }
+            : { location, homeLocation: home, asrMethod: null, calculationMethod };
         }),
       setCalculationMethod: (calculationMethod) => set({ calculationMethod }),
       setMosque: (mosque) => set({ mosque }),
@@ -167,7 +191,7 @@ export const useSettings = create<SettingsState>()(
     {
       name: 'bonnetid-settings',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 2,
+      version: 3,
       migrate: (persisted) => {
         const state = persisted as Partial<SettingsState> | undefined;
         if (!state) return persisted as SettingsState;
@@ -179,6 +203,9 @@ export const useSettings = create<SettingsState>()(
         state.homeLocation = withMode(state.homeLocation);
         if (!state.homeLocation && state.location?.mode === 'norway') {
           state.homeLocation = state.location;
+        }
+        if (state.calculationMethod === DEFAULT_CALCULATION_METHOD) {
+          state.calculationMethod = null;
         }
         return state as SettingsState;
       },

@@ -27,6 +27,7 @@ import { asrMethodLabel } from '@/lib/asrMethods';
 import { calculationMethodLabel } from '@/lib/calculationMethods';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
 import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
+import { useAutoCalculationMethod } from '@/hooks/useEffectiveCalculationMethod';
 import { track } from '@/lib/telemetry';
 import {
   NOTIFIABLE_PRAYERS,
@@ -50,6 +51,7 @@ export default function SettingsScreen() {
   const theme = useTheme();
   const location = useActiveLocation();
   const calculationMethod = useSettings((state) => state.calculationMethod);
+  const autoCalculationMethod = useAutoCalculationMethod(location);
   const calculated = location.mode === 'calculated';
   const mosque = useActiveMosque();
   const asrMethod = useSettings((state) => state.asrMethod);
@@ -158,7 +160,11 @@ export default function SettingsScreen() {
             <Divider />
             <ListRow
               title="Beregningsmetode"
-              subtitle={calculationMethodLabel(calculationMethod)}
+              subtitle={
+                calculationMethod
+                  ? calculationMethodLabel(calculationMethod)
+                  : `Automatisk · ${calculationMethodLabel(autoCalculationMethod)}`
+              }
               leading={<Ionicons name="calculator-outline" size={20} color={theme.colors.primary} />}
               chevron
               onPress={() => router.push('/calculation-method')}
