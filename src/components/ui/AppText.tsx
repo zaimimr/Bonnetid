@@ -20,6 +20,7 @@ export type TextTone = keyof Pick<
   | 'accent'
   | 'danger'
   | 'success'
+  | 'notice'
   | 'onPrimary'
   | 'onPrimarySoft'
   | 'onNoticeSoft'

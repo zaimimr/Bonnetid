@@ -1,14 +1,24 @@
 import { Pressable, ScrollView, View } from 'react-native';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { QiblaAr } from '@/components/qibla/QiblaAr';
 import { QiblaCompass } from '@/components/qibla/QiblaCompass';
+import { QiblaHaramNotice } from '@/components/qibla/QiblaHaramNotice';
 import { QiblaMap } from '@/components/qibla/QiblaMap';
 import { AppText, Card, EmptyState, Screen } from '@/components/ui';
 import { useCompassHeading } from '@/hooks/useCompassHeading';
+import { usePreciseCoords } from '@/hooks/usePreciseCoords';
 import { useResponsive } from '@/hooks/useResponsive';
-import { useUserCoords } from '@/hooks/useUserCoords';
-import { formatDistance, distanceKm, KAABA, qiblaBearing } from '@/lib/geo';
+import {
+  bearingUncertaintyDegrees,
+  distanceKm,
+  formatAccuracy,
+  formatDistance,
+  isInsideHaram,
+  KAABA,
+  qiblaBearing,
+} from '@/lib/geo';
 import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
@@ -17,14 +27,24 @@ import { useIsCalculatedMode } from '@/store/settings';
 type QiblaView = 'compass' | 'map' | '3d';
 
 export default function QiblaScreen() {
-  const coords = useUserCoords();
+  const [isFocused, setIsFocused] = useState(true);
+  const coords = usePreciseCoords(isFocused);
   const { heading, permissionDenied } = useCompassHeading();
   const { isLandscape } = useResponsive();
   const calculated = useIsCalculatedMode();
   const [view, setView] = useState<QiblaView>('compass');
 
+  useFocusEffect(
+    useCallback(() => {
+      setIsFocused(true);
+      return () => setIsFocused(false);
+    }, []),
+  );
+
   const bearing = qiblaBearing(coords.lat, coords.lon);
   const kaabaDistance = distanceKm(coords.lat, coords.lon, KAABA.lat, KAABA.lon);
+  const uncertainty = bearingUncertaintyDegrees(coords.accuracyM, kaabaDistance);
+  const insideHaram = coords.source === 'gps' && isInsideHaram(kaabaDistance);
 
   return (
     <Screen>
@@ -41,9 +61,16 @@ export default function QiblaScreen() {
           <AppText size="xxl" weight="bold" heading>
             Qibla
           </AppText>
-          <AppText size="sm" tone="textMuted">
-            {formatDistance(kaabaDistance)} til Mekka
-          </AppText>
+          <View style={{ alignItems: 'flex-end' }}>
+            <AppText size="sm" tone="textMuted">
+              {formatDistance(kaabaDistance)} til Mekka
+            </AppText>
+            {coords.accuracyM != null && (
+              <AppText size="xs" tone="textMuted">
+                Posisjon ±{formatAccuracy(coords.accuracyM)}
+              </AppText>
+            )}
+          </View>
         </View>
 
         <ViewSwitcher
@@ -69,11 +96,18 @@ export default function QiblaScreen() {
               paddingBottom: spacing.lg,
             }}
             showsVerticalScrollIndicator={false}>
-            {isLandscape ? (
+            {insideHaram ? (
+              <QiblaHaramNotice distanceKm={kaabaDistance} />
+            ) : isLandscape ? (
               <RotateNotice bearing={bearing} />
             ) : (
               <>
-                <QiblaCompass heading={heading ?? 0} qiblaBearing={bearing} />
+                <QiblaCompass
+                  heading={heading ?? 0}
+                  qiblaBearing={bearing}
+                  uncertaintyDegrees={uncertainty}
+                  accuracyM={coords.accuracyM}
+                />
                 {coords.source === 'settings' && (
                   <AppText
                     size="xs"
@@ -91,7 +125,13 @@ export default function QiblaScreen() {
         )}
 
         {view === 'map' && (
-          <QiblaMap lat={coords.lat} lon={coords.lon} heading={isLandscape ? null : heading} />
+          <QiblaMap
+            lat={coords.lat}
+            lon={coords.lon}
+            heading={isLandscape ? null : heading}
+            accuracyM={coords.accuracyM}
+            distanceToKaabaKm={kaabaDistance}
+          />
         )}
 
         {view === '3d' &&
@@ -99,8 +139,10 @@ export default function QiblaScreen() {
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <RotateNotice bearing={bearing} />
             </View>
+          ) : insideHaram ? (
+            <QiblaHaramNotice distanceKm={kaabaDistance} />
           ) : (
-            <QiblaAr qiblaBearing={bearing} />
+            <QiblaAr qiblaBearing={bearing} uncertaintyDegrees={uncertainty} />
           ))}
       </View>
     </Screen>
