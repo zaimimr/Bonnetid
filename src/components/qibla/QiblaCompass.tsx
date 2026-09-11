@@ -6,9 +6,15 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import Svg, { Path } from 'react-native-svg';
 import { AppText } from '@/components/ui';
 import { useResponsive } from '@/hooks/useResponsive';
-import { isQiblaAligned, normalizeAngleDelta } from '@/lib/geo';
+import {
+  formatAccuracy,
+  isBearingTrustworthy,
+  isQiblaAligned,
+  normalizeAngleDelta,
+} from '@/lib/geo';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
 
@@ -26,12 +32,32 @@ const CARDINALS = [
   { label: 'V', angle: 270 },
 ];
 
+function sectorPath(size: number, centreBearing: number, halfAngle: number): string {
+  const centre = size / 2;
+  const radius = centre - 6;
+  const toPoint = (degrees: number) => {
+    const radians = (degrees * Math.PI) / 180;
+    return [centre + radius * Math.sin(radians), centre - radius * Math.cos(radians)];
+  };
+  const [startX, startY] = toPoint(centreBearing - halfAngle);
+  const [endX, endY] = toPoint(centreBearing + halfAngle);
+  const largeArc = halfAngle * 2 > 180 ? 1 : 0;
+  return `M ${centre} ${centre} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArc} 1 ${endX} ${endY} Z`;
+}
+
 export type QiblaCompassProps = {
   heading: number;
   qiblaBearing: number;
+  uncertaintyDegrees?: number;
+  accuracyM?: number | null;
 };
 
-export function QiblaCompass({ heading, qiblaBearing }: QiblaCompassProps) {
+export function QiblaCompass({
+  heading,
+  qiblaBearing,
+  uncertaintyDegrees = 0,
+  accuracyM = null,
+}: QiblaCompassProps) {
   const theme = useTheme();
   const { width, height } = useResponsive();
   const roseRotation = useSharedValue(0);
@@ -40,7 +66,9 @@ export function QiblaCompass({ heading, qiblaBearing }: QiblaCompassProps) {
     Math.max(MIN_COMPASS_SIZE, Math.min(MAX_COMPASS_SIZE, width - spacing.xxl * 2, height * 0.42)),
   );
 
-  const isAligned = isQiblaAligned(heading, qiblaBearing);
+  const trustworthy = isBearingTrustworthy(uncertaintyDegrees);
+  const isAligned = isQiblaAligned(heading, qiblaBearing, uncertaintyDegrees);
+  const wedgeHalfAngle = Math.min(uncertaintyDegrees, 89);
 
   useEffect(() => {
     roseRotation.value = withTiming(shortestRotation(roseRotation.value, -heading), {
@@ -75,6 +103,20 @@ export function QiblaCompass({ heading, qiblaBearing }: QiblaCompassProps) {
             },
             roseStyle,
           ]}>
+          {wedgeHalfAngle > 1 && (
+            <Svg
+              width={compassSize}
+              height={compassSize}
+              style={{ position: 'absolute' }}
+              pointerEvents="none">
+              <Path
+                d={sectorPath(compassSize, qiblaBearing, wedgeHalfAngle)}
+                fill={theme.colors.primarySoft}
+                opacity={0.55}
+              />
+            </Svg>
+          )}
+
           {CARDINALS.map((cardinal) => (
             <View
               key={cardinal.label}
@@ -140,9 +182,15 @@ export function QiblaCompass({ heading, qiblaBearing }: QiblaCompassProps) {
           {Math.round(qiblaBearing)}°
         </AppText>
         <AppText tone="textMuted">Qibla-retning fra din posisjon</AppText>
+        {!trustworthy && accuracyM != null && (
+          <AppText size="sm" tone="notice" align="center">
+            Posisjonen er usikker (±{formatAccuracy(accuracyM)}). Retningen kan være opptil{' '}
+            {Math.round(uncertaintyDegrees)}° feil. Gå ut i åpent lende og vent noen sekunder.
+          </AppText>
+        )}
         {isAligned && (
           <AppText weight="semibold" tone="primary">
-            Du peker mot Qibla
+            {trustworthy ? 'Du peker mot Qibla' : 'Du peker innenfor det usikre området'}
           </AppText>
         )}
       </View>

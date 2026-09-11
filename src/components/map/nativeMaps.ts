@@ -10,3 +10,4 @@ export const MapView = MapUnavailable as unknown as NativeMaps['default'];
 export const Marker = MapUnavailable as unknown as NativeMaps['Marker'];
 export const Polygon = MapUnavailable as unknown as NativeMaps['Polygon'];
 export const Polyline = MapUnavailable as unknown as NativeMaps['Polyline'];
+export const Circle = MapUnavailable as unknown as NativeMaps['Circle'];

@@ -16,7 +16,7 @@ import Svg, { Circle, Line, Polygon, Polyline } from 'react-native-svg';
 import { AppText, Button, EmptyState } from '@/components/ui';
 import { useArPose } from '@/hooks/useArPose';
 import { buildArScene, type ArScene, type Viewport } from '@/lib/arProjection';
-import { isQiblaAligned } from '@/lib/geo';
+import { isBearingTrustworthy, isQiblaAligned } from '@/lib/geo';
 import { palette, radius, spacing } from '@/theme/tokens';
 
 const AR_INK = palette.neutral0;
@@ -31,16 +31,18 @@ const AR_TEXT_SHADOW = {
 
 export type QiblaArProps = {
   qiblaBearing: number;
+  uncertaintyDegrees?: number;
 };
 
-export function QiblaAr({ qiblaBearing }: QiblaArProps) {
+export function QiblaAr({ qiblaBearing, uncertaintyDegrees = 0 }: QiblaArProps) {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [viewport, setViewport] = useState<Viewport | null>(null);
   const { pose, headingAccuracy, permissionDenied, motionUnavailable } = useArPose(
     cameraPermission?.granted ?? false,
   );
 
-  const aligned = pose ? isQiblaAligned(pose.heading, qiblaBearing) : false;
+  const trustworthy = isBearingTrustworthy(uncertaintyDegrees);
+  const aligned = pose ? isQiblaAligned(pose.heading, qiblaBearing, uncertaintyDegrees) : false;
   const wasAligned = useRef(false);
   const granted = cameraPermission?.granted ?? false;
   const [introDone, setIntroDone] = useState(false);
@@ -114,6 +116,8 @@ export function QiblaAr({ qiblaBearing }: QiblaArProps) {
           scene={scene}
           viewport={viewport}
           aligned={aligned}
+          trustworthy={trustworthy}
+          uncertaintyDegrees={uncertaintyDegrees}
           headingAccuracy={headingAccuracy}
           hintsVisible={introDone}
         />
@@ -144,12 +148,16 @@ function ArOverlay({
   scene,
   viewport,
   aligned,
+  trustworthy,
+  uncertaintyDegrees,
   headingAccuracy,
   hintsVisible,
 }: {
   scene: ArScene;
   viewport: Viewport;
   aligned: boolean;
+  trustworthy: boolean;
+  uncertaintyDegrees: number;
   headingAccuracy: number | null;
   hintsVisible: boolean;
 }) {
@@ -282,9 +290,27 @@ function ArOverlay({
             weight="semibold"
             color={aligned ? AR_ALIGNED : AR_INK}
             style={{ flexShrink: 1 }}>
-            {aligned ? 'Du peker mot Qibla' : (rotationHint ?? 'Nesten der …')}
+            {aligned
+              ? trustworthy
+                ? 'Du peker mot Qibla'
+                : 'Du peker innenfor det usikre området'
+              : (rotationHint ?? 'Nesten der …')}
           </AppText>
         </View>
+
+        {!trustworthy && (
+          <View
+            style={{
+              backgroundColor: AR_SCRIM,
+              paddingHorizontal: spacing.lg,
+              paddingVertical: spacing.sm,
+              borderRadius: radius.full,
+            }}>
+            <AppText size="xs" color={AR_INK}>
+              Usikker posisjon – retningen kan være ±{Math.round(uncertaintyDegrees)}° feil
+            </AppText>
+          </View>
+        )}
 
         {compassPoor && (
           <View

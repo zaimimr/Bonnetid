@@ -26,12 +26,39 @@ export function qiblaBearing(lat: number, lon: number): number {
 
 export const QIBLA_ALIGNED_THRESHOLD_DEGREES = 5;
 
+export const HARAM_RADIUS_KM = 0.05;
+
+export const QIBLA_UNCERTAIN_THRESHOLD_DEGREES = 15;
+
+export function bearingUncertaintyDegrees(
+  accuracyMetres: number | null,
+  distanceToKaabaKm: number,
+): number {
+  if (accuracyMetres == null || accuracyMetres <= 0) return 0;
+  const distanceMetres = distanceToKaabaKm * 1000;
+  if (distanceMetres <= accuracyMetres) return 180;
+  return toDegrees(Math.atan2(accuracyMetres, distanceMetres));
+}
+
+export function isInsideHaram(distanceToKaabaKm: number): boolean {
+  return distanceToKaabaKm <= HARAM_RADIUS_KM;
+}
+
+export function isBearingTrustworthy(uncertaintyDegrees: number): boolean {
+  return uncertaintyDegrees < QIBLA_UNCERTAIN_THRESHOLD_DEGREES;
+}
+
 export function normalizeAngleDelta(degrees: number): number {
   return (((degrees % 360) + 540) % 360) - 180;
 }
 
-export function isQiblaAligned(heading: number, bearing: number): boolean {
-  return Math.abs(normalizeAngleDelta(bearing - heading)) <= QIBLA_ALIGNED_THRESHOLD_DEGREES;
+export function isQiblaAligned(
+  heading: number,
+  bearing: number,
+  uncertaintyDegrees = 0,
+): boolean {
+  const tolerance = Math.max(QIBLA_ALIGNED_THRESHOLD_DEGREES, uncertaintyDegrees);
+  return Math.abs(normalizeAngleDelta(bearing - heading)) <= tolerance;
 }
 
 export function distanceKm(
@@ -130,6 +157,11 @@ export function facingConePoints(
     points.push(destinationPoint(lat, lon, bearing, distanceKm));
   }
   return points;
+}
+
+export function formatAccuracy(metres: number): string {
+  if (metres < 1000) return `${Math.round(metres)} m`;
+  return `${(metres / 1000).toFixed(1)} km`;
 }
 
 export function formatDistance(km: number): string {

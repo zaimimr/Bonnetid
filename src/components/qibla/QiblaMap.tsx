@@ -2,7 +2,14 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LeafletMap, type LeafletMapHandle } from '@/components/map/LeafletMap';
-import { MapView, Marker, NATIVE_MAPS_AVAILABLE, Polygon, Polyline } from '@/components/map/nativeMaps';
+import {
+  Circle,
+  MapView,
+  Marker,
+  NATIVE_MAPS_AVAILABLE,
+  Polygon,
+  Polyline,
+} from '@/components/map/nativeMaps';
 import { AppText } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
@@ -13,17 +20,57 @@ export type QiblaMapProps = {
   lat: number;
   lon: number;
   heading?: number | null;
+  accuracyM?: number | null;
+  distanceToKaabaKm?: number;
 };
 
-export function QiblaMap({ lat, lon, heading }: QiblaMapProps) {
+function leafletZoom(distanceToKaabaKm: number, accuracyM: number | null): number {
+  const span = spanKm(distanceToKaabaKm, accuracyM);
+  if (span <= 0.3) return 17;
+  if (span <= 0.8) return 16;
+  if (span <= 2) return 14;
+  return 13;
+}
+
+function coneLengthKm(distanceToKaabaKm: number): number {
+  return Math.max(0.05, Math.min(0.6, distanceToKaabaKm * 0.6));
+}
+
+const MAX_SPAN_KM = 5.5;
+
+function spanKm(distanceToKaabaKm: number, accuracyM: number | null): number {
+  const fromAccuracy = ((accuracyM ?? 0) * 4) / 1000;
+  const fromDistance = Math.min(MAX_SPAN_KM, distanceToKaabaKm * 4);
+  return Math.max(0.2, Math.min(MAX_SPAN_KM, Math.max(fromAccuracy, fromDistance)));
+}
+
+export function QiblaMap({
+  lat,
+  lon,
+  heading,
+  accuracyM = null,
+  distanceToKaabaKm = 1000,
+}: QiblaMapProps) {
   const theme = useTheme();
 
   return (
     <View style={{ flex: 1, borderRadius: radius.xl, overflow: 'hidden' }}>
       {NATIVE_MAPS_AVAILABLE ? (
-        <NativeQiblaMap lat={lat} lon={lon} heading={heading} />
+        <NativeQiblaMap
+          lat={lat}
+          lon={lon}
+          heading={heading}
+          accuracyM={accuracyM}
+          distanceToKaabaKm={distanceToKaabaKm}
+        />
       ) : (
-        <OsmQiblaMap lat={lat} lon={lon} heading={heading} />
+        <OsmQiblaMap
+          lat={lat}
+          lon={lon}
+          heading={heading}
+          accuracyM={accuracyM}
+          distanceToKaabaKm={distanceToKaabaKm}
+        />
       )}
 
       <View
@@ -52,9 +99,19 @@ export function QiblaMap({ lat, lon, heading }: QiblaMapProps) {
   );
 }
 
-function NativeQiblaMap({ lat, lon, heading }: QiblaMapProps) {
+function NativeQiblaMap({
+  lat,
+  lon,
+  heading,
+  accuracyM = null,
+  distanceToKaabaKm = 1000,
+}: QiblaMapProps) {
   const theme = useTheme();
-  const cone = heading != null ? facingConePoints(lat, lon, heading) : null;
+  const cone =
+    heading != null
+      ? facingConePoints(lat, lon, heading, coneLengthKm(distanceToKaabaKm))
+      : null;
+  const delta = spanKm(distanceToKaabaKm, accuracyM) / 111;
 
   return (
     <MapView
@@ -62,11 +119,20 @@ function NativeQiblaMap({ lat, lon, heading }: QiblaMapProps) {
       initialRegion={{
         latitude: lat,
         longitude: lon,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
+        latitudeDelta: delta,
+        longitudeDelta: delta,
       }}
       showsUserLocation
       showsCompass>
+      {accuracyM != null && accuracyM > 0 && (
+        <Circle
+          center={{ latitude: lat, longitude: lon }}
+          radius={accuracyM}
+          fillColor={theme.colors.mapFacingFill}
+          strokeColor={theme.colors.mapFacing}
+          strokeWidth={1}
+        />
+      )}
       <Polyline
         coordinates={[
           { latitude: lat, longitude: lon },
@@ -94,7 +160,13 @@ function NativeQiblaMap({ lat, lon, heading }: QiblaMapProps) {
   );
 }
 
-function OsmQiblaMap({ lat, lon, heading }: QiblaMapProps) {
+function OsmQiblaMap({
+  lat,
+  lon,
+  heading,
+  accuracyM = null,
+  distanceToKaabaKm = 1000,
+}: QiblaMapProps) {
   const theme = useTheme();
   const mapRef = useRef<LeafletMapHandle>(null);
 
@@ -117,7 +189,19 @@ function OsmQiblaMap({ lat, lon, heading }: QiblaMapProps) {
     background: ${theme.colors.surface}; color: ${theme.colors.textPrimary};
   }`,
       script: `
-  var map = createMap(${lat}, ${lon}, 13);
+  var map = createMap(${lat}, ${lon}, ${leafletZoom(distanceToKaabaKm, accuracyM)});
+
+  ${
+    accuracyM != null && accuracyM > 0
+      ? `L.circle([${lat}, ${lon}], {
+    radius: ${accuracyM},
+    color: '${theme.colors.mapFacing}',
+    weight: 1,
+    fillColor: '${theme.colors.mapFacing}',
+    fillOpacity: 0.15
+  }).addTo(map);`
+      : ''
+  }
 
   window.userCone = L.polygon([], {
     color: '${theme.colors.mapFacing}',
@@ -143,6 +227,8 @@ function OsmQiblaMap({ lat, lon, heading }: QiblaMapProps) {
   }, [
     lat,
     lon,
+    accuracyM,
+    distanceToKaabaKm,
     theme.colors.mapFacing,
     theme.colors.mapPinRing,
     theme.colors.primary,
@@ -153,9 +239,11 @@ function OsmQiblaMap({ lat, lon, heading }: QiblaMapProps) {
 
   const pushCone = useCallback(() => {
     if (heading == null) return;
-    const cone = facingConePoints(lat, lon, heading).map((point) => [point.lat, point.lon]);
+    const cone = facingConePoints(lat, lon, heading, coneLengthKm(distanceToKaabaKm)).map(
+      (point) => [point.lat, point.lon],
+    );
     mapRef.current?.run(`window.setCone && window.setCone(${JSON.stringify(cone)});`);
-  }, [lat, lon, heading]);
+  }, [lat, lon, heading, distanceToKaabaKm]);
 
   useEffect(() => {
     pushCone();
