@@ -5,7 +5,7 @@ export type NotificationSoundOption = {
   label: string;
   description: string;
   fileName: string | null;
-  previewAsset: number | null;
+  previewName: string | null;
 };
 
 export const NOTIFICATION_SOUNDS: NotificationSoundOption[] = [
@@ -14,21 +14,21 @@ export const NOTIFICATION_SOUNDS: NotificationSoundOption[] = [
     label: 'Standard',
     description: 'Systemets varsellyd',
     fileName: null,
-    previewAsset: null,
+    previewName: null,
   },
   {
     key: 'adhan_kort',
     label: 'Adhan (kort)',
     description: 'Takbir, ca. 4 sekunder',
     fileName: 'adhan_kort.wav',
-    previewAsset: require('../../assets/sounds/adhan_kort.wav'),
+    previewName: 'adhan_kort',
   },
   {
     key: 'adhan',
     label: 'Adhan',
     description: 'Takbir og shahada, ca. 29 sekunder',
     fileName: 'adhan.wav',
-    previewAsset: require('../../assets/sounds/adhan.wav'),
+    previewName: 'adhan',
   },
 ];
 

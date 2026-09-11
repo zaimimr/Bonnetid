@@ -1,5 +1,5 @@
+import { useEffect } from 'react';
 import { View } from 'react-native';
-import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText, Card, Divider, ListRow, Screen } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -7,26 +7,22 @@ import { spacing } from '@/theme/tokens';
 import { NOTIFICATION_SOUNDS, type NotificationSoundOption } from '@/lib/notificationSounds';
 import { track } from '@/lib/telemetry';
 import { useSettings } from '@/store/settings';
+import { playSoundPreview, stopSoundPreview } from '../../modules/sound-preview';
 
 export default function NotificationSoundScreen() {
   const theme = useTheme();
   const notificationSound = useSettings((state) => state.notificationSound);
   const setNotificationSound = useSettings((state) => state.setNotificationSound);
-  const previewPlayer = useAudioPlayer();
+  useEffect(() => stopSoundPreview, []);
 
   const selectSound = (option: NotificationSoundOption) => {
     setNotificationSound(option.key);
     track('notification_sound_changed', { sound: option.key });
-    if (option.previewAsset == null) {
-      previewPlayer.pause();
+    if (option.previewName == null) {
+      stopSoundPreview();
       return;
     }
-    setAudioModeAsync({ playsInSilentMode: true })
-      .catch(() => {})
-      .then(() => {
-        previewPlayer.replace(option.previewAsset);
-        previewPlayer.play();
-      });
+    playSoundPreview(option.previewName);
   };
 
   return (
