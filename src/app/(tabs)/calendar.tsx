@@ -21,6 +21,7 @@ import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { useRefresh } from '@/hooks/useRefresh';
+import { useTimezoneNote } from '@/hooks/useTimezoneNote';
 import { spacing } from '@/theme/tokens';
 import { monthName } from '@/lib/hijri';
 import { isoDateKey, parseDayKey } from '@/lib/time';
@@ -211,12 +212,20 @@ function TimesView({ year, monthIndex, specialDates, todayDayKey, onDayPress }: 
   const asrMethod = useEffectiveAsrMethod();
   const month = usePrayerMonth(location, year, monthIndex + 1);
   const zone = zoneFor(location);
+  const timezoneNote = useTimezoneNote();
 
   return (
     <View style={{ gap: spacing.md }}>
-      <AppText size="sm" tone="textMuted">
-        {location.mode === 'calculated' ? `${location.name} · lokale tider` : location.name}
-      </AppText>
+      <View style={{ gap: spacing.xxs }}>
+        <AppText size="sm" tone="textMuted">
+          {location.mode === 'calculated' ? `${location.name} · lokale tider` : location.name}
+        </AppText>
+        {timezoneNote && (
+          <AppText size="xs" tone="textMuted">
+            {timezoneNote}
+          </AppText>
+        )}
+      </View>
 
       {month.isLoading && <Skeleton height={480} rounded="xl" />}
       {month.isError && <ErrorState onRetry={month.refetch} />}
