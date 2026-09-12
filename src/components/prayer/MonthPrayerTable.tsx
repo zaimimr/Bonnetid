@@ -6,7 +6,14 @@ import { opacity, radius, spacing } from '@/theme/tokens';
 import type { PrayerDay } from '@/api/types';
 import type { AsrMethodPreference } from '@/store/settings';
 import { asrTimeFor } from '@/lib/prayerSchedule';
-import { isoDateKey, osloDayKey, osloTimeToLocalClock, parseDayKey } from '@/lib/time';
+import {
+  formatLocalClock,
+  isoDateKey,
+  osloDayKey,
+  parseDayKey,
+  wallClockToDate,
+  type PrayerTimeZone,
+} from '@/lib/time';
 
 const COLUMNS = ['Fajr', 'Sol', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 const DATE_COLUMN_WIDTH = 40;
@@ -20,6 +27,7 @@ const MARKER_SIZE = 5;
 export type MonthPrayerTableProps = {
   days: PrayerDay[];
   asrMethod: AsrMethodPreference;
+  zone?: PrayerTimeZone;
   todayDayKey?: string;
   specialDates?: ReadonlySet<string>;
   onDayPress?: (day: PrayerDay) => void;
@@ -28,6 +36,7 @@ export type MonthPrayerTableProps = {
 export function MonthPrayerTable({
   days,
   asrMethod,
+  zone = 'oslo',
   todayDayKey,
   specialDates,
   onDayPress,
@@ -158,7 +167,7 @@ export function MonthPrayerTable({
                 maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}
                 numberOfLines={1}
                 style={timeColumnStyle}>
-                {time ? (osloTimeToLocalClock(date, time) ?? time) : '–'}
+                {time ? formatLocalClock(wallClockToDate(date, time, zone)) : '–'}
               </AppText>
             ))}
           </Pressable>

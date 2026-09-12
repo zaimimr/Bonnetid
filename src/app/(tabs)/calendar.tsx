@@ -19,7 +19,7 @@ import {
 } from '@/components/ui';
 import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
-import { usePrayerMonth } from '@/hooks/usePrayerMonth';
+import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { useRefresh } from '@/hooks/useRefresh';
 import { spacing } from '@/theme/tokens';
 import { monthName } from '@/lib/hijri';
@@ -210,6 +210,7 @@ function TimesView({ year, monthIndex, specialDates, todayDayKey, onDayPress }: 
   const location = useActiveLocation();
   const asrMethod = useEffectiveAsrMethod();
   const month = usePrayerMonth(location, year, monthIndex + 1);
+  const zone = zoneFor(location);
 
   return (
     <View style={{ gap: spacing.md }}>
@@ -223,6 +224,7 @@ function TimesView({ year, monthIndex, specialDates, todayDayKey, onDayPress }: 
         <MonthPrayerTable
           days={month.data}
           asrMethod={asrMethod}
+          zone={zone}
           todayDayKey={todayDayKey}
           specialDates={specialDates}
           onDayPress={(day) => onDayPress(isoDateKey(parseDayKey(day.date)))}
