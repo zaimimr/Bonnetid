@@ -199,7 +199,7 @@ object CarDataSource {
     entries.forEachIndexed { index, (kind, at, isPrayer) ->
       val end = when {
         kind == "isha" -> midnight(row, date, at)
-        kind == "fajr" -> instant(date, time(row, "shuruq_sunrise") ?: time(row, "fajr_endtime"))
+        kind == "fajr" -> instant(date, time(row, "fajr_endtime") ?: time(row, "shuruq_sunrise"))
         else -> entries.getOrNull(index + 1)?.second
       }
       prayers.put(

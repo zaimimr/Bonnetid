@@ -53,7 +53,7 @@ export function MonthPrayerTable({
 
   const timesFor = (day: PrayerDay): (string | null)[] => [
     day.fajr,
-    day.shuruq_sunrise,
+    day.fajr_endtime ?? day.shuruq_sunrise,
     day.duhr,
     asrTimeFor(day, asrMethod),
     day.maghrib,

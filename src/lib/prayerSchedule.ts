@@ -83,7 +83,7 @@ export function buildDaySchedule(
     }
     if (!entry.isPrayer) continue;
     if (entry.name === 'fajr') {
-      const sunrise = day.shuruq_sunrise ?? day.fajr_endtime;
+      const sunrise = day.fajr_endtime ?? day.shuruq_sunrise;
       if (sunrise) {
         entry.end = {
           label: PRAYER_LABELS.fajr_endtime,
