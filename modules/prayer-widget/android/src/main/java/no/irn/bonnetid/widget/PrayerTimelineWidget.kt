@@ -193,6 +193,7 @@ class PrayerTimelineWidget : AppWidgetProvider() {
       snapshot.allPrayers.forEach { prayer ->
         candidates.add(prayer.at)
         prayer.end?.let { candidates.add(it) }
+        prayer.jummahEnd?.let { candidates.add(it) }
       }
       candidates.add(PrayerSnapshot.startOfNextDay(now))
       return candidates.filter { it > now + 1000 }.minOrNull() ?: (now + FALLBACK_UPDATE_MS)

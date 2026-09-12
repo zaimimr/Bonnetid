@@ -60,11 +60,13 @@ export default function DayScreen() {
     jamatPeriod && 'jummah' in jamatPeriod && jamatPeriod.jummah && jamatPeriod.jummah.length > 0
       ? jamatPeriod.jummah
       : (mosqueDetails.data?.jummah ?? []);
+  // Only today's card drops back to Dhuhr; a past Friday should keep showing its Jumuah.
   const jamatTimes = jamatTimesForDate(
     mosqueInLocation ? jamatPeriod : null,
     isoDate ?? '',
     mosqueInLocation ? adhanTimesFromSchedule(schedule) : {},
     jummahTimes,
+    isoDate === isoDateKey(now) ? now : null,
   );
 
   const goToDay = (delta: number) => {

@@ -68,7 +68,7 @@ data class DayTimeline(
         marks.add(
           TimelineMark(
             kind = prayer.kind,
-            label = prayer.displayLabel,
+            label = prayer.resolveJummah(at).displayLabel,
             at = prayer.at,
             fraction = fraction,
             isPrayer = prayer.isPrayer,

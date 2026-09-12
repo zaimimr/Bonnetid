@@ -1,16 +1,17 @@
+import type { JummahSlot } from './jummah';
+import { jummahSlotIsOpen } from './jummah';
 import type { PrayerEntry } from './prayerSchedule';
 import { isoDateKey, localClockNear } from './time';
 
-export const SNAPSHOT_VERSION = 2;
-const FRIDAY = 5;
+export const SNAPSHOT_VERSION = 3;
 
 export type SnapshotDayInput = {
   date: Date;
   schedule: PrayerEntry[];
   hijriText: string;
   jamatTimes?: Partial<Record<string, string>>;
-  /** True when the mosque has a Jumuah time for this Friday. */
-  hasJummah?: boolean;
+  /** This Friday's congregation, and the instant it stops standing in for Dhuhr. */
+  jummah?: JummahSlot | null;
 };
 
 export type SnapshotMosqueInput = {
@@ -38,16 +39,16 @@ export type SnapshotInput = {
 
 export type SnapshotPrayer = {
   kind: string;
-  /** The prayer's own name, used for logic. */
   label: string;
-  /** What a widget prints: "Jumuah" instead of "Dhuhr" on Friday. */
-  displayLabel: string;
   /** When the prayer starts, used for "next" and "now". */
   at: string;
   isPrayer: boolean;
+  /** The mosque's ordinary congregation time, Jumuah excluded. */
   jamat: string | null;
-  /** True when `jamat` is this Friday's Jumuah time rather than an ordinary jamat time. */
-  isJummah: boolean;
+  /** This Friday's Jumuah, which stands in for the Dhuhr congregation until `jummahEnd`. */
+  jummahAt: string | null;
+  /** When a widget goes back to printing "Dhuhr" and the ordinary jamat time. */
+  jummahEnd: string | null;
   end: string | null;
 };
 
@@ -78,8 +79,12 @@ function jamatInstant(adhanAt: Date, time: string | undefined): string | null {
   return Number.isNaN(instant.getTime()) ? null : instant.toISOString();
 }
 
-export function isJummahCell(day: SnapshotDayInput, prayerName: string): boolean {
-  return day.hasJummah === true && prayerName === 'duhr' && day.date.getDay() === FRIDAY;
+export function jummahSlotForCell(day: SnapshotDayInput, prayerName: string): JummahSlot | null {
+  return prayerName === 'duhr' ? (day.jummah ?? null) : null;
+}
+
+export function isJummahCell(day: SnapshotDayInput, prayerName: string, now?: Date): boolean {
+  return jummahSlotIsOpen(jummahSlotForCell(day, prayerName), now);
 }
 
 /**
@@ -101,17 +106,17 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
       date: isoDateKey(day.date),
       hijriText: day.hijriText,
       prayers: day.schedule.map((entry) => {
-        const jamat = jamatInstant(entry.date, day.jamatTimes?.[entry.name]);
-        const jummah = isJummahCell(day, entry.name) && jamat != null;
+        const slot = jummahSlotForCell(day, entry.name);
+        const jummahAt = slot ? jamatInstant(entry.date, slot.at) : null;
 
         return {
           kind: entry.name,
           label: entry.label,
-          displayLabel: jummah ? 'Jumuah' : entry.label,
           at: entry.date.toISOString(),
           isPrayer: entry.isPrayer,
-          jamat,
-          isJummah: jummah,
+          jamat: jamatInstant(entry.date, day.jamatTimes?.[entry.name]),
+          jummahAt,
+          jummahEnd: slot && jummahAt ? slot.endsAt.toISOString() : null,
           end: entry.end?.date.toISOString() ?? null,
         };
       }),

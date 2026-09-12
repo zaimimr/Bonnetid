@@ -1,9 +1,9 @@
 import type { PrayerDay } from '@/api/types';
 import type { AsrMethodPreference } from '@/store/settings';
+import { jummahSlotFor, jummahSlotIsOpen } from './jummah';
 import {
   addMinutesToTime,
   formatLocalClock,
-  isoDateIsFriday,
   osloTimeToLocalClock,
   wallClockToDate,
   type PrayerTimeZone,
@@ -171,6 +171,7 @@ export function jamatTimesForDate(
   isoDate: string,
   adhan: AdhanTimes = {},
   jummah: { jummah: string }[] = [],
+  now?: Date | null,
 ): JamatTimes {
   const withinPeriod =
     jamat != null &&
@@ -187,9 +188,9 @@ export function jamatTimesForDate(
       }
     : {};
 
-  const firstJummah = jummah[0]?.jummah;
-  if (firstJummah && isoDateIsFriday(isoDate)) {
-    times.duhr = osloTimeToLocalClock(isoDate, firstJummah) ?? firstJummah;
+  const slot = jummahSlotFor(isoDate, jummah);
+  if (slot && jummahSlotIsOpen(slot, now)) {
+    times.duhr = slot.at;
   }
 
   return times;

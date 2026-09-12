@@ -73,7 +73,7 @@ struct DayTimeline {
       marks.append(
         TimelineMark(
           kind: prayer.kind,
-          label: prayer.printedLabel,
+          label: prayer.jummahResolved(at: now).printedLabel,
           symbol: PrayerFormat.symbol(for: prayer.kind),
           at: prayer.at,
           fraction: fraction,

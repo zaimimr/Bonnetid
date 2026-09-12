@@ -30,7 +30,7 @@ struct DayTimelineProvider: TimelineProvider {
     if let snapshot {
       let horizonEnd = now.addingTimeInterval(Double(horizonMinutes) * 60)
       for prayer in snapshot.allPrayers {
-        for boundary in [prayer.at, prayer.end].compactMap({ $0 })
+        for boundary in [prayer.at, prayer.end, prayer.jummahEnd].compactMap({ $0 })
         where boundary > now && boundary <= horizonEnd {
           dates.insert(boundary)
         }

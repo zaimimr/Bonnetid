@@ -172,7 +172,7 @@ class PrayerAppWidget : AppWidgetProvider() {
 
       val showJamat = snapshot.showJamat && snapshot.hasJamatTimes
       val day = snapshot.dayFor(moment.headline.at)
-      val prayers = day?.prayers?.filter { it.isPrayer } ?: emptyList()
+      val prayers = day?.prayers?.filter { it.isPrayer }?.map { it.resolveJummah(now) } ?: emptyList()
       val currentAt = snapshot.currentPrayer(now)?.at
       val log = PrayerLogStore.read(context)
 
@@ -281,6 +281,7 @@ class PrayerAppWidget : AppWidgetProvider() {
       snapshot.allPrayers.forEach { prayer ->
         candidates.add(prayer.at)
         prayer.end?.let { candidates.add(it) }
+        prayer.jummahEnd?.let { candidates.add(it) }
       }
       candidates.add(PrayerSnapshot.startOfNextDay(now))
       val next = candidates.filter { it > now + 1000 }.minOrNull()

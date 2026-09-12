@@ -17,10 +17,27 @@ data class PrayerEntry(
   val jamat: Long?,
   val isJummah: Boolean,
   val end: Long? = null,
+  /** This Friday's congregation, which stands in for the Dhuhr jamat until [jummahEnd]. */
+  val jummahAt: Long? = null,
+  val jummahEnd: Long? = null,
 ) {
   fun printedAt(showJamat: Boolean): Long {
     if (!showJamat && isJummah && jamat != null) return jamat
     return at
+  }
+
+  /**
+   * Friday reads as Jumuah until half an hour after the last congregation, then it is an
+   * ordinary Dhuhr again. Resolved per render so a widget flips on its own, offline.
+   */
+  fun resolveJummah(at: Long): PrayerEntry {
+    if (jummahAt == null) return this
+    val isOpen = jummahEnd == null || at < jummahEnd
+    return copy(
+      displayLabel = if (isOpen) "Jumuah" else label,
+      isJummah = isOpen,
+      jamat = if (isOpen) jummahAt else jamat,
+    )
   }
 }
 
@@ -62,7 +79,7 @@ data class PrayerSnapshot(
     get() = days.flatMap { it.prayers }.sortedBy { it.at }
 
   val hasJamatTimes: Boolean
-    get() = days.any { day -> day.prayers.any { it.jamat != null } }
+    get() = days.any { day -> day.prayers.any { it.jamat != null || it.jummahAt != null } }
 
   fun hijriText(at: Long): String {
     val key = dayKey(at)
@@ -74,8 +91,8 @@ data class PrayerSnapshot(
     return days.firstOrNull { it.date == key } ?: days.firstOrNull()
   }
 
-  fun dailyPrayers(at: Long): List<PrayerEntry> {
-    return dayFor(at)?.prayers?.filter { it.isPrayer } ?: emptyList()
+  fun dailyPrayers(at: Long, now: Long = at): List<PrayerEntry> {
+    return dayFor(at)?.prayers?.filter { it.isPrayer }?.map { it.resolveJummah(now) } ?: emptyList()
   }
 
   fun windowEnd(prayer: PrayerEntry): Long? {
@@ -92,7 +109,7 @@ data class PrayerSnapshot(
       ?: return null
     val end = started.end
     if (end != null && at >= end) return null
-    return started
+    return started.resolveJummah(at)
   }
 
   companion object {
@@ -127,6 +144,8 @@ data class PrayerSnapshot(
                 jamat = parseInstant(optStringOrNull(prayerJson, "jamat")),
                 isJummah = prayerJson.optBoolean("isJummah", false),
                 end = parseInstant(optStringOrNull(prayerJson, "end")),
+                jummahAt = parseInstant(optStringOrNull(prayerJson, "jummahAt")),
+                jummahEnd = parseInstant(optStringOrNull(prayerJson, "jummahEnd")),
               ),
             )
           }
@@ -250,7 +269,7 @@ data class PrayerMoment(
 
   companion object {
     fun resolve(snapshot: PrayerSnapshot, at: Long): PrayerMoment? {
-      val prayers = snapshot.allPrayers.filter { it.isPrayer }
+      val prayers = snapshot.allPrayers.filter { it.isPrayer }.map { it.resolveJummah(at) }
       val nextIndex = prayers.indexOfFirst { it.at > at }
       if (nextIndex < 0) return null
 
