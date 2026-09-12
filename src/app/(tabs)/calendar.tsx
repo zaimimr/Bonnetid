@@ -18,6 +18,7 @@ import {
   Skeleton,
 } from '@/components/ui';
 import { useActiveDayKeys } from '@/hooks/useActiveDay';
+import { useNow } from '@/hooks/useNow';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { useRefresh } from '@/hooks/useRefresh';
@@ -38,7 +39,8 @@ export default function CalendarScreen() {
   const router = useRouter();
   const { refreshing, onRefresh } = useRefresh();
 
-  const today = useMemo(() => new Date(), []);
+  // The tab stays mounted for days, so a frozen date would keep marking yesterday.
+  const today = useNow(60_000);
   const { isoDate: todayIso, dayKey: todayDayKey } = useActiveDayKeys(today);
   const [view, setView] = useState<MonthView>('dates');
   const [cursor, setCursor] = useState(() => ({
