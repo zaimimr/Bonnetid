@@ -13,6 +13,9 @@ struct PrayerEntry: Codable, Hashable {
   let displayLabel: String?
   let isJummah: Bool?
   let end: Date?
+  /// This Friday's congregation, which stands in for the Dhuhr jamat until `jummahEnd`.
+  let jummahAt: Date?
+  let jummahEnd: Date?
 
   /// What a widget prints: "Jumuah" on Friday when the mosque has one.
   var printedLabel: String { displayLabel ?? label }
@@ -22,6 +25,25 @@ struct PrayerEntry: Codable, Hashable {
   func printedAt(showJamat: Bool) -> Date {
     if !showJamat, isJummah == true, let jamat { return jamat }
     return at
+  }
+
+  /// Friday reads as Jumuah until half an hour after the last congregation, then it is an
+  /// ordinary Dhuhr again. Resolved per render so a widget flips on its own, offline.
+  func jummahResolved(at date: Date) -> PrayerEntry {
+    guard let jummahAt else { return self }
+    let isOpen = jummahEnd.map { date < $0 } ?? true
+    return PrayerEntry(
+      kind: kind,
+      label: label,
+      at: at,
+      isPrayer: isPrayer,
+      jamat: isOpen ? jummahAt : jamat,
+      displayLabel: isOpen ? "Jumuah" : label,
+      isJummah: isOpen,
+      end: end,
+      jummahAt: jummahAt,
+      jummahEnd: jummahEnd
+    )
   }
 }
 
@@ -43,7 +65,7 @@ struct PrayerSnapshot: Codable, Hashable {
 
   /// True when at least one prayer has a jamat time, i.e. a mosque is selected.
   var hasJamatTimes: Bool {
-    days.contains { day in day.prayers.contains { $0.jamat != nil } }
+    days.contains { day in day.prayers.contains { $0.jamat != nil || $0.jummahAt != nil } }
   }
 
   static let placeholder = PrayerSnapshot(
@@ -96,6 +118,11 @@ struct PrayerSnapshot: Codable, Hashable {
     days.flatMap(\.prayers).sorted { $0.at < $1.at }
   }
 
+  /// Every prayer, with the Friday slot printed as it stands at `date`.
+  func allPrayers(at date: Date) -> [PrayerEntry] {
+    allPrayers.map { $0.jummahResolved(at: date) }
+  }
+
   func hijriText(for date: Date) -> String {
     let key = PrayerSnapshot.dayKey(for: date)
     return days.first(where: { $0.date == key })?.hijriText ?? days.first?.hijriText ?? ""
@@ -113,14 +140,16 @@ struct PrayerSnapshot: Codable, Hashable {
       .last { $0.at <= date }
     guard let started else { return nil }
     if let end = started.end, date >= end { return nil }
-    return started
+    return started.jummahResolved(at: date)
   }
 
   /// The five daily prayers for the calendar day containing `date`, sunrise excluded.
-  func dailyPrayers(for date: Date) -> [PrayerEntry] {
+  /// `now` decides how the Friday slot is printed, which is not the same day when the columns
+  /// have already moved on to tomorrow.
+  func dailyPrayers(for date: Date, now: Date) -> [PrayerEntry] {
     let key = PrayerSnapshot.dayKey(for: date)
     let day = days.first(where: { $0.date == key }) ?? days.first
-    return day?.prayers.filter(\.isPrayer) ?? []
+    return day?.prayers.filter(\.isPrayer).map { $0.jummahResolved(at: now) } ?? []
   }
 
   private static var dayKeyZone = osloTimeZone
@@ -164,7 +193,7 @@ struct PrayerMoment: Hashable {
 
   /// `nil` when the snapshot has no prayer at or after `date`.
   static func resolve(from snapshot: PrayerSnapshot, at date: Date) -> PrayerMoment? {
-    let prayers = snapshot.allPrayers.filter(\.isPrayer)
+    let prayers = snapshot.allPrayers(at: date).filter(\.isPrayer)
     guard let nextIndex = prayers.firstIndex(where: { $0.at > date }) else { return nil }
 
     let next = prayers[nextIndex]

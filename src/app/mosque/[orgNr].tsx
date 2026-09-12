@@ -26,6 +26,7 @@ import { eidPrayerTitle } from '@/lib/hijri';
 import { MOON_SIGHTING_NOTE } from '@/lib/hijriSeason';
 import { JUMMAH_MISSING_FOR_MOSQUE } from '@/lib/jummahCopy';
 import { osloDateKey, osloDayKey, osloDayStart, osloTimeToLocalClock } from '@/lib/time';
+import { useNow } from '@/hooks/useNow';
 import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from '@/components/prayer/TimeCell';
 
 const ASR_METHOD_LABELS: Record<Mosque['asr_method'], string | null> = {
@@ -77,7 +78,8 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
   const eidTimes = showEidSection ? mosque.eid_prayers : [];
   const eidTitle = eidPeriod ? eidPrayerTitle(eidPeriod) : '';
 
-  const today = useMemo(() => osloDayStart(new Date()), []);
+  const now = useNow(60_000);
+  const today = useMemo(() => osloDayStart(now), [now]);
   const month = usePrayerTimes(
     mosque.location_iso ?? '',
     today.getFullYear(),
@@ -91,7 +93,13 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
     () => adhanTimesFromSchedule(day ? buildDaySchedule(day, today, asrPreference) : []),
     [day, today, asrPreference],
   );
-  const jamatTimes = jamatTimesForDate(jamat, osloDateKey(today), adhanTimes, mosque.jummah);
+  const jamatTimes = jamatTimesForDate(
+    jamat,
+    osloDateKey(today),
+    adhanTimes,
+    mosque.jummah,
+    now,
+  );
 
   const jamatRows = JAMAT_PRAYERS.map((name) => ({
     name,

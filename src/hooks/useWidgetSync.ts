@@ -13,6 +13,7 @@ import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { formatHijri } from '@/lib/hijri';
 import { resolveActivityWindow } from '@/lib/liveActivityWindow';
+import { jummahSlotFor } from '@/lib/jummah';
 import { isJummahCell, type SnapshotDayInput, type SnapshotMosqueInput } from '@/lib/widgetSnapshot';
 import {
   adhanTimesFromSchedule,
@@ -78,11 +79,12 @@ export function useWidgetSync(now: Date) {
       const schedule = buildDaySchedule(row, date, asrMethod, zone);
       const iso = isoDateKey(date);
       const hijriRow = hijriRows.find((entry) => entry.gregorian_date === iso);
+      // The Jumuah rides along separately, so a widget can drop back to Dhuhr on its own
+      // once the last congregation is over, without the app having to write a new snapshot.
       const jamatTimes = jamatTimesForDate(
         mosqueInLocation ? mosqueDetails.data?.jamat : null,
         iso,
         mosqueInLocation ? adhanTimesFromSchedule(schedule) : {},
-        mosqueDetails.data?.jummah ?? [],
       );
 
       return {
@@ -90,7 +92,7 @@ export function useWidgetSync(now: Date) {
         schedule,
         hijriText: hijriRow ? formatHijri(hijriRow.hijri_date, hijriRow.hijri_month_text) : '',
         jamatTimes,
-        hasJummah: (mosqueDetails.data?.jummah?.length ?? 0) > 0,
+        jummah: jummahSlotFor(iso, mosqueDetails.data?.jummah ?? []),
       };
     });
 
@@ -221,7 +223,7 @@ function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now
 
       const labelFor = (isoDate: string, prayer: PrayerEntry) => {
         const day = days.find((entry) => isoDateKey(entry.date) === isoDate);
-        return day && isJummahCell(day, prayer.name) ? 'Jumuah' : prayer.label;
+        return day && isJummahCell(day, prayer.name, now) ? 'Jumuah' : prayer.label;
       };
 
       const { next } = window;
@@ -243,5 +245,5 @@ function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now
 
       apply(JSON.stringify(state), () => void startOrUpdatePrayerActivity(state));
     };
-  }, [window, locationName, days, trackerEnabled]);
+  }, [window, locationName, days, trackerEnabled, now]);
 }

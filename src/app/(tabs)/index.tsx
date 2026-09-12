@@ -59,6 +59,7 @@ export default function HomeScreen() {
     todayIso,
     mosqueInLocation ? adhanTimesFromSchedule(todaySchedule) : {},
     jummahTimes,
+    now,
   );
 
   const upcomingEvents = useMemo(() => {

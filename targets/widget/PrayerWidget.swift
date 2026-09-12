@@ -55,30 +55,31 @@ struct PrayerTimelineProvider: AppIntentTimelineProvider {
     let showJamat = configuration.showJamat
     // The snapshot and the log are read once, not once per entry.
     let statuses = PrayerLogStore.statuses()
-    var entries = [entry(at: now, snapshot: snapshot, showJamat: showJamat, statuses: statuses)]
 
     // Pre-computed entries cost nothing at runtime, so the countdown stays honest without
     // spending the widget's refresh budget: every minute for the next hour, then every
     // five minutes for the rest of the day.
+    let horizonMinutes = 12 * 60
+    var dates: Set<Date> = [now]
     for minute in stride(from: 1, through: 60, by: 1) {
-      entries.append(
-        entry(
-          at: now.addingTimeInterval(Double(minute) * 60),
-          snapshot: snapshot,
-          showJamat: showJamat,
-          statuses: statuses
-        )
-      )
+      dates.insert(now.addingTimeInterval(Double(minute) * 60))
     }
-    for minute in stride(from: 65, through: 12 * 60, by: 5) {
-      entries.append(
-        entry(
-          at: now.addingTimeInterval(Double(minute) * 60),
-          snapshot: snapshot,
-          showJamat: showJamat,
-          statuses: statuses
-        )
-      )
+    for minute in stride(from: 65, through: horizonMinutes, by: 5) {
+      dates.insert(now.addingTimeInterval(Double(minute) * 60))
+    }
+
+    // The Friday slot goes back to reading "Dhuhr" on its own, so the widget needs an entry
+    // exactly then rather than up to five minutes late.
+    if let snapshot {
+      let horizonEnd = now.addingTimeInterval(Double(horizonMinutes) * 60)
+      for prayer in snapshot.allPrayers {
+        guard let end = prayer.jummahEnd, end > now, end <= horizonEnd else { continue }
+        dates.insert(end)
+      }
+    }
+
+    let entries = dates.sorted().map {
+      entry(at: $0, snapshot: snapshot, showJamat: showJamat, statuses: statuses)
     }
 
     return Timeline(entries: entries, policy: .atEnd)
@@ -106,7 +107,7 @@ struct PrayerTimelineProvider: AppIntentTimelineProvider {
       date: date,
       moment: moment,
       // After the last prayer of the day the useful column set is tomorrow's, not today's.
-      dailyPrayers: snapshot.dailyPrayers(for: moment?.headline.at ?? date),
+      dailyPrayers: snapshot.dailyPrayers(for: moment?.headline.at ?? date, now: date),
       currentPrayerAt: snapshot.currentPrayer(at: date)?.at,
       showJamat: showJamat,
       hasJamatTimes: snapshot.hasJamatTimes,
