@@ -12,6 +12,7 @@ class PrayerBootReceiver : BroadcastReceiver() {
       -> {
         val app = context.applicationContext
         PrayerAppWidget.updateAll(app)
+        PrayerDayWidget.updateAll(app)
         PrayerTimelineWidget.updateAll(app)
         PrayerStatusNotifier.sync(app)
       }

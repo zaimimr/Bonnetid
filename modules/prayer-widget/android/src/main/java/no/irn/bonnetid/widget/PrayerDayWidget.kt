@@ -9,8 +9,8 @@ import android.os.Bundle
 import android.util.SizeF
 import android.widget.RemoteViews
 
-/** "Tidslinje": the day drawn as a bar, with the live countdown to the next prayer beside it. */
-class PrayerTimelineWidget : AppWidgetProvider() {
+/** "Dagens bønnetider": the whole day on the card, with a plate on the prayer in progress. */
+class PrayerDayWidget : AppWidgetProvider() {
   override fun onUpdate(
     context: Context,
     appWidgetManager: AppWidgetManager,
@@ -46,18 +46,17 @@ class PrayerTimelineWidget : AppWidgetProvider() {
   }
 
   companion object {
-    const val ACTION_REFRESH = "no.irn.bonnetid.widget.REFRESH_TIMELINE"
-
-    private const val KNOB_STEP_MINUTES = 15L
+    const val ACTION_REFRESH = "no.irn.bonnetid.widget.REFRESH_DAY"
 
     private val breakpoints = listOf(
-      SizeF(245f, 70f) to WidgetSize.COMPACT,
+      SizeF(245f, 56f) to WidgetSize.COMPACT,
       SizeF(245f, 115f) to WidgetSize.MEDIUM,
+      SizeF(245f, 200f) to WidgetSize.TALL,
     )
 
     fun updateAll(context: Context) {
       val manager = AppWidgetManager.getInstance(context) ?: return
-      val ids = manager.getAppWidgetIds(ComponentName(context, PrayerTimelineWidget::class.java))
+      val ids = manager.getAppWidgetIds(ComponentName(context, PrayerDayWidget::class.java))
       if (ids.isEmpty()) return
       render(context, manager, ids)
       scheduleNextUpdate(context)
@@ -67,17 +66,15 @@ class PrayerTimelineWidget : AppWidgetProvider() {
       val snapshot = PrayerSnapshot.load(context)
       val now = System.currentTimeMillis()
       val moment = snapshot?.let { PrayerMoment.resolve(it, now) }
-      val timeline = snapshot?.let { DayTimeline.build(it, now) }
 
       for (id in ids) {
-        val launch = WidgetChrome.openApp(context, 2)
-        val views = if (snapshot == null || moment == null || timeline == null) {
+        val launch = WidgetChrome.openApp(context, 4)
+        val views = if (snapshot == null || moment == null) {
           RemoteViews(context.packageName, R.layout.prayer_widget_empty)
             .also { it.setOnClickPendingIntent(R.id.root, launch) }
         } else {
-          val widthDp = WidgetChrome.barWidthDp(manager, id, TimelineViews.fallbackWidthDp())
           WidgetChrome.responsive(manager, id, breakpoints) { size ->
-            TimelineViews.build(context, size, widthDp, snapshot, moment, timeline, now)
+            DayViews.build(context, size, snapshot, moment, now)
               .also { it.setOnClickPendingIntent(R.id.root, launch) }
           }
         }
@@ -86,17 +83,11 @@ class PrayerTimelineWidget : AppWidgetProvider() {
     }
 
     private fun refreshIntent(context: Context) =
-      WidgetChrome.refresh(context, PrayerTimelineWidget::class.java, ACTION_REFRESH, 3)
+      WidgetChrome.refresh(context, PrayerDayWidget::class.java, ACTION_REFRESH, 5)
 
-    /** The knob creeps along the bar, so this one also wakes on a fixed cadence. */
     private fun scheduleNextUpdate(context: Context) {
       val now = System.currentTimeMillis()
-      val target = WidgetChrome.nextBoundary(
-        context,
-        now,
-        listOf(now + KNOB_STEP_MINUTES * 60 * 1000L),
-      )
-      WidgetChrome.schedule(context, refreshIntent(context), target)
+      WidgetChrome.schedule(context, refreshIntent(context), WidgetChrome.nextBoundary(context, now))
     }
   }
 }

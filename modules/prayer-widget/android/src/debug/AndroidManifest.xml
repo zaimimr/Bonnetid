@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <activity
+      android:name="no.irn.bonnetid.widget.WidgetPreviewActivity"
+      android:exported="true"
+      android:label="Widget-benk" />
+  </application>
+</manifest>

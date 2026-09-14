@@ -31,6 +31,14 @@ object PrayerLogStore {
     return statusOf(read(context), date, prayer)
   }
 
+  /** Only a prayer the snapshot still knows about can carry a status. */
+  fun statusFor(context: Context, snapshot: PrayerSnapshot, prayer: PrayerEntry): String? {
+    if (!prayer.isPrayer) return null
+    val day = snapshot.dayFor(prayer.at) ?: return null
+    if (day.prayers.none { it.kind == prayer.kind && it.at == prayer.at }) return null
+    return statusOf(context, day.date, prayer.kind)
+  }
+
   fun mark(context: Context, date: String, prayer: String, status: String) {
     val log = read(context)
     log.put(

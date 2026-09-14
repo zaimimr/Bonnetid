@@ -1,20 +1,21 @@
 package no.irn.bonnetid.widget
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.SystemClock
-import android.view.View
+import android.util.SizeF
 import android.widget.RemoteViews
 
+/**
+ * "Neste bønn". Emerald ground, one time, one ticking countdown. A placement wide enough to have
+ * been the old two-in-one widget keeps showing the day table, so nobody loses what they placed.
+ */
 class PrayerAppWidget : AppWidgetProvider() {
+  private enum class Variant { COMPACT, MEDIUM, TALL, WIDE }
+
   override fun onUpdate(
     context: Context,
     appWidgetManager: AppWidgetManager,
@@ -46,52 +47,18 @@ class PrayerAppWidget : AppWidgetProvider() {
   }
 
   override fun onDisabled(context: Context) {
-    alarmManager(context)?.cancel(refreshIntent(context))
+    WidgetChrome.alarms(context)?.cancel(refreshIntent(context))
   }
 
   companion object {
     const val ACTION_REFRESH = "no.irn.bonnetid.widget.REFRESH"
 
-    private const val MEDIUM_MIN_WIDTH_DP = 250
-    private const val ALARM_WINDOW_MS = 60 * 1000L
-    private const val FALLBACK_UPDATE_MS = 30 * 60 * 1000L
-
-    private val columnIds = intArrayOf(
-      R.id.column_0,
-      R.id.column_1,
-      R.id.column_2,
-      R.id.column_3,
-      R.id.column_4,
+    private val breakpoints = listOf(
+      SizeF(110f, 56f) to Variant.COMPACT,
+      SizeF(110f, 115f) to Variant.MEDIUM,
+      SizeF(110f, 200f) to Variant.TALL,
+      SizeF(250f, 115f) to Variant.WIDE,
     )
-    private val columnLabelIds = intArrayOf(
-      R.id.column_label_0,
-      R.id.column_label_1,
-      R.id.column_label_2,
-      R.id.column_label_3,
-      R.id.column_label_4,
-    )
-    private val columnTimeIds = intArrayOf(
-      R.id.column_time_0,
-      R.id.column_time_1,
-      R.id.column_time_2,
-      R.id.column_time_3,
-      R.id.column_time_4,
-    )
-    private val columnJamatIds = intArrayOf(
-      R.id.column_jamat_0,
-      R.id.column_jamat_1,
-      R.id.column_jamat_2,
-      R.id.column_jamat_3,
-      R.id.column_jamat_4,
-    )
-    private val columnCheckIds = intArrayOf(
-      R.id.column_check_0,
-      R.id.column_check_1,
-      R.id.column_check_2,
-      R.id.column_check_3,
-      R.id.column_check_4,
-    )
-    private const val SKIPPED_ALPHA = 0.4f
 
     fun updateAll(context: Context) {
       val manager = AppWidgetManager.getInstance(context) ?: return
@@ -107,185 +74,32 @@ class PrayerAppWidget : AppWidgetProvider() {
       val moment = snapshot?.let { PrayerMoment.resolve(it, now) }
 
       for (id in ids) {
+        val launch = WidgetChrome.openApp(context, 0)
         val views = if (snapshot == null || moment == null) {
           RemoteViews(context.packageName, R.layout.prayer_widget_empty)
-        } else if (isWide(manager, id)) {
-          mediumViews(context, snapshot, moment, now)
+            .also { it.setOnClickPendingIntent(R.id.root, launch) }
         } else {
-          smallViews(context, snapshot, moment, now)
+          // A sized RemoteViews cannot be touched after it is combined, so every breakpoint
+          // carries its own launch intent.
+          WidgetChrome.responsive(manager, id, breakpoints) { variant ->
+            when (variant) {
+              Variant.COMPACT -> NextViews.build(context, WidgetSize.COMPACT, snapshot, moment, now)
+              Variant.MEDIUM -> NextViews.build(context, WidgetSize.MEDIUM, snapshot, moment, now)
+              Variant.TALL -> NextViews.build(context, WidgetSize.TALL, snapshot, moment, now)
+              Variant.WIDE -> DayViews.build(context, WidgetSize.MEDIUM, snapshot, moment, now)
+            }.also { it.setOnClickPendingIntent(R.id.root, launch) }
+          }
         }
-        views.setOnClickPendingIntent(R.id.root, openAppIntent(context))
         manager.updateAppWidget(id, views)
       }
     }
 
-    private fun isWide(manager: AppWidgetManager, id: Int): Boolean {
-      val options = manager.getAppWidgetOptions(id) ?: return false
-      val width = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 0)
-      return width >= MEDIUM_MIN_WIDTH_DP
-    }
-
-    private fun smallViews(
-      context: Context,
-      snapshot: PrayerSnapshot,
-      moment: PrayerMoment,
-      now: Long,
-    ): RemoteViews {
-      val showJamat = snapshot.showJamat && snapshot.hasJamatTimes
-      val views = RemoteViews(context.packageName, R.layout.prayer_widget_small)
-      views.setTextViewText(R.id.state, moment.stateLabel)
-      views.setImageViewResource(R.id.headline_icon, PrayerIcons.drawable(moment.headline.kind))
-      views.setTextViewText(R.id.headline_label, moment.headline.displayLabel)
-      views.setTextViewText(
-        R.id.headline_time,
-        PrayerFormat.time(moment.headline.printedAt(showJamat)),
-      )
-
-      val status = statusOf(context, snapshot, moment.headline)
-      views.setViewVisibility(
-        R.id.headline_check,
-        if (status == PrayerLogStore.STATUS_PRAYED) View.VISIBLE else View.GONE,
-      )
-      val alpha = if (status == PrayerLogStore.STATUS_SKIPPED) SKIPPED_ALPHA else 1f
-      views.setFloat(R.id.headline_row, "setAlpha", alpha)
-      views.setFloat(R.id.headline_time, "setAlpha", alpha)
-
-      if (moment.isNow) {
-        views.setTextViewText(R.id.countdown_label, moment.next.displayLabel)
-        views.setViewVisibility(R.id.countdown_label, View.VISIBLE)
-      } else {
-        views.setViewVisibility(R.id.countdown_label, View.GONE)
-      }
-      setCountdown(views, R.id.countdown, moment.next.at, now)
-      return views
-    }
-
-    private fun mediumViews(
-      context: Context,
-      snapshot: PrayerSnapshot,
-      moment: PrayerMoment,
-      now: Long,
-    ): RemoteViews {
-      val views = RemoteViews(context.packageName, R.layout.prayer_widget_medium)
-      views.setTextViewText(R.id.location, moment.locationName)
-      views.setTextViewText(R.id.hijri, moment.hijriText)
-
-      val showJamat = snapshot.showJamat && snapshot.hasJamatTimes
-      val day = snapshot.dayFor(moment.headline.at)
-      val prayers = day?.prayers?.filter { it.isPrayer }?.map { it.resolveJummah(now) } ?: emptyList()
-      val currentAt = snapshot.currentPrayer(now)?.at
-      val log = PrayerLogStore.read(context)
-
-      for (index in columnIds.indices) {
-        val prayer = prayers.getOrNull(index)
-        if (prayer == null) {
-          views.setViewVisibility(columnIds[index], View.GONE)
-          continue
-        }
-
-        val isCurrent = prayer.at == currentAt
-        views.setViewVisibility(columnIds[index], View.VISIBLE)
-        views.setInt(
-          columnIds[index],
-          "setBackgroundResource",
-          if (isCurrent) R.drawable.prayer_widget_plate else 0,
-        )
-        views.setTextViewText(columnLabelIds[index], prayer.displayLabel)
-        views.setTextViewText(
-          columnTimeIds[index],
-          PrayerFormat.time(prayer.printedAt(showJamat)),
-        )
-
-        val status = day?.let { PrayerLogStore.statusOf(log, it.date, prayer.kind) }
-        views.setViewVisibility(
-          columnCheckIds[index],
-          if (status == PrayerLogStore.STATUS_PRAYED) View.VISIBLE else View.GONE,
-        )
-        views.setFloat(
-          columnIds[index],
-          "setAlpha",
-          if (status == PrayerLogStore.STATUS_SKIPPED) SKIPPED_ALPHA else 1f,
-        )
-
-        val jamat = prayer.jamat
-        if (showJamat && jamat != null) {
-          views.setTextViewText(columnJamatIds[index], PrayerFormat.time(jamat))
-          views.setViewVisibility(columnJamatIds[index], View.VISIBLE)
-        } else {
-          views.setViewVisibility(columnJamatIds[index], View.GONE)
-        }
-      }
-
-      views.setImageViewResource(R.id.footer_icon, PrayerIcons.drawable(moment.headline.kind))
-      views.setTextViewText(
-        R.id.footer_label,
-        if (moment.isNow) "${moment.headline.label} nå · ${moment.next.label}" else moment.next.label,
-      )
-      setCountdown(views, R.id.countdown, moment.next.at, now)
-      views.setViewVisibility(R.id.footer_jamat, if (showJamat) View.VISIBLE else View.GONE)
-      return views
-    }
-
-    private fun statusOf(
-      context: Context,
-      snapshot: PrayerSnapshot,
-      prayer: PrayerEntry,
-    ): String? {
-      if (!prayer.isPrayer) return null
-      val day = snapshot.dayFor(prayer.at) ?: return null
-      if (day.prayers.none { it.kind == prayer.kind && it.at == prayer.at }) return null
-      return PrayerLogStore.statusOf(context, day.date, prayer.kind)
-    }
-
-    private fun setCountdown(views: RemoteViews, viewId: Int, target: Long, now: Long) {
-      val base = SystemClock.elapsedRealtime() + (target - now)
-      views.setChronometer(viewId, base, "om %s", true)
-      views.setChronometerCountDown(viewId, true)
-    }
-
-    private fun openAppIntent(context: Context): PendingIntent {
-      val intent = Intent(Intent.ACTION_VIEW, Uri.parse("bonnetid://"))
-        .setPackage(context.packageName)
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-      return PendingIntent.getActivity(context, 0, intent, immutableFlags())
-    }
-
-    private fun refreshIntent(context: Context): PendingIntent {
-      val intent = Intent(context, PrayerAppWidget::class.java).setAction(ACTION_REFRESH)
-      return PendingIntent.getBroadcast(context, 1, intent, immutableFlags())
-    }
-
-    private fun immutableFlags(): Int {
-      return PendingIntent.FLAG_UPDATE_CURRENT or
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-    }
-
-    private fun alarmManager(context: Context): AlarmManager? {
-      return context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
-    }
+    private fun refreshIntent(context: Context) =
+      WidgetChrome.refresh(context, PrayerAppWidget::class.java, ACTION_REFRESH, 1)
 
     private fun scheduleNextUpdate(context: Context) {
-      val alarms = alarmManager(context) ?: return
       val now = System.currentTimeMillis()
-      val target = nextBoundary(context, now)
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        alarms.setAndAllowWhileIdle(AlarmManager.RTC, target, refreshIntent(context))
-      } else {
-        alarms.setWindow(AlarmManager.RTC, target, ALARM_WINDOW_MS, refreshIntent(context))
-      }
-    }
-
-    private fun nextBoundary(context: Context, now: Long): Long {
-      val snapshot = PrayerSnapshot.load(context) ?: return now + FALLBACK_UPDATE_MS
-      val candidates = mutableListOf<Long>()
-      snapshot.allPrayers.forEach { prayer ->
-        candidates.add(prayer.at)
-        prayer.end?.let { candidates.add(it) }
-        prayer.jummahEnd?.let { candidates.add(it) }
-      }
-      candidates.add(PrayerSnapshot.startOfNextDay(now))
-      val next = candidates.filter { it > now + 1000 }.minOrNull()
-      return next ?: (now + FALLBACK_UPDATE_MS)
+      WidgetChrome.schedule(context, refreshIntent(context), WidgetChrome.nextBoundary(context, now))
     }
   }
 }

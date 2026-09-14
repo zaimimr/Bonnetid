@@ -1,3 +1,4 @@
 <resources>
   <dimen name="prayer_widget_radius">@android:dimen/system_app_widget_background_radius</dimen>
+  <dimen name="prayer_widget_inner_radius">@android:dimen/system_app_widget_inner_radius</dimen>
 </resources>

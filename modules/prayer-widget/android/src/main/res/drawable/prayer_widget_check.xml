@@ -4,6 +4,6 @@
   android:viewportWidth="24"
   android:viewportHeight="24">
   <path
-    android:fillColor="@color/prayer_widget_brand"
+    android:fillColor="#FFFFFFFF"
     android:pathData="M9.6,17.4 L4.2,12 L6.1,10.1 L9.6,13.6 L17.9,5.3 L19.8,7.2 Z" />
 </vector>

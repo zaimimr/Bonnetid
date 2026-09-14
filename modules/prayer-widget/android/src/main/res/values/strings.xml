@@ -1,6 +1,8 @@
 <resources>
-  <string name="prayer_widget_label">Bønnetider</string>
-  <string name="prayer_widget_description">Neste bønn og dagens tider for stedet ditt.</string>
+  <string name="prayer_widget_label">Neste bønn</string>
+  <string name="prayer_widget_description">Tiden for neste bønn, med nedtelling.</string>
+  <string name="prayer_day_widget_label">Dagens bønnetider</string>
+  <string name="prayer_day_widget_description">Alle fem bønnene i dag, med den som pågår markert.</string>
   <string name="prayer_widget_empty_title">Åpne Bønnetid</string>
   <string name="prayer_widget_empty_body">Tidene vises her så snart appen har hentet dem for stedet ditt.</string>
   <string name="prayer_widget_prayed">Bedt</string>
