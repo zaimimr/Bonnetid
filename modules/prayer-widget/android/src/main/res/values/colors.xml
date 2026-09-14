@@ -9,4 +9,14 @@
   <color name="prayer_widget_hairline">#FFDDE4E0</color>
   <color name="prayer_widget_track">#FFEDF1EF</color>
   <color name="prayer_widget_track_marker">#FFC3CEC8</color>
+
+  <color name="prayer_widget_brand_surface">#FF0C6B52</color>
+  <color name="prayer_widget_on_brand">#FFFFFFFF</color>
+  <color name="prayer_widget_on_brand_secondary">#FFDCEFE7</color>
+  <color name="prayer_widget_on_brand_muted">#FFC4E2D6</color>
+  <color name="prayer_widget_on_brand_track">#40FFFFFF</color>
+
+  <color name="prayer_widget_plate_fill">#FF0C6B52</color>
+  <color name="prayer_widget_on_plate">#FFFFFFFF</color>
+  <color name="prayer_widget_on_plate_muted">#FFC4E2D6</color>
 </resources>

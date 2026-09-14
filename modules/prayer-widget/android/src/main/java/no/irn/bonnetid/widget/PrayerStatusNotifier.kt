@@ -129,6 +129,7 @@ object PrayerStatusNotifier {
     PrayerLogStore.mark(context, date, kind, status)
     clear(context)
     PrayerAppWidget.updateAll(context)
+    PrayerDayWidget.updateAll(context)
   }
 
   private fun clear(context: Context) {

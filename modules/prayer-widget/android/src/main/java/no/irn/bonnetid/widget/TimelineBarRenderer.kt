@@ -34,15 +34,16 @@ object TimelineBarRenderer {
     markerAt: Long?,
     widthPx: Int,
     heightPx: Int,
+    compact: Boolean = false,
   ): Bitmap? {
     if (widthPx <= 0 || heightPx <= 0) return null
 
     val density = context.resources.displayMetrics.density
-    val glyphBand = GLYPH_BAND_DP * density
+    val glyphBand = (if (compact) 0f else GLYPH_BAND_DP) * density
     val glyphSize = GLYPH_SIZE_DP * density
     val glyphSlot = GLYPH_SLOT_DP * density
     val barHeight = BAR_HEIGHT_DP * density
-    val axisBand = AXIS_BAND_DP * density
+    val axisBand = (if (compact) 0f else AXIS_BAND_DP) * density
     val markerOverhang = MARKER_OVERHANG_DP * density
     val knobRing = KNOB_RING_DP * density
 
@@ -57,7 +58,7 @@ object TimelineBarRenderer {
     val surface = color(context, R.color.prayer_widget_surface)
 
     val width = widthPx.toFloat()
-    val barTop = glyphBand + 2f * density
+    val barTop = if (compact) (heightPx - barHeight) / 2f else glyphBand + 2f * density
     val barBottom = barTop + barHeight
     val barCentre = barTop + barHeight / 2f
     val axisCentre = barBottom + 4f * density + axisBand / 2f
@@ -99,6 +100,8 @@ object TimelineBarRenderer {
     paint.color = brand
     canvas.drawCircle(knobX, barCentre, knobRadius, paint)
 
+    if (compact) return bitmap
+
     val glyphs = DayTimeline.placeable(
       timeline.marks,
       minGap = if (width > 0) (glyphSlot / width).toDouble() else 1.0,
@@ -131,8 +134,9 @@ object TimelineBarRenderer {
     return bitmap
   }
 
-  fun heightPx(context: Context): Int {
+  fun heightPx(context: Context, compact: Boolean = false): Int {
     val density = context.resources.displayMetrics.density
+    if (compact) return ((BAR_HEIGHT_DP + 8f) * density).toInt()
     return ((GLYPH_BAND_DP + BAR_HEIGHT_DP + AXIS_BAND_DP + 8f) * density).toInt()
   }
 

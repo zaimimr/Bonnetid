@@ -20,6 +20,7 @@ class PrayerWidgetModule : Module() {
         .putString(SNAPSHOT_KEY, json)
         .apply()
       PrayerAppWidget.updateAll(context)
+      PrayerDayWidget.updateAll(context)
       PrayerTimelineWidget.updateAll(context)
       PrayerStatusNotifier.sync(context)
     }
@@ -38,6 +39,7 @@ class PrayerWidgetModule : Module() {
         .putString(PRAYER_LOG_KEY, json)
         .apply()
       PrayerAppWidget.updateAll(context)
+      PrayerDayWidget.updateAll(context)
       PrayerTimelineWidget.updateAll(context)
       PrayerStatusNotifier.refreshPosted(context)
     }
