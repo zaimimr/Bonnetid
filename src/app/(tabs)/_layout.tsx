@@ -1,7 +1,9 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/components/ui';
+import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 import { useTheme } from '@/theme';
+import { useOnboardingDone, useSettingsHydrated } from '@/store/settings';
 
 const MAX_TAB_FONT_SCALE = 1.15;
 
@@ -21,6 +23,10 @@ function TabLabel({ title, color }: { title: string; color: string }) {
 
 export default function TabsLayout() {
   const theme = useTheme();
+  const hydrated = useSettingsHydrated();
+  const onboardingDone = useOnboardingDone();
+
+  if (hydrated && !onboardingDone) return <OnboardingFlow />;
 
   return (
     <Tabs

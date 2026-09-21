@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -77,6 +78,8 @@ type SettingsState = {
   voluntaryFasts: Record<VoluntaryFastKind, boolean>;
   launchCount: number;
   reviewRequested: boolean;
+  onboardingDone: boolean;
+  completeOnboarding: () => void;
   registerLaunch: () => void;
   markReviewRequested: () => void;
   setLocation: (location: SavedLocation) => void;
@@ -147,6 +150,8 @@ export const useSettings = create<SettingsState>()(
       voluntaryFasts: NO_VOLUNTARY_FASTS,
       launchCount: 0,
       reviewRequested: false,
+      onboardingDone: false,
+      completeOnboarding: () => set({ onboardingDone: true }),
       registerLaunch: () => set((state) => ({ launchCount: state.launchCount + 1 })),
       markReviewRequested: () => set({ reviewRequested: true }),
       setLocation: (location) =>
@@ -191,10 +196,11 @@ export const useSettings = create<SettingsState>()(
     {
       name: 'bonnetid-settings',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 3,
+      version: 4,
       migrate: (persisted) => {
         const state = persisted as Partial<SettingsState> | undefined;
         if (!state) return persisted as SettingsState;
+        state.onboardingDone = state.onboardingDone ?? true;
         if (state.location && typeof (state.location as { iso?: unknown }).iso !== 'string') {
           state.location = null;
         }
@@ -247,4 +253,20 @@ export function usePrayerTrackerEnabled(): boolean {
 
 export function useHasChosenLocation(): boolean {
   return useSettings((state) => state.location) != null;
+}
+
+export function useOnboardingDone(): boolean {
+  return useSettings((state) => state.onboardingDone);
+}
+
+export function useSettingsHydrated(): boolean {
+  const [hydrated, setHydrated] = useState(() => useSettings.persist.hasHydrated());
+
+  useEffect(() => {
+    const unsubscribe = useSettings.persist.onFinishHydration(() => setHydrated(true));
+    if (useSettings.persist.hasHydrated()) setHydrated(true);
+    return unsubscribe;
+  }, []);
+
+  return hydrated;
 }
