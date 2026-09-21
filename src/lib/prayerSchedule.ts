@@ -3,7 +3,7 @@ import type { AsrMethodPreference } from '@/store/settings';
 import { jummahSlotFor, jummahSlotIsOpen } from './jummah';
 import {
   addMinutesToTime,
-  formatLocalClock,
+  formatZonedClock,
   osloTimeToLocalClock,
   wallClockToDate,
   type PrayerTimeZone,
@@ -68,7 +68,7 @@ export function buildDaySchedule(
       return {
         name: entry.name,
         label: PRAYER_LABELS[entry.name],
-        time: formatLocalClock(date),
+        time: formatZonedClock(date, zone),
         date,
         isPrayer: entry.isPrayer,
         end: null as PrayerWindowEnd | null,

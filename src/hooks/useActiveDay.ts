@@ -1,4 +1,5 @@
-import { isoDateKey, osloDateKey, osloDayKey, todayKey } from '@/lib/time';
+import { zonedDateKey, zonedDayKey, type PrayerTimeZone } from '@/lib/time';
+import { zoneFor } from '@/hooks/usePrayerMonth';
 import { useActiveLocation } from '@/store/settings';
 
 export type ActiveDayKeys = {
@@ -6,13 +7,11 @@ export type ActiveDayKeys = {
   isoDate: string;
 };
 
-export function activeDayKeys(now: Date, calculated: boolean): ActiveDayKeys {
-  return calculated
-    ? { dayKey: todayKey(now), isoDate: isoDateKey(now) }
-    : { dayKey: osloDayKey(now), isoDate: osloDateKey(now) };
+export function activeDayKeys(now: Date, zone: PrayerTimeZone): ActiveDayKeys {
+  return { dayKey: zonedDayKey(now, zone), isoDate: zonedDateKey(now, zone) };
 }
 
 export function useActiveDayKeys(now: Date): ActiveDayKeys {
   const location = useActiveLocation();
-  return activeDayKeys(now, location.mode === 'calculated');
+  return activeDayKeys(now, zoneFor(location));
 }

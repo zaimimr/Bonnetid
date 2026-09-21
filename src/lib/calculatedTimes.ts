@@ -11,7 +11,7 @@ import {
 import type { HijriDay, PrayerDay } from '@/api/types';
 import { CALCULATED_LOCATION_ISO } from '@/store/settings';
 import { DEFAULT_CALCULATION_METHOD, type CalculationMethodKey } from './calculationMethods';
-import { formatLocalClock, isoDateKey, todayKey } from './time';
+import { formatZonedClock, isoDateKey, todayKey, type PrayerTimeZone } from './time';
 
 const HALF = 0.5;
 
@@ -35,6 +35,8 @@ export type CalculatedDayInput = {
   date: Date;
   method: CalculationMethodKey;
   hijriDate: string;
+  /** The clock the place itself keeps, so the times stay right on a phone set elsewhere. */
+  timeZone: PrayerTimeZone;
 };
 
 function parametersFor(method: CalculationMethodKey, coordinates: Coordinates) {
@@ -45,9 +47,11 @@ function parametersFor(method: CalculationMethodKey, coordinates: Coordinates) {
   return parameters;
 }
 
-function clock(instant: Date | null | undefined): string | null {
-  if (!instant || Number.isNaN(instant.getTime())) return null;
-  return formatLocalClock(instant);
+function clockIn(zone: PrayerTimeZone) {
+  return (instant: Date | null | undefined): string | null => {
+    if (!instant || Number.isNaN(instant.getTime())) return null;
+    return formatZonedClock(instant, zone);
+  };
 }
 
 function midpoint(from: Date, to: Date): Date {
@@ -66,6 +70,7 @@ export function calculatePrayerDay(input: CalculatedDayInput): PrayerDay {
 
   const night = new SunnahTimes(standard);
   const wusta = midpoint(standard.dhuhr, standard.sunset);
+  const clock = clockIn(input.timeZone);
 
   return {
     location: CALCULATED_LOCATION_ISO,
@@ -96,6 +101,7 @@ export type CalculatedMonthInput = {
   month: number;
   method: CalculationMethodKey;
   hijriDays: HijriDay[];
+  timeZone: PrayerTimeZone;
 };
 
 function hijriLookup(hijriDays: HijriDay[]): Map<string, string> {
@@ -116,6 +122,7 @@ export function calculatePrayerMonth(input: CalculatedMonthInput): PrayerDay[] {
       date,
       method: input.method,
       hijriDate: hijriByDate.get(isoDateKey(date)) ?? '',
+      timeZone: input.timeZone,
     });
   });
 }
