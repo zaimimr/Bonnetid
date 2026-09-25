@@ -4,6 +4,7 @@ import { QueryCache, QueryClient } from '@tanstack/react-query';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { Stack, useNavigationContainerRef } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useTheme } from '@/theme';
@@ -18,6 +19,7 @@ import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 import { useWidgetSync } from '@/hooks/useWidgetSync';
 import { useNow } from '@/hooks/useNow';
 import { usePrayerLogSync } from '@/hooks/usePrayerLogSync';
+import { useSettingsHydrated } from '@/store/settings';
 
 initTelemetry();
 
@@ -50,10 +52,12 @@ const persistOptions = {
 };
 
 configureNotificationHandler();
+void SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const theme = useTheme();
   const now = useNow(60_000);
+  const hydrated = useSettingsHydrated();
   useAutoLocation();
   useTravelMode();
   useNotificationScheduler();
@@ -62,6 +66,11 @@ function RootNavigator() {
   useReviewPrompt();
   useWidgetSync(now);
   usePrayerLogSync(now);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    SplashScreen.hideAsync().catch(() => {});
+  }, [hydrated]);
 
   return (
     <>

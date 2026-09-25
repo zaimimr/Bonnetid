@@ -48,10 +48,12 @@ export function useAutoLocation() {
   const { data: locations } = useLocations();
   const setLocation = useSettings((state) => state.setLocation);
   const mode = useSettings((state) => state.location)?.mode;
+  const onboardingDone = useSettings((state) => state.onboardingDone);
   const hasRun = useRef(false);
 
   useEffect(() => {
     if (hasRun.current || !locations) return;
+    if (!onboardingDone) return;
     if (mode === 'calculated') return;
     hasRun.current = true;
 
@@ -63,5 +65,5 @@ export function useAutoLocation() {
         }
       })
       .catch((error) => trackError(error, 'auto-location'));
-  }, [locations, mode, setLocation]);
+  }, [locations, mode, onboardingDone, setLocation]);
 }
