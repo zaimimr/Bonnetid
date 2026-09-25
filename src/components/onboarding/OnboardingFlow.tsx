@@ -1,10 +1,16 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Platform, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText, Button, Card, Screen } from '@/components/ui';
+import Animated, { FadeIn, FadeInDown, ReduceMotion } from 'react-native-reanimated';
+import { AppText, Button, Screen } from '@/components/ui';
+import { PrayerIcon } from '@/components/prayer/PrayerIcon';
 import { useLocations } from '@/api/queries';
 import { detectNearestLocation } from '@/hooks/useAutoLocation';
+import { useNow } from '@/hooks/useNow';
+import { usePrayerDay } from '@/hooks/usePrayerDay';
+import { formatDurationShort } from '@/lib/time';
 import { resolvePlace, requestCoords } from '@/hooks/useTravelDetection';
 import { isInsideNorwayBounds } from '@/lib/travelMode';
 import { notificationsSupported, requestNotificationPermission } from '@/lib/notifications';
@@ -14,13 +20,20 @@ import { radius, spacing } from '@/theme/tokens';
 import {
   DEFAULT_LOCATION,
   calculatedLocation,
+  useActiveLocation,
   useSettings,
   type SavedLocation,
 } from '@/store/settings';
 
-type StepId = 'welcome' | 'location' | 'mosque' | 'notifications' | 'tracker' | 'done';
+type StepId = 'welcome' | 'location' | 'mosque' | 'notifications' | 'tracker' | 'ready';
 
-const STEP_ORDER: StepId[] = ['welcome', 'location', 'mosque', 'notifications', 'tracker', 'done'];
+const STEP_ORDER: StepId[] = ['welcome', 'location', 'mosque', 'notifications', 'tracker', 'ready'];
+
+const LINE_ART = require('../../../assets/images/splash-icon.png');
+const LINE_ART_RATIO = 1525 / 1537;
+
+const enter = (delay: number) =>
+  FadeInDown.duration(250).delay(delay).reduceMotion(ReduceMotion.System);
 
 export function OnboardingFlow() {
   const theme = useTheme();
@@ -53,32 +66,50 @@ export function OnboardingFlow() {
     });
   }, [completeOnboarding, location?.mode, mosque, notificationsEnabled, trackerEnabled]);
 
+  const setupSteps: StepId[] = steps.filter((id) => id !== 'welcome' && id !== 'ready');
+  const setupPosition = setupSteps.indexOf(step);
+
   return (
     <Screen edges={['top', 'bottom']}>
       <View style={{ flex: 1, gap: spacing.xl, paddingTop: spacing.xl }}>
-        <View style={{ flexDirection: 'row', gap: spacing.xs }}>
-          {steps.map((id, position) => (
-            <View
-              key={id}
-              style={{
-                flex: 1,
-                height: 4,
-                borderRadius: radius.full,
-                backgroundColor:
-                  position <= index ? theme.colors.primary : theme.colors.surfaceSunken,
-              }}
-            />
-          ))}
-        </View>
+        {setupPosition >= 0 && (
+          <View style={{ flexDirection: 'row', gap: spacing.xs }}>
+            {setupSteps.map((id, position) => (
+              <View
+                key={id}
+                style={{
+                  flex: 1,
+                  height: 4,
+                  borderRadius: radius.full,
+                  backgroundColor:
+                    position <= setupPosition ? theme.colors.primary : theme.colors.surfaceSunken,
+                }}
+              />
+            ))}
+          </View>
+        )}
 
         {step === 'welcome' && <WelcomeStep onNext={advance} />}
         {step === 'location' && <LocationStep onNext={advance} />}
         {step === 'mosque' && <MosqueStep onNext={advance} />}
         {step === 'notifications' && <NotificationStep onNext={advance} />}
         {step === 'tracker' && <TrackerStep onNext={advance} />}
-        {step === 'done' && <DoneStep onFinish={finish} />}
+        {step === 'ready' && <ReadyStep onFinish={finish} />}
       </View>
     </Screen>
+  );
+}
+
+function LineArt() {
+  const theme = useTheme();
+  return (
+    <Image
+      source={LINE_ART}
+      tintColor={theme.colors.primary}
+      contentFit="contain"
+      accessible={false}
+      style={{ height: '78%', maxWidth: 260, aspectRatio: LINE_ART_RATIO }}
+    />
   );
 }
 
@@ -163,32 +194,55 @@ function StatusLine({ tone, text }: { tone: 'success' | 'textMuted'; text: strin
 
 function WelcomeStep({ onNext }: { onNext: () => void }) {
   const theme = useTheme();
-  const points: { icon: keyof typeof Ionicons.glyphMap; text: string }[] = [
-    { icon: 'location-outline', text: 'Bønnetider for kommunen din, hele året' },
-    { icon: 'notifications-outline', text: 'Varsel med adhan når bønnetiden kommer' },
-    { icon: 'business-outline', text: 'Jamat- og fredagstider fra moskeen din' },
-  ];
 
   return (
-    <StepShell
-      icon="moon-outline"
-      title="Velkommen til Bønnetid"
-      body="Bønnetider for hele Norge, fra Islamsk Råd Norge. Vi setter opp appen på et halvt minutt."
-      primaryLabel="Kom i gang"
-      onPrimary={onNext}>
-      <Card padding="md" rounded="xl" style={{ gap: spacing.md }}>
-        {points.map((point) => (
-          <View
-            key={point.text}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-            <Ionicons name={point.icon} size={20} color={theme.colors.primary} />
-            <AppText size="sm" style={{ flex: 1 }}>
-              {point.text}
-            </AppText>
-          </View>
-        ))}
-      </Card>
-    </StepShell>
+    <View style={{ flex: 1 }}>
+      <Animated.View
+        entering={FadeIn.duration(250).reduceMotion(ReduceMotion.System)}
+        style={{ flex: 1, minHeight: 140, alignItems: 'center', justifyContent: 'center' }}>
+        <LineArt />
+      </Animated.View>
+
+      <Animated.View entering={enter(80)} style={{ gap: spacing.sm }}>
+        <AppText size="lg" weight="semibold" color={theme.colors.primary}>
+          Assalamu alaikum
+        </AppText>
+        <AppText size="display" weight="bold" heading>
+          Velkommen til Bønnetid
+        </AppText>
+        <AppText size="md" tone="textSecondary" style={{ marginTop: spacing.xs }}>
+          Bønnetidene for kommunen din, varsel når det er tid, og jamat-tidene fra moskeen din.
+          Oppsettet tar et halvt minutt.
+        </AppText>
+      </Animated.View>
+
+      <Animated.View
+        entering={enter(160)}
+        style={{ gap: spacing.lg, paddingTop: spacing.xxl, paddingBottom: spacing.lg }}>
+        <Button label="Kom i gang" onPress={onNext} size="lg" fullWidth />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: spacing.sm,
+          }}>
+          <Image
+            source={
+              theme.scheme === 'dark'
+                ? require('../../../assets/images/irn-logo-dark.png')
+                : require('../../../assets/images/irn-logo.png')
+            }
+            style={{ width: 16, height: 18 }}
+            contentFit="contain"
+            accessible={false}
+          />
+          <AppText size="sm" tone="textSecondary">
+            Bønnetider fra Islamsk Råd Norge
+          </AppText>
+        </View>
+      </Animated.View>
+    </View>
   );
 }
 
@@ -362,40 +416,74 @@ function TrackerStep({ onNext }: { onNext: () => void }) {
   );
 }
 
-function DoneStep({ onFinish }: { onFinish: () => void }) {
-  const location = useSettings((state) => state.location);
+function ReadyStep({ onFinish }: { onFinish: () => void }) {
+  const theme = useTheme();
+  const now = useNow(30_000);
+  const location = useActiveLocation();
   const mosque = useSettings((state) => state.mosque);
-  const notificationsEnabled = useSettings((state) => state.notificationsEnabled);
-  const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled);
+  const { nextPrayer } = usePrayerDay(now);
+  const next = nextPrayer?.next;
 
-  const rows: { label: string; value: string }[] = [
-    { label: 'Sted', value: location?.name ?? DEFAULT_LOCATION.name },
-    { label: 'Moské', value: mosque?.name ?? 'Ikke valgt' },
-    { label: 'Varsler', value: notificationsEnabled ? 'På' : 'Av' },
-    { label: 'Bønnesporing', value: trackerEnabled ? 'På' : 'Av' },
-  ];
+  const body = mosque
+    ? `Bønnetidene for ${location.name} er klare, med jamat-tidene fra ${mosque.name}.`
+    : `Bønnetidene for ${location.name} er klare.`;
 
   return (
-    <StepShell
-      icon="checkmark-circle-outline"
-      title="Alt klart"
-      body="Du kan endre alt dette når som helst under Mer og Innstillinger."
-      primaryLabel="Åpne Bønnetid"
-      onPrimary={onFinish}>
-      <Card padding="md" rounded="xl" style={{ gap: spacing.sm }}>
-        {rows.map((row) => (
-          <View
-            key={row.label}
-            style={{ flexDirection: 'row', justifyContent: 'space-between', gap: spacing.md }}>
-            <AppText size="sm" tone="textMuted">
-              {row.label}
+    <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, minHeight: 180, alignItems: 'center', justifyContent: 'center' }}>
+        {next ? (
+          <Animated.View
+            entering={FadeIn.duration(250).reduceMotion(ReduceMotion.System)}
+            accessible
+            accessibilityLabel={`Neste bønn er ${next.label} klokken ${next.time}`}
+            style={{ alignItems: 'center', gap: spacing.xs }}>
+            <View
+              style={{
+                width: 88,
+                height: 88,
+                borderRadius: radius.full,
+                backgroundColor: theme.colors.primarySoft,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: spacing.md,
+              }}>
+              <PrayerIcon name={next.name} size={40} color={theme.colors.primary} />
+            </View>
+            <AppText size="sm" weight="medium" tone="textSecondary">
+              {nextPrayer.isTomorrow ? 'Første bønn i morgen' : 'Neste bønn'}
             </AppText>
-            <AppText size="sm" weight="medium" style={{ flex: 1 }} align="right" numberOfLines={1}>
-              {row.value}
+            <AppText size="display" weight="bold" heading>
+              {next.label}
             </AppText>
-          </View>
-        ))}
-      </Card>
-    </StepShell>
+            <AppText size="lg" tone="textSecondary" tabular>
+              {`kl. ${next.time} · om ${formatDurationShort(next.date.getTime() - now.getTime())}`}
+            </AppText>
+          </Animated.View>
+        ) : (
+          <LineArt />
+        )}
+      </View>
+
+      <Animated.View entering={enter(80)} style={{ gap: spacing.sm }}>
+        <AppText size="display" weight="bold" heading>
+          Klar for bruk
+        </AppText>
+        <AppText size="md" tone="textSecondary">
+          {body}
+        </AppText>
+        <AppText size="md" weight="medium" color={theme.colors.primary} style={{ marginTop: spacing.xs }}>
+          Må Allah ta imot bønnene dine.
+        </AppText>
+      </Animated.View>
+
+      <Animated.View
+        entering={enter(160)}
+        style={{ gap: spacing.md, paddingTop: spacing.xxl, paddingBottom: spacing.lg }}>
+        <Button label="Åpne Bønnetid" onPress={onFinish} size="lg" fullWidth />
+        <AppText size="sm" tone="textSecondary" align="center">
+          Alt kan endres senere under Mer.
+        </AppText>
+      </Animated.View>
+    </View>
   );
 }
