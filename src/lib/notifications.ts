@@ -10,6 +10,7 @@ import {
   type NotificationSoundOption,
 } from './notificationSounds';
 import { track } from './telemetry';
+import { setNativeNotificationQueue } from '../../modules/prayer-widget';
 
 const MAX_SCHEDULED = Platform.OS === 'ios' ? 50 : 150;
 const REMINDER_HORIZON_MS = 48 * 60 * 60 * 1000;
@@ -263,9 +264,23 @@ async function runSync(plan: PrayerNotificationPlan): Promise<number> {
     });
   }
 
-  const upcoming = planned
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
-    .slice(0, MAX_SCHEDULED);
+  planned.sort((a, b) => a.date.getTime() - b.date.getTime());
+  setNativeNotificationQueue(
+    planned
+      .filter((item) => item.identifier.startsWith(PRAYER_PREFIX))
+      .map((item) => ({
+        identifier: item.identifier,
+        title: item.title,
+        body: item.body,
+        at: item.date.getTime() / 1000,
+        sound: typeof item.sound === 'string' ? item.sound : null,
+        category: item.category ?? null,
+        isoDate: item.isoDate,
+        prayer: item.prayer,
+      })),
+  );
+
+  const upcoming = planned.slice(0, MAX_SCHEDULED);
   const wanted = new Map(upcoming.map((item) => [item.identifier, item]));
 
   const existing = await Notifications.getAllScheduledNotificationsAsync();
@@ -307,6 +322,7 @@ async function runSync(plan: PrayerNotificationPlan): Promise<number> {
 export function cancelPrayerNotifications(): Promise<void> {
   if (!notificationsSupported) return Promise.resolve();
   return serialize(async () => {
+    setNativeNotificationQueue([]);
     const Notifications = await getNotifications();
     const existing = await Notifications.getAllScheduledNotificationsAsync();
     for (const request of existing) {

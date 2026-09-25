@@ -52,6 +52,10 @@ public class PrayerWidgetModule: Module {
       WidgetCenter.shared.reloadAllTimelines()
     }
 
+    Function("setNotificationQueue") { (json: String) in
+      PrayerBackgroundRefresh.setQueue(json)
+    }
+
     Function("hasDynamicIsland") { () -> Bool in
       Self.hasDynamicIsland()
     }
@@ -72,7 +76,7 @@ public class PrayerWidgetModule: Module {
       }
 
       // The window end doubles as the stale date, so the view flips its copy to "tiden er over"
-      // on its own. PrayerActivityRefresh ends it once iOS grants the app background time.
+      // on its own. PrayerBackgroundRefresh ends it once iOS grants the app background time.
       let content = ActivityContent(
         state: state.toContentState(),
         staleDate: Date(timeIntervalSince1970: state.windowEnd),
@@ -82,7 +86,7 @@ public class PrayerWidgetModule: Module {
       if let running = Self.runningActivity() {
         await running.update(content)
         ActivityStore.current = running
-        PrayerActivityRefresh.schedule()
+        PrayerBackgroundRefresh.schedule()
         return
       }
 
@@ -91,7 +95,7 @@ public class PrayerWidgetModule: Module {
         content: content,
         pushType: nil
       )
-      PrayerActivityRefresh.schedule()
+      PrayerBackgroundRefresh.schedule()
     }
 
     AsyncFunction("endActivity") {
@@ -100,7 +104,7 @@ public class PrayerWidgetModule: Module {
         await activity.end(nil, dismissalPolicy: .immediate)
       }
       ActivityStore.current = nil
-      PrayerActivityRefresh.schedule()
+      PrayerBackgroundRefresh.schedule()
     }
   }
 

@@ -27,6 +27,19 @@ type PrayerWidgetNativeModule = {
   endActivity: () => Promise<void>;
   getPrayerLog: () => string | null;
   setPrayerLog: (json: string) => void;
+  setNotificationQueue?: (json: string) => void;
+};
+
+export type QueuedNotification = {
+  identifier: string;
+  title: string;
+  body: string;
+  /** Epoch seconds. */
+  at: number;
+  sound: string | null;
+  category: string | null;
+  isoDate: string;
+  prayer: string;
 };
 
 /** Null in Expo Go and on web: every call below turns into a no-op. */
@@ -69,6 +82,14 @@ export function readNativePrayerLog(): string | null {
 export function writeNativePrayerLog(log: unknown) {
   try {
     native?.setPrayerLog(JSON.stringify(log));
+  } catch {
+    return;
+  }
+}
+
+export function setNativeNotificationQueue(queue: QueuedNotification[]) {
+  try {
+    native?.setNotificationQueue?.(JSON.stringify(queue));
   } catch {
     return;
   }

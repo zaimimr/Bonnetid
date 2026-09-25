@@ -29,7 +29,7 @@
           "fetch"
         ],
         "BGTaskSchedulerPermittedIdentifiers": [
-          "no.irn.bonnetid.activity-refresh"
+          "no.irn.bonnetid.refresh"
         ],
         "LSApplicationQueriesSchemes": [
           "comgooglemaps",
