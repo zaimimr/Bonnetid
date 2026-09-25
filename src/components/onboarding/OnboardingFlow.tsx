@@ -288,7 +288,7 @@ function LocationStep({ onNext }: { onNext: () => void }) {
     <StepShell
       icon="location-outline"
       title="Hvor er du?"
-      body="Appen finner kommunen din og henter bønnetidene derfra. Er du utenfor Norge, regnes tidene ut for stedet du er på."
+      body="Appen finner bønnetidene for din lokasjon."
       primaryLabel={chosen ? 'Fortsett' : 'Finn posisjonen min'}
       onPrimary={chosen ? onNext : detect}
       primaryLoading={busy}
