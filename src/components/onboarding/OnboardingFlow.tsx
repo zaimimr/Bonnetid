@@ -314,7 +314,7 @@ function LocationStep({ onNext }: { onNext: () => void }) {
     <StepShell
       icon="location-outline"
       title="Hvor er du?"
-      body="Appen finner bønnetidene for din lokasjon."
+      body="For å vise riktige bønnetider trenger appen å vite hvor du er. I Norge får du tidene fra Islamsk Råd Norge. I utlandet regner appen ut tidene for stedet du er på, med metoden som er vanlig i landet."
       primaryLabel={denied ? 'Åpne Innstillinger' : 'Finn posisjonen min'}
       onPrimary={denied ? () => Linking.openSettings() : detect}
       primaryLoading={busy || !locations}
