@@ -300,7 +300,8 @@ function currentJamat(row: MosqueEmbedRow): MosqueJamat | null {
 
 function toEmbeddedMosque(row: MosqueEmbedRow): Mosque {
   const jamat = currentJamat(row);
-  const jummah = mergeJummah(sortedJummah(row.mosque_jummah), jamat?.jummah ?? []);
+  const periodJummah = jamat?.jummah ?? [];
+  const jummah = periodJummah.length > 0 ? periodJummah : sortedJummah(row.mosque_jummah);
   return toMosque(row, row.location_postnumber ?? undefined, jamat, jummah);
 }
 
@@ -311,6 +312,7 @@ export async function fetchMosques(): Promise<Mosque[]> {
     .select(MOSQUE_EMBED_COLUMNS)
     .lte('mosque_jamatperiode.start_date', today)
     .gte('mosque_jamatperiode.end_date', today)
+    .is('mosque_jummah.jamat_id', null)
     .order('reg_navn');
   if (error) throw error;
 
@@ -325,6 +327,7 @@ export async function fetchMosque(orgNr: string): Promise<Mosque> {
     .eq('organisasjonsnummer', orgNr)
     .lte('mosque_jamatperiode.start_date', today)
     .gte('mosque_jamatperiode.end_date', today)
+    .is('mosque_jummah.jamat_id', null)
     .single();
   if (error) throw error;
 
