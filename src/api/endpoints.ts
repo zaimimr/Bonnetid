@@ -273,11 +273,11 @@ type JamatEmbedRow = JamatPeriodRow & { mosque_jummah: JummahRow[] };
 
 type MosqueEmbedRow = MosqueRow & {
   location_postnumber: PostRow | null;
-  mosque_jummah: JummahRow[];
+  mosque_jummah: (JummahRow & { jamat_id: number | null })[];
   mosque_jamatperiode: JamatEmbedRow[];
 };
 
-const MOSQUE_EMBED_COLUMNS = `${MOSQUE_COLUMNS}, location_postnumber(post_no, post_name, location_iso), mosque_jummah(id, mosque_id, jummah), mosque_jamatperiode(${JAMAT_COLUMNS}, mosque_jummah(id, mosque_id, jummah))`;
+const MOSQUE_EMBED_COLUMNS = `${MOSQUE_COLUMNS}, location_postnumber(post_no, post_name, location_iso), mosque_jummah(id, mosque_id, jummah, jamat_id), mosque_jamatperiode(${JAMAT_COLUMNS}, mosque_jummah(id, mosque_id, jummah))`;
 
 function mergeJummah(...lists: MosqueJummah[][]): MosqueJummah[] {
   const byTime = new Map<string, MosqueJummah>();
@@ -300,8 +300,10 @@ function currentJamat(row: MosqueEmbedRow): MosqueJamat | null {
 
 function toEmbeddedMosque(row: MosqueEmbedRow): Mosque {
   const jamat = currentJamat(row);
-  const periodJummah = jamat?.jummah ?? [];
-  const jummah = periodJummah.length > 0 ? periodJummah : sortedJummah(row.mosque_jummah);
+  const usesPeriods = row.mosque_jummah.some((entry) => entry.jamat_id != null);
+  const jummah = usesPeriods
+    ? (jamat?.jummah ?? [])
+    : sortedJummah(row.mosque_jummah);
   return toMosque(row, row.location_postnumber ?? undefined, jamat, jummah);
 }
 
@@ -312,7 +314,6 @@ export async function fetchMosques(): Promise<Mosque[]> {
     .select(MOSQUE_EMBED_COLUMNS)
     .lte('mosque_jamatperiode.start_date', today)
     .gte('mosque_jamatperiode.end_date', today)
-    .is('mosque_jummah.jamat_id', null)
     .order('reg_navn');
   if (error) throw error;
 
@@ -327,7 +328,6 @@ export async function fetchMosque(orgNr: string): Promise<Mosque> {
     .eq('organisasjonsnummer', orgNr)
     .lte('mosque_jamatperiode.start_date', today)
     .gte('mosque_jamatperiode.end_date', today)
-    .is('mosque_jummah.jamat_id', null)
     .single();
   if (error) throw error;
 
