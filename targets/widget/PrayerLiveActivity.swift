@@ -7,10 +7,12 @@ import WidgetKit
 /// reports `isStale` once the stale date - the end of the prayer's window - has passed, and
 /// re-renders the view when it does.
 ///
-/// That re-render is the only one the activity gets for free, so it is spent moving on to the
-/// next prayer rather than on a closing line. Only the app can push a third phase, which is why
-/// the successor keeps the card honest through one more window than the app managed to reach.
-/// Without a successor the stale phase still reads as the old prayer's window being over.
+/// That re-render is the only one the activity gets for free, so it is spent on the closing
+/// line, and the successor lets a later render carry the card one prayer further than the app
+/// managed to push. The successor only takes over once it has actually begun: Fajr's window
+/// closes at soloppgang and Dhuhr is hours away, so hopping at soloppgang would announce a
+/// prayer that has not started. Until then the card stays on the prayer still left unanswered
+/// and names the next one as a time, not as the one running now.
 private struct ActivityPhase {
   let isoDate: String
   let label: String
@@ -19,24 +21,30 @@ private struct ActivityPhase {
   let windowEnd: Date
   let windowOver: Bool
   let showMarkButtons: Bool
+  /// Set once this window is over and the next prayer is still ahead of us.
+  let upcoming: Successor?
 
   init(state: PrayerActivityAttributes.ContentState, isStale: Bool) {
-    let successor = isStale ? Successor(state: state) : nil
+    let now = Date()
+    let successor = Successor(state: state)
+    let successorStarted = successor.map { now >= $0.prayerAt } ?? false
 
-    if let successor {
+    if isStale, let successor, successorStarted {
       isoDate = successor.isoDate
       label = successor.label
       kind = successor.kind
       prayerAt = successor.prayerAt
       windowEnd = successor.windowEnd
-      windowOver = Date() >= successor.windowEnd
+      windowOver = now >= successor.windowEnd
+      upcoming = nil
     } else {
       isoDate = state.isoDate
       label = state.prayerLabel
       kind = state.prayerKind
       prayerAt = state.prayerAt
       windowEnd = state.windowEnd
-      windowOver = isStale || Date() >= state.windowEnd
+      windowOver = isStale || now >= state.windowEnd
+      upcoming = windowOver ? successor : nil
     }
 
     showMarkButtons = state.showMarkButtons ?? true
@@ -44,6 +52,10 @@ private struct ActivityPhase {
 
   var question: String { "Har du bedt \(label)?" }
   var statusLine: String { windowOver ? "\(label)-tiden er over" : "Går ut om" }
+  var upcomingLine: String? {
+    guard let upcoming else { return nil }
+    return "\(upcoming.label) \(PrayerFormat.time(upcoming.prayerAt))"
+  }
   var progress: ClosedRange<Date> { PrayerFormat.progressRange(from: prayerAt, to: windowEnd) }
   var countdown: ClosedRange<Date> { PrayerFormat.countdownRange(to: windowEnd) }
 }
@@ -120,6 +132,11 @@ struct PrayerLiveActivity: Widget {
                   .prayerTime(.caption)
                   .foregroundStyle(PrayerColor.inkSecondary)
                   .frame(maxWidth: 76, alignment: .trailing)
+              } else if let upcoming = phase.upcomingLine {
+                Text("Neste: \(upcoming)")
+                  .font(.caption)
+                  .foregroundStyle(PrayerColor.inkSecondary)
+                  .lineLimit(1)
               }
             }
 
@@ -226,6 +243,11 @@ private struct LockScreenActivityView: View {
           currentValueLabel: { EmptyView() }
         )
         .tint(PrayerColor.brand)
+      } else if let upcoming = phase.upcomingLine {
+        Text("Neste: \(upcoming)")
+          .font(.subheadline)
+          .foregroundStyle(PrayerColor.inkSecondary)
+          .lineLimit(1)
       }
 
       HStack(spacing: 5) {
