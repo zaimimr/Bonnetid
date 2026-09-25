@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Platform, ScrollView, View } from 'react-native';
+import { AppState, Linking, Platform, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import * as Location from 'expo-location';
@@ -293,13 +293,20 @@ function LocationStep({ onNext }: { onNext: () => void }) {
   useEffect(() => {
     if (!locations) return;
     let cancelled = false;
-    Location.getForegroundPermissionsAsync()
-      .then((permission) => {
-        if (!cancelled && permission.granted) return detect();
-      })
-      .catch((error) => trackError(error, 'onboarding-location'));
+    const detectIfGranted = () => {
+      Location.getForegroundPermissionsAsync()
+        .then((permission) => {
+          if (!cancelled && permission.granted) return detect();
+        })
+        .catch((error) => trackError(error, 'onboarding-location'));
+    };
+    detectIfGranted();
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') detectIfGranted();
+    });
     return () => {
       cancelled = true;
+      subscription.remove();
     };
   }, [locations, detect]);
 
@@ -308,15 +315,15 @@ function LocationStep({ onNext }: { onNext: () => void }) {
       icon="location-outline"
       title="Hvor er du?"
       body="Appen finner bønnetidene for din lokasjon."
-      primaryLabel="Finn posisjonen min"
-      onPrimary={detect}
+      primaryLabel={denied ? 'Åpne Innstillinger' : 'Finn posisjonen min'}
+      onPrimary={denied ? () => Linking.openSettings() : detect}
       primaryLoading={busy || !locations}
-      secondaryLabel="Hopp over"
-      onSecondary={onNext}>
+      secondaryLabel={denied ? `Fortsett med ${DEFAULT_LOCATION.name}` : undefined}
+      onSecondary={denied ? onNext : undefined}>
       {denied && (
         <StatusLine
           tone="textMuted"
-          text={`Fant ingen posisjon. Appen bruker ${DEFAULT_LOCATION.name} til du gir tilgang i telefonens innstillinger.`}
+          text={`Fant ingen posisjon. Gi Bønnetid tilgang til posisjon i Innstillinger, eller fortsett med ${DEFAULT_LOCATION.name} for nå.`}
         />
       )}
     </StepShell>
