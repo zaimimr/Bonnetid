@@ -126,6 +126,28 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="duas/index"
+          options={{
+            headerShown: true,
+            title: 'Duaer',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="duas/[id]"
+          options={{
+            headerShown: true,
+            title: 'Dua',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
           name="irn"
           options={{
             headerShown: true,

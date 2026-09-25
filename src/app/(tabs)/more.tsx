@@ -27,6 +27,13 @@ const MOSQUE_FEATURE: Feature = {
   description: 'Finn moskeer i nærheten, med kart og jamaat-tider',
 };
 
+const DUAS_FEATURE: Feature = {
+  href: '/duas',
+  icon: 'book-outline',
+  title: 'Duaer',
+  description: 'Kjente duaer fra Koranen og sunnah',
+};
+
 const SETTINGS_FEATURE: Feature = {
   href: '/settings',
   icon: 'settings-outline',
@@ -42,6 +49,7 @@ export default function MoreScreen() {
   const features = [
     ...(trackerEnabled ? [TRACKER_FEATURE] : []),
     ...(calculated ? [] : [MOSQUE_FEATURE]),
+    DUAS_FEATURE,
     SETTINGS_FEATURE,
   ];
 
