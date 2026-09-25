@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
@@ -317,6 +317,12 @@ function LocationStep({ onNext }: { onNext: () => void }) {
 function MosqueStep({ onNext }: { onNext: () => void }) {
   const router = useRouter();
   const mosque = useSettings((state) => state.mosque);
+  const [mosqueOnArrival] = useState(() => mosque?.orgNr ?? null);
+  const chosenOrgNr = mosque?.orgNr ?? null;
+
+  useEffect(() => {
+    if (chosenOrgNr != null && chosenOrgNr !== mosqueOnArrival) onNext();
+  }, [chosenOrgNr, mosqueOnArrival, onNext]);
 
   return (
     <StepShell
