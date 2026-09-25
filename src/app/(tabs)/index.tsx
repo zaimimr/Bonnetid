@@ -9,12 +9,14 @@ import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosquePresenceCard } from '@/components/mosque/MosquePresenceCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import { NightCard } from '@/components/season/NightCard';
+import { Ionicons } from '@expo/vector-icons';
 import {
   AppText,
   Badge,
   Card,
   EmptyState,
   ErrorState,
+  ListRow,
   Screen,
   SectionHeader,
   Skeleton,
@@ -27,7 +29,9 @@ import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { useRefresh } from '@/hooks/useRefresh';
 import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
+import { DUA_LINKS } from '@/lib/duas';
 import { isoDateIsFriday, parseDayKey } from '@/lib/time';
+import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { useActiveLocation, useActiveMosque, useUnreadAnnouncement } from '@/store/settings';
 
@@ -35,6 +39,7 @@ const UPCOMING_EVENT_COUNT = 3;
 
 export default function HomeScreen() {
   const router = useRouter();
+  const theme = useTheme();
   const now = useNow();
   const location = useActiveLocation();
   const calculated = location.mode === 'calculated';
@@ -167,6 +172,17 @@ export default function HomeScreen() {
               statusDate={todayIso}
               now={now}
             />
+            <Card padding="sm" rounded="xl" style={{ marginTop: spacing.md }}>
+              <ListRow
+                title="Duaer etter bønnen"
+                leading={<Ionicons name="book-outline" size={20} color={theme.colors.primary} />}
+                chevron
+                onPress={() =>
+                  router.push({ pathname: '/duas', params: { category: DUA_LINKS.afterSalah } })
+                }
+                style={{ paddingHorizontal: spacing.md }}
+              />
+            </Card>
           </View>
         )}
 

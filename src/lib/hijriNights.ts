@@ -1,12 +1,14 @@
 import type { HijriDay } from '@/api/types';
 import { parseHijriDate } from './hijri';
 import { addIsoDays } from './time';
+import { DUA_LINKS } from './duas';
 
 export type NightDefinition = {
   month: number;
   day: number;
   title: string;
   note: string;
+  duaId?: string;
 };
 
 export const NOTABLE_NIGHTS: NightDefinition[] = [
@@ -39,6 +41,7 @@ export const NOTABLE_NIGHTS: NightDefinition[] = [
     day: 27,
     title: 'Laylat-ul-Qadr',
     note: 'Natten til den 27. Ramadan. Skjebnenatten.',
+    duaId: DUA_LINKS.laylatAlQadr,
   },
 ];
 
@@ -48,6 +51,7 @@ export type UpcomingNight = {
   isoDate: string;
   eveningIso: string;
   isTonight: boolean;
+  duaId?: string;
 };
 
 export function nightsIn(rows: HijriDay[]): UpcomingNight[] {
@@ -65,6 +69,7 @@ export function nightsIn(rows: HijriDay[]): UpcomingNight[] {
       isoDate: row.gregorian_date,
       eveningIso: addIsoDays(row.gregorian_date, -1),
       isTonight: false,
+      duaId: definition.duaId,
     });
   }
   return nights.sort((a, b) => a.isoDate.localeCompare(b.isoDate));

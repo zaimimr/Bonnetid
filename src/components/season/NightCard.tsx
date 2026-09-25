@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { DuaLink } from '@/components/duas/DuaLink';
 import { AppText, Card } from '@/components/ui';
 import { useCurrentNight } from '@/hooks/useHijriSeason';
 import { useFontScale } from '@/hooks/useFontScale';
@@ -39,6 +40,7 @@ export function NightCard({ now, onPress }: NightCardProps) {
       <AppText size="xs" tone="textMuted" style={{ marginTop: spacing.sm }}>
         {MOON_SIGHTING_NOTE}
       </AppText>
+      {night.duaId && <DuaLink duaId={night.duaId} label="Dua for natten" />}
     </Card>
   );
 }

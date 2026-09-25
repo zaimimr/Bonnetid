@@ -1,10 +1,12 @@
 import { View } from 'react-native';
 import { AppText, Card } from '@/components/ui';
+import { DuaLink } from '@/components/duas/DuaLink';
 import { SeasonCountdownCard } from '@/components/season/SeasonCountdownCard';
 import { useFontScale } from '@/hooks/useFontScale';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
 import type { SeasonStatus } from '@/lib/hijriSeason';
 import type { PrayerEntry } from '@/lib/prayerSchedule';
+import { DUA_LINKS } from '@/lib/duas';
 import { fastingProgress, ramadanCountdown, ramadanCountdownText } from '@/lib/ramadan';
 import { formatDurationShort } from '@/lib/time';
 import { useTheme } from '@/theme';
@@ -146,6 +148,8 @@ function FastingDayCard({
           {`${countdown.label} om ${formatDurationShort(countdown.target.getTime() - now.getTime())}`}
         </AppText>
       )}
+
+      <DuaLink duaId={DUA_LINKS.iftar} label="Dua ved iftar" />
     </Card>
   );
 }
