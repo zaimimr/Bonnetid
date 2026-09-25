@@ -33,8 +33,8 @@ function windowEndOf(slots: Slot[], index: number): Date {
 
 /**
  * The Live Activity follows the prayer the user is in the middle of: it appears the moment a
- * prayer starts, survives the end of its window, and only goes away once the user marks the
- * prayer or the next one takes over. Sunrise never gets one.
+ * prayer starts and goes away once the user marks the prayer or its window ends. Sunrise never
+ * gets one.
  *
  * The successor rides along so the activity can carry itself one prayer further than the app
  * managed to push. Only an unmarked successor counts: a marked one is a prayer the app would

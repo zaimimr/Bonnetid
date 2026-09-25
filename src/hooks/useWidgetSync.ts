@@ -26,7 +26,7 @@ import { buildSnapshot, snapshotIsEmpty } from '@/lib/widgetSnapshot';
 import { usePrayerLog } from '@/store/prayerLog';
 import { useActiveLocation, useActiveMosque, useSettings } from '@/store/settings';
 
-const SNAPSHOT_DAYS = 3;
+const SNAPSHOT_DAYS = 30;
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
@@ -197,10 +197,9 @@ function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now
   const window = useMemo(() => {
     if (!enabled) return null;
     const resolved = resolveActivityWindow(activityDays, log, now);
-    if (!resolved) return null;
-    if (!trackerEnabled && resolved.windowOver) return null;
+    if (!resolved || resolved.windowOver) return null;
     return resolved;
-  }, [enabled, trackerEnabled, activityDays, log, now]);
+  }, [enabled, activityDays, log, now]);
 
   return useMemo(() => {
     return () => {

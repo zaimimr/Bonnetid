@@ -25,6 +25,12 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSSupportsLiveActivities": true,
+        "UIBackgroundModes": [
+          "fetch"
+        ],
+        "BGTaskSchedulerPermittedIdentifiers": [
+          "no.irn.bonnetid.activity-refresh"
+        ],
         "LSApplicationQueriesSchemes": [
           "comgooglemaps",
           "waze"

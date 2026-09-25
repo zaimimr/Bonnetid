@@ -72,7 +72,7 @@ public class PrayerWidgetModule: Module {
       }
 
       // The window end doubles as the stale date, so the view flips its copy to "tiden er over"
-      // on its own. Nothing dismisses the activity but the buttons on it.
+      // on its own. PrayerActivityRefresh ends it once iOS grants the app background time.
       let content = ActivityContent(
         state: state.toContentState(),
         staleDate: Date(timeIntervalSince1970: state.windowEnd),
@@ -82,6 +82,7 @@ public class PrayerWidgetModule: Module {
       if let running = Self.runningActivity() {
         await running.update(content)
         ActivityStore.current = running
+        PrayerActivityRefresh.schedule()
         return
       }
 
@@ -90,6 +91,7 @@ public class PrayerWidgetModule: Module {
         content: content,
         pushType: nil
       )
+      PrayerActivityRefresh.schedule()
     }
 
     AsyncFunction("endActivity") {
@@ -98,6 +100,7 @@ public class PrayerWidgetModule: Module {
         await activity.end(nil, dismissalPolicy: .immediate)
       }
       ActivityStore.current = nil
+      PrayerActivityRefresh.schedule()
     }
   }
 

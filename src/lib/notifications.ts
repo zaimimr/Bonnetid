@@ -11,7 +11,8 @@ import {
 } from './notificationSounds';
 import { track } from './telemetry';
 
-const MAX_SCHEDULED = 50;
+const MAX_SCHEDULED = Platform.OS === 'ios' ? 50 : 150;
+const REMINDER_HORIZON_MS = 48 * 60 * 60 * 1000;
 
 const PRAYER_PREFIX = 'prayer|';
 const REMINDER_PREFIX = 'reminder|';
@@ -242,7 +243,9 @@ async function runSync(plan: PrayerNotificationPlan): Promise<number> {
     });
   }
 
+  const reminderCutoff = Date.now() + REMINDER_HORIZON_MS;
   for (const reminder of plan.reminders) {
+    if (reminder.fireAt.getTime() > reminderCutoff) continue;
     const identifier = reminderNotificationId(reminder.isoDate, reminder.prayer);
     if (seen.has(identifier)) continue;
     seen.add(identifier);
