@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
+import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInDown, ReduceMotion } from 'react-native-reanimated';
 import { AppText, Button, Screen } from '@/components/ui';
@@ -19,15 +20,16 @@ import { track, trackError } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
 import {
+  DEFAULT_LOCATION,
   calculatedLocation,
   useActiveLocation,
   useSettings,
   type SavedLocation,
 } from '@/store/settings';
 
-type StepId = 'welcome' | 'mosque' | 'notifications' | 'tracker' | 'ready';
+type StepId = 'welcome' | 'location' | 'mosque' | 'notifications' | 'tracker' | 'ready';
 
-const STEP_ORDER: StepId[] = ['welcome', 'mosque', 'notifications', 'tracker', 'ready'];
+const STEP_ORDER: StepId[] = ['welcome', 'location', 'mosque', 'notifications', 'tracker', 'ready'];
 
 const LINE_ART = require('../../../assets/images/splash-icon.png');
 const LINE_ART_RATIO = 1525 / 1537;
@@ -90,6 +92,7 @@ export function OnboardingFlow() {
         )}
 
         {step === 'welcome' && <WelcomeStep onNext={advance} />}
+        {step === 'location' && <LocationStep onNext={advance} />}
         {step === 'mosque' && <MosqueStep onNext={advance} />}
         {step === 'notifications' && <NotificationStep onNext={advance} />}
         {step === 'tracker' && <TrackerStep onNext={advance} />}
@@ -193,17 +196,6 @@ function StatusLine({ tone, text }: { tone: 'success' | 'textMuted'; text: strin
 
 function WelcomeStep({ onNext }: { onNext: () => void }) {
   const theme = useTheme();
-  const { data: locations } = useLocations();
-  const setLocation = useSettings((state) => state.setLocation);
-
-  const start = () => {
-    onNext();
-    if (locations) {
-      detectOnboardingLocation(locations, setLocation).catch((error) =>
-        trackError(error, 'onboarding-location'),
-      );
-    }
-  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -229,7 +221,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
       <Animated.View
         entering={enter(160)}
         style={{ gap: spacing.lg, paddingTop: spacing.xxl, paddingBottom: spacing.lg }}>
-        <Button label="Kom i gang" onPress={start} size="lg" fullWidth />
+        <Button label="Kom i gang" onPress={onNext} size="lg" fullWidth />
         <View
           style={{
             flexDirection: 'row',
@@ -259,20 +251,76 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
 async function detectOnboardingLocation(
   locations: ApiLocation[],
   setLocation: (location: SavedLocation) => void,
-) {
+): Promise<boolean> {
   const inNorway = await detectNearestLocation(locations);
   if (inNorway) {
     setLocation(inNorway);
     track('location_detected', { iso: inNorway.iso, source: 'onboarding' });
-    return;
+    return true;
   }
 
   const coords = await requestCoords();
-  if (!coords || isInsideNorwayBounds(coords.lat, coords.lon)) return;
+  if (!coords || isInsideNorwayBounds(coords.lat, coords.lon)) return false;
   const place = await resolvePlace(coords);
   const abroad = calculatedLocation(place.name, coords.lat, coords.lon, place);
   setLocation(abroad);
   track('location_detected', { iso: abroad.iso, source: 'onboarding-abroad' });
+  return true;
+}
+
+function LocationStep({ onNext }: { onNext: () => void }) {
+  const { data: locations } = useLocations();
+  const setLocation = useSettings((state) => state.setLocation);
+  const [busy, setBusy] = useState(false);
+  const [denied, setDenied] = useState(false);
+
+  const detect = useCallback(async () => {
+    if (!locations) return;
+    setBusy(true);
+    setDenied(false);
+    try {
+      const found = await detectOnboardingLocation(locations, setLocation);
+      if (found) onNext();
+      else setDenied(true);
+    } catch (error) {
+      trackError(error, 'onboarding-location');
+      setDenied(true);
+    } finally {
+      setBusy(false);
+    }
+  }, [locations, setLocation, onNext]);
+
+  useEffect(() => {
+    if (!locations) return;
+    let cancelled = false;
+    Location.getForegroundPermissionsAsync()
+      .then((permission) => {
+        if (!cancelled && permission.granted) return detect();
+      })
+      .catch((error) => trackError(error, 'onboarding-location'));
+    return () => {
+      cancelled = true;
+    };
+  }, [locations, detect]);
+
+  return (
+    <StepShell
+      icon="location-outline"
+      title="Hvor er du?"
+      body="Appen finner bønnetidene for din lokasjon."
+      primaryLabel="Finn posisjonen min"
+      onPrimary={detect}
+      primaryLoading={busy || !locations}
+      secondaryLabel="Hopp over"
+      onSecondary={onNext}>
+      {denied && (
+        <StatusLine
+          tone="textMuted"
+          text={`Fant ingen posisjon. Appen bruker ${DEFAULT_LOCATION.name} til du gir tilgang i telefonens innstillinger.`}
+        />
+      )}
+    </StepShell>
+  );
 }
 
 function MosqueStep({ onNext }: { onNext: () => void }) {
