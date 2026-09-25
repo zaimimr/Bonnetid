@@ -7,7 +7,7 @@ import type { PrayerDay } from '@/api/types';
 import type { AsrMethodPreference } from '@/store/settings';
 import { asrTimeFor } from '@/lib/prayerSchedule';
 import {
-  formatLocalClock,
+  formatZonedClock,
   isoDateKey,
   osloDayKey,
   parseDayKey,
@@ -167,7 +167,7 @@ export function MonthPrayerTable({
                 maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}
                 numberOfLines={1}
                 style={timeColumnStyle}>
-                {time ? formatLocalClock(wallClockToDate(date, time, zone)) : '–'}
+                {time ? formatZonedClock(wallClockToDate(date, time, zone), zone) : '–'}
               </AppText>
             ))}
           </Pressable>

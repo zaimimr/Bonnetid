@@ -1,3 +1,5 @@
+import { zoneOffsetMinutes } from './timezone';
+
 const MINUTE_MS = 60_000;
 const OSLO_STANDARD_OFFSET = 60;
 const OSLO_SUMMER_OFFSET = 120;
@@ -69,10 +71,61 @@ export function localWallClockToDate(day: Date | string, time: string): Date {
   return new Date(calendar.year, calendar.month - 1, calendar.day, hours, minutes, 0, 0);
 }
 
-export type PrayerTimeZone = 'oslo' | 'device';
+/**
+ * `oslo` is the Norwegian feed: wall clock in Norway, shown in the reader's own clock.
+ * `device` is the phone's own zone. Anything else is an IANA name for the place the times
+ * belong to, so a calculated location keeps its own clock even when the phone's is elsewhere.
+ */
+export type PrayerTimeZone = 'oslo' | 'device' | `${string}/${string}`;
+
+export function isNamedTimeZone(zone: PrayerTimeZone): zone is `${string}/${string}` {
+  return zone !== 'oslo' && zone !== 'device';
+}
+
+export function namedWallClockToDate(day: Date | string, time: string, zone: string): Date {
+  const calendar = calendarDayOf(day);
+  const [hours, minutes] = time.split(':').map(Number);
+  if (!calendar || Number.isNaN(hours) || Number.isNaN(minutes)) return new Date(NaN);
+
+  const naive = Date.UTC(calendar.year, calendar.month - 1, calendar.day, hours, minutes, 0, 0);
+  const firstGuess = zoneOffsetMinutes(zone, new Date(naive));
+  if (firstGuess == null) return localWallClockToDate(day, time);
+
+  const instant = naive - firstGuess * MINUTE_MS;
+  const settled = zoneOffsetMinutes(zone, new Date(instant));
+  return new Date(naive - (settled ?? firstGuess) * MINUTE_MS);
+}
 
 export function wallClockToDate(day: Date | string, time: string, zone: PrayerTimeZone): Date {
+  if (isNamedTimeZone(zone)) return namedWallClockToDate(day, time, zone);
   return zone === 'device' ? localWallClockToDate(day, time) : osloWallClockToDate(day, time);
+}
+
+export function formatZonedClock(instant: Date, zone: PrayerTimeZone): string {
+  if (Number.isNaN(instant.getTime())) return '–';
+  if (!isNamedTimeZone(zone)) return formatLocalClock(instant);
+
+  const offset = zoneOffsetMinutes(zone, instant);
+  if (offset == null) return formatLocalClock(instant);
+
+  const shifted = new Date(instant.getTime() + offset * MINUTE_MS);
+  return `${pad(shifted.getUTCHours())}:${pad(shifted.getUTCMinutes())}`;
+}
+
+export function zonedDateKey(instant: Date, zone: PrayerTimeZone): string {
+  if (!isNamedTimeZone(zone)) {
+    return zone === 'device' ? isoDateKey(instant) : osloDateKey(instant);
+  }
+  const offset = zoneOffsetMinutes(zone, instant);
+  if (offset == null) return isoDateKey(instant);
+
+  const shifted = new Date(instant.getTime() + offset * MINUTE_MS);
+  return `${shifted.getUTCFullYear()}-${pad(shifted.getUTCMonth() + 1)}-${pad(shifted.getUTCDate())}`;
+}
+
+export function zonedDayKey(instant: Date, zone: PrayerTimeZone): string {
+  const [year, month, day] = zonedDateKey(instant, zone).split('-');
+  return `${day}-${month}-${year}`;
 }
 
 export function parseTimeToDate(time: string, baseDate: Date): Date {

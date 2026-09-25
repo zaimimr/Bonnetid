@@ -16,7 +16,7 @@ import {
   scheduleFastingReminders,
 } from '@/lib/fastingNotifications';
 import {
-  formatLocalClock,
+  formatZonedClock,
   isoDateKey,
   osloDateKey,
   osloDayStart,
@@ -78,7 +78,7 @@ export function useFastingReminders(now: Date) {
           isoDate,
           dayOfRamadan,
           fajrAt,
-          fajrClock: formatLocalClock(fajrAt),
+          fajrClock: formatZonedClock(fajrAt, zone),
         });
       }
     }
