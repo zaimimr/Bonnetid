@@ -24,6 +24,7 @@ bridge is a `requireOptionalNativeModule`, so every call no-ops there.
 - `npx tsc --noEmit` - typecheck
 - `npx expo lint` - lint (react-compiler rules enabled, refs during render are errors)
 - `npx expo run:ios` - local dev build, required for widget and Live Activity work
+- `npm run ios:sim` - same dev build on the booted simulator via xcodebuild. Use it on Xcode 27+, which has no Simulator.app, so `expo run:ios` fails there
 
 ## Conventions
 

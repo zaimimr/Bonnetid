@@ -107,7 +107,8 @@
         }
       ],
       "./plugins/withCarFormFactors",
-      "./plugins/withTrimmedPermissions"
+      "./plugins/withTrimmedPermissions",
+      "./plugins/withPodDeploymentTarget"
     ],
     "experiments": {
       "typedRoutes": true,
