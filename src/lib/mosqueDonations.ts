@@ -15,11 +15,8 @@ export function vippsNumberFrom(...texts: (string | null | undefined)[]): string
   return null;
 }
 
-export function openVipps(vippsNumber: string | null): void {
-  const url = vippsNumber
-    ? `https://qr.vipps.no/donations/${vippsNumber}?reference=bonnetid`
-    : VIPPS_APP_URL;
-  Linking.openURL(url).catch(() => {
+export function openVipps(): void {
+  Linking.openURL(VIPPS_APP_URL).catch(() => {
     Linking.openURL(VIPPS_STORE_URL).catch(() => {});
   });
 }

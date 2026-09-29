@@ -50,13 +50,13 @@ export function MosquePresenceCard() {
       </View>
       {announcement && <MosqueAnnouncement text={announcement} compact />}
       <Button
-        label="Doner med Vipps"
+        label={mosque.vipps_number ? `Doner med Vipps · ${mosque.vipps_number}` : 'Doner med Vipps'}
         variant="secondary"
         size="sm"
         fullWidth
         onPress={() => {
           track('mosque_donation_opened', { source: 'presence' });
-          openVipps(mosque.vipps_number);
+          openVipps();
         }}
       />
     </Card>
