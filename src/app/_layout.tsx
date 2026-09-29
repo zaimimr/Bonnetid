@@ -151,7 +151,7 @@ function RootNavigator() {
           name="notification-prayers"
           options={{
             headerShown: true,
-            title: 'Bønner',
+            title: 'Bønnetider',
             headerBackTitle: 'Tilbake',
             headerStyle: { backgroundColor: theme.colors.surface },
             headerTitleStyle: { color: theme.colors.textPrimary },

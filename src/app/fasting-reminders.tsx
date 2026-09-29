@@ -1,8 +1,6 @@
 import { View } from 'react-native';
 import { AppText, Card, Divider, ListRow, Screen, Toggle } from '@/components/ui';
 import { EVENING_REMINDER_CLOCK } from '@/lib/fasting';
-import { FASTING_POOL_LIMIT } from '@/lib/fastingNotifications';
-import { MOON_SIGHTING_NOTE } from '@/lib/hijriSeason';
 import { notificationsSupported } from '@/lib/notifications';
 import { SUHOOR_REMINDER_MINUTES } from '@/lib/ramadan';
 import { track } from '@/lib/telemetry';
@@ -84,13 +82,7 @@ export default function FastingRemindersScreen() {
 
       <View style={{ marginTop: spacing.md, paddingHorizontal: spacing.md, gap: spacing.sm }}>
         <AppText size="xs" tone="textMuted">
-          {`Påminnelsene om frivillig faste kommer kl. ${EVENING_REMINDER_CLOCK} kvelden før, så du rekker å planlegge suhoor. I ramadan er det suhoor-påminnelsen som gjelder.`}
-        </AppText>
-        <AppText size="xs" tone="textMuted">
-          {`Appen holder maks ${FASTING_POOL_LIMIT} fastepåminnelser klare om gangen, slik at varslene for bønnetidene ikke går tapt.`}
-        </AppText>
-        <AppText size="xs" tone="textMuted">
-          {MOON_SIGHTING_NOTE}
+          {`Påminnelsen kommer kl. ${EVENING_REMINDER_CLOCK} kvelden før. Datoene kan flytte seg ved månesikting.`}
         </AppText>
       </View>
     </Screen>

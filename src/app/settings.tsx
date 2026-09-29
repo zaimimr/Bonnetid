@@ -178,7 +178,7 @@ export default function SettingsScreen() {
       <SectionHeader title="Varsler" />
       <Card padding="sm" rounded="xl">
         <ListRow
-          title="Varsle ved bønnetid"
+          title="Slå på varsler"
           subtitle={notificationsSupported ? undefined : 'Ikke tilgjengelig i Expo Go på Android'}
           leading={<Ionicons name="notifications-outline" size={20} color={theme.colors.primary} />}
           trailing={
@@ -194,22 +194,11 @@ export default function SettingsScreen() {
           <>
             <Divider />
             <ListRow
-              title="Bønner"
-              subtitle={prayerSummary}
-              leading={<Ionicons name="list-outline" size={20} color={theme.colors.primary} />}
+              title="Bønnetider"
+              subtitle={`${prayerSummary} · ${getNotificationSound(notificationSound).label}`}
+              leading={<Ionicons name="time-outline" size={20} color={theme.colors.primary} />}
               chevron
               onPress={() => router.push('/notification-prayers')}
-              style={ROW}
-            />
-            <Divider />
-            <ListRow
-              title="Varsellyd"
-              subtitle={getNotificationSound(notificationSound).label}
-              leading={
-                <Ionicons name="musical-notes-outline" size={20} color={theme.colors.primary} />
-              }
-              chevron
-              onPress={() => router.push('/notification-sound')}
               style={ROW}
             />
             <Divider />
