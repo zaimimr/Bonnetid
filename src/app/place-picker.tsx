@@ -70,7 +70,7 @@ export default function PlacePickerScreen() {
             }}
           />
           {query.length > 0 && (
-            <Pressable onPress={() => setQuery('')} hitSlop={8}>
+            <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel="Tøm søk">
               <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
             </Pressable>
           )}
