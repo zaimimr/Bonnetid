@@ -13,7 +13,7 @@ import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { MosqueSelectAction } from '@/components/mosque/MosqueSelectAction';
 import { AppText, Card, ErrorState, ListRow, Screen, SectionHeader, Skeleton } from '@/components/ui';
-import { donationForMosque, openDonation } from '@/lib/mosqueDonations';
+import { openVipps } from '@/lib/mosqueDonations';
 import { track } from '@/lib/telemetry';
 import { useIsCalculatedMode, useSettings } from '@/store/settings';
 import { useTheme } from '@/theme';
@@ -79,7 +79,6 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
   const showEidSection = eidPeriod != null && mosque.show_eid;
   const eidTimes = showEidSection ? mosque.eid_prayers : [];
   const eidTitle = eidPeriod ? eidPrayerTitle(eidPeriod) : '';
-  const donation = donationForMosque(mosque.org_nr);
   const markAnnouncementRead = useSettings((state) => state.markAnnouncementRead);
 
   useEffect(() => {
@@ -218,12 +217,12 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
           <Card padding="sm" rounded="xl">
             <ListRow
               title="Doner med Vipps"
-              subtitle={donation.vippsNumber ? `Vipps ${donation.vippsNumber}` : 'Åpner Vipps'}
+              subtitle="Åpner Vipps"
               leading={<Ionicons name="heart-outline" size={20} color={theme.colors.primary} />}
               trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
               onPress={() => {
                 track('mosque_donation_opened', { source: 'detail' });
-                openDonation(donation);
+                openVipps();
               }}
               style={{ paddingHorizontal: spacing.md }}
             />

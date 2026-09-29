@@ -6,7 +6,7 @@ import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { AppText, Button, Card } from '@/components/ui';
 import { useMosquePresence } from '@/hooks/useMosquePresence';
-import { donationForMosque, openDonation } from '@/lib/mosqueDonations';
+import { openVipps } from '@/lib/mosqueDonations';
 import { track } from '@/lib/telemetry';
 import { useUnreadAnnouncement } from '@/store/settings';
 import { useTheme } from '@/theme';
@@ -30,7 +30,6 @@ export function MosquePresenceCard() {
   if (!presence) return null;
 
   const { mosque } = presence;
-  const donation = donationForMosque(mosque.org_nr);
 
   return (
     <Card
@@ -57,7 +56,7 @@ export function MosquePresenceCard() {
         fullWidth
         onPress={() => {
           track('mosque_donation_opened', { source: 'presence' });
-          openDonation(donation);
+          openVipps();
         }}
       />
     </Card>
