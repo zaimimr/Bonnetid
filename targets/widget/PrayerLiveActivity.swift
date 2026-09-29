@@ -87,7 +87,7 @@ private struct Successor {
 struct PrayerLiveActivity: Widget {
   var body: some WidgetConfiguration {
     ActivityConfiguration(for: PrayerActivityAttributes.self) { context in
-      LockScreenActivityView(
+      ActivityContentView(
         locationName: context.attributes.locationName,
         phase: ActivityPhase(state: context.state, isStale: context.isStale)
       )
@@ -160,6 +160,67 @@ struct PrayerLiveActivity: Widget {
       .widgetURL(URL(string: "bonnetid://"))
       .keylineTint(PrayerColor.brand)
     }
+    .supplementalActivityFamilies([.small])
+  }
+}
+
+private struct ActivityContentView: View {
+  @Environment(\.activityFamily) private var family
+  let locationName: String
+  let phase: ActivityPhase
+
+  var body: some View {
+    if family == .small {
+      SmallActivityView(phase: phase)
+    } else {
+      LockScreenActivityView(locationName: locationName, phase: phase)
+    }
+  }
+}
+
+private struct SmallActivityView: View {
+  let phase: ActivityPhase
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 2) {
+      HStack(spacing: 5) {
+        Image(systemName: PrayerFormat.symbol(for: phase.kind))
+          .font(.caption)
+          .foregroundStyle(PrayerColor.brand)
+        Text(phase.label)
+          .font(.headline)
+          .foregroundStyle(PrayerColor.brand)
+          .lineLimit(1)
+      }
+
+      Text(PrayerFormat.time(phase.prayerAt))
+        .prayerTime(.system(.title2, design: .default).weight(.bold))
+        .foregroundStyle(PrayerColor.ink)
+        .lineLimit(1)
+
+      if !phase.windowOver {
+        HStack(spacing: 4) {
+          Text(phase.statusLine)
+            .font(.caption)
+            .foregroundStyle(PrayerColor.inkMuted)
+          Text(timerInterval: phase.countdown, countsDown: true)
+            .prayerTime(.caption)
+            .foregroundStyle(PrayerColor.inkSecondary)
+        }
+      } else if let upcoming = phase.upcomingLine {
+        Text("Neste: \(upcoming)")
+          .font(.caption)
+          .foregroundStyle(PrayerColor.inkSecondary)
+          .lineLimit(1)
+      } else {
+        Text(phase.statusLine)
+          .font(.caption)
+          .foregroundStyle(PrayerColor.inkMuted)
+          .lineLimit(1)
+      }
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(10)
   }
 }
 

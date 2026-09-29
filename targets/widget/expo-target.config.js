@@ -4,7 +4,7 @@ module.exports = (config) => ({
   name: 'bonnetidwidget',
   displayName: 'Bønnetid',
   icon: '../../assets/images/icon.png',
-  deploymentTarget: '17.0',
+  deploymentTarget: '18.0',
   frameworks: ['SwiftUI', 'WidgetKit', 'ActivityKit', 'AppIntents'],
   entitlements: {
     'com.apple.security.application-groups':
