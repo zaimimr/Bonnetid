@@ -43,7 +43,7 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Oversikt',
-          tabBarLabel: ({ color }) => <TabLabel title="Oversikt" color={color} />,
+          tabBarLabel: ({ color }) => <TabLabel title="Oversikt" color={color as string} />,
           tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
         }}
       />
@@ -51,7 +51,7 @@ export default function TabsLayout() {
         name="calendar"
         options={{
           title: 'Kalender',
-          tabBarLabel: ({ color }) => <TabLabel title="Kalender" color={color} />,
+          tabBarLabel: ({ color }) => <TabLabel title="Kalender" color={color as string} />,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar-outline" size={size} color={color} />
           ),
@@ -61,7 +61,7 @@ export default function TabsLayout() {
         name="qibla"
         options={{
           title: 'Qibla',
-          tabBarLabel: ({ color }) => <TabLabel title="Qibla" color={color} />,
+          tabBarLabel: ({ color }) => <TabLabel title="Qibla" color={color as string} />,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="compass-outline" size={size} color={color} />
           ),
@@ -71,7 +71,7 @@ export default function TabsLayout() {
         name="more"
         options={{
           title: 'Mer',
-          tabBarLabel: ({ color }) => <TabLabel title="Mer" color={color} />,
+          tabBarLabel: ({ color }) => <TabLabel title="Mer" color={color as string} />,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="apps-outline" size={size} color={color} />
           ),

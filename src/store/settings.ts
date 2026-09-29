@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -275,13 +275,8 @@ export function useOnboardingDone(): boolean {
 }
 
 export function useSettingsHydrated(): boolean {
-  const [hydrated, setHydrated] = useState(() => useSettings.persist.hasHydrated());
-
-  useEffect(() => {
-    const unsubscribe = useSettings.persist.onFinishHydration(() => setHydrated(true));
-    if (useSettings.persist.hasHydrated()) setHydrated(true);
-    return unsubscribe;
-  }, []);
-
-  return hydrated;
+  return useSyncExternalStore(
+    (listener) => useSettings.persist.onFinishHydration(listener),
+    () => useSettings.persist.hasHydrated(),
+  );
 }

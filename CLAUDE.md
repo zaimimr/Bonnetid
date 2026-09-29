@@ -1,6 +1,6 @@
 # Bønnetid
 
-Expo SDK 54 (max Expo Go supports; do not upgrade past 54) + React Native + TypeScript prayer times app for Norwegian Muslims. Data source: Supabase Postgres (project `gsutnlmtvsbwvaslcgfa`) read directly via `@supabase/supabase-js` with the publishable key and public-read RLS. URL/key in `.env` as `EXPO_PUBLIC_SUPABASE_URL`/`EXPO_PUBLIC_SUPABASE_KEY`. Locations are keyed by `location_iso` strings like `NO0301` (Oslo).
+Expo SDK 57 (matches the App Store Expo Go; keep the SDK on the version Expo Go supports) + React Native + TypeScript prayer times app for Norwegian Muslims. Data source: Supabase Postgres (project `gsutnlmtvsbwvaslcgfa`) read directly via `@supabase/supabase-js` with the publishable key and public-read RLS. URL/key in `.env` as `EXPO_PUBLIC_SUPABASE_URL`/`EXPO_PUBLIC_SUPABASE_KEY`. Locations are keyed by `location_iso` strings like `NO0301` (Oslo).
 
 ## Native surfaces (widgets + Live Activity)
 
