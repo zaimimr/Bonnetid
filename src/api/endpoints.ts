@@ -1,4 +1,5 @@
 import { HIJRI_META, type HijriMeta } from '@/lib/hijriMeta';
+import { vippsNumberFrom } from '@/lib/mosqueDonations';
 import { supabase } from './supabase';
 import type { ApiLocation, HijriDay, Mosque, MosqueJamat, MosqueJummah, PrayerDay } from './types';
 
@@ -263,6 +264,7 @@ function toMosque(
     homepage: toHomepage(row.reg_hjemmeside),
     logo: toLogo(row.logo),
     announcement: toAnnouncement(row.announcement),
+    vipps_number: vippsNumberFrom(row.org_info, row.announcement),
     asr_method: toAsrMethod(row.asr_method),
     show_eid: row.show_eid ?? false,
     eid_prayers: [row.eidprayer_time1, row.eidprayer_time2, row.eidprayer_time3]

@@ -75,6 +75,7 @@ export type Mosque = {
   homepage: string | null;
   logo: string | null;
   announcement: string | null;
+  vipps_number: string | null;
   asr_method: 'IRN' | 'SHADOW_1X' | 'SHADOW_2X' | 'WUSTA' | 'NONE';
   show_eid: boolean;
   eid_prayers: string[];

@@ -217,12 +217,12 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
           <Card padding="sm" rounded="xl">
             <ListRow
               title="Doner med Vipps"
-              subtitle="Åpner Vipps"
+              subtitle={mosque.vipps_number ? `Vipps ${mosque.vipps_number}` : 'Åpner Vipps'}
               leading={<Ionicons name="heart-outline" size={20} color={theme.colors.primary} />}
               trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
               onPress={() => {
                 track('mosque_donation_opened', { source: 'detail' });
-                openVipps();
+                openVipps(mosque.vipps_number);
               }}
               style={{ paddingHorizontal: spacing.md }}
             />
