@@ -79,6 +79,8 @@ type SettingsState = {
   launchCount: number;
   reviewRequested: boolean;
   onboardingDone: boolean;
+  readAnnouncements: Record<string, string>;
+  markAnnouncementRead: (orgNr: string, announcement: string) => void;
   completeOnboarding: () => void;
   registerLaunch: () => void;
   markReviewRequested: () => void;
@@ -151,6 +153,11 @@ export const useSettings = create<SettingsState>()(
       launchCount: 0,
       reviewRequested: false,
       onboardingDone: false,
+      readAnnouncements: {},
+      markAnnouncementRead: (orgNr, announcement) =>
+        set((state) => ({
+          readAnnouncements: { ...state.readAnnouncements, [orgNr]: announcement },
+        })),
       completeOnboarding: () => set({ onboardingDone: true }),
       registerLaunch: () => set((state) => ({ launchCount: state.launchCount + 1 })),
       markReviewRequested: () => set({ reviewRequested: true }),
@@ -235,6 +242,14 @@ export function useLocationMode(): LocationMode {
 
 export function useIsCalculatedMode(): boolean {
   return useLocationMode() === 'calculated';
+}
+
+export function useUnreadAnnouncement(
+  orgNr: string | null | undefined,
+  announcement: string | null | undefined,
+): string | null {
+  const read = useSettings((state) => (orgNr ? state.readAnnouncements[orgNr] : undefined));
+  return announcement && read !== announcement ? announcement : null;
 }
 
 export function useActiveMosque(): SavedMosque | null {

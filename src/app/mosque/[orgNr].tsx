@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ActionSheetIOS, Linking, Platform, Pressable, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -80,6 +80,11 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
   const eidTimes = showEidSection ? mosque.eid_prayers : [];
   const eidTitle = eidPeriod ? eidPrayerTitle(eidPeriod) : '';
   const donation = donationForMosque(mosque.org_nr);
+  const markAnnouncementRead = useSettings((state) => state.markAnnouncementRead);
+
+  useEffect(() => {
+    if (mosque.announcement) markAnnouncementRead(mosque.org_nr, mosque.announcement);
+  }, [mosque.org_nr, mosque.announcement, markAnnouncementRead]);
 
   const now = useNow(60_000);
   const today = useMemo(() => osloDayStart(now), [now]);

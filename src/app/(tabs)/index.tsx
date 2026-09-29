@@ -29,7 +29,7 @@ import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
 import { isoDateIsFriday, parseDayKey } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
-import { useActiveLocation, useActiveMosque } from '@/store/settings';
+import { useActiveLocation, useActiveMosque, useUnreadAnnouncement } from '@/store/settings';
 
 const UPCOMING_EVENT_COUNT = 3;
 
@@ -59,10 +59,11 @@ export default function HomeScreen() {
   const mosqueIso = mosqueDetails.data?.location_iso;
   const mosqueInLocation = mosqueIso == null || mosqueIso === location.iso;
   const jummahTimes = mosqueDetails.data?.jummah ?? [];
-  const myAnnouncement =
-    mosque && presence?.mosque.org_nr !== mosque.orgNr
-      ? mosqueDetails.data?.announcement
-      : null;
+  const unreadAnnouncement = useUnreadAnnouncement(
+    mosque?.orgNr,
+    mosqueDetails.data?.announcement,
+  );
+  const myAnnouncement = presence?.mosque.org_nr !== mosque?.orgNr ? unreadAnnouncement : null;
   const jamatTimes = jamatTimesForDate(
     mosqueInLocation ? mosqueDetails.data?.jamat : null,
     todayIso,

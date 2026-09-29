@@ -8,6 +8,7 @@ import { AppText, Button, Card } from '@/components/ui';
 import { useMosquePresence } from '@/hooks/useMosquePresence';
 import { donationForMosque } from '@/lib/mosqueDonations';
 import { track } from '@/lib/telemetry';
+import { useUnreadAnnouncement } from '@/store/settings';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 
@@ -18,6 +19,7 @@ export function MosquePresenceCard() {
   const router = useRouter();
   const presence = useMosquePresence();
   const orgNr = presence?.mosque.org_nr;
+  const announcement = useUnreadAnnouncement(orgNr, presence?.mosque.announcement);
 
   useEffect(() => {
     if (!orgNr || trackedMosques.has(orgNr)) return;
@@ -47,9 +49,7 @@ export function MosquePresenceCard() {
         </View>
         <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
       </View>
-      {mosque.announcement && (
-        <MosqueAnnouncement text={mosque.announcement} compact />
-      )}
+      {announcement && <MosqueAnnouncement text={announcement} compact />}
       {donation && (
         <Button
           label="Doner med Vipps"
