@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
-import { Linking, View } from 'react-native';
+import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { AppText, Button, Card } from '@/components/ui';
 import { useMosquePresence } from '@/hooks/useMosquePresence';
-import { donationForMosque } from '@/lib/mosqueDonations';
+import { donationForMosque, openDonation } from '@/lib/mosqueDonations';
 import { track } from '@/lib/telemetry';
 import { useUnreadAnnouncement } from '@/store/settings';
 import { useTheme } from '@/theme';
@@ -50,18 +50,16 @@ export function MosquePresenceCard() {
         <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
       </View>
       {announcement && <MosqueAnnouncement text={announcement} compact />}
-      {donation && (
-        <Button
-          label="Doner med Vipps"
-          variant="secondary"
-          size="sm"
-          fullWidth
-          onPress={() => {
-            track('mosque_donation_opened', { source: 'presence' });
-            Linking.openURL(donation.url).catch(() => {});
-          }}
-        />
-      )}
+      <Button
+        label="Doner med Vipps"
+        variant="secondary"
+        size="sm"
+        fullWidth
+        onPress={() => {
+          track('mosque_donation_opened', { source: 'presence' });
+          openDonation(donation);
+        }}
+      />
     </Card>
   );
 }

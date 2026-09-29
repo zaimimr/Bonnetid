@@ -13,7 +13,7 @@ import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { MosqueSelectAction } from '@/components/mosque/MosqueSelectAction';
 import { AppText, Card, ErrorState, ListRow, Screen, SectionHeader, Skeleton } from '@/components/ui';
-import { donationForMosque } from '@/lib/mosqueDonations';
+import { donationForMosque, openDonation } from '@/lib/mosqueDonations';
 import { track } from '@/lib/telemetry';
 import { useIsCalculatedMode, useSettings } from '@/store/settings';
 import { useTheme } from '@/theme';
@@ -212,18 +212,18 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
         </Card>
       )}
 
-      {donation && (
+      {!mosque.map_only && (
         <View>
           <SectionHeader title="Støtt moskeen" />
           <Card padding="sm" rounded="xl">
             <ListRow
               title="Doner med Vipps"
-              subtitle={`Vipps ${donation.vippsNumber}`}
+              subtitle={donation.vippsNumber ? `Vipps ${donation.vippsNumber}` : 'Åpner Vipps'}
               leading={<Ionicons name="heart-outline" size={20} color={theme.colors.primary} />}
               trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
               onPress={() => {
                 track('mosque_donation_opened', { source: 'detail' });
-                Linking.openURL(donation.url).catch(() => {});
+                openDonation(donation);
               }}
               style={{ paddingHorizontal: spacing.md }}
             />
