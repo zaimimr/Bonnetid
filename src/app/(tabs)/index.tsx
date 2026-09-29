@@ -106,13 +106,15 @@ export default function HomeScreen() {
         {mosque && myAnnouncement && (
           <Card
             rounded="xl"
+            padding="md"
             onPress={() =>
               router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } })
             }>
             <MosqueAnnouncement
               title={`Kunngjøring fra ${mosque.name}`}
               text={myAnnouncement}
-              numberOfLines={4}
+              compact
+              chevron
             />
           </Card>
         )}

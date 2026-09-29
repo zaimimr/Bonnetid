@@ -7,25 +7,30 @@ import { spacing } from '@/theme/tokens';
 export function MosqueAnnouncement({
   text,
   title = 'Kunngjøring',
-  numberOfLines,
+  compact = false,
+  chevron = false,
 }: {
   text: string;
   title?: string;
-  numberOfLines?: number;
+  compact?: boolean;
+  chevron?: boolean;
 }) {
   const theme = useTheme();
 
   return (
-    <View style={{ gap: spacing.xs }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-        <Ionicons name="megaphone-outline" size={15} color={theme.colors.primary} />
-        <AppText size="xs" weight="semibold" tone="primary" style={{ flex: 1 }}>
-          {title}
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+      <View style={{ flex: 1, gap: spacing.xs }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+          <Ionicons name="megaphone-outline" size={15} color={theme.colors.primary} />
+          <AppText size="xs" weight="semibold" tone="primary" style={{ flex: 1 }} numberOfLines={1}>
+            {title}
+          </AppText>
+        </View>
+        <AppText size="sm" tone="textSecondary" numberOfLines={compact ? 1 : undefined}>
+          {text}
         </AppText>
       </View>
-      <AppText size="sm" tone="textSecondary" numberOfLines={numberOfLines}>
-        {text}
-      </AppText>
+      {chevron && <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />}
     </View>
   );
 }

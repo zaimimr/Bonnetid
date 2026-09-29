@@ -48,7 +48,7 @@ export function MosquePresenceCard() {
         <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
       </View>
       {mosque.announcement && (
-        <MosqueAnnouncement text={mosque.announcement} numberOfLines={4} />
+        <MosqueAnnouncement text={mosque.announcement} compact />
       )}
       {donation && (
         <Button
