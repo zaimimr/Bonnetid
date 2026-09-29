@@ -444,7 +444,11 @@ function ReadyStep({ onFinish }: { onFinish: () => void }) {
   const location = useActiveLocation();
   const mosque = useSettings((state) => state.mosque);
   const { nextPrayer } = usePrayerDay(now);
-  const next = nextPrayer?.next;
+  const current = nextPrayer?.current;
+  const shown = current ?? nextPrayer?.next;
+  const countdownTarget = current ? (current.end?.date ?? nextPrayer?.next.date) : shown?.date;
+  const countdownLabel = current ? (current.end?.label ?? nextPrayer?.next.label) : null;
+  const remaining = countdownTarget ? formatDurationShort(countdownTarget.getTime() - now.getTime()) : '';
 
   const body = mosque
     ? `Bønnetidene for ${location.name} er klare, med jamat-tidene fra ${mosque.name}.`
@@ -453,11 +457,15 @@ function ReadyStep({ onFinish }: { onFinish: () => void }) {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 1, minHeight: 180, alignItems: 'center', justifyContent: 'center' }}>
-        {next ? (
+        {shown ? (
           <Animated.View
             entering={FadeIn.duration(250).reduceMotion(ReduceMotion.System)}
             accessible
-            accessibilityLabel={`Neste bønn er ${next.label} klokken ${next.time}`}
+            accessibilityLabel={
+              current
+                ? `Nåværende bønn er ${shown.label} fra klokken ${shown.time}`
+                : `Neste bønn er ${shown.label} klokken ${shown.time}`
+            }
             style={{ alignItems: 'center', gap: spacing.xs }}>
             <View
               style={{
@@ -469,16 +477,18 @@ function ReadyStep({ onFinish }: { onFinish: () => void }) {
                 justifyContent: 'center',
                 marginBottom: spacing.md,
               }}>
-              <PrayerIcon name={next.name} size={40} color={theme.colors.primary} />
+              <PrayerIcon name={shown.name} size={40} color={theme.colors.primary} />
             </View>
             <AppText size="sm" weight="medium" tone="textSecondary">
-              {nextPrayer.isTomorrow ? 'Første bønn i morgen' : 'Neste bønn'}
+              {current ? 'Nåværende bønn' : nextPrayer?.isTomorrow ? 'Første bønn i morgen' : 'Neste bønn'}
             </AppText>
             <AppText size="display" weight="bold" heading>
-              {next.label}
+              {shown.label}
             </AppText>
             <AppText size="lg" tone="textSecondary" tabular>
-              {`kl. ${next.time} · om ${formatDurationShort(next.date.getTime() - now.getTime())}`}
+              {countdownLabel
+                ? `kl. ${shown.time} · ${countdownLabel} om ${remaining}`
+                : `kl. ${shown.time} · om ${remaining}`}
             </AppText>
           </Animated.View>
         ) : (
