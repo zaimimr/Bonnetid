@@ -5,6 +5,7 @@ import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
 import { NextPrayerHero } from '@/components/prayer/NextPrayerHero';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { EventCard } from '@/components/calendar/EventCard';
+import { MosquePresenceCard } from '@/components/mosque/MosquePresenceCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import { NightCard } from '@/components/season/NightCard';
 import {
@@ -72,6 +73,8 @@ export default function HomeScreen() {
   return (
     <Screen scroll refreshing={refreshing} onRefresh={onRefresh}>
       <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
+        <MosquePresenceCard />
+
         {isLoading && <Skeleton height={220} rounded="xl" />}
 
         {isError && <ErrorState onRetry={refetch} />}

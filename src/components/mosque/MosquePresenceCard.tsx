@@ -1,0 +1,63 @@
+import { useEffect } from 'react';
+import { Linking, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { MosqueLogo } from '@/components/mosque/MosqueLogo';
+import { AppText, Button, Card } from '@/components/ui';
+import { useMosquePresence } from '@/hooks/useMosquePresence';
+import { donationForMosque } from '@/lib/mosqueDonations';
+import { track } from '@/lib/telemetry';
+import { useTheme } from '@/theme';
+import { spacing } from '@/theme/tokens';
+
+const trackedMosques = new Set<string>();
+
+export function MosquePresenceCard() {
+  const theme = useTheme();
+  const router = useRouter();
+  const presence = useMosquePresence();
+  const orgNr = presence?.mosque.org_nr;
+
+  useEffect(() => {
+    if (!orgNr || trackedMosques.has(orgNr)) return;
+    trackedMosques.add(orgNr);
+    track('mosque_presence_shown');
+  }, [orgNr]);
+
+  if (!presence) return null;
+
+  const { mosque } = presence;
+  const donation = donationForMosque(mosque.org_nr);
+
+  return (
+    <Card
+      rounded="xl"
+      onPress={() => router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.org_nr } })}
+      style={{ gap: spacing.md }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
+        <MosqueLogo uri={mosque.logo} size="sm" />
+        <View style={{ flex: 1 }}>
+          <AppText size="xs" weight="medium" tone="primary">
+            Du er i moskeen
+          </AppText>
+          <AppText size="md" weight="semibold">
+            {mosque.name}
+          </AppText>
+        </View>
+        <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
+      </View>
+      {donation && (
+        <Button
+          label="Doner med Vipps"
+          variant="secondary"
+          size="sm"
+          fullWidth
+          onPress={() => {
+            track('mosque_donation_opened', { source: 'presence' });
+            Linking.openURL(donation.url).catch(() => {});
+          }}
+        />
+      )}
+    </Card>
+  );
+}

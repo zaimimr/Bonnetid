@@ -51,6 +51,9 @@ planned one and gets its own design (part 2).
 - Uses the existing `Card` language and `useTheme()` roles. No new colours. Respects font scaling
   caps from `AppText`.
 - Later features (donation first) attach to this card.
+- Test donation: `src/lib/mosqueDonations.ts` hardcodes Al-Noor Islamic Centre (971258470) to
+  Vipps Donasjoner 101598. The card and the mosque page show "Doner med Vipps", which opens
+  `https://qr.vipps.no/donations/<number>?reference=bonnetid`. A real data source replaces the map later.
 
 ## Privacy and telemetry
 

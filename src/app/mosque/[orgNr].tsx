@@ -12,6 +12,7 @@ import type { Mosque } from '@/api/types';
 import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { MosqueSelectAction } from '@/components/mosque/MosqueSelectAction';
 import { AppText, Card, ErrorState, ListRow, Screen, SectionHeader, Skeleton } from '@/components/ui';
+import { donationForMosque } from '@/lib/mosqueDonations';
 import { track } from '@/lib/telemetry';
 import { useIsCalculatedMode, useSettings } from '@/store/settings';
 import { useTheme } from '@/theme';
@@ -77,6 +78,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
   const showEidSection = eidPeriod != null && mosque.show_eid;
   const eidTimes = showEidSection ? mosque.eid_prayers : [];
   const eidTitle = eidPeriod ? eidPrayerTitle(eidPeriod) : '';
+  const donation = donationForMosque(mosque.org_nr);
 
   const now = useNow(60_000);
   const today = useMemo(() => osloDayStart(now), [now]);
@@ -197,6 +199,25 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
           </View>
         </View>
       </Card>
+
+      {donation && (
+        <View>
+          <SectionHeader title="Støtt moskeen" />
+          <Card padding="sm" rounded="xl">
+            <ListRow
+              title="Doner med Vipps"
+              subtitle={`Vipps ${donation.vippsNumber}`}
+              leading={<Ionicons name="heart-outline" size={20} color={theme.colors.primary} />}
+              trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
+              onPress={() => {
+                track('mosque_donation_opened', { source: 'detail' });
+                Linking.openURL(donation.url).catch(() => {});
+              }}
+              style={{ paddingHorizontal: spacing.md }}
+            />
+          </Card>
+        </View>
+      )}
 
       {jamatRows.length > 0 && (
         <View>

@@ -11,11 +11,17 @@ const FALLBACK_PLACE_NAME = 'Din posisjon';
 
 type PositionSnapshot = {
   coords: Coords | null;
+  accuracyM: number | null;
   permissionDenied: boolean;
   readAt: number;
 };
 
-let snapshot: PositionSnapshot = { coords: null, permissionDenied: false, readAt: 0 };
+let snapshot: PositionSnapshot = {
+  coords: null,
+  accuracyM: null,
+  permissionDenied: false,
+  readAt: 0,
+};
 let inFlight: Promise<void> | null = null;
 const listeners = new Set<() => void>();
 
@@ -38,13 +44,19 @@ function getSnapshot(): PositionSnapshot {
 async function readPosition(): Promise<PositionSnapshot> {
   const permission = await Location.getForegroundPermissionsAsync();
   if (!permission.granted) {
-    return { coords: snapshot.coords, permissionDenied: true, readAt: Date.now() };
+    return {
+      coords: snapshot.coords,
+      accuracyM: snapshot.accuracyM,
+      permissionDenied: true,
+      readAt: Date.now(),
+    };
   }
   const position = await Location.getCurrentPositionAsync({
     accuracy: Location.Accuracy.Balanced,
   });
   return {
     coords: { lat: position.coords.latitude, lon: position.coords.longitude },
+    accuracyM: position.coords.accuracy,
     permissionDenied: false,
     readAt: Date.now(),
   };
@@ -69,8 +81,7 @@ export type TravelState = {
   permissionDenied: boolean;
 };
 
-export function useTravelState(): TravelState {
-  const { data: locations } = useLocations();
+export function useSharedPosition(): PositionSnapshot {
   const position = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
   useEffect(() => {
@@ -80,6 +91,13 @@ export function useTravelState(): TravelState {
     });
     return () => subscription.remove();
   }, []);
+
+  return position;
+}
+
+export function useTravelState(): TravelState {
+  const { data: locations } = useLocations();
+  const position = useSharedPosition();
 
   const now = new Date();
   const device = deviceOffsetMinutes(now);
@@ -131,7 +149,12 @@ export async function requestCoords(): Promise<Coords | null> {
       accuracy: Location.Accuracy.Balanced,
     });
     const coords = { lat: position.coords.latitude, lon: position.coords.longitude };
-    publish({ coords, permissionDenied: false, readAt: Date.now() });
+    publish({
+      coords,
+      accuracyM: position.coords.accuracy,
+      permissionDenied: false,
+      readAt: Date.now(),
+    });
     return coords;
   } catch {
     return null;
