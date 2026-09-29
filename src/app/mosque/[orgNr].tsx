@@ -9,6 +9,7 @@ import { useRefresh } from '@/hooks/useRefresh';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useResponsive } from '@/hooks/useResponsive';
 import type { Mosque } from '@/api/types';
+import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { MosqueSelectAction } from '@/components/mosque/MosqueSelectAction';
 import { AppText, Card, ErrorState, ListRow, Screen, SectionHeader, Skeleton } from '@/components/ui';
@@ -199,6 +200,12 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
           </View>
         </View>
       </Card>
+
+      {mosque.announcement && (
+        <Card rounded="xl">
+          <MosqueAnnouncement text={mosque.announcement} />
+        </Card>
+      )}
 
       {donation && (
         <View>

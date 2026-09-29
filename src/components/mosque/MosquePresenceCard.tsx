@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Linking, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { AppText, Button, Card } from '@/components/ui';
 import { useMosquePresence } from '@/hooks/useMosquePresence';
@@ -46,6 +47,9 @@ export function MosquePresenceCard() {
         </View>
         <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
       </View>
+      {mosque.announcement && (
+        <MosqueAnnouncement text={mosque.announcement} numberOfLines={4} />
+      )}
       {donation && (
         <Button
           label="Doner med Vipps"

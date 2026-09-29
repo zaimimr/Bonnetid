@@ -5,12 +5,14 @@ import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
 import { NextPrayerHero } from '@/components/prayer/NextPrayerHero';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { EventCard } from '@/components/calendar/EventCard';
+import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosquePresenceCard } from '@/components/mosque/MosquePresenceCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import { NightCard } from '@/components/season/NightCard';
 import {
   AppText,
   Badge,
+  Card,
   EmptyState,
   ErrorState,
   Screen,
@@ -18,6 +20,7 @@ import {
   Skeleton,
 } from '@/components/ui';
 import { useActiveDayKeys } from '@/hooks/useActiveDay';
+import { useMosquePresence } from '@/hooks/useMosquePresence';
 import { useNow } from '@/hooks/useNow';
 import { useTimezoneNote } from '@/hooks/useTimezoneNote';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
@@ -44,6 +47,7 @@ export default function HomeScreen() {
 
   const hijriMonth = useHijriMonth(today.getFullYear(), today.getMonth() + 1);
   const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
+  const presence = useMosquePresence();
   const specialsThisYear = useSpecialDates(today.getFullYear());
   const specialsNextYear = useSpecialDates(today.getFullYear() + 1);
 
@@ -55,6 +59,10 @@ export default function HomeScreen() {
   const mosqueIso = mosqueDetails.data?.location_iso;
   const mosqueInLocation = mosqueIso == null || mosqueIso === location.iso;
   const jummahTimes = mosqueDetails.data?.jummah ?? [];
+  const myAnnouncement =
+    mosque && presence?.mosque.org_nr !== mosque.orgNr
+      ? mosqueDetails.data?.announcement
+      : null;
   const jamatTimes = jamatTimesForDate(
     mosqueInLocation ? mosqueDetails.data?.jamat : null,
     todayIso,
@@ -93,6 +101,20 @@ export default function HomeScreen() {
               router.push({ pathname: '/day/[date]', params: { date: todayIso } })
             }
           />
+        )}
+
+        {mosque && myAnnouncement && (
+          <Card
+            rounded="xl"
+            onPress={() =>
+              router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } })
+            }>
+            <MosqueAnnouncement
+              title={`Kunngjøring fra ${mosque.name}`}
+              text={myAnnouncement}
+              numberOfLines={4}
+            />
+          </Card>
         )}
 
         <SeasonCard />

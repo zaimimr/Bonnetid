@@ -158,6 +158,7 @@ type MosqueRow = {
   contact_email: string | null;
   reg_hjemmeside: string | null;
   logo: string | null;
+  announcement: string | null;
   show_eid: boolean | null;
   eidprayer_time1: string | null;
   eidprayer_time2: string | null;
@@ -165,7 +166,7 @@ type MosqueRow = {
 };
 
 const MOSQUE_COLUMNS =
-  'organisasjonsnummer, reg_navn, org_name2, org_info, address, post_no, lat, lon, map_only, asr_method, contact_name, contact_phone, contact_email, reg_hjemmeside, logo, show_eid, eidprayer_time1, eidprayer_time2, eidprayer_time3';
+  'organisasjonsnummer, reg_navn, org_name2, org_info, address, post_no, lat, lon, map_only, asr_method, contact_name, contact_phone, contact_email, reg_hjemmeside, logo, announcement, show_eid, eidprayer_time1, eidprayer_time2, eidprayer_time3';
 
 type JamatPeriodRow = {
   id: number;
@@ -236,6 +237,10 @@ function toJamat(row: JamatPeriodRow, jummah: MosqueJummah[]): MosqueJamat {
 
 type PostRow = { post_no: string; post_name: string; location_iso: string | null };
 
+function toAnnouncement(value: string | null): string | null {
+  return value?.replace(/\u00a0/g, ' ').replace(/''/g, '"').trim() || null;
+}
+
 function toMosque(
   row: MosqueRow,
   post: PostRow | undefined,
@@ -257,6 +262,7 @@ function toMosque(
     contact_email: row.contact_email,
     homepage: toHomepage(row.reg_hjemmeside),
     logo: toLogo(row.logo),
+    announcement: toAnnouncement(row.announcement),
     asr_method: toAsrMethod(row.asr_method),
     show_eid: row.show_eid ?? false,
     eid_prayers: [row.eidprayer_time1, row.eidprayer_time2, row.eidprayer_time3]
