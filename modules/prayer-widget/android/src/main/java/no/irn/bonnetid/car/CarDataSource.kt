@@ -38,7 +38,6 @@ object CarDataSource {
     "wusta_noon_sunset",
     "maghrib",
     "isha",
-    "muntasafallayl_midnight",
   ).joinToString(",")
 
   fun configured(): Boolean = BuildConfig.SUPABASE_URL.isNotEmpty() && BuildConfig.SUPABASE_KEY.isNotEmpty()
@@ -176,13 +175,13 @@ object CarDataSource {
         JSONObject()
           .put("date", date)
           .put("hijriText", "")
-          .put("prayers", buildPrayers(row, date, asrMethod)),
+          .put("prayers", buildPrayers(row, rows.optJSONObject(index + 1), date, asrMethod)),
       )
     }
     return days
   }
 
-  private fun buildPrayers(row: JSONObject, date: String, asrMethod: Int): JSONArray {
+  private fun buildPrayers(row: JSONObject, nextRow: JSONObject?, date: String, asrMethod: Int): JSONArray {
     val entries = listOf(
       Triple("fajr", time(row, "fajr"), true),
       Triple("fajr_endtime", time(row, "fajr_endtime"), false),
@@ -198,7 +197,7 @@ object CarDataSource {
     val prayers = JSONArray()
     entries.forEachIndexed { index, (kind, at, isPrayer) ->
       val end = when {
-        kind == "isha" -> midnight(row, date, at)
+        kind == "isha" -> nextFajr(row, nextRow, date)
         kind == "fajr" -> instant(date, time(row, "fajr_endtime") ?: time(row, "shuruq_sunrise"))
         else -> entries.getOrNull(index + 1)?.second
       }
@@ -217,10 +216,11 @@ object CarDataSource {
     return prayers
   }
 
-  private fun midnight(row: JSONObject, date: String, ishaAt: Long): Long? {
-    val clock = time(row, "muntasafallayl_midnight") ?: return null
-    val sameDay = instant(date, clock) ?: return null
-    if (sameDay > ishaAt) return sameDay
+  private fun nextFajr(row: JSONObject, nextRow: JSONObject?, date: String): Long? {
+    nextRow?.let { next ->
+      instant(next.optString("date"), time(next, "fajr"))?.let { return it }
+    }
+    val sameDay = instant(date, time(row, "fajr")) ?: return null
     return sameDay + 24 * 60 * 60 * 1000L
   }
 

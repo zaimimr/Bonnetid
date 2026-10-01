@@ -50,14 +50,20 @@ export function usePrayerDay(now: Date): PrayerDayData {
     ? findDay(nextMonth.data, tomorrowStart)
     : findDay(currentMonth.data, tomorrowStart);
 
+  const dayAfter = addDays(dayStart, 2);
+  const dayAfterRow = findDay(nextMonth.data, dayAfter) ?? findDay(currentMonth.data, dayAfter);
+
   const todaySchedule = useMemo(
-    () => (todayRow ? buildDaySchedule(todayRow, dayStart, asrMethod, zone) : []),
-    [todayRow, dayStart, asrMethod, zone],
+    () => (todayRow ? buildDaySchedule(todayRow, dayStart, asrMethod, zone, tomorrowRow) : []),
+    [todayRow, tomorrowRow, dayStart, asrMethod, zone],
   );
 
   const tomorrowSchedule = useMemo(
-    () => (tomorrowRow ? buildDaySchedule(tomorrowRow, tomorrowStart, asrMethod, zone) : []),
-    [tomorrowRow, tomorrowStart, asrMethod, zone],
+    () =>
+      tomorrowRow
+        ? buildDaySchedule(tomorrowRow, tomorrowStart, asrMethod, zone, dayAfterRow)
+        : [],
+    [tomorrowRow, dayAfterRow, tomorrowStart, asrMethod, zone],
   );
 
   const nextPrayer = useMemo(

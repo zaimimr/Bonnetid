@@ -129,8 +129,8 @@ struct PrayerSnapshot: Codable, Hashable {
   }
 
   /// The prayer that is currently running, using the same rule as the app: the last prayer of
-  /// today that has started, until its own window end passes. Sunrise ends Fajr and midnight
-  /// ends Isha, so neither lingers into the next prayer's window.
+  /// today that has started, until its own window end passes. Sunrise ends Fajr and the next
+  /// Fajr ends Isha, so neither lingers into the next prayer's window.
   func currentPrayer(at date: Date) -> PrayerEntry? {
     let key = PrayerSnapshot.dayKey(for: date)
     guard let day = days.first(where: { $0.date == key }) else { return nil }
@@ -172,7 +172,7 @@ struct PrayerSnapshot: Codable, Hashable {
 
 /// What every surface renders: which prayer is running, which is next, and the window between them.
 struct PrayerMoment: Hashable {
-  /// The prayer whose window is open right now: Fajr stops running at sunrise, Isha at midnight.
+  /// The prayer whose window is open right now: Fajr stops running at sunrise, Isha at the next Fajr.
   let current: PrayerEntry?
   let next: PrayerEntry
   let windowStart: Date

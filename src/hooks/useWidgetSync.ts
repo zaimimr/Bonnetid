@@ -19,6 +19,7 @@ import {
   adhanTimesFromSchedule,
   buildDaySchedule,
   jamatTimesForDate,
+  nextPrayerDay,
   type PrayerEntry,
 } from '@/lib/prayerSchedule';
 import { isoDateKey, parseDayKey, todayKey } from '@/lib/time';
@@ -76,7 +77,7 @@ export function useWidgetSync(now: Date) {
       const row = findDay(rows, date);
       if (!row) return null;
 
-      const schedule = buildDaySchedule(row, date, asrMethod, zone);
+      const schedule = buildDaySchedule(row, date, asrMethod, zone, nextPrayerDay(rows, row));
       const iso = isoDateKey(date);
       const hijriRow = hijriRows.find((entry) => entry.gregorian_date === iso);
       // The Jumuah rides along separately, so a widget can drop back to Dhuhr on its own

@@ -1,7 +1,5 @@
 import Foundation
 
-let midnightKind = "midnight"
-
 struct TimelineMark: Hashable {
   let kind: String
   let label: String
@@ -82,27 +80,6 @@ struct DayTimeline {
       )
     }
 
-    if
-      let isha = day.prayers.first(where: { $0.kind == "isha" }),
-      let midnight = isha.end,
-      let fraction = fractionWithinDay(
-        midnight,
-        dayStart: dayStart,
-        length: lengthOfThisDayIncludingClockChanges
-      )
-    {
-      marks.append(
-        TimelineMark(
-          kind: midnightKind,
-          label: "Midnatt",
-          symbol: "moon.zzz",
-          at: midnight,
-          fraction: fraction,
-          isPrayer: false
-        )
-      )
-    }
-
     guard !marks.isEmpty else { return nil }
 
     return DayTimeline(
@@ -114,7 +91,6 @@ struct DayTimeline {
 
   private static func rank(_ mark: TimelineMark, highlighting: Date?) -> Int {
     if let highlighting, mark.at == highlighting { return 0 }
-    if mark.kind == midnightKind { return 3 }
     return mark.isPrayer ? 1 : 2
   }
 

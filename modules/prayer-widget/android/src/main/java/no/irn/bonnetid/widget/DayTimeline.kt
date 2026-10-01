@@ -44,7 +44,6 @@ data class DayTimeline(
 
     private fun rank(mark: TimelineMark, highlighting: Long?): Int {
       if (highlighting != null && mark.at == highlighting) return 0
-      if (mark.kind == MIDNIGHT_KIND) return 3
       return if (mark.isPrayer) 1 else 2
     }
 
@@ -74,21 +73,6 @@ data class DayTimeline(
             isPrayer = prayer.isPrayer,
           ),
         )
-      }
-
-      val midnight = day.prayers.firstOrNull { it.kind == "isha" }?.end
-      if (midnight != null) {
-        fractionWithinDay(midnight, dayStart, length)?.let { fraction ->
-          marks.add(
-            TimelineMark(
-              kind = MIDNIGHT_KIND,
-              label = "Midnatt",
-              at = midnight,
-              fraction = fraction,
-              isPrayer = false,
-            ),
-          )
-        }
       }
 
       if (marks.isEmpty()) return null

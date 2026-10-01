@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { buildDaySchedule, type PrayerName } from '@/lib/prayerSchedule';
+import { buildDaySchedule, nextPrayerDay, type PrayerName } from '@/lib/prayerSchedule';
 import {
   cancelPrayerNotifications,
   syncPrayerNotifications,
@@ -69,15 +69,14 @@ export function useNotificationScheduler() {
     }
 
     const now = new Date();
-    const days: ScheduleDay[] = [...(currentMonth.data ?? []), ...(nextMonth.data ?? [])].map(
-      (day) => {
-        const dayStart = parseDayKey(day.date);
-        return {
-          isoDate: isoDateKey(dayStart),
-          schedule: buildDaySchedule(day, dayStart, asrMethod, zone),
-        };
-      },
-    );
+    const rows = [...(currentMonth.data ?? []), ...(nextMonth.data ?? [])];
+    const days: ScheduleDay[] = rows.map((day) => {
+      const dayStart = parseDayKey(day.date);
+      return {
+        isoDate: isoDateKey(dayStart),
+        schedule: buildDaySchedule(day, dayStart, asrMethod, zone, nextPrayerDay(rows, day)),
+      };
+    });
 
     const isEnabled = (prayer: PrayerName) =>
       prayer !== 'fajr_endtime' && notificationPrayers[prayer];

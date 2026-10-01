@@ -10,6 +10,7 @@ import {
   buildDaySchedule,
   findJamatPeriod,
   jamatTimesForDate,
+  nextPrayerDay,
 } from '@/lib/prayerSchedule';
 import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { isoDateKey, todayKey } from '@/lib/time';
@@ -47,8 +48,11 @@ export default function DayScreen() {
   const hijriDay = hijriMonth.data?.find((row) => row.gregorian_date === isoDate);
 
   const schedule = useMemo(
-    () => (day ? buildDaySchedule(day, date, asrMethod, zone) : []),
-    [day, date, asrMethod, zone],
+    () =>
+      day && month.data
+        ? buildDaySchedule(day, date, asrMethod, zone, nextPrayerDay(month.data, day))
+        : [],
+    [day, month.data, date, asrMethod, zone],
   );
 
   const isFriday = date.getDay() === FRIDAY;

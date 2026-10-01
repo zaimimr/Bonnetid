@@ -5,6 +5,8 @@ import {
   addMinutesToTime,
   formatZonedClock,
   osloTimeToLocalClock,
+  parseDayKey,
+  todayKey,
   wallClockToDate,
   type PrayerTimeZone,
 } from './time';
@@ -51,6 +53,7 @@ export function buildDaySchedule(
   baseDate: Date,
   asrMethod: AsrMethodPreference,
   zone: PrayerTimeZone = 'oslo',
+  nextDay?: PrayerDay | null,
 ): PrayerEntry[] {
   const source: { name: PrayerName; time: string | null; isPrayer: boolean }[] = [
     { name: 'fajr', time: day.fajr, isPrayer: true },
@@ -78,7 +81,7 @@ export function buildDaySchedule(
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry.name === 'isha') {
-      entry.end = midnightEnd(day, entry.date, baseDate, zone);
+      entry.end = ishaEnd(day, nextDay, baseDate, zone);
       continue;
     }
     if (!entry.isPrayer) continue;
@@ -99,19 +102,24 @@ export function buildDaySchedule(
   return entries;
 }
 
-function midnightEnd(
+function ishaEnd(
   day: PrayerDay,
-  ishaDate: Date,
+  nextDay: PrayerDay | null | undefined,
   baseDate: Date,
   zone: PrayerTimeZone,
 ): PrayerWindowEnd | null {
-  if (!day.muntasafallayl_midnight) return null;
-  const sameDay = wallClockToDate(baseDate, day.muntasafallayl_midnight, zone);
-  if (sameDay.getTime() > ishaDate.getTime()) return { label: 'Midnatt', date: sameDay };
+  const fajr = nextDay?.fajr ?? day.fajr;
+  if (!fajr) return null;
+  const tomorrow = new Date(baseDate);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return { label: PRAYER_LABELS.fajr, date: wallClockToDate(tomorrow, fajr, zone) };
+}
 
-  const nextDay = new Date(baseDate);
-  nextDay.setDate(nextDay.getDate() + 1);
-  return { label: 'Midnatt', date: wallClockToDate(nextDay, day.muntasafallayl_midnight, zone) };
+export function nextPrayerDay(rows: PrayerDay[], day: PrayerDay): PrayerDay | undefined {
+  const date = parseDayKey(day.date);
+  date.setDate(date.getDate() + 1);
+  const key = todayKey(date);
+  return rows.find((row) => row.date === key);
 }
 
 export type JamatTimes = Partial<Record<PrayerName, string>>;
