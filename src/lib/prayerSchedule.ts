@@ -210,8 +210,15 @@ export type NextPrayerResult = {
   isTomorrow: boolean;
 };
 
-function currentWithinWindow(passed: PrayerEntry[], now: Date): PrayerEntry | null {
-  const last = passed.length > 0 ? passed[passed.length - 1] : null;
+function currentWithinWindow(
+  passed: PrayerEntry[],
+  now: Date,
+  yesterday: PrayerEntry[],
+): PrayerEntry | null {
+  const last =
+    passed.length > 0
+      ? passed[passed.length - 1]
+      : (yesterday.filter((entry) => entry.isPrayer).pop() ?? null);
   if (!last) return null;
   if (last.end && now.getTime() >= last.end.date.getTime()) return null;
   return last;
@@ -221,11 +228,12 @@ export function findNextPrayer(
   today: PrayerEntry[],
   tomorrow: PrayerEntry[],
   now: Date,
+  yesterday: PrayerEntry[] = [],
 ): NextPrayerResult | null {
   const prayersToday = today.filter((entry) => entry.isPrayer);
   const upcoming = prayersToday.find((entry) => entry.date.getTime() > now.getTime());
   const passed = prayersToday.filter((entry) => entry.date.getTime() <= now.getTime());
-  const current = currentWithinWindow(passed, now);
+  const current = currentWithinWindow(passed, now, yesterday);
 
   if (upcoming) {
     return { next: upcoming, current, isTomorrow: false };

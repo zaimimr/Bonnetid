@@ -129,15 +129,16 @@ struct PrayerSnapshot: Codable, Hashable {
   }
 
   /// The prayer that is currently running, using the same rule as the app: the last prayer of
-  /// today that has started, until its own window end passes. Sunrise ends Fajr and the next
+  /// today that has started (or yesterday's Isha before Fajr), until its window end passes. Sunrise ends Fajr and the next
   /// Fajr ends Isha, so neither lingers into the next prayer's window.
   func currentPrayer(at date: Date) -> PrayerEntry? {
     let key = PrayerSnapshot.dayKey(for: date)
-    guard let day = days.first(where: { $0.date == key }) else { return nil }
-    let started = day.prayers
+    guard let index = days.firstIndex(where: { $0.date == key }) else { return nil }
+    let started = days[index].prayers
       .filter(\.isPrayer)
       .sorted { $0.at < $1.at }
       .last { $0.at <= date }
+      ?? (index > 0 ? days[index - 1].prayers.filter(\.isPrayer).max { $0.at < $1.at } : nil)
     guard let started else { return nil }
     if let end = started.end, date >= end { return nil }
     return started.jummahResolved(at: date)

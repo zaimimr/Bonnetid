@@ -148,7 +148,11 @@ export default function HomeScreen() {
             )}
             <PrayerTimesCard
               schedule={todaySchedule}
-              highlightedName={nextPrayer?.current?.name}
+              highlightedName={
+                nextPrayer?.current && todaySchedule.includes(nextPrayer.current)
+                  ? nextPrayer.current.name
+                  : undefined
+              }
               mosqueName={mosque?.name}
               mosqueNote={
                 mosqueInLocation

@@ -80,7 +80,10 @@ object PrayerStatusNotifier {
 
   private fun postCurrent(context: Context, snapshot: PrayerSnapshot, now: Long) {
     val prayer = snapshot.currentPrayer(now) ?: return
-    val date = snapshot.dayFor(now)?.date ?: return
+    val date = snapshot.days
+      .firstOrNull { day -> day.prayers.any { it.kind == prayer.kind && it.at == prayer.at } }
+      ?.date
+      ?: return
     val posted = context
       .getSharedPreferences(SNAPSHOT_PREFS, Context.MODE_PRIVATE)
       .getString(POSTED_KEY, null)

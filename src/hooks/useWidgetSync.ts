@@ -59,7 +59,10 @@ export function useWidgetSync(now: Date) {
   const { dayKey } = useActiveDayKeys(now);
   const dayStart = useMemo(() => parseDayKey(dayKey), [dayKey]);
   const lastDay = useMemo(() => addDays(dayStart, SNAPSHOT_DAYS - 1), [dayStart]);
+  const yesterday = useMemo(() => addDays(dayStart, -1), [dayStart]);
 
+  const previousMonth = usePrayerMonth(location, yesterday.getFullYear(), yesterday.getMonth() + 1);
+  const previousHijri = useHijriMonth(yesterday.getFullYear(), yesterday.getMonth() + 1);
   const currentMonth = usePrayerMonth(location, dayStart.getFullYear(), dayStart.getMonth() + 1);
   const nextMonth = usePrayerMonth(location, lastDay.getFullYear(), lastDay.getMonth() + 1);
   const currentHijri = useHijriMonth(dayStart.getFullYear(), dayStart.getMonth() + 1);
@@ -69,11 +72,20 @@ export function useWidgetSync(now: Date) {
   const mosqueInLocation = mosqueIso == null || mosqueIso === location.iso;
 
   const days = useMemo<SnapshotDayInput[]>(() => {
-    const rows = [...(currentMonth.data ?? []), ...(nextMonth.data ?? [])];
-    const hijriRows = [...(currentHijri.data ?? []), ...(nextHijri.data ?? [])];
+    const rows = [
+      ...(previousMonth.data ?? []),
+      ...(currentMonth.data ?? []),
+      ...(nextMonth.data ?? []),
+    ];
+    const hijriRows = [
+      ...(previousHijri.data ?? []),
+      ...(currentHijri.data ?? []),
+      ...(nextHijri.data ?? []),
+    ];
 
-    const built = Array.from({ length: SNAPSHOT_DAYS }, (_, index): SnapshotDayInput | null => {
-      const date = addDays(dayStart, index);
+    // Yesterday rides along because its Isha is still running until Fajr.
+    const built = Array.from({ length: SNAPSHOT_DAYS + 1 }, (_, index): SnapshotDayInput | null => {
+      const date = addDays(yesterday, index);
       const row = findDay(rows, date);
       if (!row) return null;
 
@@ -99,11 +111,13 @@ export function useWidgetSync(now: Date) {
 
     return built.filter((day): day is SnapshotDayInput => day !== null);
   }, [
+    previousMonth.data,
     currentMonth.data,
     nextMonth.data,
+    previousHijri.data,
     currentHijri.data,
     nextHijri.data,
-    dayStart,
+    yesterday,
     asrMethod,
     zone,
     mosqueInLocation,

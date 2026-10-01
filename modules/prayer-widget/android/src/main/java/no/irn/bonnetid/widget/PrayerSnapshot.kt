@@ -101,11 +101,13 @@ data class PrayerSnapshot(
 
   fun currentPrayer(at: Long): PrayerEntry? {
     val key = dayKey(at)
-    val day = days.firstOrNull { it.date == key } ?: return null
-    val started = day.prayers
+    val index = days.indexOfFirst { it.date == key }
+    if (index < 0) return null
+    val started = days[index].prayers
       .filter { it.isPrayer }
       .sortedBy { it.at }
       .lastOrNull { it.at <= at }
+      ?: days.getOrNull(index - 1)?.prayers?.filter { it.isPrayer }?.maxByOrNull { it.at }
       ?: return null
     val end = started.end
     if (end != null && at >= end) return null

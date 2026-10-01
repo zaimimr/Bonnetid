@@ -36,6 +36,7 @@ export function usePrayerDay(now: Date): PrayerDayData {
   const { dayKey } = useActiveDayKeys(now);
   const dayStart = useMemo(() => parseDayKey(dayKey), [dayKey]);
   const tomorrowStart = useMemo(() => addDays(dayStart, 1), [dayStart]);
+  const yesterdayStart = useMemo(() => addDays(dayStart, -1), [dayStart]);
 
   const currentMonth = usePrayerMonth(location, dayStart.getFullYear(), dayStart.getMonth() + 1);
   const needsNextMonth = tomorrowStart.getMonth() !== dayStart.getMonth();
@@ -45,6 +46,13 @@ export function usePrayerDay(now: Date): PrayerDayData {
     tomorrowStart.getMonth() + 1,
   );
 
+  const previousMonth = usePrayerMonth(
+    location,
+    yesterdayStart.getFullYear(),
+    yesterdayStart.getMonth() + 1,
+  );
+
+  const yesterdayRow = findDay(previousMonth.data, yesterdayStart);
   const todayRow = findDay(currentMonth.data, dayStart);
   const tomorrowRow = needsNextMonth
     ? findDay(nextMonth.data, tomorrowStart)
@@ -66,9 +74,17 @@ export function usePrayerDay(now: Date): PrayerDayData {
     [tomorrowRow, dayAfterRow, tomorrowStart, asrMethod, zone],
   );
 
+  const yesterdaySchedule = useMemo(
+    () =>
+      yesterdayRow
+        ? buildDaySchedule(yesterdayRow, yesterdayStart, asrMethod, zone, todayRow)
+        : [],
+    [yesterdayRow, todayRow, yesterdayStart, asrMethod, zone],
+  );
+
   const nextPrayer = useMemo(
-    () => findNextPrayer(todaySchedule, tomorrowSchedule, now),
-    [todaySchedule, tomorrowSchedule, now],
+    () => findNextPrayer(todaySchedule, tomorrowSchedule, now, yesterdaySchedule),
+    [todaySchedule, tomorrowSchedule, now, yesterdaySchedule],
   );
 
   return {
