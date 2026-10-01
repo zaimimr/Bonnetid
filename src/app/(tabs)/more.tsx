@@ -31,7 +31,7 @@ const DUAS_FEATURE: Feature = {
   href: '/duas',
   icon: 'book-outline',
   title: 'Duaer',
-  description: 'Kjente duaer fra Koranen og sunnah',
+  description: 'Duaer til adhan, bønnen og Ramadan',
 };
 
 const SETTINGS_FEATURE: Feature = {

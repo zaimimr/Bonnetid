@@ -5,6 +5,7 @@ export type DuaSeason = 'ramadan' | 'dhul-hijjah';
 export type DuaCategory = {
   id: DuaCategoryId;
   title: string;
+  description: string;
   season?: DuaSeason;
 };
 
@@ -21,11 +22,21 @@ export type Dua = {
 };
 
 export const DUA_CATEGORIES: DuaCategory[] = [
-  { id: 'after-adhan', title: 'Etter adhan' },
-  { id: 'wudu-mosque', title: 'Wudu og moské' },
-  { id: 'after-salah', title: 'Etter bønnen' },
-  { id: 'ramadan', title: 'Ramadan', season: 'ramadan' },
-  { id: 'hajj', title: 'Hajj og Dhul-Hijjah', season: 'dhul-hijjah' },
+  { id: 'after-adhan', title: 'Etter adhan', description: 'Svar på kallet og duaen etterpå' },
+  { id: 'wudu-mosque', title: 'Wudu og moské', description: 'Etter wudu, inn og ut av moskeen' },
+  { id: 'after-salah', title: 'Etter bønnen', description: 'Dhikr og duaer etter hver bønn' },
+  {
+    id: 'ramadan',
+    title: 'Ramadan',
+    description: 'Iftar, fasten og Laylat-ul-Qadr',
+    season: 'ramadan',
+  },
+  {
+    id: 'hajj',
+    title: 'Hajj og Dhul-Hijjah',
+    description: 'Talbiyah, Arafah, takbir og qurbani',
+    season: 'dhul-hijjah',
+  },
 ];
 
 export const DUA_LINKS = {
@@ -59,7 +70,7 @@ export const DUAS: Dua[] = [
     source: 'Sahih Muslim 386',
   },
   {
-    id: 'after-adhan',
+    id: 'adhan-dua',
     category: 'after-adhan',
     title: 'Dua etter adhan',
     arabic:
@@ -122,7 +133,7 @@ export const DUAS: Dua[] = [
   {
     id: 'la-ilaha-illallah-after-salah',
     category: 'after-salah',
-    title: 'Ingen gud uten Allah',
+    title: 'La ilaha illallah',
     arabic:
       'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ، اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ، وَلَا مُعْطِيَ لِمَا مَنَعْتَ، وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ',
     transliteration:
@@ -132,46 +143,27 @@ export const DUAS: Dua[] = [
     source: 'Sahih al-Bukhari 844, Sahih Muslim 593',
   },
   {
-    id: 'subhanallah-33',
+    id: 'tasbih',
     category: 'after-salah',
-    title: 'Subhanallah',
-    arabic: 'سُبْحَانَ اللَّهِ',
-    transliteration: 'Subhanallah',
-    meaning: 'Allah er hevet over alle mangler.',
-    repeat: 33,
-    source: 'Sahih Muslim 597',
-  },
-  {
-    id: 'alhamdulillah-33',
-    category: 'after-salah',
-    title: 'Alhamdulillah',
-    arabic: 'الْحَمْدُ لِلَّهِ',
-    transliteration: 'Alhamdulillah',
-    meaning: 'All lovprisning tilhører Allah.',
-    repeat: 33,
-    source: 'Sahih Muslim 597',
-  },
-  {
-    id: 'allahu-akbar-33',
-    category: 'after-salah',
-    title: 'Allahu akbar',
-    arabic: 'اللَّهُ أَكْبَرُ',
-    transliteration: 'Allahu akbar',
-    meaning: 'Allah er størst.',
+    title: 'Subhanallah, Alhamdulillah, Allahu akbar',
+    arabic: 'سُبْحَانَ اللَّهِ\nالْحَمْدُ لِلَّهِ\nاللَّهُ أَكْبَرُ',
+    transliteration: 'Subhanallah\nAlhamdulillah\nAllahu akbar',
+    meaning: 'Allah er hevet over alle mangler.\nAll lovprisning tilhører Allah.\nAllah er størst.',
+    note: 'Si hver av dem 33 ganger.',
     repeat: 33,
     source: 'Sahih Muslim 597',
   },
   {
     id: 'tasbih-completion',
     category: 'after-salah',
-    title: 'Fullfør hundre',
+    title: 'Til sammen hundre',
     arabic:
       'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ',
     transliteration:
       "La ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamdu wa huwa 'ala kulli shay'in qadir",
     meaning:
       'Ingen har rett til å tilbes unntatt Allah alene, uten partner. Hans er herredømmet og Hans er lovprisningen, og Han har makt over alle ting.',
-    note: 'Sies én gang etter de tre gangene 33, så det blir hundre til sammen.',
+    note: 'Sies én gang etter de tre rundene med 33, så det blir hundre til sammen.',
     source: 'Sahih Muslim 597',
   },
   {
@@ -202,7 +194,7 @@ export const DUAS: Dua[] = [
   {
     id: 'help-me-remember',
     category: 'after-salah',
-    title: 'Hjelp meg å minnes deg',
+    title: 'Hjelp meg å minnes Deg',
     arabic: 'اللَّهُمَّ أَعِنِّي عَلَىٰ ذِكْرِكَ، وَشُكْرِكَ، وَحُسْنِ عِبَادَتِكَ',
     transliteration: "Allahumma a'inni 'ala dhikrika, wa shukrika, wa husni 'ibadatik",
     meaning: 'Allah, hjelp meg å minnes Deg, å takke Deg og å tilbe Deg på best mulig måte.',
@@ -225,7 +217,7 @@ export const DUAS: Dua[] = [
     arabic: 'اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي',
     transliteration: "Allahumma innaka 'afuwwun tuhibbul-'afwa fa'fu 'anni",
     meaning: 'Allah, Du er Den som tilgir, og Du elsker å tilgi, så tilgi meg.',
-    note: 'Profeten lærte Aisha denne duaen for Laylat-ul-Qadr.',
+    note: 'Profeten lærte Aisha å si denne duaen.',
     source: "Jami' at-Tirmidhi 3513, Sunan Ibn Majah 3850",
   },
   {

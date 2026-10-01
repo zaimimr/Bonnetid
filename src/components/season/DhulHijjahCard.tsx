@@ -102,7 +102,7 @@ export function DhulHijjahCard({ status }: DhulHijjahCardProps) {
         {MOON_SIGHTING_NOTE}
       </AppText>
 
-      <DuaLink category={DUA_LINKS.hajj} label="Duaer for Dhul-Hijjah" />
+      <DuaLink category={DUA_LINKS.hajj} label="Duaer for Hajj og Dhul-Hijjah" />
     </Card>
   );
 }

@@ -22,7 +22,13 @@ export function DuaLink({ duaId, category, label }: DuaLinkProps) {
           ? router.push({ pathname: '/duas/[id]', params: { id: duaId } })
           : router.push({ pathname: '/duas', params: { category } })
       }
-      style={({ pressed }) => ({ marginTop: spacing.md, opacity: pressed ? opacity.pressed : 1 })}>
+      style={({ pressed }) => ({
+        marginTop: spacing.sm,
+        minHeight: 44,
+        justifyContent: 'center',
+        alignSelf: 'flex-start',
+        opacity: pressed ? opacity.pressed : 1,
+      })}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
         <Ionicons name="book-outline" size={16} color={theme.colors.primary} />
         <AppText size="sm" weight="semibold" tone="primary" style={{ flexShrink: 1 }}>

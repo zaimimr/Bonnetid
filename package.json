@@ -4,6 +4,7 @@
   "version": "1.1.0",
   "dependencies": {
     "@bacons/apple-targets": "5.0.0",
+    "@expo-google-fonts/amiri-quran": "^0.4.1",
     "@expo/ui": "~57.0.21",
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -63,6 +64,8 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "ios:sim": "scripts/run-ios-sim.sh",
+    "duas:check": "node --no-warnings scripts/duas.mjs",
+    "duas:review": "node --no-warnings scripts/duas.mjs review",
     "web": "expo start --web",
     "lint": "expo lint",
     "leaflet:bundle": "node scripts/generate-leaflet-bundle.mjs"

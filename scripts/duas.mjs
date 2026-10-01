@@ -1,31 +1,10 @@
-import { execFileSync } from 'node:child_process';
-import { mkdtempSync } from 'node:fs';
-import { createRequire } from 'node:module';
-import { tmpdir } from 'node:os';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const outDir = mkdtempSync(join(tmpdir(), 'duas-'));
-
-execFileSync(
-  join(root, 'node_modules/.bin/tsc'),
-  [
-    join(root, 'src/lib/duas.ts'),
-    '--outDir',
-    outDir,
-    '--module',
-    'commonjs',
-    '--target',
-    'es2020',
-    '--strict',
-    '--skipLibCheck',
-    '--ignoreConfig',
-  ],
-  { stdio: 'inherit' },
-);
-
-const { DUAS, DUA_CATEGORIES, DUA_LINKS } = createRequire(import.meta.url)(join(outDir, 'duas.js'));
+const reviewPath = join(root, 'docs/duas-review.md');
+const { DUAS, DUA_CATEGORIES, DUA_LINKS } = await import(join(root, 'src/lib/duas.ts'));
 
 function check() {
   const failures = [];
@@ -52,6 +31,15 @@ function check() {
     }
   }
   const categoryIds = new Set(DUA_CATEGORIES.map((category) => category.id));
+  for (const id of ids) {
+    if (categoryIds.has(id)) failures.push(`dua id ${id} collides with a category id`);
+  }
+  for (const category of DUA_CATEGORIES) {
+    if (!category.description?.trim()) failures.push(`category ${category.id}: empty description`);
+  }
+  if (readFileSync(reviewPath, 'utf8') !== reviewText()) {
+    failures.push('docs/duas-review.md is out of date, run npm run duas:review');
+  }
   for (const [name, target] of Object.entries(DUA_LINKS)) {
     if (!ids.has(target) && !categoryIds.has(target)) failures.push(`link ${name} -> ${target} missing`);
   }
@@ -63,7 +51,7 @@ function check() {
   console.log(`OK ${DUAS.length} duas in ${DUA_CATEGORIES.length} categories`);
 }
 
-function review() {
+function reviewText() {
   const lines = [
     '# Duaer i Bønnetid - til gjennomgang',
     '',
@@ -83,12 +71,12 @@ function review() {
       lines.push(`Kilde: ${dua.source}`, '');
     }
   }
-  console.log(lines.join('\n'));
+  return `${lines.join('\n')}\n`;
 }
 
 const mode = process.argv[2] ?? 'check';
 if (mode === 'check') check();
-else if (mode === 'review') review();
+else if (mode === 'review') writeFileSync(reviewPath, reviewText());
 else {
   console.error(`unknown mode ${mode}, use check or review`);
   process.exit(1);

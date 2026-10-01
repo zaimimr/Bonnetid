@@ -40,7 +40,7 @@ export function NightCard({ now, onPress }: NightCardProps) {
       <AppText size="xs" tone="textMuted" style={{ marginTop: spacing.sm }}>
         {MOON_SIGHTING_NOTE}
       </AppText>
-      {night.duaId && <DuaLink duaId={night.duaId} label="Dua for natten" />}
+      {night.duaId && <DuaLink duaId={night.duaId} label={`Dua for ${night.title}`} />}
     </Card>
   );
 }

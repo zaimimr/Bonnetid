@@ -1,3 +1,5 @@
+import { AmiriQuran_400Regular } from '@expo-google-fonts/amiri-quran';
+import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { QueryCache, QueryClient } from '@tanstack/react-query';
@@ -67,10 +69,12 @@ function RootNavigator() {
   useWidgetSync(now);
   usePrayerLogSync(now);
 
+  const [fontsLoaded, fontError] = useFonts({ AmiriQuran_400Regular });
+
   useEffect(() => {
-    if (!hydrated) return;
+    if (!hydrated || (!fontsLoaded && !fontError)) return;
     SplashScreen.hideAsync().catch(() => {});
-  }, [hydrated]);
+  }, [hydrated, fontsLoaded, fontError]);
 
   return (
     <>

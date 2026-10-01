@@ -1,8 +1,9 @@
 import { View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { DuaCard } from '@/components/duas/DuaCard';
+import { TransliterationToggle } from '@/components/duas/TransliterationToggle';
 import { EmptyState, Screen } from '@/components/ui';
-import { duaById } from '@/lib/duas';
+import { categoryById, duaById } from '@/lib/duas';
 import { spacing } from '@/theme/tokens';
 
 export default function DuaScreen() {
@@ -19,8 +20,9 @@ export default function DuaScreen() {
 
   return (
     <Screen scroll edges={[]}>
-      <Stack.Screen options={{ title: dua.title }} />
-      <View style={{ marginTop: spacing.lg }}>
+      <Stack.Screen options={{ title: categoryById(dua.category)?.title ?? 'Dua' }} />
+      <View style={{ gap: spacing.lg, marginTop: spacing.md }}>
+        <TransliterationToggle />
         <DuaCard dua={dua} />
       </View>
     </Screen>

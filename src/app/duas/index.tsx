@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import { View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { DuaCard } from '@/components/duas/DuaCard';
+import { TransliterationToggle } from '@/components/duas/TransliterationToggle';
 import { Card, Divider, EmptyState, ListRow, Screen } from '@/components/ui';
 import { useHijriSeasonNow } from '@/hooks/useHijriSeason';
 import { categoryById, DUA_CATEGORIES, duasIn, type DuaCategory } from '@/lib/duas';
@@ -38,7 +39,7 @@ function CategoryList() {
             {index > 0 && <Divider />}
             <ListRow
               title={entry.title}
-              subtitle={`${duasIn(entry.id).length} duaer`}
+              subtitle={entry.description}
               chevron
               onPress={() => router.push({ pathname: '/duas', params: { category: entry.id } })}
               style={{ paddingHorizontal: spacing.md }}
@@ -56,9 +57,10 @@ function CategoryReader({ category }: { category: DuaCategory }) {
   return (
     <Screen scroll edges={[]}>
       <Stack.Screen options={{ title: category.title }} />
-      <View style={{ gap: spacing.lg, marginTop: spacing.lg }}>
-        {duas.map((dua, index) => (
-          <DuaCard key={dua.id} dua={dua} step={`${index + 1} av ${duas.length}`} />
+      <View style={{ gap: spacing.lg, marginTop: spacing.md }}>
+        <TransliterationToggle />
+        {duas.map((dua) => (
+          <DuaCard key={dua.id} dua={dua} />
         ))}
       </View>
     </Screen>

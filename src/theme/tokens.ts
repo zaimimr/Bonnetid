@@ -101,6 +101,13 @@ export const fontFamily = {
   mono: 'Menlo',
 } as const;
 
+export const arabicType = {
+  family: 'AmiriQuran_400Regular',
+  size: 28,
+  leading: 2.1,
+  maxScale: 1.6,
+} as const;
+
 export const lineHeight = {
   tight: 1.15,
   normal: 1.45,

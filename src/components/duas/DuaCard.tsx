@@ -1,74 +1,66 @@
-import { Platform, useWindowDimensions, View } from 'react-native';
+import { View } from 'react-native';
 import { AppText, Badge, Card, Divider } from '@/components/ui';
 import type { Dua } from '@/lib/duas';
-import { fontSize, spacing } from '@/theme/tokens';
-
-const ARABIC_SIZE = 'xxl';
-const ARABIC_MAX_SCALE = 1.4;
-const ARABIC_LINE_HEIGHT = 1.9;
+import { useTheme } from '@/theme';
+import { radius, spacing } from '@/theme/tokens';
+import { useSettings } from '@/store/settings';
+import { ArabicText } from './ArabicText';
 
 export type DuaCardProps = {
   dua: Dua;
-  step?: string;
 };
 
-export function DuaCard({ dua, step }: DuaCardProps) {
-  const { fontScale } = useWindowDimensions();
-  const scale = Platform.OS === 'ios' ? Math.min(Math.max(fontScale || 1, 1), ARABIC_MAX_SCALE) : 1;
+export function DuaCard({ dua }: DuaCardProps) {
+  const theme = useTheme();
+  const showTransliteration = useSettings((state) => state.duaShowTransliteration);
 
   return (
-    <Card rounded="xl" padding="lg">
+    <Card rounded="xl" padding="lg" style={{ gap: spacing.md }}>
       <View
         style={{
           flexDirection: 'row',
-          alignItems: 'baseline',
+          alignItems: 'center',
           justifyContent: 'space-between',
           gap: spacing.md,
-          marginBottom: spacing.md,
         }}>
-        <AppText weight="semibold" style={{ flexShrink: 1 }}>
+        <AppText weight="semibold" accessibilityRole="header" style={{ flexShrink: 1 }}>
           {dua.title}
         </AppText>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-          {dua.repeat ? <Badge label={`${dua.repeat}×`} variant="primary" /> : null}
-          {step && (
-            <AppText size="xs" tone="textMuted" tabular>
-              {step}
-            </AppText>
-          )}
-        </View>
+        {dua.repeat ? (
+          <View accessible accessibilityLabel={`Gjentas ${dua.repeat} ganger`}>
+            <Badge label={`${dua.repeat}×`} variant="primary" />
+          </View>
+        ) : null}
       </View>
 
-      <AppText
-        size={ARABIC_SIZE}
-        maxFontSizeMultiplier={ARABIC_MAX_SCALE}
-        align="right"
+      {dua.note ? (
+        <AppText size="sm" tone="textSecondary">
+          {dua.note}
+        </AppText>
+      ) : null}
+
+      <View
         style={{
-          writingDirection: 'rtl',
-          lineHeight: fontSize[ARABIC_SIZE] * ARABIC_LINE_HEIGHT * scale,
+          backgroundColor: theme.colors.surfaceSunken,
+          borderRadius: radius.lg,
+          paddingHorizontal: spacing.lg,
+          paddingVertical: spacing.md,
         }}>
-        {dua.arabic}
-      </AppText>
-
-      <View style={{ marginVertical: spacing.md }}>
-        <Divider inset={0} />
+        <ArabicText>{dua.arabic}</ArabicText>
       </View>
 
-      <View style={{ gap: spacing.sm }}>
-        <AppText tone="textSecondary" style={{ fontStyle: 'italic' }}>
+      {showTransliteration && (
+        <AppText tone="textSecondary" accessibilityLabel={`Uttale: ${dua.transliteration}`}>
           {dua.transliteration}
         </AppText>
-        <AppText>{dua.meaning}</AppText>
-        {dua.note ? (
-          <AppText size="sm" tone="textSecondary">
-            {dua.note}
-          </AppText>
-        ) : null}
-        <AppText size="xs" tone="textMuted">
-          {`Kilde: ${dua.source}`}
-        </AppText>
-      </View>
+      )}
 
+      <Divider inset={0} />
+
+      <AppText>{dua.meaning}</AppText>
+      <AppText size="xs" tone="textMuted">
+        {`Kilde: ${dua.source}`}
+      </AppText>
     </Card>
   );
 }

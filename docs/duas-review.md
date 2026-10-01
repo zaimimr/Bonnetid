@@ -93,7 +93,7 @@ Allah, Du er Fred, og fra Deg kommer fred. Velsignet er Du, Du som eier majestet
 
 Kilde: Sahih Muslim 591
 
-### Ingen gud uten Allah
+### La ilaha illallah
 
 <div dir="rtl" lang="ar">لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ، اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ، وَلَا مُعْطِيَ لِمَا مَنَعْتَ، وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ</div>
 
@@ -103,43 +103,27 @@ Ingen har rett til å tilbes unntatt Allah alene, uten partner. Hans er herredø
 
 Kilde: Sahih al-Bukhari 844, Sahih Muslim 593
 
-### Subhanallah
+### Subhanallah, Alhamdulillah, Allahu akbar
 
-<div dir="rtl" lang="ar">سُبْحَانَ اللَّهِ</div>
+<div dir="rtl" lang="ar">سُبْحَانَ اللَّهِ
+الْحَمْدُ لِلَّهِ
+اللَّهُ أَكْبَرُ</div>
 
-*Subhanallah*
+*Subhanallah
+Alhamdulillah
+Allahu akbar*
 
 Allah er hevet over alle mangler.
-
-Gjentas 33 ganger.
-
-Kilde: Sahih Muslim 597
-
-### Alhamdulillah
-
-<div dir="rtl" lang="ar">الْحَمْدُ لِلَّهِ</div>
-
-*Alhamdulillah*
-
 All lovprisning tilhører Allah.
-
-Gjentas 33 ganger.
-
-Kilde: Sahih Muslim 597
-
-### Allahu akbar
-
-<div dir="rtl" lang="ar">اللَّهُ أَكْبَرُ</div>
-
-*Allahu akbar*
-
 Allah er størst.
 
+Merknad: Si hver av dem 33 ganger.
+
 Gjentas 33 ganger.
 
 Kilde: Sahih Muslim 597
 
-### Fullfør hundre
+### Til sammen hundre
 
 <div dir="rtl" lang="ar">لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ</div>
 
@@ -147,7 +131,7 @@ Kilde: Sahih Muslim 597
 
 Ingen har rett til å tilbes unntatt Allah alene, uten partner. Hans er herredømmet og Hans er lovprisningen, og Han har makt over alle ting.
 
-Merknad: Sies én gang etter de tre gangene 33, så det blir hundre til sammen.
+Merknad: Sies én gang etter de tre rundene med 33, så det blir hundre til sammen.
 
 Kilde: Sahih Muslim 597
 
@@ -188,7 +172,7 @@ Merknad: Leses én gang etter hver bønn.
 
 Kilde: Koranen 112-114. Etter bønnen: Sunan Abi Dawud 1523, Jami' at-Tirmidhi 2903
 
-### Hjelp meg å minnes deg
+### Hjelp meg å minnes Deg
 
 <div dir="rtl" lang="ar">اللَّهُمَّ أَعِنِّي عَلَىٰ ذِكْرِكَ، وَشُكْرِكَ، وَحُسْنِ عِبَادَتِكَ</div>
 
@@ -220,7 +204,7 @@ Kilde: Sunan Abi Dawud 2357
 
 Allah, Du er Den som tilgir, og Du elsker å tilgi, så tilgi meg.
 
-Merknad: Profeten lærte Aisha denne duaen for Laylat-ul-Qadr.
+Merknad: Profeten lærte Aisha å si denne duaen.
 
 Kilde: Jami' at-Tirmidhi 3513, Sunan Ibn Majah 3850
 
