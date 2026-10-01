@@ -10,6 +10,8 @@ export type LocationMode = 'norway' | 'calculated';
 
 export const CALCULATED_LOCATION_ISO = 'LOCAL';
 
+export type CalendarPrimary = 'gregorian' | 'hijri';
+
 export type SavedLocation = {
   iso: string;
   name: string;
@@ -79,6 +81,8 @@ type SettingsState = {
   launchCount: number;
   reviewRequested: boolean;
   onboardingDone: boolean;
+  calendarPrimary: CalendarPrimary;
+  setCalendarPrimary: (calendarPrimary: CalendarPrimary) => void;
   readAnnouncements: Record<string, string>;
   markAnnouncementRead: (orgNr: string, announcement: string) => void;
   completeOnboarding: () => void;
@@ -153,6 +157,8 @@ export const useSettings = create<SettingsState>()(
       launchCount: 0,
       reviewRequested: false,
       onboardingDone: false,
+      calendarPrimary: 'gregorian',
+      setCalendarPrimary: (calendarPrimary) => set({ calendarPrimary }),
       readAnnouncements: {},
       markAnnouncementRead: (orgNr, announcement) =>
         set((state) => ({

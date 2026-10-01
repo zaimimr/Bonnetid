@@ -105,11 +105,13 @@ export function PlaceFilterButton({
   disabled,
   onPress,
   onClear,
+  emptyLabel = 'Alle steder',
 }: {
   place: Place | null;
   disabled: boolean;
   onPress: () => void;
   onClear: () => void;
+  emptyLabel?: string;
 }) {
   const theme = useTheme();
   const active = place != null;
@@ -147,7 +149,7 @@ export function PlaceFilterButton({
         color={active ? theme.colors.filterActiveText : theme.colors.textSecondary}
         numberOfLines={1}
         style={{ flexShrink: 1 }}>
-        {active ? place.name : 'Alle steder'}
+        {active ? place.name : emptyLabel}
       </AppText>
       {active ? (
         <Pressable onPress={onClear} hitSlop={8} accessibilityLabel="Fjern stedsfilter">

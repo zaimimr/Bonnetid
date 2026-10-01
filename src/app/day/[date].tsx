@@ -26,6 +26,7 @@ import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { isoDateKey, todayKey } from '@/lib/time';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { useNow } from '@/hooks/useNow';
+import { usePickedLocation } from '@/hooks/usePickedLocation';
 import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useTimezoneNote } from '@/hooks/useTimezoneNote';
@@ -35,19 +36,23 @@ const FRIDAY = 5;
 const HEADER_HEIGHT = 44;
 
 export default function DayScreen() {
-  const { date: isoDate } = useLocalSearchParams<{ date: string }>();
+  const { date: isoDate, place } = useLocalSearchParams<{ date: string; place?: string }>();
   const router = useRouter();
-  const location = useActiveLocation();
+  const activeLocation = useActiveLocation();
+  const picked = usePickedLocation(place);
+  const location = picked ?? activeLocation;
+  const otherPlace = picked != null && picked.iso !== activeLocation.iso;
   const asrMethod = useEffectiveAsrMethod();
   const zone = zoneFor(location);
   const calculated = location.mode === 'calculated';
-  const mosque = useActiveMosque();
+  const activeMosque = useActiveMosque();
+  const mosque = otherPlace ? null : activeMosque;
   const { refreshing, onRefresh } = useRefresh();
   const now = useNow(30_000);
 
   const date = useMemo(() => new Date(`${isoDate}T12:00:00`), [isoDate]);
   const valid = !Number.isNaN(date.getTime());
-  const timezoneNote = useTimezoneNote(date);
+  const timezoneNote = useTimezoneNote(date, location);
 
   const month = usePrayerMonth(location, date.getFullYear(), date.getMonth() + 1);
   const hijriMonth = useHijriMonth(date.getFullYear(), date.getMonth() + 1);
@@ -184,7 +189,9 @@ export default function DayScreen() {
               mosque &&
               router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } })
             }
-            onSelectMosque={calculated ? undefined : () => router.push('/mosque-picker')}
+            onSelectMosque={
+              calculated || otherPlace ? undefined : () => router.push('/mosque-picker')
+            }
           />
         )}
       </View>

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchHijriYear,
@@ -8,6 +8,7 @@ import {
   fetchMosques,
   fetchPrayerTimes,
 } from './endpoints';
+import { approxGregorianStart, parseHijriDate, type HijriMonthCursor } from '@/lib/hijri';
 import type { HijriDay } from './types';
 
 const MOSQUE_CACHE_VERSION = 'vipps-v1';
@@ -96,4 +97,42 @@ export function useSpecialDates(year: number) {
     [],
   );
   return useQuery({ ...hijriYearOptions(year), select });
+}
+
+export function useHijriMonthDays(
+  { year, month }: HijriMonthCursor,
+  options?: { enabled?: boolean },
+) {
+  const enabled = options?.enabled ?? true;
+  const start = approxGregorianStart({ year, month }).getTime();
+  const firstYear = new Date(start - 20 * DAY).getUTCFullYear();
+  const lastYear = new Date(start + 50 * DAY).getUTCFullYear();
+  const spansYears = lastYear !== firstYear;
+  const first = useQuery({ ...hijriYearOptions(firstYear), enabled });
+  const last = useQuery({ ...hijriYearOptions(lastYear), enabled: enabled && spansYears });
+
+  const data = useMemo(() => {
+    if (!first.data || (spansYears && !last.data)) return undefined;
+    const rows = spansYears ? [...first.data, ...(last.data ?? [])] : first.data;
+    return rows
+      .filter((day) => {
+        const hijri = parseHijriDate(day.hijri_date);
+        return hijri?.year === year && hijri.month === month;
+      })
+      .sort((a, b) => a.gregorian_date.localeCompare(b.gregorian_date));
+  }, [first.data, last.data, spansYears, year, month]);
+
+  const refetchFirst = first.refetch;
+  const refetchLast = last.refetch;
+  const refetch = useCallback(() => {
+    refetchFirst();
+    if (spansYears) refetchLast();
+  }, [refetchFirst, refetchLast, spansYears]);
+
+  return {
+    data,
+    isLoading: first.isLoading || (spansYears && last.isLoading),
+    isError: first.isError || (spansYears && last.isError),
+    refetch,
+  };
 }

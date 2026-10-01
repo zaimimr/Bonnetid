@@ -77,3 +77,23 @@ export function monthName(monthIndex: number): string {
 function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
+
+export type HijriMonthCursor = {
+  year: number;
+  month: number;
+};
+
+const HIJRI_EPOCH_UTC = Date.UTC(622, 6, 19);
+const DAY_MS = 24 * 60 * 60 * 1000;
+const HIJRI_YEAR_DAYS = 354.36667;
+const HIJRI_MONTH_DAYS = 29.5306;
+
+export function approxGregorianStart({ year, month }: HijriMonthCursor): Date {
+  const days = Math.floor((year - 1) * HIJRI_YEAR_DAYS + (month - 1) * HIJRI_MONTH_DAYS);
+  return new Date(HIJRI_EPOCH_UTC + days * DAY_MS);
+}
+
+export function shiftHijriMonth(cursor: HijriMonthCursor, delta: number): HijriMonthCursor {
+  const index = cursor.year * 12 + (cursor.month - 1) + delta;
+  return { year: Math.floor(index / 12), month: (index % 12) + 1 };
+}

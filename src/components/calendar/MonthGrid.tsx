@@ -7,6 +7,7 @@ import { opacity, radius, spacing } from '@/theme/tokens';
 import type { HijriDay } from '@/api/types';
 import { parseHijriDate } from '@/lib/hijri';
 import { isoDateKey, osloDateKey } from '@/lib/time';
+import type { CalendarPrimary } from '@/store/settings';
 
 const WEEKDAY_LABELS = ['man', 'tir', 'ons', 'tor', 'fre', 'lør', 'søn'];
 const CELL_HEIGHT = 56;
@@ -16,10 +17,53 @@ const WIDE_DAY_WIDTH = 56;
 const MAX_GRID_FONT_SCALE = 1.25;
 const MARKER_SIZE = 5;
 
+type GridCell = {
+  iso: string;
+  primary: number;
+  secondary: number | undefined;
+  hijri: HijriDay | undefined;
+};
+
+function gregorianCells(year: number, monthIndex: number, days: HijriDay[]): GridCell[] {
+  const byDate = new Map(days.map((day) => [day.gregorian_date, day]));
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  return Array.from({ length: daysInMonth }, (_, index) => {
+    const iso = isoDateKey(new Date(year, monthIndex, index + 1));
+    const hijri = byDate.get(iso);
+    return {
+      iso,
+      primary: index + 1,
+      secondary: hijri ? parseHijriDate(hijri.hijri_date)?.day : undefined,
+      hijri,
+    };
+  });
+}
+
+function hijriCells(days: HijriDay[]): GridCell[] {
+  return days.flatMap((day) => {
+    const hijriDay = parseHijriDate(day.hijri_date)?.day;
+    if (hijriDay == null) return [];
+    return [
+      {
+        iso: day.gregorian_date,
+        primary: hijriDay,
+        secondary: Number(day.gregorian_date.slice(8, 10)),
+        hijri: day,
+      },
+    ];
+  });
+}
+
+function isoWeekdayIndex(iso: string): number {
+  const [year, month, day] = iso.split('-').map(Number);
+  return (new Date(year, month - 1, day).getDay() + 6) % 7;
+}
+
 export type MonthGridProps = {
   year: number;
   monthIndex: number;
   days: HijriDay[];
+  calendar?: CalendarPrimary;
   todayIso?: string;
   onDayPress?: (iso: string, day: HijriDay | undefined) => void;
 };
@@ -28,6 +72,7 @@ export function MonthGrid({
   year,
   monthIndex,
   days,
+  calendar = 'gregorian',
   todayIso: todayIsoOverride,
   onDayPress,
 }: MonthGridProps) {
@@ -39,19 +84,13 @@ export function MonthGrid({
   const cellHeight = scaleWidth(CELL_HEIGHT, gridScale);
   const dayHeight = scaleWidth(DAY_HEIGHT, gridScale);
   const todayIso = todayIsoOverride ?? osloDateKey();
-  const byDate = new Map(days.map((day) => [day.gregorian_date, day]));
+  const monthCells =
+    calendar === 'hijri' ? hijriCells(days) : gregorianCells(year, monthIndex, days);
+  const leadingBlanks = monthCells.length > 0 ? isoWeekdayIndex(monthCells[0].iso) : 0;
 
-  const firstOfMonth = new Date(year, monthIndex, 1);
-  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-  const leadingBlanks = (firstOfMonth.getDay() + 6) % 7;
-
-  const cells: ({ dayOfMonth: number; iso: string; hijri: HijriDay | undefined } | null)[] = [
+  const cells: (GridCell | null)[] = [
     ...Array.from({ length: leadingBlanks }, () => null),
-    ...Array.from({ length: daysInMonth }, (_, index) => {
-      const date = new Date(year, monthIndex, index + 1);
-      const iso = isoDateKey(date);
-      return { dayOfMonth: index + 1, iso, hijri: byDate.get(iso) };
-    }),
+    ...monthCells,
   ];
 
   return (
@@ -79,10 +118,9 @@ export function MonthGrid({
 
           const isToday = cell.iso === todayIso;
           const isSpecial = Boolean(cell.hijri?.special_date_name);
-          const hijriDay = cell.hijri ? parseHijriDate(cell.hijri.hijri_date)?.day : undefined;
           const label = isSpecial
-            ? `${cell.dayOfMonth}. ${cell.hijri?.special_date_name}`
-            : String(cell.dayOfMonth);
+            ? `${cell.primary}. ${cell.hijri?.special_date_name}`
+            : String(cell.primary);
 
           return (
             <Pressable
@@ -115,14 +153,14 @@ export function MonthGrid({
                   weight={isToday ? 'bold' : 'medium'}
                   color={isToday ? theme.colors.onPrimary : theme.colors.textPrimary}
                   maxFontSizeMultiplier={MAX_GRID_FONT_SCALE}>
-                  {cell.dayOfMonth}
+                  {cell.primary}
                 </AppText>
-                {hijriDay != null && (
+                {cell.secondary != null && (
                   <AppText
                     size="xs"
                     color={isToday ? theme.colors.onPrimary : theme.colors.textMuted}
                     maxFontSizeMultiplier={MAX_GRID_FONT_SCALE}>
-                    {hijriDay}
+                    {cell.secondary}
                   </AppText>
                 )}
                 <View

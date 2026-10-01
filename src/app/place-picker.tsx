@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Pressable, SectionList, TextInput, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText, EmptyState, ErrorState, ListRow, Screen, Skeleton } from '@/components/ui';
 import { useFontScale } from '@/hooks/useFontScale';
@@ -10,14 +10,20 @@ import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { fontSize, opacity, radius, spacing } from '@/theme/tokens';
 import { usePlaceFilter } from '@/store/placeFilter';
+import { useActiveLocation } from '@/store/settings';
 
 export default function PlacePickerScreen() {
   const router = useRouter();
   const theme = useTheme();
   const { isStacked } = useFontScale();
-  const { places, isLoading, isError } = usePlaces();
-  const placeIso = usePlaceFilter((state) => state.placeIso);
-  const setPlaceIso = usePlaceFilter((state) => state.setPlaceIso);
+  const { scope } = useLocalSearchParams<{ scope?: string }>();
+  const forTimes = scope === 'times';
+  const activeLocation = useActiveLocation();
+  const { places, isLoading, isError } = usePlaces(forTimes ? 'times' : 'mosques');
+  const placeIso = usePlaceFilter((state) => (forTimes ? state.timesPlaceIso : state.placeIso));
+  const setPlaceIso = usePlaceFilter((state) =>
+    forTimes ? state.setTimesPlaceIso : state.setPlaceIso,
+  );
   const [query, setQuery] = useState('');
 
   const sections = useMemo(() => {
@@ -32,13 +38,16 @@ export default function PlacePickerScreen() {
 
   const choose = (place: Place) => {
     setPlaceIso(place.iso);
-    track('mosque_place_selected', { iso: place.iso, mosques: place.mosqueCount });
+    track(forTimes ? 'prayer_times_place_selected' : 'mosque_place_selected', {
+      iso: place.iso,
+      mosques: place.mosqueCount,
+    });
     router.back();
   };
 
   const clear = () => {
     setPlaceIso(null);
-    track('mosque_place_cleared');
+    track(forTimes ? 'prayer_times_place_cleared' : 'mosque_place_cleared');
     router.back();
   };
 
@@ -92,7 +101,7 @@ export default function PlacePickerScreen() {
             pressed && { opacity: opacity.pressed },
           ]}>
           <Ionicons
-            name="earth-outline"
+            name={forTimes ? 'navigate-outline' : 'earth-outline'}
             size={18}
             color={placeIso == null ? theme.colors.onPrimarySoft : theme.colors.textSecondary}
           />
@@ -101,10 +110,10 @@ export default function PlacePickerScreen() {
               weight="semibold"
               tone={placeIso == null ? 'onPrimarySoft' : 'textPrimary'}
               numberOfLines={2}>
-              Alle steder
+              {forTimes ? 'Mitt sted' : 'Alle steder'}
             </AppText>
             <AppText size="xs" tone={placeIso == null ? 'onPrimarySoft' : 'textMuted'}>
-              Vis moskeer i hele landet
+              {forTimes ? `Bønnetider for ${activeLocation.name}` : 'Vis moskeer i hele landet'}
             </AppText>
           </View>
           {placeIso == null && (
@@ -146,11 +155,11 @@ export default function PlacePickerScreen() {
             renderItem={({ item }) => (
               <ListRow
                 title={item.name}
-                subtitle={isStacked ? placeCountLabel(item.mosqueCount) : item.kommune}
+                subtitle={isStacked && !forTimes ? placeCountLabel(item.mosqueCount) : item.kommune}
                 trailing={
                   item.iso === placeIso ? (
                     <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
-                  ) : isStacked ? undefined : (
+                  ) : isStacked || forTimes ? undefined : (
                     <AppText size="sm" tone="textMuted">
                       {placeCountLabel(item.mosqueCount)}
                     </AppText>
@@ -169,7 +178,7 @@ export default function PlacePickerScreen() {
                   tone="textMuted"
                   align="center"
                   style={{ marginTop: spacing.xl }}>
-                  {`${totalMatches} steder med registrerte moskeer`}
+                  {forTimes ? `${totalMatches} steder` : `${totalMatches} steder med registrerte moskeer`}
                 </AppText>
               ) : null
             }

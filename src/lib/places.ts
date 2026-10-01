@@ -24,6 +24,7 @@ export function formatFylke(raw: string): string {
 export function buildPlaces(
   mosques: { location_iso: string | null }[],
   locations: ApiLocation[],
+  includeEmpty = false,
 ): Place[] {
   const counts = new Map<string, number>();
   for (const mosque of mosques) {
@@ -33,8 +34,8 @@ export function buildPlaces(
 
   const places: Place[] = [];
   for (const location of locations) {
-    const count = counts.get(location.iso);
-    if (!count) continue;
+    const count = counts.get(location.iso) ?? 0;
+    if (!count && !includeEmpty) continue;
     places.push({
       iso: location.iso,
       name: location.name,

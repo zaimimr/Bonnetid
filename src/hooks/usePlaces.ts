@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useLocations, useMosques } from '@/api/queries';
 import { buildPlaces, placesByIso, type Place } from '@/lib/places';
-import { usePlaceFilter } from '@/store/placeFilter';
+import { usePlaceFilter, type PlaceScope } from '@/store/placeFilter';
 
 export type PlacesResult = {
   places: Place[];
@@ -11,15 +11,17 @@ export type PlacesResult = {
   isError: boolean;
 };
 
-export function usePlaces(): PlacesResult {
+export function usePlaces(scope: PlaceScope = 'mosques'): PlacesResult {
   const mosques = useMosques();
   const locations = useLocations();
-  const placeIso = usePlaceFilter((state) => state.placeIso);
+  const placeIso = usePlaceFilter((state) =>
+    scope === 'times' ? state.timesPlaceIso : state.placeIso,
+  );
 
   const places = useMemo(() => {
     if (!mosques.data || !locations.data) return [];
-    return buildPlaces(mosques.data, locations.data);
-  }, [mosques.data, locations.data]);
+    return buildPlaces(mosques.data, locations.data, scope === 'times');
+  }, [mosques.data, locations.data, scope]);
 
   const byIso = useMemo(() => placesByIso(places), [places]);
 

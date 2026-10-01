@@ -1,10 +1,14 @@
 import { deviceOffsetMinutes, formatUtcOffset, isNamedTimeZone, osloOffsetMinutes } from '@/lib/time';
 import { zoneOffsetMinutes } from '@/lib/timezone';
 import { zoneFor } from '@/hooks/usePrayerMonth';
-import { useActiveLocation } from '@/store/settings';
+import { useActiveLocation, type SavedLocation } from '@/store/settings';
 
-export function useTimezoneNote(now: Date = new Date()): string | null {
-  const location = useActiveLocation();
+export function useTimezoneNote(
+  now: Date = new Date(),
+  override?: SavedLocation | null,
+): string | null {
+  const active = useActiveLocation();
+  const location = override ?? active;
   const device = deviceOffsetMinutes(now);
 
   if (location.mode === 'calculated') {

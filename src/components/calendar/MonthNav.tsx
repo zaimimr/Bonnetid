@@ -1,4 +1,5 @@
 import { Pressable, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { AppText, IconButton } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
@@ -11,9 +12,19 @@ export type MonthNavProps = {
   onPrev: () => void;
   onNext: () => void;
   onToday?: () => void;
+  onSwap?: () => void;
+  swapLabel?: string;
 };
 
-export function MonthNav({ title, subtitle, onPrev, onNext, onToday }: MonthNavProps) {
+export function MonthNav({
+  title,
+  subtitle,
+  onPrev,
+  onNext,
+  onToday,
+  onSwap,
+  swapLabel,
+}: MonthNavProps) {
   const theme = useTheme();
 
   return (
@@ -37,9 +48,26 @@ export function MonthNav({ title, subtitle, onPrev, onNext, onToday }: MonthNavP
         <AppText size="xl" weight="bold" heading numberOfLines={1}>
           {title}
         </AppText>
-        <AppText size="sm" tone="textMuted" numberOfLines={1}>
-          {subtitle ?? ' '}
-        </AppText>
+        {onSwap ? (
+          <Pressable
+            onPress={onSwap}
+            hitSlop={hitSlop}
+            accessibilityRole="button"
+            accessibilityLabel={swapLabel}
+            style={({ pressed }) => [
+              { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, alignSelf: 'flex-start' },
+              pressed && { opacity: opacity.pressed },
+            ]}>
+            <AppText size="sm" tone="textMuted" numberOfLines={1} style={{ flexShrink: 1 }}>
+              {subtitle ?? ' '}
+            </AppText>
+            <Ionicons name="swap-vertical" size={15} color={theme.colors.primary} />
+          </Pressable>
+        ) : (
+          <AppText size="sm" tone="textMuted" numberOfLines={1}>
+            {subtitle ?? ' '}
+          </AppText>
+        )}
       </View>
 
       <View

@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useHijriMonth, useSpecialDates } from '@/api/queries';
+import { useHijriMonth, useHijriMonthDays, useSpecialDates } from '@/api/queries';
 import type { HijriDay } from '@/api/types';
 import { MonthGrid } from '@/components/calendar/MonthGrid';
 import { MonthNav } from '@/components/calendar/MonthNav';
 import { EventCard } from '@/components/calendar/EventCard';
+import { PlaceFilterButton } from '@/components/mosque/MosqueListControls';
 import { MonthPrayerTable } from '@/components/prayer/MonthPrayerTable';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import {
@@ -19,14 +20,24 @@ import {
 } from '@/components/ui';
 import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useNow } from '@/hooks/useNow';
+import { usePickedLocation } from '@/hooks/usePickedLocation';
+import { usePlaces } from '@/hooks/usePlaces';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useTimezoneNote } from '@/hooks/useTimezoneNote';
 import { spacing } from '@/theme/tokens';
-import { monthName } from '@/lib/hijri';
+import {
+  monthName,
+  parseHijriDate,
+  shiftHijriMonth,
+  type HijriMonthCursor,
+} from '@/lib/hijri';
+import { HIJRI_META } from '@/lib/hijriMeta';
+import { track } from '@/lib/telemetry';
 import { isoDateKey, parseDayKey } from '@/lib/time';
-import { useActiveLocation } from '@/store/settings';
+import { usePlaceFilter } from '@/store/placeFilter';
+import { useActiveLocation, useSettings, type CalendarPrimary } from '@/store/settings';
 
 type MonthView = 'dates' | 'times';
 
@@ -34,6 +45,29 @@ const VIEW_OPTIONS: { value: MonthView; label: string }[] = [
   { value: 'dates', label: 'Måned' },
   { value: 'times', label: 'Bønnetider' },
 ];
+
+function gregorianLabel(iso: string): { month: string; year: number } {
+  const [year, month] = iso.split('-').map(Number);
+  return { month: monthName(month - 1), year };
+}
+
+function gregorianRange(days: HijriDay[] | undefined): string {
+  if (!days || days.length === 0) return '';
+  const first = gregorianLabel(days[0].gregorian_date);
+  const last = gregorianLabel(days[days.length - 1].gregorian_date);
+  if (first.month === last.month && first.year === last.year) return `${first.month} ${first.year}`;
+  if (first.year === last.year) return `${first.month} – ${last.month} ${last.year}`;
+  return `${first.month} ${first.year} – ${last.month} ${last.year}`;
+}
+
+function hijriCursorOf(day: HijriDay | undefined): HijriMonthCursor | null {
+  const parsed = day ? parseHijriDate(day.hijri_date) : null;
+  return parsed ? { year: parsed.year, month: parsed.month } : null;
+}
+
+function sameHijriMonth(a: HijriMonthCursor | null, b: HijriMonthCursor | null): boolean {
+  return a != null && b != null && a.year === b.year && a.month === b.month;
+}
 
 export default function CalendarScreen() {
   const router = useRouter();
@@ -43,22 +77,64 @@ export default function CalendarScreen() {
   const today = useNow(60_000);
   const { isoDate: todayIso, dayKey: todayDayKey } = useActiveDayKeys(today);
   const [view, setView] = useState<MonthView>('dates');
+  const calendar = useSettings((state) => state.calendarPrimary);
+  const setCalendar = useSettings((state) => state.setCalendarPrimary);
+  const isHijri = calendar === 'hijri';
   const [cursor, setCursor] = useState(() => ({
     year: today.getFullYear(),
     monthIndex: today.getMonth(),
   }));
+  const [hijriCursor, setHijriCursor] = useState<HijriMonthCursor | null>(null);
 
-  const isCurrentMonth =
-    cursor.year === today.getFullYear() && cursor.monthIndex === today.getMonth();
+  const todayMonth = useHijriMonth(today.getFullYear(), today.getMonth() + 1);
+  const todayHijri = hijriCursorOf(todayMonth.data?.find((day) => day.gregorian_date === todayIso));
+  const shownHijri = hijriCursor ?? todayHijri;
 
   const month = useHijriMonth(cursor.year, cursor.monthIndex + 1);
+  const hijriMonth = useHijriMonthDays(shownHijri ?? { year: 1, month: 1 }, {
+    enabled: isHijri && shownHijri != null,
+  });
   const specials = useSpecialDates(cursor.year);
 
+  const isCurrentMonth = isHijri
+    ? sameHijriMonth(shownHijri, todayHijri)
+    : cursor.year === today.getFullYear() && cursor.monthIndex === today.getMonth();
+
   const shiftMonth = (delta: number) => {
+    if (isHijri) {
+      if (shownHijri) setHijriCursor(shiftHijriMonth(shownHijri, delta));
+      return;
+    }
     setCursor((current) => {
       const shifted = new Date(current.year, current.monthIndex + delta, 1);
       return { year: shifted.getFullYear(), monthIndex: shifted.getMonth() };
     });
+  };
+
+  const goToToday = () => {
+    if (isHijri) setHijriCursor(null);
+    else setCursor({ year: today.getFullYear(), monthIndex: today.getMonth() });
+  };
+
+  const swapCalendar = () => {
+    if (isHijri) {
+      const middle = hijriMonth.data?.[Math.floor((hijriMonth.data.length - 1) / 2)];
+      if (middle && !isCurrentMonth) {
+        const [year, monthNumber] = middle.gregorian_date.split('-').map(Number);
+        setCursor({ year, monthIndex: monthNumber - 1 });
+      } else {
+        setCursor({ year: today.getFullYear(), monthIndex: today.getMonth() });
+      }
+      setCalendar('gregorian');
+      track('calendar_primary_changed', { calendar: 'gregorian' });
+      return;
+    }
+    const middleIso = isoDateKey(new Date(cursor.year, cursor.monthIndex, 15));
+    const anchor = isCurrentMonth ? todayIso : middleIso;
+    const target = hijriCursorOf(month.data?.find((day) => day.gregorian_date === anchor));
+    setHijriCursor(target && !sameHijriMonth(target, todayHijri) ? target : null);
+    setCalendar('hijri');
+    track('calendar_primary_changed', { calendar: 'hijri' });
   };
 
   const hijriRange = useMemo(() => {
@@ -70,32 +146,60 @@ export default function CalendarScreen() {
   }, [month.data]);
 
   const events = useMemo(() => {
+    if (isHijri) return (hijriMonth.data ?? []).filter((day) => day.special_date_name != null);
     const monthPrefix = `${cursor.year}-${String(cursor.monthIndex + 1).padStart(2, '0')}`;
     return (specials.data ?? []).filter((event) => event.gregorian_date.startsWith(monthPrefix));
-  }, [specials.data, cursor.year, cursor.monthIndex]);
+  }, [isHijri, hijriMonth.data, specials.data, cursor.year, cursor.monthIndex]);
 
   const specialDates = useMemo(
     () => new Set(events.map((event) => event.gregorian_date)),
     [events],
   );
 
-  const openDay = (iso: string) => {
-    router.push({ pathname: '/day/[date]', params: { date: iso } });
+  const hijriName = shownHijri ? (HIJRI_META.monthNames.get(shownHijri.month) ?? '') : '';
+  const title = isHijri
+    ? shownHijri
+      ? `${hijriName} ${shownHijri.year}`
+      : ' '
+    : `${monthName(cursor.monthIndex)} ${cursor.year}`;
+  const subtitle = isHijri ? gregorianRange(hijriMonth.data) : hijriRange;
+  const monthLabel = isHijri ? hijriName : monthName(cursor.monthIndex).toLowerCase();
+
+  const hijriDates = useMemo(
+    () => (hijriMonth.data ? new Set(hijriMonth.data.map((day) => day.gregorian_date)) : null),
+    [hijriMonth.data],
+  );
+  const timesRange = useMemo(() => {
+    if (!isHijri) return { first: cursor, last: cursor };
+    const days = hijriMonth.data;
+    if (!days || days.length === 0) return null;
+    const [firstYear, firstMonth] = days[0].gregorian_date.split('-').map(Number);
+    const [lastYear, lastMonth] = days[days.length - 1].gregorian_date.split('-').map(Number);
+    return {
+      first: { year: firstYear, monthIndex: firstMonth - 1 },
+      last: { year: lastYear, monthIndex: lastMonth - 1 },
+    };
+  }, [isHijri, cursor, hijriMonth.data]);
+
+  const openDay = (iso: string, place?: string) => {
+    router.push({ pathname: '/day/[date]', params: place ? { date: iso, place } : { date: iso } });
   };
+
+  const days = isHijri ? hijriMonth.data : month.data;
+  const daysLoading = isHijri ? hijriMonth.isLoading || shownHijri == null : month.isLoading;
+  const daysError = isHijri ? hijriMonth.isError : month.isError;
 
   return (
     <Screen scroll refreshing={refreshing} onRefresh={onRefresh}>
       <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
         <MonthNav
-          title={`${monthName(cursor.monthIndex)} ${cursor.year}`}
-          subtitle={hijriRange || undefined}
+          title={title}
+          subtitle={subtitle || undefined}
           onPrev={() => shiftMonth(-1)}
           onNext={() => shiftMonth(1)}
-          onToday={
-            isCurrentMonth
-              ? undefined
-              : () => setCursor({ year: today.getFullYear(), monthIndex: today.getMonth() })
-          }
+          onToday={isCurrentMonth ? undefined : goToToday}
+          onSwap={swapCalendar}
+          swapLabel={isHijri ? 'Vis gregoriansk kalender' : 'Vis hijri-kalender'}
         />
 
         <SegmentedControl value={view} options={VIEW_OPTIONS} onChange={setView} />
@@ -104,26 +208,34 @@ export default function CalendarScreen() {
           <DatesView
             year={cursor.year}
             monthIndex={cursor.monthIndex}
-            days={month.data}
-            isLoading={month.isLoading}
-            isError={month.isError}
-            onRetry={month.refetch}
+            calendar={calendar}
+            monthLabel={monthLabel}
+            days={days}
+            isLoading={daysLoading}
+            isError={daysError}
+            onRetry={isHijri ? hijriMonth.refetch : month.refetch}
             todayIso={todayIso}
             isCurrentMonth={isCurrentMonth}
             events={events}
-            eventsLoading={specials.isLoading}
-            eventsError={specials.isError}
-            onEventsRetry={specials.refetch}
+            eventsLoading={isHijri ? daysLoading : specials.isLoading}
+            eventsError={isHijri ? daysError : specials.isError}
+            onEventsRetry={isHijri ? hijriMonth.refetch : specials.refetch}
             onDayPress={openDay}
           />
-        ) : (
+        ) : timesRange ? (
           <TimesView
-            year={cursor.year}
-            monthIndex={cursor.monthIndex}
+            first={timesRange.first}
+            last={timesRange.last}
+            dates={isHijri ? hijriDates : null}
+            calendar={calendar}
             specialDates={specialDates}
             todayDayKey={todayDayKey}
             onDayPress={openDay}
           />
+        ) : daysError ? (
+          <ErrorState onRetry={hijriMonth.refetch} />
+        ) : (
+          <Skeleton height={480} rounded="xl" />
         )}
       </View>
     </Screen>
@@ -133,6 +245,8 @@ export default function CalendarScreen() {
 type DatesViewProps = {
   year: number;
   monthIndex: number;
+  calendar: CalendarPrimary;
+  monthLabel: string;
   days: HijriDay[] | undefined;
   isLoading: boolean;
   isError: boolean;
@@ -149,6 +263,8 @@ type DatesViewProps = {
 function DatesView({
   year,
   monthIndex,
+  calendar,
+  monthLabel,
   days,
   isLoading,
   isError,
@@ -171,6 +287,7 @@ function DatesView({
         <MonthGrid
           year={year}
           monthIndex={monthIndex}
+          calendar={calendar}
           days={days}
           todayIso={todayIso}
           onDayPress={(iso) => onDayPress(iso)}
@@ -179,7 +296,7 @@ function DatesView({
 
       <View>
         <SectionHeader
-          title={`Merkedager i ${monthName(monthIndex).toLowerCase()}`}
+          title={`Merkedager i ${monthLabel}`}
           style={{ marginTop: 0 }}
         />
         {eventsLoading && <Skeleton height={180} rounded="xl" />}
@@ -201,27 +318,71 @@ function DatesView({
   );
 }
 
+type MonthCursor = { year: number; monthIndex: number };
+
 type TimesViewProps = {
-  year: number;
-  monthIndex: number;
+  first: MonthCursor;
+  last: MonthCursor;
+  dates: ReadonlySet<string> | null;
+  calendar: CalendarPrimary;
   specialDates: ReadonlySet<string>;
   todayDayKey: string;
-  onDayPress: (iso: string) => void;
+  onDayPress: (iso: string, place?: string) => void;
 };
 
-function TimesView({ year, monthIndex, specialDates, todayDayKey, onDayPress }: TimesViewProps) {
-  const location = useActiveLocation();
+function TimesView({
+  first,
+  last,
+  dates,
+  calendar,
+  specialDates,
+  todayDayKey,
+  onDayPress,
+}: TimesViewProps) {
+  const router = useRouter();
+  const activeLocation = useActiveLocation();
+  const timesPlaceIso = usePlaceFilter((state) => state.timesPlaceIso);
+  const setTimesPlaceIso = usePlaceFilter((state) => state.setTimesPlaceIso);
+  const { selected, isLoading: placesLoading } = usePlaces('times');
+  const picked = usePickedLocation(timesPlaceIso);
+  const location = picked ?? activeLocation;
   const asrMethod = useEffectiveAsrMethod();
-  const month = usePrayerMonth(location, year, monthIndex + 1);
+  const firstMonth = usePrayerMonth(location, first.year, first.monthIndex + 1);
+  const lastMonth = usePrayerMonth(location, last.year, last.monthIndex + 1);
   const zone = zoneFor(location);
-  const timezoneNote = useTimezoneNote();
+  const timezoneNote = useTimezoneNote(new Date(), location);
+  const spans = first.year !== last.year || first.monthIndex !== last.monthIndex;
+
+  const rows = useMemo(() => {
+    if (!firstMonth.data || (spans && !lastMonth.data)) return undefined;
+    const all = spans ? [...firstMonth.data, ...(lastMonth.data ?? [])] : firstMonth.data;
+    if (!dates) return all;
+    return all.filter((day) => dates.has(isoDateKey(parseDayKey(day.date))));
+  }, [firstMonth.data, lastMonth.data, spans, dates]);
+
+  const isLoading = firstMonth.isLoading || (spans && lastMonth.isLoading);
+  const isError = firstMonth.isError || (spans && lastMonth.isError);
+  const refetch = () => {
+    firstMonth.refetch();
+    if (spans) lastMonth.refetch();
+  };
 
   return (
     <View style={{ gap: spacing.md }}>
-      <View style={{ gap: spacing.xxs }}>
-        <AppText size="sm" tone="textMuted">
-          {location.mode === 'calculated' ? `${location.name} · lokale tider` : location.name}
-        </AppText>
+      <View style={{ gap: spacing.xs }}>
+        <View style={{ flexDirection: 'row' }}>
+          <PlaceFilterButton
+            place={selected}
+            disabled={placesLoading}
+            emptyLabel={
+              activeLocation.mode === 'calculated'
+                ? `${activeLocation.name} · lokale tider`
+                : activeLocation.name
+            }
+            onPress={() => router.push({ pathname: '/place-picker', params: { scope: 'times' } })}
+            onClear={() => setTimesPlaceIso(null)}
+          />
+        </View>
         {timezoneNote && (
           <AppText size="xs" tone="textMuted">
             {timezoneNote}
@@ -229,16 +390,19 @@ function TimesView({ year, monthIndex, specialDates, todayDayKey, onDayPress }: 
         )}
       </View>
 
-      {month.isLoading && <Skeleton height={480} rounded="xl" />}
-      {month.isError && <ErrorState onRetry={month.refetch} />}
-      {month.data && (
+      {isLoading && <Skeleton height={480} rounded="xl" />}
+      {isError && <ErrorState onRetry={refetch} />}
+      {rows && (
         <MonthPrayerTable
-          days={month.data}
+          days={rows}
           asrMethod={asrMethod}
           zone={zone}
           todayDayKey={todayDayKey}
           specialDates={specialDates}
-          onDayPress={(day) => onDayPress(isoDateKey(parseDayKey(day.date)))}
+          calendar={calendar}
+          onDayPress={(day) =>
+            onDayPress(isoDateKey(parseDayKey(day.date)), picked ? picked.iso : undefined)
+          }
         />
       )}
     </View>

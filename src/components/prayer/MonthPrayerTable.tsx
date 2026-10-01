@@ -5,7 +5,7 @@ import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import type { PrayerDay } from '@/api/types';
-import type { AsrMethodPreference } from '@/store/settings';
+import type { AsrMethodPreference, CalendarPrimary } from '@/store/settings';
 import { asrTimeFor } from '@/lib/prayerSchedule';
 import {
   formatZonedClock,
@@ -30,8 +30,14 @@ export type MonthPrayerTableProps = {
   zone?: PrayerTimeZone;
   todayDayKey?: string;
   specialDates?: ReadonlySet<string>;
+  calendar?: CalendarPrimary;
   onDayPress?: (day: PrayerDay) => void;
 };
+
+function hijriDayNumber(day: PrayerDay): number | null {
+  const value = Number(day.hijri_date.split('-')[0]);
+  return Number.isFinite(value) && value > 0 ? value : null;
+}
 
 export function MonthPrayerTable({
   days,
@@ -39,6 +45,7 @@ export function MonthPrayerTable({
   zone = 'oslo',
   todayDayKey,
   specialDates,
+  calendar = 'gregorian',
   onDayPress,
 }: MonthPrayerTableProps) {
   const theme = useTheme();
@@ -131,7 +138,7 @@ export function MonthPrayerTable({
                 tone={isToday ? 'onPrimarySoft' : isFriday ? 'primary' : 'textPrimary'}
                 maxFontSizeMultiplier={tableScale}
                 tabular>
-                {date.getDate()}
+                {calendar === 'hijri' ? (hijriDayNumber(day) ?? date.getDate()) : date.getDate()}
               </AppText>
               <AppText
                 size="xs"
