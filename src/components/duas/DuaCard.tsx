@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { AppText, Card, Divider } from '@/components/ui';
+import { AppText, Badge, Card, Divider } from '@/components/ui';
 import type { Dua } from '@/lib/duas';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
@@ -17,9 +17,22 @@ export function DuaCard({ dua }: DuaCardProps) {
 
   return (
     <Card rounded="xl" padding="lg" style={{ gap: spacing.md }}>
-      <AppText weight="semibold" accessibilityRole="header">
-        {dua.title}
-      </AppText>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: spacing.md,
+        }}>
+        <AppText weight="semibold" accessibilityRole="header" style={{ flexShrink: 1 }}>
+          {dua.title}
+        </AppText>
+        {dua.repeat ? (
+          <View accessible accessibilityLabel={`Gjentas ${dua.repeat} ganger`}>
+            <Badge label={`${dua.repeat}×`} variant="primary" />
+          </View>
+        ) : null}
+      </View>
 
       <View
         style={{
