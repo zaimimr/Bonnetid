@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, Ref } from 'react';
 import { ScrollView, StyleSheet, View, type ViewStyle, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -15,6 +15,7 @@ export type ScreenProps = PropsWithChildren<{
   maxWidth?: number | null;
   refreshing?: boolean;
   onRefresh?: () => void;
+  scrollRef?: Ref<ScrollView>;
 }>;
 
 export function Screen({
@@ -27,6 +28,7 @@ export function Screen({
   maxWidth,
   refreshing = false,
   onRefresh,
+  scrollRef,
 }: ScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -57,6 +59,7 @@ export function Screen({
 
   const body = scroll ? (
     <ScrollView
+        ref={scrollRef}
         style={[base, style]}
         contentContainerStyle={[padding, styles.scrollContent, contentStyle]}
         showsVerticalScrollIndicator={false}
