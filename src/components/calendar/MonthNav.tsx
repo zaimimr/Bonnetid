@@ -35,40 +35,37 @@ export function MonthNav({
         justifyContent: 'space-between',
         gap: spacing.md,
       }}>
-      <View
-        style={{
-          flexGrow: 1,
-          flexShrink: 1,
-          flexBasis: 0,
-          minWidth: 0,
-          gap: spacing.xxs,
-          minHeight: CONTROL_SIZE,
-          justifyContent: 'center',
-        }}>
+      <Pressable
+        onPress={onSwap}
+        disabled={!onSwap}
+        accessibilityRole={onSwap ? 'button' : undefined}
+        accessibilityLabel={onSwap ? `${title}, ${subtitle ?? ''}. ${swapLabel ?? ''}` : undefined}
+        style={({ pressed }) => [
+          {
+            flexGrow: 1,
+            flexShrink: 1,
+            flexBasis: 0,
+            minWidth: 0,
+            gap: spacing.xxs,
+            minHeight: CONTROL_SIZE,
+            justifyContent: 'center',
+          },
+          pressed && { opacity: opacity.pressed },
+        ]}>
         <AppText size="xl" weight="bold" heading numberOfLines={1}>
           {title}
         </AppText>
-        {onSwap ? (
-          <Pressable
-            onPress={onSwap}
-            hitSlop={hitSlop}
-            accessibilityRole="button"
-            accessibilityLabel={swapLabel}
-            style={({ pressed }) => [
-              { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, alignSelf: 'flex-start' },
-              pressed && { opacity: opacity.pressed },
-            ]}>
-            <AppText size="sm" tone="textMuted" numberOfLines={2} style={{ flexShrink: 1 }}>
-              {subtitle ?? ' '}
-            </AppText>
-            <Ionicons name="swap-vertical" size={15} color={theme.colors.primary} />
-          </Pressable>
-        ) : (
-          <AppText size="sm" tone="textMuted" numberOfLines={1}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+          <AppText
+            size="sm"
+            tone="textMuted"
+            numberOfLines={onSwap ? 2 : 1}
+            style={{ flexShrink: 1 }}>
             {subtitle ?? ' '}
           </AppText>
-        )}
-      </View>
+          {onSwap && <Ionicons name="swap-vertical" size={15} color={theme.colors.primary} />}
+        </View>
+      </Pressable>
 
       <View
         style={{
