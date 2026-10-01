@@ -1,4 +1,5 @@
-import { Pressable, ScrollView, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, View } from 'react-native';
 import { AppText, Card } from '@/components/ui';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useTheme } from '@/theme';
@@ -17,9 +18,8 @@ import {
 
 const COLUMNS = ['Fajr', 'Sol', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 const DATE_COLUMN_WIDTH = 40;
-const TIME_COLUMN_WIDTH = 52;
+const TIME_TEXT_WIDTH = 32;
 const MAX_TABLE_FONT_SCALE = 1.3;
-const SCROLL_FROM_SCALE = 1.15;
 const WEEKDAY_LETTERS = ['S', 'M', 'T', 'O', 'T', 'F', 'L'];
 const FRIDAY = 5;
 const MARKER_SIZE = 5;
@@ -44,12 +44,13 @@ export function MonthPrayerTable({
   const theme = useTheme();
   const { scale } = useFontScale();
   const today = todayDayKey ?? osloDayKey();
-  const tableScale = Math.min(scale, MAX_TABLE_FONT_SCALE);
+  const [tableWidth, setTableWidth] = useState(0);
+  const contentWidth = tableWidth - spacing.sm * 2 - spacing.xs * COLUMNS.length;
+  const fitScale =
+    tableWidth > 0 ? contentWidth / (DATE_COLUMN_WIDTH + TIME_TEXT_WIDTH * COLUMNS.length) : 1;
+  const tableScale = Math.max(1, Math.min(scale, MAX_TABLE_FONT_SCALE, fitScale));
   const dateColumnWidth = scaleWidth(DATE_COLUMN_WIDTH, tableScale);
-  const scrolls = scale >= SCROLL_FROM_SCALE;
-  const timeColumnStyle = scrolls
-    ? { width: scaleWidth(TIME_COLUMN_WIDTH, tableScale) }
-    : { flex: 1 };
+  const timeColumnStyle = { flex: 1 };
 
   const timesFor = (day: PrayerDay): (string | null)[] => [
     day.fajr,
@@ -61,7 +62,9 @@ export function MonthPrayerTable({
   ];
 
   const table = (
-    <View style={scrolls ? undefined : { width: '100%' }}>
+    <View
+      style={{ width: '100%' }}
+      onLayout={(event) => setTableWidth(Math.round(event.nativeEvent.layout.width))}>
       <View
         style={{
           flexDirection: 'row',
@@ -73,7 +76,7 @@ export function MonthPrayerTable({
           size="xs"
           weight="medium"
           tone="textMuted"
-          maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}
+          maxFontSizeMultiplier={tableScale}
           style={{ width: dateColumnWidth }}>
           Dato
         </AppText>
@@ -84,7 +87,7 @@ export function MonthPrayerTable({
             weight="medium"
             tone="textMuted"
             align="center"
-            maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}
+            maxFontSizeMultiplier={tableScale}
             numberOfLines={1}
             adjustsFontSizeToFit
             minimumFontScale={0.85}
@@ -126,14 +129,14 @@ export function MonthPrayerTable({
                 size="sm"
                 weight={isToday || isFriday ? 'bold' : 'medium'}
                 tone={isToday ? 'onPrimarySoft' : isFriday ? 'primary' : 'textPrimary'}
-                maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}
+                maxFontSizeMultiplier={tableScale}
                 tabular>
                 {date.getDate()}
               </AppText>
               <AppText
                 size="xs"
                 tone={isFriday ? 'primary' : 'textMuted'}
-                maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}>
+                maxFontSizeMultiplier={tableScale}>
                 {WEEKDAY_LETTERS[date.getDay()]}
               </AppText>
               {isSpecial && (
@@ -164,8 +167,10 @@ export function MonthPrayerTable({
                 tone={isToday ? 'onPrimarySoft' : index === 1 ? 'textMuted' : 'textSecondary'}
                 align="center"
                 tabular
-                maxFontSizeMultiplier={MAX_TABLE_FONT_SCALE}
+                maxFontSizeMultiplier={tableScale}
                 numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
                 style={timeColumnStyle}>
                 {time ? formatZonedClock(wallClockToDate(date, time, zone), zone) : '–'}
               </AppText>
@@ -178,13 +183,7 @@ export function MonthPrayerTable({
 
   return (
     <Card padding="sm" rounded="xl">
-      {scrolls ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {table}
-        </ScrollView>
-      ) : (
-        table
-      )}
+      {table}
     </Card>
   );
 }

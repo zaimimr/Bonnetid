@@ -2,8 +2,17 @@ import { useMemo } from 'react';
 import { View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useHijriMonth, useMosque, useMosqueJamatPeriods } from '@/api/queries';
+import { ExtraTimesCard } from '@/components/prayer/ExtraTimesCard';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
-import { AppText, EmptyState, ErrorState, IconButton, Screen, Skeleton } from '@/components/ui';
+import {
+  AppText,
+  EmptyState,
+  ErrorState,
+  IconButton,
+  Screen,
+  SectionHeader,
+  Skeleton,
+} from '@/components/ui';
 import { spacing } from '@/theme/tokens';
 import {
   adhanTimesFromSchedule,
@@ -12,6 +21,7 @@ import {
   jamatTimesForDate,
   nextPrayerDay,
 } from '@/lib/prayerSchedule';
+import { buildExtraTimes } from '@/lib/extraTimes';
 import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { isoDateKey, todayKey } from '@/lib/time';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
@@ -53,6 +63,12 @@ export default function DayScreen() {
         ? buildDaySchedule(day, date, asrMethod, zone, nextPrayerDay(month.data, day))
         : [],
     [day, month.data, date, asrMethod, zone],
+  );
+
+  const extraTimes = useMemo(
+    () =>
+      day && month.data ? buildExtraTimes(day, date, zone, nextPrayerDay(month.data, day)) : [],
+    [day, month.data, date, zone],
   );
 
   const isFriday = date.getDay() === FRIDAY;
@@ -172,6 +188,13 @@ export default function DayScreen() {
           />
         )}
       </View>
+
+      {extraTimes.length > 0 && (
+        <View style={{ marginBottom: spacing.lg }}>
+          <SectionHeader title="Flere tider" />
+          <ExtraTimesCard times={extraTimes} />
+        </View>
+      )}
     </Screen>
   );
 }
