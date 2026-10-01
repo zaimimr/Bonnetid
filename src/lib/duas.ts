@@ -1,8 +1,11 @@
-export type DuaCategoryId = 'after-adhan' | 'after-salah' | 'morning-evening' | 'ramadan' | 'everyday';
+export type DuaCategoryId = 'after-adhan' | 'wudu-mosque' | 'after-salah' | 'ramadan' | 'hajj';
+
+export type DuaSeason = 'ramadan' | 'dhul-hijjah';
 
 export type DuaCategory = {
   id: DuaCategoryId;
   title: string;
+  season?: DuaSeason;
 };
 
 export type Dua = {
@@ -19,14 +22,15 @@ export type Dua = {
 
 export const DUA_CATEGORIES: DuaCategory[] = [
   { id: 'after-adhan', title: 'Etter adhan' },
+  { id: 'wudu-mosque', title: 'Wudu og moské' },
   { id: 'after-salah', title: 'Etter bønnen' },
-  { id: 'morning-evening', title: 'Morgen og kveld' },
-  { id: 'ramadan', title: 'Ramadan' },
-  { id: 'everyday', title: 'Hverdag' },
+  { id: 'ramadan', title: 'Ramadan', season: 'ramadan' },
+  { id: 'hajj', title: 'Hajj og Dhul-Hijjah', season: 'dhul-hijjah' },
 ];
 
 export const DUA_LINKS = {
   afterSalah: 'after-salah',
+  hajj: 'hajj',
   iftar: 'iftar',
   laylatAlQadr: 'laylat-al-qadr',
 } as const;
@@ -65,6 +69,36 @@ export const DUAS: Dua[] = [
     meaning:
       'Allah, Herre over dette fullkomne kallet og bønnen som skal holdes: Gi Muhammad al-wasila og den høye rangen, og reis ham opp til den priste plassen Du har lovet ham.',
     source: 'Sahih al-Bukhari 614',
+  },
+  {
+    id: 'after-wudu',
+    category: 'wudu-mosque',
+    title: 'Etter wudu',
+    arabic:
+      'أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ',
+    transliteration:
+      "Ashhadu an la ilaha illallahu wahdahu la sharika lah, wa ashhadu anna Muhammadan 'abduhu wa rasuluh",
+    meaning:
+      'Jeg vitner om at ingen har rett til å tilbes unntatt Allah alene, uten partner, og jeg vitner om at Muhammad er Hans tjener og sendebud.',
+    source: 'Sahih Muslim 234',
+  },
+  {
+    id: 'entering-mosque',
+    category: 'wudu-mosque',
+    title: 'Når du går inn i moskeen',
+    arabic: 'اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ',
+    transliteration: 'Allahummaf-tah li abwaba rahmatik',
+    meaning: 'Allah, åpne dørene til Din nåde for meg.',
+    source: 'Sahih Muslim 713',
+  },
+  {
+    id: 'leaving-mosque',
+    category: 'wudu-mosque',
+    title: 'Når du går ut av moskeen',
+    arabic: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ',
+    transliteration: "Allahumma inni as'aluka min fadlik",
+    meaning: 'Allah, jeg ber Deg om Din gavmildhet.',
+    source: 'Sahih Muslim 713',
   },
   {
     id: 'istighfar',
@@ -175,79 +209,6 @@ export const DUAS: Dua[] = [
     source: 'Sunan Abi Dawud 1522',
   },
   {
-    id: 'sayyid-al-istighfar',
-    category: 'morning-evening',
-    title: 'Sayyid al-istighfar',
-    arabic:
-      'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَىٰ عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ',
-    transliteration:
-      "Allahumma anta rabbi la ilaha illa ant, khalaqtani wa ana 'abduk, wa ana 'ala 'ahdika wa wa'dika mastata't, a'udhu bika min sharri ma sana't, abu'u laka bi-ni'matika 'alayy, wa abu'u bi-dhanbi faghfir li, fa-innahu la yaghfirudh-dhunuba illa ant",
-    meaning:
-      'Allah, Du er min Herre. Ingen har rett til å tilbes unntatt Deg. Du skapte meg, og jeg er Din tjener. Jeg holder meg til min pakt og mitt løfte til Deg så godt jeg kan. Jeg søker tilflukt hos Deg mot det onde jeg har gjort. Jeg erkjenner Din nåde mot meg, og jeg erkjenner min synd, så tilgi meg. For ingen tilgir synder unntatt Deg.',
-    note: 'Den beste formen for å be om tilgivelse. Sies morgen og kveld.',
-    source: 'Sahih al-Bukhari 6306',
-  },
-  {
-    id: 'morning-kingdom',
-    category: 'morning-evening',
-    title: 'Vi har nådd morgenen',
-    arabic:
-      'أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَٰذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَٰذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ',
-    transliteration:
-      "Asbahna wa asbahal-mulku lillah, wal-hamdu lillah, la ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamdu wa huwa 'ala kulli shay'in qadir. Rabbi as'aluka khayra ma fi hadhal-yawmi wa khayra ma ba'dah, wa a'udhu bika min sharri ma fi hadhal-yawmi wa sharri ma ba'dah. Rabbi a'udhu bika minal-kasali wa su'il-kibar. Rabbi a'udhu bika min 'adhabin fin-nari wa 'adhabin fil-qabr",
-    meaning:
-      'Vi har nådd morgenen, og herredømmet tilhører Allah. All lovprisning tilhører Allah. Ingen har rett til å tilbes unntatt Allah alene, uten partner. Hans er herredømmet og Hans er lovprisningen, og Han har makt over alle ting. Herre, jeg ber Deg om det gode i denne dagen og det som kommer etter, og søker tilflukt hos Deg mot det onde i denne dagen og det som kommer etter. Herre, jeg søker tilflukt hos Deg mot latskap og en vond alderdom. Herre, jeg søker tilflukt hos Deg mot straffen i Ilden og straffen i graven.',
-    note: 'Om kvelden sier du «amsayna wa amsal-mulku lillah» og «hadhihil-laylah» (denne natten) i stedet for «hadhal-yawm».',
-    source: 'Sahih Muslim 2723',
-  },
-  {
-    id: 'bika-asbahna',
-    category: 'morning-evening',
-    title: 'Med deg når vi morgenen',
-    arabic:
-      'اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ',
-    transliteration:
-      'Allahumma bika asbahna, wa bika amsayna, wa bika nahya, wa bika namutu, wa ilaykan-nushur',
-    meaning:
-      'Allah, ved Deg har vi nådd morgenen og ved Deg har vi nådd kvelden. Ved Deg lever vi og ved Deg dør vi, og til Deg er oppstandelsen.',
-    note: 'Om kvelden: «Allahumma bika amsayna, wa bika asbahna, wa bika nahya, wa bika namutu, wa ilaykal-masir» (og til Deg er hjemkomsten).',
-    source: "Jami' at-Tirmidhi 3391, Sunan Abi Dawud 5068",
-  },
-  {
-    id: 'bismillah-no-harm',
-    category: 'morning-evening',
-    title: 'I Allahs navn, intet skader',
-    arabic:
-      'بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ',
-    transliteration:
-      "Bismillahil-ladhi la yadurru ma'as-mihi shay'un fil-ardi wa la fis-sama'i wa huwas-sami'ul-'alim",
-    meaning:
-      'I Allahs navn, Han som gjør at ingenting på jorden eller i himmelen kan skade når Hans navn er nevnt. Han er Den Allhørende, Den Allvitende.',
-    repeat: 3,
-    source: "Sunan Abi Dawud 5088, Jami' at-Tirmidhi 3388",
-  },
-  {
-    id: 'subhanallah-wa-bihamdihi',
-    category: 'morning-evening',
-    title: 'Subhanallah wa bihamdihi',
-    arabic: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',
-    transliteration: 'Subhanallahi wa bi-hamdih',
-    meaning: 'Allah er hevet over alle mangler, og all lovprisning er Hans.',
-    repeat: 100,
-    source: 'Sahih Muslim 2692',
-  },
-  {
-    id: 'perfect-words',
-    category: 'morning-evening',
-    title: 'Allahs fullkomne ord',
-    arabic: 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',
-    transliteration: "A'udhu bi-kalimatillahit-tammati min sharri ma khalaq",
-    meaning: 'Jeg søker tilflukt i Allahs fullkomne ord mot ondskapen i det Han har skapt.',
-    note: 'Sies om kvelden.',
-    repeat: 3,
-    source: 'Sahih Muslim 2708, 2709',
-  },
-  {
     id: 'iftar',
     category: 'ramadan',
     title: 'Dua ved iftar',
@@ -290,165 +251,61 @@ export const DUAS: Dua[] = [
     source: 'Sunan Abi Dawud 3854',
   },
   {
-    id: 'before-eating',
-    category: 'everyday',
-    title: 'Før maten',
-    arabic: 'بِسْمِ اللَّهِ',
-    transliteration: 'Bismillah',
-    meaning: 'I Allahs navn.',
-    note: 'Glemte du det i starten, sier du «Bismillahi awwalahu wa akhirah» (i Allahs navn, i begynnelsen og slutten).',
-    source: "Sunan Abi Dawud 3767, Jami' at-Tirmidhi 1858",
-  },
-  {
-    id: 'after-eating',
-    category: 'everyday',
-    title: 'Etter maten',
+    id: 'talbiyah',
+    category: 'hajj',
+    title: 'Talbiyah',
     arabic:
-      'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَٰذَا وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ',
+      'لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ، إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ، لَا شَرِيكَ لَكَ',
     transliteration:
-      "Alhamdu lillahil-ladhi at'amani hadha wa razaqanihi min ghayri hawlin minni wa la quwwah",
+      "Labbayk Allahumma labbayk, labbayka la sharika laka labbayk, innal-hamda wan-ni'mata laka wal-mulk, la sharika lak",
     meaning:
-      'All lovprisning tilhører Allah, som ga meg dette å spise og sørget for det uten noen kraft eller styrke fra meg.',
-    source: "Sunan Abi Dawud 4023, Jami' at-Tirmidhi 3458",
+      'Her er jeg, Allah, her er jeg. Her er jeg, Du har ingen partner, her er jeg. All lovprisning og all nåde tilhører Deg, og herredømmet. Du har ingen partner.',
+    note: 'Sies av pilegrimer fra de går i ihram til de kaster steiner på Eid-dagen.',
+    source: 'Sahih al-Bukhari 1549, Sahih Muslim 1184',
   },
   {
-    id: 'before-sleep',
-    category: 'everyday',
-    title: 'Før du sovner',
-    arabic: 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا',
-    transliteration: 'Bismika Allahumma amutu wa ahya',
-    meaning: 'I Ditt navn, Allah, dør jeg og lever jeg.',
-    source: 'Sahih al-Bukhari 6324',
-  },
-  {
-    id: 'waking-up',
-    category: 'everyday',
-    title: 'Når du våkner',
-    arabic: 'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',
-    transliteration: "Alhamdu lillahil-ladhi ahyana ba'da ma amatana wa ilayhin-nushur",
-    meaning: 'All lovprisning tilhører Allah, som ga oss liv etter å ha latt oss dø, og til Ham er oppstandelsen.',
-    source: 'Sahih al-Bukhari 6324',
-  },
-  {
-    id: 'leaving-home',
-    category: 'everyday',
-    title: 'Når du går ut',
-    arabic: 'بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ',
-    transliteration: "Bismillah, tawakkaltu 'alallah, wa la hawla wa la quwwata illa billah",
-    meaning:
-      'I Allahs navn. Jeg setter min lit til Allah, og det finnes ingen kraft og ingen styrke unntatt hos Allah.',
-    source: "Sunan Abi Dawud 5095, Jami' at-Tirmidhi 3426",
-  },
-  {
-    id: 'entering-home',
-    category: 'everyday',
-    title: 'Når du kommer hjem',
-    arabic: 'بِسْمِ اللَّهِ',
-    transliteration: 'Bismillah',
-    meaning: 'I Allahs navn.',
-    note: 'Nevn Allahs navn når du går inn og når du spiser, så får ikke Shaytan verken husly eller mat hos deg.',
-    source: 'Sahih Muslim 2018',
-  },
-  {
-    id: 'entering-mosque',
-    category: 'everyday',
-    title: 'Når du går inn i moskeen',
-    arabic: 'اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ',
-    transliteration: 'Allahummaf-tah li abwaba rahmatik',
-    meaning: 'Allah, åpne dørene til Din nåde for meg.',
-    source: 'Sahih Muslim 713',
-  },
-  {
-    id: 'leaving-mosque',
-    category: 'everyday',
-    title: 'Når du går ut av moskeen',
-    arabic: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ',
-    transliteration: "Allahumma inni as'aluka min fadlik",
-    meaning: 'Allah, jeg ber Deg om Din gavmildhet.',
-    source: 'Sahih Muslim 713',
-  },
-  {
-    id: 'after-wudu',
-    category: 'everyday',
-    title: 'Etter wudu',
+    id: 'arafah',
+    category: 'hajj',
+    title: 'Den beste duaen på Arafah-dagen',
     arabic:
-      'أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ',
+      'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ',
     transliteration:
-      "Ashhadu an la ilaha illallahu wahdahu la sharika lah, wa ashhadu anna Muhammadan 'abduhu wa rasuluh",
+      "La ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa 'ala kulli shay'in qadir",
     meaning:
-      'Jeg vitner om at ingen har rett til å tilbes unntatt Allah alene, uten partner, og jeg vitner om at Muhammad er Hans tjener og sendebud.',
-    source: 'Sahih Muslim 234',
+      'Ingen har rett til å tilbes unntatt Allah alene, uten partner. Herredømmet og all lovprisning tilhører Ham, og Han har makt over alle ting.',
+    note: 'Profeten sa at den beste duaen er duaen på Arafah-dagen, og at dette er det beste han og profetene før ham har sagt.',
+    source: "Jami' at-Tirmidhi 3585",
   },
   {
-    id: 'travel',
-    category: 'everyday',
-    title: 'Når du reiser',
+    id: 'takbir-dhul-hijjah',
+    category: 'hajj',
+    title: 'Takbir i Dhul-Hijjah',
     arabic:
-      'اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ، وَإِنَّا إِلَىٰ رَبِّنَا لَمُنْقَلِبُونَ، اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَٰذَا الْبِرَّ وَالتَّقْوَىٰ، وَمِنَ الْعَمَلِ مَا تَرْضَىٰ، اللَّهُمَّ هَوِّنْ عَلَيْنَا سَفَرَنَا هَٰذَا وَاطْوِ عَنَّا بُعْدَهُ، اللَّهُمَّ أَنْتَ الصَّاحِبُ فِي السَّفَرِ، وَالْخَلِيفَةُ فِي الْأَهْلِ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ وَعْثَاءِ السَّفَرِ، وَكَآبَةِ الْمَنْظَرِ، وَسُوءِ الْمُنْقَلَبِ فِي الْمَالِ وَالْأَهْلِ',
-    transliteration:
-      "Allahu akbar, Allahu akbar, Allahu akbar. Subhanal-ladhi sakhkhara lana hadha wa ma kunna lahu muqrinin, wa inna ila rabbina la-munqalibun. Allahumma inna nas'aluka fi safarina hadhal-birra wat-taqwa, wa minal-'amali ma tarda. Allahumma hawwin 'alayna safarana hadha watwi 'anna bu'dah. Allahumma antas-sahibu fis-safar, wal-khalifatu fil-ahl. Allahumma inni a'udhu bika min wa'tha'is-safar, wa ka'abatil-manzar, wa su'il-munqalabi fil-mali wal-ahl",
+      'اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، لَا إِلَٰهَ إِلَّا اللَّهُ، وَاللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، وَلِلَّهِ الْحَمْدُ',
+    transliteration: 'Allahu akbar, Allahu akbar, la ilaha illallah, wallahu akbar, Allahu akbar, wa lillahil-hamd',
     meaning:
-      'Allah er størst (tre ganger). Hevet over alle mangler er Han som har gjort dette tjenlig for oss, noe vi ikke selv kunne ha klart, og til vår Herre skal vi vende tilbake. Allah, vi ber Deg om godhet og gudsfrykt på denne reisen, og om handlinger som behager Deg. Allah, gjør denne reisen lett for oss og korte ned avstanden. Allah, Du er følgesvennen på reisen og den som tar vare på familien. Allah, jeg søker tilflukt hos Deg mot reisens strabaser, mot triste syn og mot å komme hjem til skade på eiendom eller familie.',
-    source: 'Sahih Muslim 1342',
+      'Allah er størst, Allah er størst, ingen har rett til å tilbes unntatt Allah. Allah er størst, Allah er størst, og all lovprisning tilhører Allah.',
+    note: 'Sies ofte de ti første dagene, og etter bønnene fra Arafah-dagen til og med 13. Dhul-Hijjah.',
+    source: 'Musannaf Ibn Abi Shaybah, fra Abdullah ibn Masud',
   },
   {
-    id: 'entering-toilet',
-    category: 'everyday',
-    title: 'Før toalettet',
-    arabic: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ',
-    transliteration: "Allahumma inni a'udhu bika minal-khubuthi wal-khaba'ith",
-    meaning: 'Allah, jeg søker tilflukt hos Deg mot onde vesener, både hankjønn og hunkjønn.',
-    source: 'Sahih al-Bukhari 142, Sahih Muslim 375',
-  },
-  {
-    id: 'leaving-toilet',
-    category: 'everyday',
-    title: 'Etter toalettet',
-    arabic: 'غُفْرَانَكَ',
-    transliteration: 'Ghufranak',
-    meaning: 'Jeg ber om Din tilgivelse.',
-    source: "Sunan Abi Dawud 30, Jami' at-Tirmidhi 7",
-  },
-  {
-    id: 'sneezing',
-    category: 'everyday',
-    title: 'Når noen nyser',
-    arabic: 'الْحَمْدُ لِلَّهِ\nيَرْحَمُكَ اللَّهُ\nيَهْدِيكُمُ اللَّهُ وَيُصْلِحُ بَالَكُمْ',
-    transliteration: 'Alhamdulillah\nYarhamukallah\nYahdikumullahu wa yuslihu balakum',
-    meaning:
-      'Den som nyser sier: All lovprisning tilhører Allah.\nDen som hører det svarer: Må Allah vise deg nåde.\nDen som nyste svarer: Må Allah veilede dere og gjøre det godt for dere.',
-    source: 'Sahih al-Bukhari 6224',
-  },
-  {
-    id: 'distress',
-    category: 'everyday',
-    title: 'I vanskelige stunder',
-    arabic:
-      'لَا إِلَٰهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلَٰهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلَٰهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ الْعَرْشِ الْكَرِيمِ',
-    transliteration:
-      "La ilaha illallahul-'azimul-halim. La ilaha illallahu rabbul-'arshil-'azim. La ilaha illallahu rabbus-samawati wa rabbul-ardi wa rabbul-'arshil-karim",
-    meaning:
-      'Ingen har rett til å tilbes unntatt Allah, Den Veldige, Den Tålmodige. Ingen har rett til å tilbes unntatt Allah, Herre over den veldige tronen. Ingen har rett til å tilbes unntatt Allah, Herre over himlene, Herre over jorden og Herre over den edle tronen.',
-    source: 'Sahih al-Bukhari 6346, Sahih Muslim 2730',
-  },
-  {
-    id: 'rabbana-atina',
-    category: 'everyday',
-    title: 'Rabbana atina',
+    id: 'between-the-corners',
+    category: 'hajj',
+    title: 'Mellom Rukn al-Yamani og Den svarte steinen',
     arabic: 'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ',
     transliteration: "Rabbana atina fid-dunya hasanatan wa fil-akhirati hasanatan wa qina 'adhaban-nar",
     meaning: 'Vår Herre, gi oss det gode i dette livet og det gode i det neste, og vern oss mot straffen i Ilden.',
-    note: 'Den duaen Profeten ba oftest.',
-    source: 'Koranen 2:201. Sahih al-Bukhari 6389',
+    note: 'Sies under tawaf, på strekningen mellom de to hjørnene av Kaba.',
+    source: 'Sunan Abi Dawud 1892. Koranen 2:201',
   },
   {
-    id: 'visiting-sick',
-    category: 'everyday',
-    title: 'Når du besøker en syk',
-    arabic: 'لَا بَأْسَ، طَهُورٌ إِنْ شَاءَ اللَّهُ',
-    transliteration: "La ba's, tahurun in sha' Allah",
-    meaning: 'Det går bra. Det renser deg, om Allah vil.',
-    source: 'Sahih al-Bukhari 3616',
+    id: 'qurbani',
+    category: 'hajj',
+    title: 'Når du slakter qurbani',
+    arabic: 'بِسْمِ اللَّهِ وَاللَّهُ أَكْبَرُ',
+    transliteration: 'Bismillahi wallahu akbar',
+    meaning: 'I Allahs navn, og Allah er størst.',
+    source: 'Sahih Muslim 1966',
   },
 ];
 

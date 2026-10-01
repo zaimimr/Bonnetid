@@ -37,6 +37,38 @@ Allah, Herre over dette fullkomne kallet og bønnen som skal holdes: Gi Muhammad
 
 Kilde: Sahih al-Bukhari 614
 
+## Wudu og moské
+
+### Etter wudu
+
+<div dir="rtl" lang="ar">أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ</div>
+
+*Ashhadu an la ilaha illallahu wahdahu la sharika lah, wa ashhadu anna Muhammadan 'abduhu wa rasuluh*
+
+Jeg vitner om at ingen har rett til å tilbes unntatt Allah alene, uten partner, og jeg vitner om at Muhammad er Hans tjener og sendebud.
+
+Kilde: Sahih Muslim 234
+
+### Når du går inn i moskeen
+
+<div dir="rtl" lang="ar">اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ</div>
+
+*Allahummaf-tah li abwaba rahmatik*
+
+Allah, åpne dørene til Din nåde for meg.
+
+Kilde: Sahih Muslim 713
+
+### Når du går ut av moskeen
+
+<div dir="rtl" lang="ar">اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ</div>
+
+*Allahumma inni as'aluka min fadlik*
+
+Allah, jeg ber Deg om Din gavmildhet.
+
+Kilde: Sahih Muslim 713
+
 ## Etter bønnen
 
 ### Be om tilgivelse
@@ -166,82 +198,6 @@ Allah, hjelp meg å minnes Deg, å takke Deg og å tilbe Deg på best mulig måt
 
 Kilde: Sunan Abi Dawud 1522
 
-## Morgen og kveld
-
-### Sayyid al-istighfar
-
-<div dir="rtl" lang="ar">اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَىٰ عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ</div>
-
-*Allahumma anta rabbi la ilaha illa ant, khalaqtani wa ana 'abduk, wa ana 'ala 'ahdika wa wa'dika mastata't, a'udhu bika min sharri ma sana't, abu'u laka bi-ni'matika 'alayy, wa abu'u bi-dhanbi faghfir li, fa-innahu la yaghfirudh-dhunuba illa ant*
-
-Allah, Du er min Herre. Ingen har rett til å tilbes unntatt Deg. Du skapte meg, og jeg er Din tjener. Jeg holder meg til min pakt og mitt løfte til Deg så godt jeg kan. Jeg søker tilflukt hos Deg mot det onde jeg har gjort. Jeg erkjenner Din nåde mot meg, og jeg erkjenner min synd, så tilgi meg. For ingen tilgir synder unntatt Deg.
-
-Merknad: Den beste formen for å be om tilgivelse. Sies morgen og kveld.
-
-Kilde: Sahih al-Bukhari 6306
-
-### Vi har nådd morgenen
-
-<div dir="rtl" lang="ar">أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَٰذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَٰذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ</div>
-
-*Asbahna wa asbahal-mulku lillah, wal-hamdu lillah, la ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamdu wa huwa 'ala kulli shay'in qadir. Rabbi as'aluka khayra ma fi hadhal-yawmi wa khayra ma ba'dah, wa a'udhu bika min sharri ma fi hadhal-yawmi wa sharri ma ba'dah. Rabbi a'udhu bika minal-kasali wa su'il-kibar. Rabbi a'udhu bika min 'adhabin fin-nari wa 'adhabin fil-qabr*
-
-Vi har nådd morgenen, og herredømmet tilhører Allah. All lovprisning tilhører Allah. Ingen har rett til å tilbes unntatt Allah alene, uten partner. Hans er herredømmet og Hans er lovprisningen, og Han har makt over alle ting. Herre, jeg ber Deg om det gode i denne dagen og det som kommer etter, og søker tilflukt hos Deg mot det onde i denne dagen og det som kommer etter. Herre, jeg søker tilflukt hos Deg mot latskap og en vond alderdom. Herre, jeg søker tilflukt hos Deg mot straffen i Ilden og straffen i graven.
-
-Merknad: Om kvelden sier du «amsayna wa amsal-mulku lillah» og «hadhihil-laylah» (denne natten) i stedet for «hadhal-yawm».
-
-Kilde: Sahih Muslim 2723
-
-### Med deg når vi morgenen
-
-<div dir="rtl" lang="ar">اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ</div>
-
-*Allahumma bika asbahna, wa bika amsayna, wa bika nahya, wa bika namutu, wa ilaykan-nushur*
-
-Allah, ved Deg har vi nådd morgenen og ved Deg har vi nådd kvelden. Ved Deg lever vi og ved Deg dør vi, og til Deg er oppstandelsen.
-
-Merknad: Om kvelden: «Allahumma bika amsayna, wa bika asbahna, wa bika nahya, wa bika namutu, wa ilaykal-masir» (og til Deg er hjemkomsten).
-
-Kilde: Jami' at-Tirmidhi 3391, Sunan Abi Dawud 5068
-
-### I Allahs navn, intet skader
-
-<div dir="rtl" lang="ar">بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ</div>
-
-*Bismillahil-ladhi la yadurru ma'as-mihi shay'un fil-ardi wa la fis-sama'i wa huwas-sami'ul-'alim*
-
-I Allahs navn, Han som gjør at ingenting på jorden eller i himmelen kan skade når Hans navn er nevnt. Han er Den Allhørende, Den Allvitende.
-
-Gjentas 3 ganger.
-
-Kilde: Sunan Abi Dawud 5088, Jami' at-Tirmidhi 3388
-
-### Subhanallah wa bihamdihi
-
-<div dir="rtl" lang="ar">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ</div>
-
-*Subhanallahi wa bi-hamdih*
-
-Allah er hevet over alle mangler, og all lovprisning er Hans.
-
-Gjentas 100 ganger.
-
-Kilde: Sahih Muslim 2692
-
-### Allahs fullkomne ord
-
-<div dir="rtl" lang="ar">أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ</div>
-
-*A'udhu bi-kalimatillahit-tammati min sharri ma khalaq*
-
-Jeg søker tilflukt i Allahs fullkomne ord mot ondskapen i det Han har skapt.
-
-Merknad: Sies om kvelden.
-
-Gjentas 3 ganger.
-
-Kilde: Sahih Muslim 2708, 2709
-
 ## Ramadan
 
 ### Dua ved iftar
@@ -290,159 +246,45 @@ Må de fastende bryte fasten hos dere, må de rettskafne spise maten deres, og m
 
 Kilde: Sunan Abi Dawud 3854
 
-## Hverdag
+## Hajj og Dhul-Hijjah
 
-### Før maten
+### Talbiyah
 
-<div dir="rtl" lang="ar">بِسْمِ اللَّهِ</div>
+<div dir="rtl" lang="ar">لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ، إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ، لَا شَرِيكَ لَكَ</div>
 
-*Bismillah*
+*Labbayk Allahumma labbayk, labbayka la sharika laka labbayk, innal-hamda wan-ni'mata laka wal-mulk, la sharika lak*
 
-I Allahs navn.
+Her er jeg, Allah, her er jeg. Her er jeg, Du har ingen partner, her er jeg. All lovprisning og all nåde tilhører Deg, og herredømmet. Du har ingen partner.
 
-Merknad: Glemte du det i starten, sier du «Bismillahi awwalahu wa akhirah» (i Allahs navn, i begynnelsen og slutten).
+Merknad: Sies av pilegrimer fra de går i ihram til de kaster steiner på Eid-dagen.
 
-Kilde: Sunan Abi Dawud 3767, Jami' at-Tirmidhi 1858
+Kilde: Sahih al-Bukhari 1549, Sahih Muslim 1184
 
-### Etter maten
+### Den beste duaen på Arafah-dagen
 
-<div dir="rtl" lang="ar">الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَٰذَا وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ</div>
+<div dir="rtl" lang="ar">لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ</div>
 
-*Alhamdu lillahil-ladhi at'amani hadha wa razaqanihi min ghayri hawlin minni wa la quwwah*
+*La ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa 'ala kulli shay'in qadir*
 
-All lovprisning tilhører Allah, som ga meg dette å spise og sørget for det uten noen kraft eller styrke fra meg.
+Ingen har rett til å tilbes unntatt Allah alene, uten partner. Herredømmet og all lovprisning tilhører Ham, og Han har makt over alle ting.
 
-Kilde: Sunan Abi Dawud 4023, Jami' at-Tirmidhi 3458
+Merknad: Profeten sa at den beste duaen er duaen på Arafah-dagen, og at dette er det beste han og profetene før ham har sagt.
 
-### Før du sovner
+Kilde: Jami' at-Tirmidhi 3585
 
-<div dir="rtl" lang="ar">بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا</div>
+### Takbir i Dhul-Hijjah
 
-*Bismika Allahumma amutu wa ahya*
+<div dir="rtl" lang="ar">اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، لَا إِلَٰهَ إِلَّا اللَّهُ، وَاللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، وَلِلَّهِ الْحَمْدُ</div>
 
-I Ditt navn, Allah, dør jeg og lever jeg.
+*Allahu akbar, Allahu akbar, la ilaha illallah, wallahu akbar, Allahu akbar, wa lillahil-hamd*
 
-Kilde: Sahih al-Bukhari 6324
+Allah er størst, Allah er størst, ingen har rett til å tilbes unntatt Allah. Allah er størst, Allah er størst, og all lovprisning tilhører Allah.
 
-### Når du våkner
+Merknad: Sies ofte de ti første dagene, og etter bønnene fra Arafah-dagen til og med 13. Dhul-Hijjah.
 
-<div dir="rtl" lang="ar">الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ</div>
+Kilde: Musannaf Ibn Abi Shaybah, fra Abdullah ibn Masud
 
-*Alhamdu lillahil-ladhi ahyana ba'da ma amatana wa ilayhin-nushur*
-
-All lovprisning tilhører Allah, som ga oss liv etter å ha latt oss dø, og til Ham er oppstandelsen.
-
-Kilde: Sahih al-Bukhari 6324
-
-### Når du går ut
-
-<div dir="rtl" lang="ar">بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ</div>
-
-*Bismillah, tawakkaltu 'alallah, wa la hawla wa la quwwata illa billah*
-
-I Allahs navn. Jeg setter min lit til Allah, og det finnes ingen kraft og ingen styrke unntatt hos Allah.
-
-Kilde: Sunan Abi Dawud 5095, Jami' at-Tirmidhi 3426
-
-### Når du kommer hjem
-
-<div dir="rtl" lang="ar">بِسْمِ اللَّهِ</div>
-
-*Bismillah*
-
-I Allahs navn.
-
-Merknad: Nevn Allahs navn når du går inn og når du spiser, så får ikke Shaytan verken husly eller mat hos deg.
-
-Kilde: Sahih Muslim 2018
-
-### Når du går inn i moskeen
-
-<div dir="rtl" lang="ar">اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ</div>
-
-*Allahummaf-tah li abwaba rahmatik*
-
-Allah, åpne dørene til Din nåde for meg.
-
-Kilde: Sahih Muslim 713
-
-### Når du går ut av moskeen
-
-<div dir="rtl" lang="ar">اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ</div>
-
-*Allahumma inni as'aluka min fadlik*
-
-Allah, jeg ber Deg om Din gavmildhet.
-
-Kilde: Sahih Muslim 713
-
-### Etter wudu
-
-<div dir="rtl" lang="ar">أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ</div>
-
-*Ashhadu an la ilaha illallahu wahdahu la sharika lah, wa ashhadu anna Muhammadan 'abduhu wa rasuluh*
-
-Jeg vitner om at ingen har rett til å tilbes unntatt Allah alene, uten partner, og jeg vitner om at Muhammad er Hans tjener og sendebud.
-
-Kilde: Sahih Muslim 234
-
-### Når du reiser
-
-<div dir="rtl" lang="ar">اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ، وَإِنَّا إِلَىٰ رَبِّنَا لَمُنْقَلِبُونَ، اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَٰذَا الْبِرَّ وَالتَّقْوَىٰ، وَمِنَ الْعَمَلِ مَا تَرْضَىٰ، اللَّهُمَّ هَوِّنْ عَلَيْنَا سَفَرَنَا هَٰذَا وَاطْوِ عَنَّا بُعْدَهُ، اللَّهُمَّ أَنْتَ الصَّاحِبُ فِي السَّفَرِ، وَالْخَلِيفَةُ فِي الْأَهْلِ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ وَعْثَاءِ السَّفَرِ، وَكَآبَةِ الْمَنْظَرِ، وَسُوءِ الْمُنْقَلَبِ فِي الْمَالِ وَالْأَهْلِ</div>
-
-*Allahu akbar, Allahu akbar, Allahu akbar. Subhanal-ladhi sakhkhara lana hadha wa ma kunna lahu muqrinin, wa inna ila rabbina la-munqalibun. Allahumma inna nas'aluka fi safarina hadhal-birra wat-taqwa, wa minal-'amali ma tarda. Allahumma hawwin 'alayna safarana hadha watwi 'anna bu'dah. Allahumma antas-sahibu fis-safar, wal-khalifatu fil-ahl. Allahumma inni a'udhu bika min wa'tha'is-safar, wa ka'abatil-manzar, wa su'il-munqalabi fil-mali wal-ahl*
-
-Allah er størst (tre ganger). Hevet over alle mangler er Han som har gjort dette tjenlig for oss, noe vi ikke selv kunne ha klart, og til vår Herre skal vi vende tilbake. Allah, vi ber Deg om godhet og gudsfrykt på denne reisen, og om handlinger som behager Deg. Allah, gjør denne reisen lett for oss og korte ned avstanden. Allah, Du er følgesvennen på reisen og den som tar vare på familien. Allah, jeg søker tilflukt hos Deg mot reisens strabaser, mot triste syn og mot å komme hjem til skade på eiendom eller familie.
-
-Kilde: Sahih Muslim 1342
-
-### Før toalettet
-
-<div dir="rtl" lang="ar">اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ</div>
-
-*Allahumma inni a'udhu bika minal-khubuthi wal-khaba'ith*
-
-Allah, jeg søker tilflukt hos Deg mot onde vesener, både hankjønn og hunkjønn.
-
-Kilde: Sahih al-Bukhari 142, Sahih Muslim 375
-
-### Etter toalettet
-
-<div dir="rtl" lang="ar">غُفْرَانَكَ</div>
-
-*Ghufranak*
-
-Jeg ber om Din tilgivelse.
-
-Kilde: Sunan Abi Dawud 30, Jami' at-Tirmidhi 7
-
-### Når noen nyser
-
-<div dir="rtl" lang="ar">الْحَمْدُ لِلَّهِ
-يَرْحَمُكَ اللَّهُ
-يَهْدِيكُمُ اللَّهُ وَيُصْلِحُ بَالَكُمْ</div>
-
-*Alhamdulillah
-Yarhamukallah
-Yahdikumullahu wa yuslihu balakum*
-
-Den som nyser sier: All lovprisning tilhører Allah.
-Den som hører det svarer: Må Allah vise deg nåde.
-Den som nyste svarer: Må Allah veilede dere og gjøre det godt for dere.
-
-Kilde: Sahih al-Bukhari 6224
-
-### I vanskelige stunder
-
-<div dir="rtl" lang="ar">لَا إِلَٰهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلَٰهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلَٰهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ الْعَرْشِ الْكَرِيمِ</div>
-
-*La ilaha illallahul-'azimul-halim. La ilaha illallahu rabbul-'arshil-'azim. La ilaha illallahu rabbus-samawati wa rabbul-ardi wa rabbul-'arshil-karim*
-
-Ingen har rett til å tilbes unntatt Allah, Den Veldige, Den Tålmodige. Ingen har rett til å tilbes unntatt Allah, Herre over den veldige tronen. Ingen har rett til å tilbes unntatt Allah, Herre over himlene, Herre over jorden og Herre over den edle tronen.
-
-Kilde: Sahih al-Bukhari 6346, Sahih Muslim 2730
-
-### Rabbana atina
+### Mellom Rukn al-Yamani og Den svarte steinen
 
 <div dir="rtl" lang="ar">رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ</div>
 
@@ -450,17 +292,17 @@ Kilde: Sahih al-Bukhari 6346, Sahih Muslim 2730
 
 Vår Herre, gi oss det gode i dette livet og det gode i det neste, og vern oss mot straffen i Ilden.
 
-Merknad: Den duaen Profeten ba oftest.
+Merknad: Sies under tawaf, på strekningen mellom de to hjørnene av Kaba.
 
-Kilde: Koranen 2:201. Sahih al-Bukhari 6389
+Kilde: Sunan Abi Dawud 1892. Koranen 2:201
 
-### Når du besøker en syk
+### Når du slakter qurbani
 
-<div dir="rtl" lang="ar">لَا بَأْسَ، طَهُورٌ إِنْ شَاءَ اللَّهُ</div>
+<div dir="rtl" lang="ar">بِسْمِ اللَّهِ وَاللَّهُ أَكْبَرُ</div>
 
-*La ba's, tahurun in sha' Allah*
+*Bismillahi wallahu akbar*
 
-Det går bra. Det renser deg, om Allah vil.
+I Allahs navn, og Allah er størst.
 
-Kilde: Sahih al-Bukhari 3616
+Kilde: Sahih Muslim 1966
 

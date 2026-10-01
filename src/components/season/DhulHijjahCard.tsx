@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 import { AppText, Badge, Card } from '@/components/ui';
+import { DuaLink } from '@/components/duas/DuaLink';
 import { SeasonCountdownCard } from '@/components/season/SeasonCountdownCard';
 import {
   ARAFAH_DAY,
@@ -11,6 +12,7 @@ import {
   dhulHijjahHighlight,
   type SeasonStatus,
 } from '@/lib/hijriSeason';
+import { DUA_LINKS } from '@/lib/duas';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
 
@@ -99,6 +101,8 @@ export function DhulHijjahCard({ status }: DhulHijjahCardProps) {
       <AppText size="xs" tone="textMuted" style={{ marginTop: spacing.sm }}>
         {MOON_SIGHTING_NOTE}
       </AppText>
+
+      <DuaLink category={DUA_LINKS.hajj} label="Duaer for Dhul-Hijjah" />
     </Card>
   );
 }

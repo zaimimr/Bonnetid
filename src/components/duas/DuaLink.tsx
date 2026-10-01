@@ -6,11 +6,10 @@ import { useTheme } from '@/theme';
 import { hitSlop, opacity, spacing } from '@/theme/tokens';
 
 export type DuaLinkProps = {
-  duaId: string;
   label: string;
-};
+} & ({ duaId: string; category?: never } | { category: string; duaId?: never });
 
-export function DuaLink({ duaId, label }: DuaLinkProps) {
+export function DuaLink({ duaId, category, label }: DuaLinkProps) {
   const theme = useTheme();
   const router = useRouter();
 
@@ -18,7 +17,11 @@ export function DuaLink({ duaId, label }: DuaLinkProps) {
     <Pressable
       accessibilityRole="link"
       hitSlop={hitSlop}
-      onPress={() => router.push({ pathname: '/duas/[id]', params: { id: duaId } })}
+      onPress={() =>
+        duaId
+          ? router.push({ pathname: '/duas/[id]', params: { id: duaId } })
+          : router.push({ pathname: '/duas', params: { category } })
+      }
       style={({ pressed }) => ({ marginTop: spacing.md, opacity: pressed ? opacity.pressed : 1 })}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
         <Ionicons name="book-outline" size={16} color={theme.colors.primary} />

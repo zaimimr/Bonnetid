@@ -2,13 +2,16 @@ import { Fragment } from 'react';
 import { View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { AppText, Card, Divider, EmptyState, ListRow, Screen, SectionHeader } from '@/components/ui';
+import { useHijriSeasonNow } from '@/hooks/useHijriSeason';
 import { categoryById, DUA_CATEGORIES, duasIn, type DuaCategory } from '@/lib/duas';
 import { spacing } from '@/theme/tokens';
 
 export default function DuasScreen() {
   const { category } = useLocalSearchParams<{ category?: string }>();
+  const { status } = useHijriSeasonNow();
   const selected = category ? categoryById(category) : null;
-  const categories = category ? (selected ? [selected] : []) : DUA_CATEGORIES;
+  const inSeason = DUA_CATEGORIES.filter((entry) => !entry.season || entry.season === status?.id);
+  const categories = category ? (selected ? [selected] : []) : inSeason;
 
   return (
     <Screen scroll edges={[]}>
