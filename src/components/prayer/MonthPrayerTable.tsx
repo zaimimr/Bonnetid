@@ -176,8 +176,6 @@ export function MonthPrayerTable({
                 tabular
                 maxFontSizeMultiplier={tableScale}
                 numberOfLines={1}
-                adjustsFontSizeToFit
-                minimumFontScale={0.8}
                 style={timeColumnStyle}>
                 {time ? formatZonedClock(wallClockToDate(date, time, zone), zone) : '–'}
               </AppText>

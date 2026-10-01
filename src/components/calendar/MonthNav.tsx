@@ -58,7 +58,7 @@ export function MonthNav({
               { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, alignSelf: 'flex-start' },
               pressed && { opacity: opacity.pressed },
             ]}>
-            <AppText size="sm" tone="textMuted" numberOfLines={1} style={{ flexShrink: 1 }}>
+            <AppText size="sm" tone="textMuted" numberOfLines={2} style={{ flexShrink: 1 }}>
               {subtitle ?? ' '}
             </AppText>
             <Ionicons name="swap-vertical" size={15} color={theme.colors.primary} />

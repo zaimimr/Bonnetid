@@ -1,11 +1,14 @@
 import tzLookup from 'tz-lookup';
 
 const MINUTE_MS = 60_000;
+const DAY_MS = 24 * 60 * MINUTE_MS;
+const MAX_CACHED_DAYS = 2000;
 const COORD_PRECISION = 2;
 const HOURS_IN_DAY = 24;
 
 const zoneByCoords = new Map<string, string | null>();
 const formatters = new Map<string, Intl.DateTimeFormat | null>();
+const dayOffsets = new Map<string, number | null>();
 
 function coordKey(lat: number, lon: number): string {
   return `${lat.toFixed(COORD_PRECISION)},${lon.toFixed(COORD_PRECISION)}`;
@@ -78,14 +81,34 @@ function partsIn(zone: string, instant: Date): ZonedParts | null {
   return Object.values(values).some(Number.isNaN) ? null : values;
 }
 
-/**
- * Minutes the zone runs ahead of UTC at that instant, DST included. Null when the runtime
- * cannot resolve the zone, so callers can fall back to the device clock.
- */
-export function zoneOffsetMinutes(zone: string, instant: Date): number | null {
+function exactOffsetMinutes(zone: string, instant: Date): number | null {
   const parts = partsIn(zone, instant);
   if (!parts) return null;
 
   const asUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
   return Math.round((asUtc - Math.floor(instant.getTime() / 1000) * 1000) / MINUTE_MS);
+}
+
+function steadyDayOffset(zone: string, utcDay: number): number | null {
+  const key = `${zone}|${utcDay}`;
+  const cached = dayOffsets.get(key);
+  if (cached !== undefined) return cached;
+
+  const start = exactOffsetMinutes(zone, new Date(utcDay * DAY_MS));
+  const end = exactOffsetMinutes(zone, new Date((utcDay + 1) * DAY_MS));
+  const steady = start != null && start === end ? start : null;
+  if (dayOffsets.size >= MAX_CACHED_DAYS) dayOffsets.clear();
+  dayOffsets.set(key, steady);
+  return steady;
+}
+
+/**
+ * Minutes the zone runs ahead of UTC at that instant, DST included. Null when the runtime
+ * cannot resolve the zone, so callers can fall back to the device clock.
+ */
+export function zoneOffsetMinutes(zone: string, instant: Date): number | null {
+  const time = instant.getTime();
+  if (Number.isNaN(time)) return null;
+  const steady = steadyDayOffset(zone, Math.floor(time / DAY_MS));
+  return steady ?? exactOffsetMinutes(zone, instant);
 }

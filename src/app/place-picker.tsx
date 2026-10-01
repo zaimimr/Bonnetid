@@ -155,7 +155,15 @@ export default function PlacePickerScreen() {
             renderItem={({ item }) => (
               <ListRow
                 title={item.name}
-                subtitle={isStacked && !forTimes ? placeCountLabel(item.mosqueCount) : item.kommune}
+                subtitle={
+                  forTimes
+                    ? item.kommune !== item.name
+                      ? item.kommune
+                      : undefined
+                    : isStacked
+                      ? placeCountLabel(item.mosqueCount)
+                      : item.kommune
+                }
                 trailing={
                   item.iso === placeIso ? (
                     <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
