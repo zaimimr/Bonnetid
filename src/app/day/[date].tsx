@@ -10,7 +10,6 @@ import {
   ErrorState,
   IconButton,
   Screen,
-  SectionHeader,
   Skeleton,
 } from '@/components/ui';
 import { spacing } from '@/theme/tokens';
@@ -197,8 +196,7 @@ export default function DayScreen() {
       </View>
 
       {extraTimes.length > 0 && (
-        <View style={{ marginBottom: spacing.lg }}>
-          <SectionHeader title="Flere tider" />
+        <View style={{ marginTop: spacing.lg, marginBottom: spacing.lg }}>
           <ExtraTimesCard times={extraTimes} />
         </View>
       )}

@@ -1,7 +1,7 @@
 import type { PrayerDay } from '@/api/types';
 import { formatZonedClock, wallClockToDate, type PrayerTimeZone } from './time';
 
-export type ExtraTimeName = 'duha' | 'zawal' | 'midnight' | 'tahajjud';
+export type ExtraTimeName = 'duha' | 'midnight' | 'tahajjud';
 
 export type ExtraTime = {
   name: ExtraTimeName;
@@ -48,12 +48,6 @@ export function buildExtraTimes(
   }
 
   if (noon) {
-    entries.push({
-      name: 'zawal',
-      label: 'Middag (zawal)',
-      note: 'Solen står høyest. Unngå å be akkurat nå',
-      date: noon,
-    });
     entries.push({
       name: 'midnight',
       label: 'Midnatt',
