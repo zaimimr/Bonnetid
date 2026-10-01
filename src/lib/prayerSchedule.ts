@@ -161,7 +161,7 @@ function resolveJamatTime(
   offset: number | null | undefined,
   adhan: string | undefined,
 ): string | undefined {
-  if (offset && adhan) return addMinutesToTime(adhan, offset);
+  if (offset != null && adhan) return addMinutesToTime(adhan, offset);
   if (!fixed) return undefined;
   return osloTimeToLocalClock(isoDate, fixed) ?? undefined;
 }
