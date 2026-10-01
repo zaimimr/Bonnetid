@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import { View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { DuaCard } from '@/components/duas/DuaCard';
-import { TransliterationToggle } from '@/components/duas/TransliterationToggle';
+import { DuaOptionsButton } from '@/components/duas/DuaOptionsButton';
 import { Card, Divider, EmptyState, ListRow, Screen } from '@/components/ui';
 import { useHijriSeasonNow } from '@/hooks/useHijriSeason';
 import { categoryById, DUA_CATEGORIES, duasIn, type DuaCategory } from '@/lib/duas';
@@ -56,7 +56,7 @@ function CategoryReader({ category }: { category: DuaCategory }) {
   return (
     <Screen scroll edges={[]}>
       <Stack.Screen
-        options={{ title: category.title, headerRight: () => <TransliterationToggle /> }}
+        options={{ title: category.title, headerRight: () => <DuaOptionsButton /> }}
       />
       <View style={{ gap: spacing.lg, marginTop: spacing.md }}>
         {duas.map((dua) => (

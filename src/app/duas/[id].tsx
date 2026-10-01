@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { DuaCard } from '@/components/duas/DuaCard';
-import { TransliterationToggle } from '@/components/duas/TransliterationToggle';
+import { DuaOptionsButton } from '@/components/duas/DuaOptionsButton';
 import { EmptyState, Screen } from '@/components/ui';
 import { categoryById, duaById } from '@/lib/duas';
 import { spacing } from '@/theme/tokens';
@@ -23,7 +23,7 @@ export default function DuaScreen() {
       <Stack.Screen
         options={{
           title: categoryById(dua.category)?.title ?? 'Dua',
-          headerRight: () => <TransliterationToggle />,
+          headerRight: () => <DuaOptionsButton />,
         }}
       />
       <View style={{ gap: spacing.lg, marginTop: spacing.md }}>

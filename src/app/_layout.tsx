@@ -218,6 +218,16 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="duas/options"
+          options={{
+            presentation: 'formSheet',
+            sheetAllowedDetents: 'fitToContents',
+            sheetGrabberVisible: true,
+            headerShown: false,
+            contentStyle: { backgroundColor: theme.colors.background },
+          }}
+        />
+        <Stack.Screen
           name="mosque-picker"
           options={{
             presentation: 'modal',

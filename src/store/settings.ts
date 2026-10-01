@@ -85,6 +85,8 @@ type SettingsState = {
   setCalendarPrimary: (calendarPrimary: CalendarPrimary) => void;
   duaShowTransliteration: boolean;
   setDuaShowTransliteration: (duaShowTransliteration: boolean) => void;
+  duaShowMeaning: boolean;
+  setDuaShowMeaning: (duaShowMeaning: boolean) => void;
   readAnnouncements: Record<string, string>;
   markAnnouncementRead: (orgNr: string, announcement: string) => void;
   completeOnboarding: () => void;
@@ -163,6 +165,8 @@ export const useSettings = create<SettingsState>()(
       setCalendarPrimary: (calendarPrimary) => set({ calendarPrimary }),
       duaShowTransliteration: true,
       setDuaShowTransliteration: (duaShowTransliteration) => set({ duaShowTransliteration }),
+      duaShowMeaning: true,
+      setDuaShowMeaning: (duaShowMeaning) => set({ duaShowMeaning }),
       readAnnouncements: {},
       markAnnouncementRead: (orgNr, announcement) =>
         set((state) => ({

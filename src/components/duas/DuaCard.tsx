@@ -13,6 +13,7 @@ export type DuaCardProps = {
 export function DuaCard({ dua }: DuaCardProps) {
   const theme = useTheme();
   const showTransliteration = useSettings((state) => state.duaShowTransliteration);
+  const showMeaning = useSettings((state) => state.duaShowMeaning);
 
   return (
     <Card rounded="xl" padding="lg" style={{ gap: spacing.md }}>
@@ -36,9 +37,12 @@ export function DuaCard({ dua }: DuaCardProps) {
         </AppText>
       )}
 
-      <Divider inset={0} />
-
-      <AppText>{dua.meaning}</AppText>
+      {showMeaning && (
+        <>
+          <Divider inset={0} />
+          <AppText>{dua.meaning}</AppText>
+        </>
+      )}
       <AppText size="xs" tone="textMuted">
         {`Kilde: ${dua.source}`}
       </AppText>
