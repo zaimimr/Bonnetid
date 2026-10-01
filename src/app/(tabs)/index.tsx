@@ -9,7 +9,6 @@ import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosquePresenceCard } from '@/components/mosque/MosquePresenceCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import { NightCard } from '@/components/season/NightCard';
-import { DuaLink } from '@/components/duas/DuaLink';
 import {
   AppText,
   Badge,
@@ -28,7 +27,6 @@ import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { useRefresh } from '@/hooks/useRefresh';
 import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
-import { DUA_LINKS } from '@/lib/duas';
 import { isoDateIsFriday, parseDayKey } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
 import { useActiveLocation, useActiveMosque, useUnreadAnnouncement } from '@/store/settings';
@@ -173,7 +171,6 @@ export default function HomeScreen() {
               statusDate={todayIso}
               now={now}
             />
-            <DuaLink category={DUA_LINKS.afterSalah} label="Duaer etter bønnen" />
           </View>
         )}
 

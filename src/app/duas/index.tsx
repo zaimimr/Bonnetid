@@ -39,7 +39,6 @@ function CategoryList() {
             {index > 0 && <Divider />}
             <ListRow
               title={entry.title}
-              subtitle={entry.description}
               chevron
               onPress={() => router.push({ pathname: '/duas', params: { category: entry.id } })}
               style={{ paddingHorizontal: spacing.md }}
@@ -56,9 +55,10 @@ function CategoryReader({ category }: { category: DuaCategory }) {
 
   return (
     <Screen scroll edges={[]}>
-      <Stack.Screen options={{ title: category.title }} />
+      <Stack.Screen
+        options={{ title: category.title, headerRight: () => <TransliterationToggle /> }}
+      />
       <View style={{ gap: spacing.lg, marginTop: spacing.md }}>
-        <TransliterationToggle />
         {duas.map((dua) => (
           <DuaCard key={dua.id} dua={dua} />
         ))}

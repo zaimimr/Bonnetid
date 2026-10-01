@@ -20,9 +20,13 @@ export default function DuaScreen() {
 
   return (
     <Screen scroll edges={[]}>
-      <Stack.Screen options={{ title: categoryById(dua.category)?.title ?? 'Dua' }} />
+      <Stack.Screen
+        options={{
+          title: categoryById(dua.category)?.title ?? 'Dua',
+          headerRight: () => <TransliterationToggle />,
+        }}
+      />
       <View style={{ gap: spacing.lg, marginTop: spacing.md }}>
-        <TransliterationToggle />
         <DuaCard dua={dua} />
       </View>
     </Screen>

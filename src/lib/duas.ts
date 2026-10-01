@@ -40,7 +40,6 @@ export const DUA_CATEGORIES: DuaCategory[] = [
 ];
 
 export const DUA_LINKS = {
-  afterSalah: 'after-salah',
   hajj: 'hajj',
   iftar: 'iftar',
   laylatAlQadr: 'laylat-al-qadr',
