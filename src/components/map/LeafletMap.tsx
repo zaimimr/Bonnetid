@@ -101,6 +101,7 @@ export const LeafletMap = forwardRef<LeafletMapHandle, LeafletMapProps>(function
       originWhitelist={['*']}
       setSupportMultipleWindows={false}
       overScrollMode="never"
+      androidLayerType="hardware"
       javaScriptCanOpenWindowsAutomatically={false}
       onLoadEnd={onReady}
       onMessage={handleMessage}

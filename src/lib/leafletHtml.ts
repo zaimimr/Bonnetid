@@ -30,11 +30,13 @@ ${styles}
 <script>${LEAFLET_JS}</script>
 <script>
   function createMap(lat, lon, zoom) {
-    var map = L.map('map', { zoomControl: false }).setView([lat, lon], zoom);
+    var map = L.map('map', { zoomControl: false, preferCanvas: true }).setView([lat, lon], zoom);
     L.tileLayer('${TILE_URL}', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap',
-      crossOrigin: true
+      crossOrigin: true,
+      updateWhenZooming: false,
+      keepBuffer: 4
     }).addTo(map);
     return map;
   }

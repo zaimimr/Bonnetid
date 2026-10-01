@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, View } from 'react-native';
+import { Platform, Pressable, ScrollView, View } from 'react-native';
 import { useCallback, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,7 +29,15 @@ type QiblaView = 'compass' | 'map' | '3d';
 export default function QiblaScreen() {
   const [isFocused, setIsFocused] = useState(true);
   const coords = usePreciseCoords(isFocused);
-  const { heading, permissionDenied } = useCompassHeading();
+  const { heading, accuracy: headingAccuracy, permissionDenied } = useCompassHeading();
+  const lowAndroidAccuracy =
+    Platform.OS === 'android' && headingAccuracy != null && headingAccuracy <= 1;
+  const calibrationNote =
+    heading == null
+      ? 'Venter på kompasset. Beveg telefonen i en åttetallsbevegelse hvis nålen ikke flytter seg.'
+      : lowAndroidAccuracy
+        ? 'Kompasset er unøyaktig. Beveg telefonen i en åttetallsbevegelse for å kalibrere det.'
+        : null;
   const { isLandscape } = useResponsive();
   const calculated = useIsCalculatedMode();
   const [view, setView] = useState<QiblaView>('compass');
@@ -108,6 +116,15 @@ export default function QiblaScreen() {
                   uncertaintyDegrees={uncertainty}
                   accuracyM={coords.accuracyM}
                 />
+                {calibrationNote && (
+                  <AppText
+                    size="sm"
+                    tone="notice"
+                    align="center"
+                    style={{ marginTop: spacing.lg }}>
+                    {calibrationNote}
+                  </AppText>
+                )}
                 {coords.source === 'settings' && (
                   <AppText
                     size="xs"

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LeafletMap, type LeafletMapHandle } from '@/components/map/LeafletMap';
@@ -37,6 +37,7 @@ function coneLengthKm(distanceToKaabaKm: number): number {
 }
 
 const MAX_SPAN_KM = 5.5;
+const CONE_STEP_DEGREES = 2;
 
 function spanKm(distanceToKaabaKm: number, accuracyM: number | null): number {
   const fromAccuracy = ((accuracyM ?? 0) * 4) / 1000;
@@ -169,16 +170,17 @@ function OsmQiblaMap({
 }: QiblaMapProps) {
   const theme = useTheme();
   const mapRef = useRef<LeafletMapHandle>(null);
+  const [initial] = useState(() => ({
+    lat,
+    lon,
+    zoom: leafletZoom(distanceToKaabaKm, accuracyM),
+  }));
 
-  const html = useMemo(() => {
-    const path = greatCirclePoints(lat, lon, KAABA.lat, KAABA.lon).map((point) => [
-      point.lat,
-      point.lon,
-    ]);
-
-    return buildLeafletHtml({
-      background: theme.colors.surfaceSunken,
-      styles: `
+  const html = useMemo(
+    () =>
+      buildLeafletHtml({
+        background: theme.colors.surfaceSunken,
+        styles: `
   .kaaba-icon { font-size: 26px; line-height: 1; text-align: center; }
   .user-dot {
     width: 16px; height: 16px; border-radius: 50%;
@@ -188,62 +190,79 @@ function OsmQiblaMap({
   .leaflet-popup-content-wrapper, .leaflet-popup-tip {
     background: ${theme.colors.surface}; color: ${theme.colors.textPrimary};
   }`,
-      script: `
-  var map = createMap(${lat}, ${lon}, ${leafletZoom(distanceToKaabaKm, accuracyM)});
+        script: `
+  var map = createMap(${initial.lat}, ${initial.lon}, ${initial.zoom});
 
-  ${
-    accuracyM != null && accuracyM > 0
-      ? `L.circle([${lat}, ${lon}], {
-    radius: ${accuracyM},
+  var accuracyCircle = L.circle([${initial.lat}, ${initial.lon}], {
+    radius: 0,
     color: '${theme.colors.mapFacing}',
     weight: 1,
     fillColor: '${theme.colors.mapFacing}',
     fillOpacity: 0.15
-  }).addTo(map);`
-      : ''
-  }
+  }).addTo(map);
 
-  window.userCone = L.polygon([], {
+  var userCone = L.polygon([], {
     color: '${theme.colors.mapFacing}',
     weight: 1,
     fillColor: '${theme.colors.mapFacing}',
     fillOpacity: 0.25
   }).addTo(map);
-  window.setCone = function (pts) { window.userCone.setLatLngs(pts); };
+  window.setCone = function (pts) { userCone.setLatLngs(pts); };
 
-  L.polyline(${JSON.stringify(path)}, {
+  var qiblaLine = L.polyline([], {
     color: '${theme.colors.primary}',
     weight: 3
   }).addTo(map);
 
-  L.marker([${lat}, ${lon}], {
+  var userMarker = L.marker([${initial.lat}, ${initial.lon}], {
     icon: L.divIcon({ className: '', html: '<div class="user-dot"></div>', iconSize: [16, 16], iconAnchor: [8, 8] })
   }).addTo(map);
+
+  window.setUser = function (lat, lon, accuracy, path) {
+    userMarker.setLatLng([lat, lon]);
+    accuracyCircle.setLatLng([lat, lon]);
+    accuracyCircle.setRadius(accuracy > 0 ? accuracy : 0);
+    qiblaLine.setLatLngs(path);
+  };
 
   L.marker([${KAABA.lat}, ${KAABA.lon}], {
     icon: L.divIcon({ className: '', html: '<div class="kaaba-icon">🕋</div>', iconSize: [26, 26], iconAnchor: [13, 13] })
   }).addTo(map).bindPopup('Kaba, Mekka');`,
-    });
-  }, [
-    lat,
-    lon,
-    accuracyM,
-    distanceToKaabaKm,
-    theme.colors.mapFacing,
-    theme.colors.mapPinRing,
-    theme.colors.primary,
-    theme.colors.surface,
-    theme.colors.surfaceSunken,
-    theme.colors.textPrimary,
-  ]);
+      }),
+    [
+      initial,
+      theme.colors.mapFacing,
+      theme.colors.mapPinRing,
+      theme.colors.primary,
+      theme.colors.surface,
+      theme.colors.surfaceSunken,
+      theme.colors.textPrimary,
+    ],
+  );
+
+  const coneHeading = heading == null ? null : Math.round(heading / CONE_STEP_DEGREES) * CONE_STEP_DEGREES;
+
+  const pushUser = useCallback(() => {
+    const path = greatCirclePoints(lat, lon, KAABA.lat, KAABA.lon).map((point) => [
+      point.lat,
+      point.lon,
+    ]);
+    mapRef.current?.run(
+      `window.setUser && window.setUser(${lat}, ${lon}, ${accuracyM ?? 0}, ${JSON.stringify(path)});`,
+    );
+  }, [lat, lon, accuracyM]);
 
   const pushCone = useCallback(() => {
-    if (heading == null) return;
-    const cone = facingConePoints(lat, lon, heading, coneLengthKm(distanceToKaabaKm)).map(
+    if (coneHeading == null) return;
+    const cone = facingConePoints(lat, lon, coneHeading, coneLengthKm(distanceToKaabaKm)).map(
       (point) => [point.lat, point.lon],
     );
     mapRef.current?.run(`window.setCone && window.setCone(${JSON.stringify(cone)});`);
-  }, [lat, lon, heading, distanceToKaabaKm]);
+  }, [lat, lon, coneHeading, distanceToKaabaKm]);
+
+  useEffect(() => {
+    pushUser();
+  }, [pushUser]);
 
   useEffect(() => {
     pushCone();
@@ -253,7 +272,10 @@ function OsmQiblaMap({
     <LeafletMap
       ref={mapRef}
       html={html}
-      onReady={pushCone}
+      onReady={() => {
+        pushUser();
+        pushCone();
+      }}
       fallbackMessage="Kartet ble avsluttet av systemet. Kompassvisningen virker fortsatt."
     />
   );
