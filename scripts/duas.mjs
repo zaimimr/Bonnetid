@@ -20,6 +20,7 @@ execFileSync(
     'es2020',
     '--strict',
     '--skipLibCheck',
+    '--ignoreConfig',
   ],
   { stdio: 'inherit' },
 );
