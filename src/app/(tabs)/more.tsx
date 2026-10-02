@@ -1,15 +1,14 @@
 import { View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText, Card, Screen } from '@/components/ui';
-import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
+import { AppText, FeatureCard, Screen } from '@/components/ui';
 import { useTheme } from '@/theme';
-import { radius, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 import { useIsCalculatedMode, usePrayerTrackerEnabled } from '@/store/settings';
 
 type Feature = {
   href: Href;
-  icon: keyof typeof Ionicons.glyphMap | 'tasbih';
+  icon: keyof typeof Ionicons.glyphMap;
   title: string;
   description: string;
 };
@@ -32,14 +31,7 @@ const DUAS_FEATURE: Feature = {
   href: '/duas',
   icon: 'book-outline',
   title: 'Dua og dhikr',
-  description: 'Duaer til adhan, bønnen og Ramadan',
-};
-
-const TASBIH_FEATURE: Feature = {
-  href: '/tasbih',
-  icon: 'tasbih',
-  title: 'Tasbih',
-  description: 'Tell dhikr etter bønnen',
+  description: 'Duaer og tasbih til bønnen og Ramadan',
 };
 
 const SETTINGS_FEATURE: Feature = {
@@ -58,7 +50,6 @@ export default function MoreScreen() {
     ...(trackerEnabled ? [TRACKER_FEATURE] : []),
     ...(calculated ? [] : [MOSQUE_FEATURE]),
     DUAS_FEATURE,
-    TASBIH_FEATURE,
     SETTINGS_FEATURE,
   ];
 
@@ -72,32 +63,13 @@ export default function MoreScreen() {
 
       <View style={{ gap: spacing.md }}>
         {features.map((feature) => (
-          <Card key={feature.title} rounded="xl" onPress={() => router.push(feature.href)}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-              <View
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: radius.md,
-                  backgroundColor: theme.colors.primarySoft,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                {feature.icon === 'tasbih' ? (
-                  <TasbihIcon size={24} color={theme.colors.primary} />
-                ) : (
-                  <Ionicons name={feature.icon} size={24} color={theme.colors.primary} />
-                )}
-              </View>
-              <View style={{ flex: 1, gap: spacing.xxs }}>
-                <AppText weight="semibold">{feature.title}</AppText>
-                <AppText size="sm" tone="textMuted">
-                  {feature.description}
-                </AppText>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
-            </View>
-          </Card>
+          <FeatureCard
+            key={feature.title}
+            icon={<Ionicons name={feature.icon} size={24} color={theme.colors.primary} />}
+            title={feature.title}
+            description={feature.description}
+            onPress={() => router.push(feature.href)}
+          />
         ))}
       </View>
     </Screen>

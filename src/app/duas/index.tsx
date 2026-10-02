@@ -3,9 +3,11 @@ import { ScrollView, View } from 'react-native';
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { DuaCard } from '@/components/duas/DuaCard';
 import { DuaOptionsButton } from '@/components/duas/DuaOptionsButton';
-import { Button, Card, Divider, EmptyState, ListRow, Screen } from '@/components/ui';
+import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
+import { Button, Card, Divider, EmptyState, FeatureCard, ListRow, Screen } from '@/components/ui';
 import { useHijriSeasonNow } from '@/hooks/useHijriSeason';
 import { categoryById, DUA_CATEGORIES, DUA_LINKS, duasIn, type DuaCategory } from '@/lib/duas';
+import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { useTasbihReturn } from '@/store/tasbihReturn';
 
@@ -27,6 +29,7 @@ export default function DuasScreen() {
 
 function CategoryList() {
   const router = useRouter();
+  const theme = useTheme();
   const { status } = useHijriSeasonNow();
   const categories = DUA_CATEGORIES.filter(
     (entry) => !entry.season || entry.season === status?.id,
@@ -34,6 +37,13 @@ function CategoryList() {
 
   return (
     <Screen scroll edges={[]}>
+      <FeatureCard
+        icon={<TasbihIcon size={24} color={theme.colors.primary} />}
+        title="Tasbih"
+        description="Tell dhikr etter bønnen"
+        onPress={() => router.push('/tasbih')}
+        style={{ marginTop: spacing.lg }}
+      />
       <Card padding="sm" rounded="xl" style={{ marginTop: spacing.lg }}>
         {categories.map((entry, index) => (
           <Fragment key={entry.id}>
