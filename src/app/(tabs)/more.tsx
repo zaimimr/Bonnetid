@@ -30,8 +30,8 @@ const MOSQUE_FEATURE: Feature = {
 const DUAS_FEATURE: Feature = {
   href: '/duas',
   icon: 'book-outline',
-  title: 'Duaer',
-  description: 'Duaer til adhan, bønnen og Ramadan',
+  title: 'Dua og dhikr',
+  description: 'Duaer og tasbih til bønnen og Ramadan',
 };
 
 const SETTINGS_FEATURE: Feature = {

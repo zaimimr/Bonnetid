@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { AppText, Badge, Card, Divider } from '@/components/ui';
 import type { Dua } from '@/lib/duas';
@@ -8,9 +9,10 @@ import { ArabicText } from './ArabicText';
 
 export type DuaCardProps = {
   dua: Dua;
+  footer?: ReactNode;
 };
 
-export function DuaCard({ dua }: DuaCardProps) {
+export function DuaCard({ dua, footer }: DuaCardProps) {
   const theme = useTheme();
   const showTransliteration = useSettings((state) => state.duaShowTransliteration);
   const showMeaning = useSettings((state) => state.duaShowMeaning);
@@ -59,6 +61,7 @@ export function DuaCard({ dua }: DuaCardProps) {
       <AppText size="xs" tone="textMuted">
         {`Kilde: ${dua.source}`}
       </AppText>
+      {footer}
     </Card>
   );
 }

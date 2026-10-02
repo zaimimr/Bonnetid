@@ -130,10 +130,21 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="tasbih"
+          options={{
+            headerShown: true,
+            title: 'Tasbih',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
           name="duas/index"
           options={{
             headerShown: true,
-            title: 'Duaer',
+            title: 'Dua og dhikr',
             headerBackTitle: 'Tilbake',
             headerStyle: { backgroundColor: theme.colors.surface },
             headerTitleStyle: { color: theme.colors.textPrimary },

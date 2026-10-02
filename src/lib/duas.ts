@@ -43,6 +43,7 @@ export const DUA_LINKS = {
   hajj: 'hajj',
   iftar: 'iftar',
   laylatAlQadr: 'laylat-al-qadr',
+  tasbih: 'tasbih',
 } as const;
 
 export const DUAS: Dua[] = [

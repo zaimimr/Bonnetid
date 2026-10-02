@@ -15,6 +15,7 @@ import {
   Card,
   EmptyState,
   ErrorState,
+  InlineLink,
   Screen,
   SectionHeader,
   Skeleton,
@@ -170,6 +171,11 @@ export default function HomeScreen() {
               onSelectMosque={calculated ? undefined : () => router.push('/mosque-picker')}
               statusDate={todayIso}
               now={now}
+            />
+            <InlineLink
+              label="Tasbih etter bønnen"
+              icon="ellipse-outline"
+              onPress={() => router.push('/tasbih')}
             />
           </View>
         )}

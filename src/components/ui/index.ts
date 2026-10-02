@@ -11,3 +11,4 @@ export * from './StateViews';
 export * from './IconButton';
 export * from './SegmentedControl';
 export * from './Toggle';
+export * from './InlineLink';

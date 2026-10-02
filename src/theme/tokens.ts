@@ -108,6 +108,11 @@ export const arabicType = {
   maxScale: 1.6,
 } as const;
 
+export const counterType = {
+  size: 64,
+  maxScale: 1.2,
+} as const;
+
 export const lineHeight = {
   tight: 1.15,
   normal: 1.45,
