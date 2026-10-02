@@ -59,7 +59,8 @@ export function MonthNav({
           <AppText
             size="sm"
             tone="textMuted"
-            numberOfLines={onSwap ? 2 : 1}
+            numberOfLines={1}
+            ellipsizeMode="tail"
             style={{ flexShrink: 1 }}>
             {subtitle ?? ' '}
           </AppText>
