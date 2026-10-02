@@ -5,13 +5,14 @@ import { Image } from 'expo-image';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInDown, ReduceMotion } from 'react-native-reanimated';
-import { AppText, Button, Screen } from '@/components/ui';
+import { AppText, Button, Card, Divider, ListRow, Screen } from '@/components/ui';
 import { PrayerIcon } from '@/components/prayer/PrayerIcon';
 import { useLocations } from '@/api/queries';
 import type { ApiLocation } from '@/api/types';
 import { detectNearestLocation } from '@/hooks/useAutoLocation';
 import { useNow } from '@/hooks/useNow';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
+import { ASR_METHOD_OPTIONS } from '@/lib/asrMethods';
 import { formatDurationShort } from '@/lib/time';
 import { resolvePlace, requestCoords } from '@/hooks/useTravelDetection';
 import { isInsideNorwayBounds } from '@/lib/travelMode';
@@ -27,9 +28,17 @@ import {
   type SavedLocation,
 } from '@/store/settings';
 
-type StepId = 'welcome' | 'location' | 'mosque' | 'notifications' | 'tracker' | 'ready';
+type StepId = 'welcome' | 'location' | 'mosque' | 'asr' | 'notifications' | 'tracker' | 'ready';
 
-const STEP_ORDER: StepId[] = ['welcome', 'location', 'mosque', 'notifications', 'tracker', 'ready'];
+const STEP_ORDER: StepId[] = [
+  'welcome',
+  'location',
+  'mosque',
+  'asr',
+  'notifications',
+  'tracker',
+  'ready',
+];
 
 const LINE_ART = require('../../../assets/images/splash-icon.png');
 const LINE_ART_RATIO = 1525 / 1537;
@@ -49,8 +58,11 @@ export function OnboardingFlow() {
 
   const calculated = location?.mode === 'calculated';
   const steps = useMemo(
-    () => STEP_ORDER.filter((step) => step !== 'mosque' || !calculated),
-    [calculated],
+    () =>
+      STEP_ORDER.filter(
+        (step) => (step !== 'mosque' || !calculated) && (step !== 'asr' || mosque == null),
+      ),
+    [calculated, mosque],
   );
   const step = steps[Math.min(index, steps.length - 1)];
 
@@ -94,6 +106,7 @@ export function OnboardingFlow() {
         {step === 'welcome' && <WelcomeStep onNext={advance} />}
         {step === 'location' && <LocationStep onNext={advance} />}
         {step === 'mosque' && <MosqueStep onNext={advance} />}
+        {step === 'asr' && <AsrStep onNext={advance} />}
         {step === 'notifications' && <NotificationStep onNext={advance} />}
         {step === 'tracker' && <TrackerStep onNext={advance} />}
         {step === 'ready' && <ReadyStep onFinish={finish} />}
@@ -353,6 +366,47 @@ function MosqueStep({ onNext }: { onNext: () => void }) {
       {!mosque && (
         <StatusLine tone="textMuted" text="Du kan velge moské senere under Innstillinger." />
       )}
+    </StepShell>
+  );
+}
+
+function AsrStep({ onNext }: { onNext: () => void }) {
+  const theme = useTheme();
+  const asrMethod = useSettings((state) => state.asrMethod);
+  const setAsrMethod = useSettings((state) => state.setAsrMethod);
+  const current = asrMethod ?? 'irn';
+
+  const choose = () => {
+    if (asrMethod == null) setAsrMethod(current);
+    track('asr_method_changed', { method: current, source: 'onboarding' });
+    onNext();
+  };
+
+  return (
+    <StepShell
+      icon="partly-sunny-outline"
+      title="Velg asr-metode"
+      body="Asr-tiden avhenger av metoden du følger. Er du usikker, velg IRN standard."
+      primaryLabel="Fortsett"
+      onPrimary={choose}>
+      <Card padding="sm" rounded="xl">
+        {ASR_METHOD_OPTIONS.map((option, index) => (
+          <View key={option.value}>
+            {index > 0 && <Divider />}
+            <ListRow
+              title={option.label}
+              subtitle={option.description}
+              trailing={
+                option.value === current ? (
+                  <Ionicons name="checkmark" size={22} color={theme.colors.primary} />
+                ) : undefined
+              }
+              onPress={() => setAsrMethod(option.value)}
+              style={{ paddingHorizontal: spacing.md }}
+            />
+          </View>
+        ))}
+      </Card>
     </StepShell>
   );
 }
