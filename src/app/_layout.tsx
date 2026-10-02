@@ -1,4 +1,6 @@
 import { AmiriQuran_400Regular } from '@expo-google-fonts/amiri-quran';
+import { NotoNaskhArabic_400Regular } from '@expo-google-fonts/noto-naskh-arabic/400Regular';
+import { ScheherazadeNew_400Regular } from '@expo-google-fonts/scheherazade-new/400Regular';
 import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -69,7 +71,11 @@ function RootNavigator() {
   useWidgetSync(now);
   usePrayerLogSync(now);
 
-  const [fontsLoaded, fontError] = useFonts({ AmiriQuran_400Regular });
+  const [fontsLoaded, fontError] = useFonts({
+    AmiriQuran_400Regular,
+    NotoNaskhArabic_400Regular,
+    ScheherazadeNew_400Regular,
+  });
 
   useEffect(() => {
     if (!hydrated || (!fontsLoaded && !fontError)) return;
@@ -229,13 +235,14 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
-          name="duas/options"
+          name="arabic-font"
           options={{
-            presentation: 'formSheet',
-            sheetAllowedDetents: 'fitToContents',
-            sheetGrabberVisible: true,
-            headerShown: false,
-            contentStyle: { backgroundColor: theme.colors.background },
+            headerShown: true,
+            title: 'Arabisk skrift',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen

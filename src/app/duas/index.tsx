@@ -2,7 +2,6 @@ import { Fragment, useCallback, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { DuaCard } from '@/components/duas/DuaCard';
-import { DuaOptionsButton } from '@/components/duas/DuaOptionsButton';
 import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
 import { Button, Card, Divider, EmptyState, FeatureCard, ListRow, Screen } from '@/components/ui';
 import { useHijriSeasonNow } from '@/hooks/useHijriSeason';
@@ -87,9 +86,7 @@ function CategoryReader({ category }: { category: DuaCategory }) {
 
   return (
     <Screen scroll edges={[]} scrollRef={scrollRef}>
-      <Stack.Screen
-        options={{ title: category.title, headerRight: () => <DuaOptionsButton /> }}
-      />
+      <Stack.Screen options={{ title: category.title }} />
       <View
         onLayout={(event) => {
           listTop.current = event.nativeEvent.layout.y;

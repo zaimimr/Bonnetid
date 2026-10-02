@@ -102,11 +102,21 @@ export const fontFamily = {
 } as const;
 
 export const arabicType = {
-  family: 'AmiriQuran_400Regular',
-  size: 28,
-  leading: 2.1,
   maxScale: 1.6,
 } as const;
+
+export const arabicFonts = {
+  amiri: { label: 'Amiri Quran', family: 'AmiriQuran_400Regular', size: 28, leading: 2.1 },
+  naskh: { label: 'Noto Naskh', family: 'NotoNaskhArabic_400Regular', size: 26, leading: 1.9 },
+  scheherazade: {
+    label: 'Scheherazade',
+    family: 'ScheherazadeNew_400Regular',
+    size: 32,
+    leading: 1.8,
+  },
+} as const;
+
+export type ArabicFontKey = keyof typeof arabicFonts;
 
 export const counterType = {
   size: 64,

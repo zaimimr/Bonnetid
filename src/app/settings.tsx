@@ -14,7 +14,7 @@ import {
   Toggle,
 } from '@/components/ui';
 import { useTheme } from '@/theme';
-import { radius, spacing } from '@/theme/tokens';
+import { arabicFonts, radius, spacing } from '@/theme/tokens';
 import { notificationsSupported, requestNotificationPermission } from '@/lib/notifications';
 import {
   dynamicIslandAvailable,
@@ -56,6 +56,11 @@ export default function SettingsScreen() {
   const mosque = useActiveMosque();
   const asrMethod = useSettings((state) => state.asrMethod);
   const themePreference = useSettings((state) => state.themePreference);
+  const showTransliteration = useSettings((state) => state.duaShowTransliteration);
+  const setShowTransliteration = useSettings((state) => state.setDuaShowTransliteration);
+  const showMeaning = useSettings((state) => state.duaShowMeaning);
+  const setShowMeaning = useSettings((state) => state.setDuaShowMeaning);
+  const arabicFont = useSettings((state) => state.duaArabicFont);
   const setThemePreference = useSettings((state) => state.setThemePreference);
   const notificationsEnabled = useSettings((state) => state.notificationsEnabled);
   const setNotificationsEnabled = useSettings((state) => state.setNotificationsEnabled);
@@ -299,6 +304,41 @@ export default function SettingsScreen() {
             ]}
           />
         </View>
+      </Card>
+
+      <SectionHeader title="Dua og dhikr" />
+      <Card padding="sm" rounded="xl">
+        <ListRow
+          title="Uttale"
+          trailing={
+            <Toggle
+              value={showTransliteration}
+              onValueChange={setShowTransliteration}
+              accessibilityLabel="Uttale"
+            />
+          }
+          style={ROW}
+        />
+        <Divider />
+        <ListRow
+          title="Oversettelse"
+          trailing={
+            <Toggle
+              value={showMeaning}
+              onValueChange={setShowMeaning}
+              accessibilityLabel="Oversettelse"
+            />
+          }
+          style={ROW}
+        />
+        <Divider />
+        <ListRow
+          title="Arabisk skrift"
+          subtitle={arabicFonts[arabicFont]?.label ?? arabicFonts.amiri.label}
+          chevron
+          onPress={() => router.push('/arabic-font')}
+          style={ROW}
+        />
       </Card>
 
       <SectionHeader title="Om appen" />
