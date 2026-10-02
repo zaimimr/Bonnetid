@@ -2,13 +2,14 @@ import { View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText, Card, Screen } from '@/components/ui';
+import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
 import { useIsCalculatedMode, usePrayerTrackerEnabled } from '@/store/settings';
 
 type Feature = {
   href: Href;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: keyof typeof Ionicons.glyphMap | 'tasbih';
   title: string;
   description: string;
 };
@@ -36,7 +37,7 @@ const DUAS_FEATURE: Feature = {
 
 const TASBIH_FEATURE: Feature = {
   href: '/tasbih',
-  icon: 'ellipse-outline',
+  icon: 'tasbih',
   title: 'Tasbih',
   description: 'Tell dhikr etter bønnen',
 };
@@ -82,7 +83,11 @@ export default function MoreScreen() {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                <Ionicons name={feature.icon} size={24} color={theme.colors.primary} />
+                {feature.icon === 'tasbih' ? (
+                  <TasbihIcon size={24} color={theme.colors.primary} />
+                ) : (
+                  <Ionicons name={feature.icon} size={24} color={theme.colors.primary} />
+                )}
               </View>
               <View style={{ flex: 1, gap: spacing.xxs }}>
                 <AppText weight="semibold">{feature.title}</AppText>
