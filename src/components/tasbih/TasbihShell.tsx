@@ -1,11 +1,10 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeIn, FadeOut, ReduceMotion } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown, FadeOut, ReduceMotion } from 'react-native-reanimated';
 import { AppText, Button, SegmentedControl } from '@/components/ui';
-import { ArabicText } from '@/components/duas/ArabicText';
 import { COMPLETION, type TasbihGoal, type TasbihMode } from '@/lib/tasbih';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, spacing } from '@/theme/tokens';
@@ -31,6 +30,7 @@ function goalFrom(value: string): TasbihGoal {
 
 const fade = FadeIn.duration(250).reduceMotion(ReduceMotion.System);
 const fadeOut = FadeOut.duration(150).reduceMotion(ReduceMotion.System);
+const rise = FadeInDown.duration(300).delay(250).reduceMotion(ReduceMotion.System);
 
 function ResetButton({ onPress }: { onPress: () => void }) {
   const theme = useTheme();
@@ -46,54 +46,30 @@ function ResetButton({ onPress }: { onPress: () => void }) {
   );
 }
 
-function Done({ session, fromDuas }: { session: TasbihSession; fromDuas: boolean }) {
+function FinishAction({ session, fromDuas }: { session: TasbihSession; fromDuas: boolean }) {
   const { state, reset } = session;
-  const theme = useTheme();
   const router = useRouter();
   const setScrollPast = useTasbihReturn((store) => store.setScrollPast);
-  const sequence = state.mode === 'sequence';
 
+  if (fromDuas && state.mode === 'sequence') {
+    return (
+      <Button
+        label="Ferdig"
+        onPress={() => {
+          setScrollPast(COMPLETION?.id ?? null);
+          router.back();
+        }}
+        style={{ alignSelf: 'center', minWidth: 200 }}
+      />
+    );
+  }
   return (
-    <Animated.View
-      entering={fade}
-      exiting={fadeOut}
-      style={[
-        StyleSheet.absoluteFill,
-        {
-          backgroundColor: theme.colors.background,
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: spacing.lg,
-        },
-      ]}>
-      <Ionicons name="checkmark-circle" size={40} color={theme.colors.primary} />
-      {sequence && COMPLETION ? (
-        <View style={{ gap: spacing.sm, alignItems: 'center' }}>
-          <AppText size="sm" tone="textMuted" align="center">
-            Avslutt med
-          </AppText>
-          <ArabicText>{COMPLETION.arabic}</ArabicText>
-          <AppText size="sm" tone="textSecondary" align="center">
-            {COMPLETION.meaning}
-          </AppText>
-        </View>
-      ) : (
-        <AppText size="xl" weight="semibold" tabular>
-          {state.count}
-        </AppText>
-      )}
-      {fromDuas && sequence ? (
-        <Button
-          label="Ferdig"
-          onPress={() => {
-            setScrollPast(COMPLETION?.id ?? null);
-            router.back();
-          }}
-        />
-      ) : (
-        <Button label="Begynn på nytt" variant="secondary" onPress={reset} />
-      )}
-    </Animated.View>
+    <Button
+      label="Begynn på nytt"
+      variant="secondary"
+      onPress={reset}
+      style={{ alignSelf: 'center', minWidth: 200 }}
+    />
   );
 }
 
@@ -131,22 +107,21 @@ export function TasbihShell({ session, fromDuas = false, children }: TasbihShell
           </Animated.View>
         ) : null}
 
-        <View style={{ flex: 1 }}>
-          <Pressable
-            onPress={tap}
-            disabled={state.done}
-            accessibilityRole="button"
-            accessibilityLabel={label}
-            accessibilityElementsHidden={state.done}
-            importantForAccessibility={state.done ? 'no-hide-descendants' : 'auto'}
-            style={{ flex: 1 }}>
-            {children}
-          </Pressable>
-          {state.done ? <Done session={session} fromDuas={fromDuas} /> : null}
-        </View>
+        <Pressable
+          onPress={tap}
+          disabled={state.done}
+          accessibilityRole="button"
+          accessibilityLabel={label}
+          style={{ flex: 1 }}>
+          {children}
+        </Pressable>
 
-        <View style={{ height: 20, justifyContent: 'center' }}>
-          {untouched && !state.done ? (
+        <View style={{ minHeight: 52, justifyContent: 'center' }}>
+          {state.done ? (
+            <Animated.View entering={rise} exiting={fadeOut}>
+              <FinishAction session={session} fromDuas={fromDuas} />
+            </Animated.View>
+          ) : untouched ? (
             <Animated.View entering={fade} exiting={fadeOut}>
               <AppText size="sm" tone="textMuted" align="center">
                 Trykk hvor som helst for å telle

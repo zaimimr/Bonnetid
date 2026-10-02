@@ -12,7 +12,7 @@ import { radius, spacing } from '@/theme/tokens';
 const DOT = 8;
 const ACTIVE = 24;
 
-function Pip({ state }: { state: 'done' | 'active' | 'next' }) {
+function Pip({ state, complete }: { state: 'done' | 'active' | 'next'; complete: boolean }) {
   const theme = useTheme();
   const width = useSharedValue(state === 'active' ? ACTIVE : DOT);
 
@@ -32,7 +32,7 @@ function Pip({ state }: { state: 'done' | 'active' | 'next' }) {
           height: DOT,
           borderRadius: radius.full,
           backgroundColor: state === 'next' ? theme.colors.trackMarker : theme.colors.primary,
-          opacity: state === 'done' ? 0.45 : 1,
+          opacity: state === 'done' && !complete ? 0.45 : 1,
         },
         style,
       ]}
@@ -40,13 +40,25 @@ function Pip({ state }: { state: 'done' | 'active' | 'next' }) {
   );
 }
 
-export function StepPips({ step, total }: { step: number; total: number }) {
+export function StepPips({
+  step,
+  total,
+  complete = false,
+}: {
+  step: number;
+  total: number;
+  complete?: boolean;
+}) {
   return (
     <View
-      accessibilityLabel={`Runde ${step + 1} av ${total}`}
+      accessibilityLabel={complete ? 'Alle runder fullført' : `Runde ${step + 1} av ${total}`}
       style={{ flexDirection: 'row', justifyContent: 'center', gap: spacing.sm }}>
       {Array.from({ length: total }, (_, index) => (
-        <Pip key={index} state={index < step ? 'done' : index === step ? 'active' : 'next'} />
+        <Pip
+          key={index}
+          complete={complete}
+          state={complete || index < step ? 'done' : index === step ? 'active' : 'next'}
+        />
       ))}
     </View>
   );

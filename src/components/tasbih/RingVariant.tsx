@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Text, View, useWindowDimensions } from 'react-native';
 import Animated, {
   Easing,
@@ -11,7 +11,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { AppText } from '@/components/ui';
-import { BEADS_PER_ROUND, SEQUENCE } from '@/lib/tasbih';
+import { BEADS_PER_ROUND, SEQUENCE, SEQUENCE_TOTAL } from '@/lib/tasbih';
 import { useTheme } from '@/theme';
 import { counterType, radius, spacing } from '@/theme/tokens';
 import { PhraseBlock } from './PhraseBlock';
@@ -104,38 +104,69 @@ function PulseCount({ count }: { count: number }) {
 }
 
 export function RingVariant({ session }: { session: TasbihSession }) {
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const { state, phrase, target } = session;
-  const size = Math.min(width - spacing.xxxl * 2, height * 0.42, MAX_RING);
+  const [fit, setFit] = useState<number | null>(null);
+  const size = Math.min(width - spacing.xxxl * 2, MAX_RING);
   const ringRadius = size / 2 - BEAD;
-  const filled = state.mode === 'sequence' ? state.count : state.count % BEADS_PER_ROUND;
+  const sequence = state.mode === 'sequence';
+  const complete = sequence && state.done;
+  const filled = state.done
+    ? BEADS_PER_ROUND
+    : sequence
+      ? state.count
+      : state.count % BEADS_PER_ROUND;
+  const scale = useSharedValue(1);
+
+  useEffect(() => {
+    if (fit === null) return;
+    scale.value = withTiming(Math.min((fit - spacing.lg) / size, 1), {
+      duration: 400,
+      easing: Easing.out(Easing.cubic),
+      reduceMotion: ReduceMotion.System,
+    });
+  }, [fit, size, scale]);
+
+  const ringStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   return (
-    <View style={{ flex: 1, justifyContent: 'space-evenly', alignItems: 'center' }}>
-      <PhraseBlock phrase={phrase} />
-      <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-        {Array.from({ length: BEADS_PER_ROUND }, (_, index) => {
-          const angle = (index / BEADS_PER_ROUND) * Math.PI * 2 - Math.PI / 2;
-          return (
-            <Bead
-              key={index}
-              index={index}
-              filled={index < filled}
-              current={index === filled}
-              x={size / 2 + Math.cos(angle) * ringRadius}
-              y={size / 2 + Math.sin(angle) * ringRadius}
-            />
-          );
-        })}
-        <PulseCount count={state.count} />
-        {target ? (
-          <AppText size="sm" tone="textMuted" tabular>
-            av {target}
-          </AppText>
-        ) : null}
+    <View style={{ flex: 1, alignItems: 'center', gap: spacing.md }}>
+      <PhraseBlock phrase={phrase} note={complete ? 'Sies én gang' : undefined} compact={complete} />
+      <View
+        onLayout={(event) => {
+          const { width: w, height: h } = event.nativeEvent.layout;
+          setFit(Math.min(w, h));
+        }}
+        style={{ flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center' }}>
+        <Animated.View
+          style={[{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }, ringStyle]}>
+          {Array.from({ length: BEADS_PER_ROUND }, (_, index) => {
+            const angle = (index / BEADS_PER_ROUND) * Math.PI * 2 - Math.PI / 2;
+            return (
+              <Bead
+                key={index}
+                index={index}
+                filled={index < filled}
+                current={!state.done && index === filled}
+                x={size / 2 + Math.cos(angle) * ringRadius}
+                y={size / 2 + Math.sin(angle) * ringRadius}
+              />
+            );
+          })}
+          <PulseCount count={complete ? SEQUENCE_TOTAL : state.count} />
+          {complete ? (
+            <AppText size="sm" tone="textMuted">
+              til sammen
+            </AppText>
+          ) : target ? (
+            <AppText size="sm" tone="textMuted" tabular>
+              av {target}
+            </AppText>
+          ) : null}
+        </Animated.View>
       </View>
       <View style={{ height: 8 }}>
-        {state.mode === 'sequence' ? <StepPips step={state.step} total={SEQUENCE.length} /> : null}
+        {sequence ? <StepPips step={state.step} total={SEQUENCE.length} complete={complete} /> : null}
       </View>
     </View>
   );

@@ -39,6 +39,16 @@ export const SEQUENCE: TasbihPhrase[] = arabic.map((line, index) => ({
 
 export const COMPLETION = duaById('tasbih-completion');
 
+export const COMPLETION_PHRASE: TasbihPhrase | null = COMPLETION
+  ? {
+      arabic: COMPLETION.arabic,
+      transliteration: COMPLETION.transliteration,
+      meaning: COMPLETION.meaning,
+    }
+  : null;
+
+export const SEQUENCE_TOTAL = 100;
+
 export function initialTasbih(mode: TasbihMode = 'sequence', goal: TasbihGoal = 33): TasbihState {
   return { mode, step: 0, count: 0, goal, done: false };
 }
@@ -48,7 +58,9 @@ export function targetOf(state: TasbihState): number | null {
 }
 
 export function phraseOf(state: TasbihState): TasbihPhrase | null {
-  return state.mode === 'sequence' ? (SEQUENCE[state.step] ?? null) : null;
+  if (state.mode !== 'sequence') return null;
+  if (state.done) return COMPLETION_PHRASE;
+  return SEQUENCE[state.step] ?? null;
 }
 
 export function advance(state: TasbihState): { next: TasbihState; result: TasbihTapResult } {
