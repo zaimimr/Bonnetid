@@ -33,9 +33,6 @@ object CarDataSource {
     "shuruq_sunrise",
     "duhr",
     "asr",
-    "shadow_1x",
-    "shadow_2x",
-    "wusta_noon_sunset",
     "maghrib",
     "isha",
   ).joinToString(",")
@@ -77,7 +74,7 @@ object CarDataSource {
         .put("mosqueName", JSONObject.NULL)
         .put("showJamat", false)
         .put("lockScreenEnabled", false)
-        .put("days", buildDays(days, location.asrMethod))
+        .put("days", buildDays(days))
 
       context
         .getSharedPreferences(SNAPSHOT_PREFS, Context.MODE_PRIVATE)
@@ -96,7 +93,6 @@ object CarDataSource {
     val name: String,
     val lat: Double,
     val lon: Double,
-    val asrMethod: Int,
   )
 
   /** org.json turns a JSON null into the string "null", which would defeat every fallback. */
@@ -104,7 +100,7 @@ object CarDataSource {
     if (row.isNull(key)) "" else row.optString(key).trim()
 
   private fun fetchLocations(): List<RemoteLocation> {
-    val rows = getJson("location_t?select=location_iso,location_name,lat_n_s,long_e_w,asr_method")
+    val rows = getJson("location_t?select=location_iso,location_name,lat_n_s,long_e_w")
     val locations = mutableListOf<RemoteLocation>()
     for (index in 0 until rows.length()) {
       val row = rows.getJSONObject(index)
@@ -117,7 +113,6 @@ object CarDataSource {
           name = row.optString("location_name"),
           lat = lat,
           lon = lon,
-          asrMethod = row.optInt("asr_method", 0),
         ),
       )
     }
@@ -165,7 +160,7 @@ object CarDataSource {
     return mosques
   }
 
-  private fun buildDays(rows: JSONArray, asrMethod: Int): JSONArray {
+  private fun buildDays(rows: JSONArray): JSONArray {
     val days = JSONArray()
     for (index in 0 until rows.length()) {
       val row = rows.getJSONObject(index)
@@ -175,18 +170,18 @@ object CarDataSource {
         JSONObject()
           .put("date", date)
           .put("hijriText", "")
-          .put("prayers", buildPrayers(row, rows.optJSONObject(index + 1), date, asrMethod)),
+          .put("prayers", buildPrayers(row, rows.optJSONObject(index + 1), date)),
       )
     }
     return days
   }
 
-  private fun buildPrayers(row: JSONObject, nextRow: JSONObject?, date: String, asrMethod: Int): JSONArray {
+  private fun buildPrayers(row: JSONObject, nextRow: JSONObject?, date: String): JSONArray {
     val entries = listOf(
       Triple("fajr", time(row, "fajr"), true),
       Triple("fajr_endtime", time(row, "fajr_endtime"), false),
       Triple("duhr", time(row, "duhr"), true),
-      Triple("asr", asrTime(row, asrMethod), true),
+      Triple("asr", time(row, "asr"), true),
       Triple("maghrib", time(row, "maghrib"), true),
       Triple("isha", time(row, "isha"), true),
     ).mapNotNull { (kind, clock, isPrayer) ->
@@ -222,16 +217,6 @@ object CarDataSource {
     }
     val sameDay = instant(date, time(row, "fajr")) ?: return null
     return sameDay + 24 * 60 * 60 * 1000L
-  }
-
-  private fun asrTime(row: JSONObject, method: Int): String? {
-    val preferred = when (method) {
-      1 -> time(row, "shadow_1x")
-      2 -> time(row, "shadow_2x")
-      3 -> time(row, "wusta_noon_sunset")
-      else -> time(row, "asr")
-    }
-    return preferred ?: time(row, "asr")
   }
 
   private fun time(row: JSONObject, key: String): String? {

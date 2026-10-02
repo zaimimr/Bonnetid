@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText, Card, Divider, ListRow, Screen } from '@/components/ui';
-import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
+import { useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
 import { ASR_METHOD_OPTIONS, type AsrMethodOption } from '@/lib/asrMethods';
 import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
@@ -14,10 +14,9 @@ export default function AsrMethodScreen() {
   const asrMethod = useSettings((state) => state.asrMethod);
   const setAsrMethod = useSettings((state) => state.setAsrMethod);
   const asrOverride = useMosqueAsrOverride();
-  const asrLocationDefault = useLocationAsrDefault();
 
   const locked = asrOverride != null;
-  const current = asrOverride ?? asrMethod ?? asrLocationDefault ?? 'shadow_1x';
+  const current = asrOverride ?? asrMethod ?? 'irn';
 
   const select = (option: AsrMethodOption) => {
     if (locked) return;

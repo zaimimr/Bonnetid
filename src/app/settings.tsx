@@ -26,7 +26,7 @@ import { getNotificationSound } from '@/lib/notificationSounds';
 import { asrMethodLabel } from '@/lib/asrMethods';
 import { calculationMethodLabel } from '@/lib/calculationMethods';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
-import { useLocationAsrDefault, useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
+import { useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
 import { useAutoCalculationMethod } from '@/hooks/useEffectiveCalculationMethod';
 import { track } from '@/lib/telemetry';
 import {
@@ -70,7 +70,6 @@ export default function SettingsScreen() {
   const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled);
   const setTrackerEnabled = useSettings((state) => state.setPrayerTrackerEnabled);
   const asrOverride = useMosqueAsrOverride();
-  const asrLocationDefault = useLocationAsrDefault();
   const ramadanRemindersEnabled = useSettings((state) => state.ramadanRemindersEnabled);
   const dhulHijjahRemindersEnabled = useSettings((state) => state.dhulHijjahRemindersEnabled);
   const voluntaryFasts = useSettings((state) => state.voluntaryFasts);
@@ -148,7 +147,7 @@ export default function SettingsScreen() {
           subtitle={
             asrOverride && mosque
               ? `Styres av ${mosque.name}`
-              : asrMethodLabel(asrMethod ?? asrLocationDefault ?? 'shadow_1x')
+              : asrMethodLabel(asrMethod ?? 'irn')
           }
           leading={<Ionicons name="partly-sunny-outline" size={20} color={theme.colors.primary} />}
           chevron

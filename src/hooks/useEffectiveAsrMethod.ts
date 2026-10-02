@@ -1,4 +1,4 @@
-import { useLocations, useMosque } from '@/api/queries';
+import { useMosque } from '@/api/queries';
 import {
   useActiveLocation,
   useActiveMosque,
@@ -25,15 +25,8 @@ export function useMosqueAsrOverride(): AsrMethodPreference | null {
   return toPreference(data.asr_method);
 }
 
-export function useLocationAsrDefault(): AsrMethodPreference | null {
-  const location = useActiveLocation();
-  const { data } = useLocations();
-  return toPreference(data?.find((entry) => entry.iso === location.iso)?.asr_method);
-}
-
 export function useEffectiveAsrMethod(): AsrMethodPreference {
   const override = useMosqueAsrOverride();
   const chosen = useSettings((state) => state.asrMethod);
-  const locationDefault = useLocationAsrDefault();
-  return override ?? chosen ?? locationDefault ?? 'shadow_1x';
+  return override ?? chosen ?? 'irn';
 }
