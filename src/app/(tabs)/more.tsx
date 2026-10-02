@@ -31,7 +31,14 @@ const DUAS_FEATURE: Feature = {
   href: '/duas',
   icon: 'book-outline',
   title: 'Dua og dhikr',
-  description: 'Duaer og tasbih til bønnen og Ramadan',
+  description: 'Duaer til adhan, bønnen og Ramadan',
+};
+
+const TASBIH_FEATURE: Feature = {
+  href: '/tasbih',
+  icon: 'ellipse-outline',
+  title: 'Tasbih',
+  description: 'Tell dhikr etter bønnen',
 };
 
 const SETTINGS_FEATURE: Feature = {
@@ -50,6 +57,7 @@ export default function MoreScreen() {
     ...(trackerEnabled ? [TRACKER_FEATURE] : []),
     ...(calculated ? [] : [MOSQUE_FEATURE]),
     DUAS_FEATURE,
+    TASBIH_FEATURE,
     SETTINGS_FEATURE,
   ];
 

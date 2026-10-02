@@ -35,14 +35,6 @@ function CategoryList() {
   return (
     <Screen scroll edges={[]}>
       <Card padding="sm" rounded="xl" style={{ marginTop: spacing.lg }}>
-        <ListRow
-          title="Tasbih"
-          chevron
-          onPress={() => router.push('/tasbih')}
-          style={{ paddingHorizontal: spacing.md }}
-        />
-      </Card>
-      <Card padding="sm" rounded="xl" style={{ marginTop: spacing.lg }}>
         {categories.map((entry, index) => (
           <Fragment key={entry.id}>
             {index > 0 && <Divider />}
