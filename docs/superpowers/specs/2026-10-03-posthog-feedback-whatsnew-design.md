@@ -56,12 +56,27 @@ Understand how people use Bønnetid, hear from them directly, and tell them what
 - Archive at "Hva er nytt" in Mer. Items whose flag is off are hidden. Items with a route get a "Prøv nå" button.
 - Events: `whats_new_shown`, `whats_new_opened_item`.
 
+## 6. Store ratings (primary ask)
+
+Store ratings are the main thing we ask users for. Surveys and feedback stay secondary.
+
+- No sentiment gate. Never ask "do you like the app" before the native prompt (Google Play in-app review policy, Apple review gating).
+- `useReviewPrompt` stops prompting at launch. It requests the native review sheet (`expo-store-review`) when a trigger has fired and the user is on Oversikt with nothing else open. Triggers:
+  - `prayers_logged`: 5 prayers marked as prayed in the tracker.
+  - `active_days`: app opened on 7 distinct days.
+  - `mosque_return`: a mosque is selected and the app is opened on a later day.
+- Re-ask allowed once 120 days have passed since the last request and the app version has changed. The OS still applies its own quota.
+- Suppressed during onboarding, when the app was opened from a notification, after a tracked error in the session, and in a session where what's new or a survey was shown.
+- Explicit links stay: "Vurder Bønnetid" card in Mer, and a "Gi Bønnetid en vurdering" button in the what's-new sheet that calls `openStoreReview()`.
+- Event `review_prompt_requested` with `trigger`.
+- Surveys are only for targeted product questions and are never shown in the same session as the review prompt.
+
 ## PostHog project setup
 
 - Project timezone Europe/Oslo, discard client IP.
 - Enable exception autocapture, session replay for mobile, surveys, Support.
 - Create the five flags at 100 percent rollout.
-- Dashboard "Bønnetid": daily active users, retention, top screens, top feature events, onboarding funnel, feedback funnel, errors by version.
+- Dashboard "Bønnetid": daily and weekly active users, retention, top screens, feature usage, onboarding funnel, feedback funnel, errors by version, users by version, platform, kommune, times mode, review prompt requests.
 
 ## Verification
 
