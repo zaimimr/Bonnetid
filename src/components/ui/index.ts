@@ -13,3 +13,4 @@ export * from './SegmentedControl';
 export * from './Toggle';
 export * from './InlineLink';
 export * from './FeatureCard';
+export * from './Sheet';
