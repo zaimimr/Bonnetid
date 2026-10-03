@@ -3,6 +3,7 @@ import { Pressable, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText, Card, Divider } from '@/components/ui';
+import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
 import { useFeature } from '@/hooks/useFeature';
 import type { FeatureFlag } from '@/lib/featureFlags';
 import { track } from '@/lib/telemetry';
@@ -39,11 +40,15 @@ function WhatsNewRow({ item, onPress }: { item: WhatsNewItem; onPress?: () => vo
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <Ionicons
-          name={item.icon as keyof typeof Ionicons.glyphMap}
-          size={20}
-          color={theme.colors.primary}
-        />
+        {item.icon === 'tasbih' ? (
+          <TasbihIcon size={20} color={theme.colors.primary} />
+        ) : (
+          <Ionicons
+            name={item.icon as keyof typeof Ionicons.glyphMap}
+            size={20}
+            color={theme.colors.primary}
+          />
+        )}
       </View>
       <View style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, gap: spacing.xxs }}>
         <AppText weight="semibold">{item.title}</AppText>

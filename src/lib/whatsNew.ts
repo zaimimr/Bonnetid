@@ -27,7 +27,7 @@ export const WHATS_NEW: WhatsNewEntry[] = [
       {
         title: 'Tasbih',
         body: 'Tell dhikr etter bønnen med en perlering.',
-        icon: 'ellipse-outline',
+        icon: 'tasbih',
         route: '/tasbih',
         flag: 'tasbih',
       },
