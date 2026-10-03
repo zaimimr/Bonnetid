@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, SectionList, TextInput, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText, EmptyState, ErrorState, ListRow, Screen, Skeleton } from '@/components/ui';
+import { AppText, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
 import { useFontScale } from '@/hooks/useFontScale';
 import { usePlaces } from '@/hooks/usePlaces';
 import { groupPlacesByFylke, matchesPlace, placeCountLabel, type Place } from '@/lib/places';
@@ -30,6 +30,29 @@ export default function PlacePickerScreen() {
     const normalized = query.trim().toLowerCase();
     return groupPlacesByFylke(places.filter((place) => matchesPlace(place, normalized)));
   }, [places, query]);
+
+  const searching = query.trim().length > 0;
+
+  const defaultFylke = useMemo(() => {
+    const iso = placeIso ?? (forTimes ? activeLocation.iso : null);
+    return places.find((place) => place.iso === iso)?.fylke ?? null;
+  }, [places, placeIso, forTimes, activeLocation.iso]);
+
+  const [toggledFylker, setToggledFylker] = useState<Set<string> | null>(null);
+  const openFylker = toggledFylker ?? new Set(defaultFylke ? [defaultFylke] : []);
+
+  const toggleFylke = (fylke: string) => {
+    const next = new Set(openFylker);
+    if (next.has(fylke)) next.delete(fylke);
+    else next.add(fylke);
+    setToggledFylker(next);
+  };
+
+  const visibleSections = sections.map((section) => ({
+    ...section,
+    places: section.data,
+    data: searching || openFylker.has(section.fylke) ? section.data : [],
+  }));
 
   const totalMatches = useMemo(
     () => sections.reduce((sum, section) => sum + section.data.length, 0),
@@ -59,7 +82,9 @@ export default function PlacePickerScreen() {
             flexDirection: 'row',
             alignItems: 'center',
             gap: spacing.sm,
-            backgroundColor: theme.colors.surfaceSunken,
+            backgroundColor: theme.colors.surface,
+            borderWidth: 1,
+            borderColor: theme.colors.border,
             borderRadius: radius.md,
             paddingHorizontal: spacing.md,
           }}>
@@ -92,9 +117,10 @@ export default function PlacePickerScreen() {
               flexDirection: 'row',
               alignItems: 'center',
               gap: spacing.sm,
-              backgroundColor:
-                placeIso == null ? theme.colors.primarySoft : theme.colors.surfaceSunken,
-              borderRadius: radius.md,
+              backgroundColor: placeIso == null ? theme.colors.primarySoft : theme.colors.surface,
+              borderWidth: 1,
+              borderColor: placeIso == null ? theme.colors.primarySoft : theme.colors.border,
+              borderRadius: radius.lg,
               padding: spacing.md,
               minHeight: 48,
             },
@@ -133,59 +159,139 @@ export default function PlacePickerScreen() {
 
         {!isLoading && !isError && (
           <SectionList
-            sections={sections}
+            sections={visibleSections}
             keyExtractor={(item) => item.iso}
             keyboardDismissMode="on-drag"
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets
             stickySectionHeadersEnabled={false}
             contentContainerStyle={{ paddingBottom: spacing.xxl }}
-            renderSectionHeader={({ section }) => (
-              <View
-                style={{
-                  paddingTop: spacing.lg,
-                  paddingBottom: spacing.xs,
-                  backgroundColor: theme.colors.background,
-                }}>
-                <AppText size="xs" weight="semibold" tone="textMuted">
-                  {section.fylke.toUpperCase()}
-                </AppText>
-              </View>
-            )}
-            renderItem={({ item }) => (
-              <ListRow
-                title={item.name}
-                subtitle={
-                  forTimes
-                    ? item.kommune !== item.name
-                      ? item.kommune
-                      : undefined
-                    : isStacked
-                      ? placeCountLabel(item.mosqueCount)
-                      : item.kommune
-                }
-                trailing={
-                  item.iso === placeIso ? (
-                    <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
-                  ) : isStacked || forTimes ? undefined : (
-                    <AppText size="sm" tone="textMuted">
-                      {placeCountLabel(item.mosqueCount)}
+            renderSectionHeader={({ section }) => {
+              const isOpen = searching || openFylker.has(section.fylke);
+              const chosen = section.places.find((place) => place.iso === placeIso);
+              return (
+                <Pressable
+                  onPress={() => toggleFylke(section.fylke)}
+                  disabled={searching}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: isOpen }}
+                  style={({ pressed }) => [
+                    {
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: spacing.md,
+                      minHeight: 60,
+                      paddingVertical: spacing.md,
+                      paddingHorizontal: spacing.lg,
+                      backgroundColor: theme.colors.surface,
+                      borderWidth: 1,
+                      borderColor: theme.colors.border,
+                      borderTopLeftRadius: radius.lg,
+                      borderTopRightRadius: radius.lg,
+                      borderBottomLeftRadius: isOpen ? 0 : radius.lg,
+                      borderBottomRightRadius: isOpen ? 0 : radius.lg,
+                    },
+                    pressed && { opacity: opacity.pressed },
+                  ]}>
+                  <View style={{ flex: 1, gap: spacing.xxs }}>
+                    <AppText size="lg" weight="semibold" numberOfLines={2}>
+                      {section.fylke}
                     </AppText>
-                  )
-                }
-                onPress={() => choose(item)}
-              />
-            )}
-            ItemSeparatorComponent={() => (
-              <View style={{ height: 1, backgroundColor: theme.colors.border }} />
-            )}
+                    {chosen ? (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+                        <Ionicons name="checkmark-circle" size={16} color={theme.colors.primary} />
+                        <AppText size="sm" weight="medium" tone="primary" numberOfLines={1}>
+                          {chosen.name}
+                        </AppText>
+                      </View>
+                    ) : (
+                      <AppText size="sm" tone="textMuted" tabular>
+                        {forTimes
+                          ? `${section.places.length} steder`
+                          : placeCountLabel(
+                              section.places.reduce((sum, place) => sum + place.mosqueCount, 0),
+                            )}
+                      </AppText>
+                    )}
+                  </View>
+                  {!searching && (
+                    <Ionicons
+                      name={isOpen ? 'chevron-up' : 'chevron-down'}
+                      size={20}
+                      color={theme.colors.textSecondary}
+                    />
+                  )}
+                </Pressable>
+              );
+            }}
+            renderItem={({ item, index, section }) => {
+              const isSelected = item.iso === placeIso;
+              const isLast = index === section.data.length - 1;
+              const subtitle = forTimes && item.kommune !== item.name ? item.kommune : undefined;
+              return (
+                <View
+                  style={{
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                    borderLeftWidth: 1,
+                    borderRightWidth: 1,
+                    borderBottomWidth: isLast ? 1 : 0,
+                    borderBottomLeftRadius: isLast ? radius.lg : 0,
+                    borderBottomRightRadius: isLast ? radius.lg : 0,
+                    paddingLeft: spacing.lg,
+                  }}>
+                  <Pressable
+                    onPress={() => choose(item)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: isSelected }}
+                    style={({ pressed }) => [
+                      {
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: spacing.md,
+                        minHeight: 52,
+                        paddingVertical: spacing.md,
+                        paddingRight: spacing.lg,
+                        borderTopWidth: index > 0 ? 1 : 0,
+                        borderTopColor: theme.colors.border,
+                      },
+                      pressed && { opacity: opacity.pressed },
+                    ]}>
+                    <View style={{ flex: 1, gap: spacing.xxs }}>
+                      <AppText
+                        weight={isSelected ? 'semibold' : 'regular'}
+                        tone={isSelected ? 'primary' : 'textPrimary'}
+                        numberOfLines={2}>
+                        {item.name}
+                      </AppText>
+                      {subtitle ? (
+                        <AppText size="sm" tone="textMuted" numberOfLines={1}>
+                          {subtitle}
+                        </AppText>
+                      ) : null}
+                      {!forTimes && isStacked ? (
+                        <AppText size="sm" tone="textMuted">
+                          {placeCountLabel(item.mosqueCount)}
+                        </AppText>
+                      ) : null}
+                    </View>
+                    {!forTimes && !isStacked && (
+                      <AppText size="sm" tone="textMuted" tabular>
+                        {placeCountLabel(item.mosqueCount)}
+                      </AppText>
+                    )}
+                    {isSelected && (
+                      <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
+                    )}
+                  </Pressable>
+                </View>
+              );
+            }}
+            renderSectionFooter={() => <View style={{ height: spacing.md }} />}
+            ListHeaderComponent={<View style={{ height: spacing.xs }} />}
             ListFooterComponent={
               totalMatches > 0 ? (
-                <AppText
-                  size="xs"
-                  tone="textMuted"
-                  align="center"
-                  style={{ marginTop: spacing.xl }}>
+                <AppText size="xs" tone="textMuted" align="center" style={{ marginTop: spacing.md }}>
                   {forTimes ? `${totalMatches} steder` : `${totalMatches} steder med registrerte moskeer`}
                 </AppText>
               ) : null
