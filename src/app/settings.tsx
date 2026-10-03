@@ -1,5 +1,5 @@
 import { Linking, Platform, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useIsFocused, useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,7 @@ import {
   AppText,
   Card,
   Divider,
+  FeatureCard,
   ListRow,
   Screen,
   SectionHeader,
@@ -30,6 +31,7 @@ import { useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
 import { useAutoCalculationMethod } from '@/hooks/useEffectiveCalculationMethod';
 import { track } from '@/lib/telemetry';
 import { useFeature } from '@/hooks/useFeature';
+import { useSupportThread } from '@/hooks/useSupportThread';
 import {
   NOTIFIABLE_PRAYERS,
   VOLUNTARY_FAST_KINDS,
@@ -86,6 +88,8 @@ export default function SettingsScreen() {
   const ramadanRemindersEnabled = useSettings((state) => state.ramadanRemindersEnabled);
   const dhulHijjahRemindersEnabled = useSettings((state) => state.dhulHijjahRemindersEnabled);
   const voluntaryFasts = useSettings((state) => state.voluntaryFasts);
+  const isFocused = useIsFocused();
+  const support = useSupportThread(isFocused);
 
   const toggleNotifications = async (value: boolean) => {
     if (!value) {
@@ -129,6 +133,21 @@ export default function SettingsScreen() {
 
   return (
     <Screen scroll edges={[]}>
+      <View style={{ gap: spacing.md, marginTop: spacing.md }}>
+        <FeatureCard
+          icon={<Ionicons name="chatbubble-ellipses-outline" size={24} color={theme.colors.primary} />}
+          title={support.hasTicket ? 'Meldinger' : 'Gi tilbakemelding'}
+          description="Skriv til oss, vi svarer i appen"
+          badge={support.unread > 0 ? String(support.unread) : undefined}
+          onPress={() => router.push('/feedback')}
+        />
+        <FeatureCard
+          icon={<Ionicons name="sparkles-outline" size={24} color={theme.colors.primary} />}
+          title="Hva er nytt"
+          description="Nyheter i siste versjon"
+          onPress={() => router.push('/whats-new')}
+        />
+      </View>
       <SectionHeader title="Bønnetider" />
       <Card padding="sm" rounded="xl">
         <ListRow

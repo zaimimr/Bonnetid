@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { useIsFocused, useRouter, type Href } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText, FeatureCard, Screen } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -7,7 +7,6 @@ import { spacing } from '@/theme/tokens';
 import { useIsCalculatedMode, usePrayerTrackerEnabled } from '@/store/settings';
 import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
 import { useFeature } from '@/hooks/useFeature';
-import { useSupportThread } from '@/hooks/useSupportThread';
 
 type Feature = {
   href: Href;
@@ -37,20 +36,6 @@ const DUAS_FEATURE: Feature = {
   description: 'Duaer og tasbih til bønnen og Ramadan',
 };
 
-const FEEDBACK_FEATURE: Feature = {
-  href: '/feedback',
-  icon: 'chatbubble-ellipses-outline',
-  title: 'Gi tilbakemelding',
-  description: 'Skriv til oss, vi svarer i appen',
-};
-
-const WHATS_NEW_FEATURE: Feature = {
-  href: '/whats-new',
-  icon: 'sparkles-outline',
-  title: 'Hva er nytt',
-  description: 'Nyheter i siste versjon',
-};
-
 const SETTINGS_FEATURE: Feature = {
   href: '/settings',
   icon: 'settings-outline',
@@ -65,15 +50,10 @@ export default function MoreScreen() {
   const calculated = useIsCalculatedMode();
   const duasEnabled = useFeature('duas');
   const tasbihEnabled = useFeature('tasbih');
-  const isFocused = useIsFocused();
-  const support = useSupportThread(isFocused);
-  const feedbackFeature = support.hasTicket ? { ...FEEDBACK_FEATURE, title: 'Meldinger' } : FEEDBACK_FEATURE;
   const features = [
     ...(trackerEnabled ? [TRACKER_FEATURE] : []),
     ...(calculated ? [] : [MOSQUE_FEATURE]),
     ...(duasEnabled ? [DUAS_FEATURE] : []),
-    feedbackFeature,
-    WHATS_NEW_FEATURE,
     SETTINGS_FEATURE,
   ];
 
@@ -92,7 +72,6 @@ export default function MoreScreen() {
             icon={<Ionicons name={feature.icon} size={24} color={theme.colors.primary} />}
             title={feature.title}
             description={feature.description}
-            badge={feature.href === '/feedback' && support.unread > 0 ? String(support.unread) : undefined}
             onPress={() => router.push(feature.href)}
           />
         ))}
