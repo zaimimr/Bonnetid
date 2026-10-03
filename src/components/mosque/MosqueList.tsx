@@ -162,6 +162,7 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
           address: item.mosque.address,
           lat: Number(item.mosque.lat),
           lon: Number(item.mosque.lon),
+          distanceKm: item.distance,
         })),
     [visible],
   );
@@ -331,6 +332,8 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
           pins={pins}
           center={mapCenter}
           actionLabel={picking ? 'Velg denne moskeen' : 'Vis moské'}
+          myOrgNr={selectedOrgNr}
+          fitToPins={place != null}
           onSelect={onSelectPin}
         />
       )}

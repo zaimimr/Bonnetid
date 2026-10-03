@@ -123,6 +123,11 @@ function NativeQiblaMap({
         latitudeDelta: delta,
         longitudeDelta: delta,
       }}
+      mapType="mutedStandard"
+      showsPointsOfInterests={false}
+      showsBuildings={false}
+      userInterfaceStyle={theme.scheme}
+      tintColor={theme.colors.mapFacing}
       showsUserLocation
       showsCompass>
       {accuracyM != null && accuracyM > 0 && (

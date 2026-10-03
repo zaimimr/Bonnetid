@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ElementRef } from 'react';
+import { View } from 'react-native';
 import { LeafletMap, type LeafletMapHandle } from '@/components/map/LeafletMap';
 import { MapView, Marker, NATIVE_MAPS_AVAILABLE } from '@/components/map/nativeMaps';
+import { AppText, Badge, Button, Card, IconButton } from '@/components/ui';
+import { formatDistance } from '@/lib/geo';
 import { buildLeafletHtml } from '@/lib/leafletHtml';
 import { useTheme } from '@/theme';
+import { spacing } from '@/theme/tokens';
+
+type MapViewHandle = ElementRef<typeof MapView>;
 
 export type MosqueMapPin = {
   orgNr: string;
@@ -10,48 +16,163 @@ export type MosqueMapPin = {
   address?: string | null;
   lat: number;
   lon: number;
+  distanceKm?: number | null;
 };
 
 export type MosqueMapProps = {
   pins: MosqueMapPin[];
   center: { lat: number; lon: number };
   actionLabel?: string;
+  myOrgNr?: string;
+  fitToPins?: boolean;
   onSelect: (orgNr: string) => void;
 };
 
-export function MosqueMap({ pins, center, actionLabel = 'Vis moské', onSelect }: MosqueMapProps) {
-  if (!NATIVE_MAPS_AVAILABLE) {
-    return (
-      <OsmMosqueMap pins={pins} center={center} actionLabel={actionLabel} onSelect={onSelect} />
-    );
-  }
-  return <NativeMosqueMap pins={pins} center={center} onSelect={onSelect} />;
+export function MosqueMap(props: MosqueMapProps) {
+  if (!NATIVE_MAPS_AVAILABLE) return <OsmMosqueMap {...props} />;
+  return <NativeMosqueMap {...props} />;
 }
 
-function NativeMosqueMap({ pins, center, onSelect }: MosqueMapProps) {
+const PIN_SIZE = 16;
+const PIN_SIZE_ACTIVE = 24;
+const FIT_PADDING = { top: 64, right: 48, bottom: 200, left: 48 };
+
+function NativeMosqueMap({
+  pins,
+  center,
+  actionLabel = 'Vis moské',
+  myOrgNr,
+  fitToPins,
+  onSelect,
+}: MosqueMapProps) {
   const theme = useTheme();
+  const mapRef = useRef<MapViewHandle>(null);
+  const [activeOrgNr, setActiveOrgNr] = useState<string | null>(null);
+  const active = pins.find((pin) => pin.orgNr === activeOrgNr) ?? null;
+
+  const fit = () => {
+    if (!fitToPins || pins.length < 2) return;
+    mapRef.current?.fitToCoordinates(
+      pins.map((pin) => ({ latitude: pin.lat, longitude: pin.lon })),
+      { edgePadding: FIT_PADDING, animated: false },
+    );
+  };
 
   return (
-    <MapView
-      style={{ flex: 1 }}
-      initialRegion={{
-        latitude: center.lat,
-        longitude: center.lon,
-        latitudeDelta: 0.08,
-        longitudeDelta: 0.08,
-      }}
-      showsUserLocation>
-      {pins.map((pin) => (
-        <Marker
-          key={pin.orgNr}
-          coordinate={{ latitude: pin.lat, longitude: pin.lon }}
-          title={pin.name}
-          description={pin.address ?? undefined}
-          pinColor={theme.colors.primary}
-          onCalloutPress={() => onSelect(pin.orgNr)}
+    <View style={{ flex: 1 }}>
+      <MapView
+        ref={mapRef}
+        style={{ flex: 1 }}
+        initialRegion={{
+          latitude: center.lat,
+          longitude: center.lon,
+          latitudeDelta: 0.08,
+          longitudeDelta: 0.08,
+        }}
+        onMapReady={fit}
+        mapType="mutedStandard"
+        pointsOfInterestFilter={['publicTransport', 'parking']}
+        showsBuildings={false}
+        pitchEnabled={false}
+        userInterfaceStyle={theme.scheme}
+        showsUserLocation
+        onPress={(event) => {
+          if (event.nativeEvent.action !== 'marker-press') setActiveOrgNr(null);
+        }}>
+        {pins.map((pin) => {
+          const isActive = pin.orgNr === activeOrgNr;
+          const isMine = pin.orgNr === myOrgNr;
+          return (
+            <Marker
+              key={`${pin.orgNr}-${isActive ? 'active' : 'idle'}`}
+              coordinate={{ latitude: pin.lat, longitude: pin.lon }}
+              anchor={{ x: 0.5, y: 0.5 }}
+              zIndex={isActive ? 3 : isMine ? 2 : 1}
+              tracksViewChanges={false}
+              accessibilityLabel={pin.name}
+              onPress={() => setActiveOrgNr(pin.orgNr)}>
+              <MosquePin active={isActive} mine={isMine} />
+            </Marker>
+          );
+        })}
+      </MapView>
+
+      {active && (
+        <MosquePinCard
+          pin={active}
+          mine={active.orgNr === myOrgNr}
+          actionLabel={actionLabel}
+          onClose={() => setActiveOrgNr(null)}
+          onSelect={() => onSelect(active.orgNr)}
         />
-      ))}
-    </MapView>
+      )}
+    </View>
+  );
+}
+
+function MosquePin({ active, mine }: { active: boolean; mine: boolean }) {
+  const theme = useTheme();
+  const size = active ? PIN_SIZE_ACTIVE : PIN_SIZE;
+  return (
+    <View style={{ padding: 4 }}>
+      <View
+        style={{
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: mine ? theme.colors.accent : theme.colors.primary,
+          borderWidth: active ? 4 : 3,
+          borderColor: theme.colors.mapPinRing,
+          shadowColor: '#000',
+          shadowOpacity: 0.3,
+          shadowRadius: 2,
+          shadowOffset: { width: 0, height: 1 },
+        }}
+      />
+    </View>
+  );
+}
+
+function MosquePinCard({
+  pin,
+  mine,
+  actionLabel,
+  onClose,
+  onSelect,
+}: {
+  pin: MosqueMapPin;
+  mine: boolean;
+  actionLabel: string;
+  onClose: () => void;
+  onSelect: () => void;
+}) {
+  return (
+    <Card
+      elevated
+      style={{ position: 'absolute', left: spacing.md, right: spacing.md, bottom: spacing.lg }}>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm }}>
+        <View style={{ flex: 1, gap: spacing.xs }}>
+          <AppText size="lg" weight="semibold">
+            {pin.name}
+          </AppText>
+          {pin.address ? (
+            <AppText size="sm" tone="textSecondary">
+              {pin.address}
+            </AppText>
+          ) : null}
+          {(pin.distanceKm != null || mine) && (
+            <View style={{ flexDirection: 'row', gap: spacing.xs, marginTop: spacing.xs }}>
+              {mine && <Badge label="Din moské" variant="accent" />}
+              {pin.distanceKm != null && (
+                <Badge label={formatDistance(pin.distanceKm)} variant="neutral" />
+              )}
+            </View>
+          )}
+        </View>
+        <IconButton name="close" accessibilityLabel="Lukk" onPress={onClose} />
+      </View>
+      <Button label={actionLabel} onPress={onSelect} fullWidth style={{ marginTop: spacing.md }} />
+    </Card>
   );
 }
 
