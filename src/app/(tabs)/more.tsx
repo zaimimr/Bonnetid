@@ -5,6 +5,8 @@ import { AppText, FeatureCard, Screen } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { useIsCalculatedMode, usePrayerTrackerEnabled } from '@/store/settings';
+import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
+import { useFeature } from '@/hooks/useFeature';
 
 type Feature = {
   href: Href;
@@ -46,10 +48,12 @@ export default function MoreScreen() {
   const theme = useTheme();
   const trackerEnabled = usePrayerTrackerEnabled();
   const calculated = useIsCalculatedMode();
+  const duasEnabled = useFeature('duas');
+  const tasbihEnabled = useFeature('tasbih');
   const features = [
     ...(trackerEnabled ? [TRACKER_FEATURE] : []),
     ...(calculated ? [] : [MOSQUE_FEATURE]),
-    DUAS_FEATURE,
+    ...(duasEnabled ? [DUAS_FEATURE] : []),
     SETTINGS_FEATURE,
   ];
 
@@ -71,6 +75,14 @@ export default function MoreScreen() {
             onPress={() => router.push(feature.href)}
           />
         ))}
+        {!duasEnabled && tasbihEnabled && (
+          <FeatureCard
+            icon={<TasbihIcon size={24} color={theme.colors.primary} />}
+            title="Tasbih"
+            description="Tell dhikr etter bønnen"
+            onPress={() => router.push('/tasbih')}
+          />
+        )}
       </View>
     </Screen>
   );

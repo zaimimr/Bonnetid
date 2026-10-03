@@ -14,6 +14,7 @@ import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { MosqueSelectAction } from '@/components/mosque/MosqueSelectAction';
 import { AppText, Card, ErrorState, ListRow, Screen, SectionHeader, Skeleton } from '@/components/ui';
 import { openVipps } from '@/lib/mosqueDonations';
+import { useFeature } from '@/hooks/useFeature';
 import { track } from '@/lib/telemetry';
 import { useIsCalculatedMode, useSettings } from '@/store/settings';
 import { useTheme } from '@/theme';
@@ -66,6 +67,7 @@ const JAMAT_PRAYERS = ['fajr', 'duhr', 'asr', 'maghrib', 'isha'] as const;
 
 function MosqueDetail({ mosque }: { mosque: Mosque }) {
   const theme = useTheme();
+  const donationEnabled = useFeature('mosque-donation');
   const { scale, isStacked } = useFontScale();
   const { isWide } = useResponsive();
   const stacked = isStacked && !isWide;
@@ -211,7 +213,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
         </Card>
       )}
 
-      {!mosque.map_only && (
+      {!mosque.map_only && donationEnabled && (
         <View>
           <SectionHeader title="Støtt moskeen" />
           <Card padding="sm" rounded="xl">

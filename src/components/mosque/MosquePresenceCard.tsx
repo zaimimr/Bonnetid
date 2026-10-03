@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { AppText, Button, Card } from '@/components/ui';
+import { useFeature } from '@/hooks/useFeature';
 import { useMosquePresence } from '@/hooks/useMosquePresence';
 import { openVipps } from '@/lib/mosqueDonations';
 import { track } from '@/lib/telemetry';
@@ -18,6 +19,7 @@ export function MosquePresenceCard() {
   const theme = useTheme();
   const router = useRouter();
   const presence = useMosquePresence();
+  const donationEnabled = useFeature('mosque-donation');
   const orgNr = presence?.mosque.org_nr;
   const announcement = useUnreadAnnouncement(orgNr, presence?.mosque.announcement);
 
@@ -49,16 +51,18 @@ export function MosquePresenceCard() {
         <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
       </View>
       {announcement && <MosqueAnnouncement text={announcement} compact />}
-      <Button
-        label={mosque.vipps_number ? `Doner med Vipps · ${mosque.vipps_number}` : 'Doner med Vipps'}
-        variant="secondary"
-        size="sm"
-        fullWidth
-        onPress={() => {
-          track('mosque_donation_opened', { source: 'presence' });
-          openVipps();
-        }}
-      />
+      {donationEnabled && (
+        <Button
+          label={mosque.vipps_number ? `Doner med Vipps · ${mosque.vipps_number}` : 'Doner med Vipps'}
+          variant="secondary"
+          size="sm"
+          fullWidth
+          onPress={() => {
+            track('mosque_donation_opened', { source: 'presence' });
+            openVipps();
+          }}
+        />
+      )}
     </Card>
   );
 }

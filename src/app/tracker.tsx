@@ -20,6 +20,7 @@ import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import { usePrayerLog } from '@/store/prayerLog';
 import { useActiveLocation } from '@/store/settings';
+import { FeatureGate } from '@/components/FeatureGate';
 
 const MINUTE_MS = 60 * 1000;
 
@@ -34,7 +35,7 @@ function shiftIso(isoDate: string, days: number): string {
   return isoDateKey(date);
 }
 
-export default function TrackerScreen() {
+function TrackerScreen() {
   const now = useNow();
   const theme = useTheme();
   const location = useActiveLocation();
@@ -230,5 +231,13 @@ function DayArrow({
         color={theme.colors.textSecondary}
       />
     </Pressable>
+  );
+}
+
+export default function TrackerScreenRoute() {
+  return (
+    <FeatureGate flag="prayer-tracker">
+      <TrackerScreen />
+    </FeatureGate>
   );
 }

@@ -9,8 +9,10 @@ import { categoryById, DUA_CATEGORIES, DUA_LINKS, duasIn, type DuaCategory } fro
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { useTasbihReturn } from '@/store/tasbihReturn';
+import { FeatureGate } from '@/components/FeatureGate';
+import { useFeature } from '@/hooks/useFeature';
 
-export default function DuasScreen() {
+function DuasScreen() {
   const { category } = useLocalSearchParams<{ category?: string }>();
 
   if (!category) return <CategoryList />;
@@ -30,19 +32,22 @@ function CategoryList() {
   const router = useRouter();
   const theme = useTheme();
   const { status } = useHijriSeasonNow();
+  const tasbihEnabled = useFeature('tasbih');
   const categories = DUA_CATEGORIES.filter(
     (entry) => !entry.season || entry.season === status?.id,
   );
 
   return (
     <Screen scroll edges={[]}>
-      <FeatureCard
-        icon={<TasbihIcon size={24} color={theme.colors.primary} />}
-        title="Tasbih"
-        description="Tell dhikr etter bønnen"
-        onPress={() => router.push('/tasbih')}
-        style={{ marginTop: spacing.lg }}
-      />
+      {tasbihEnabled && (
+        <FeatureCard
+          icon={<TasbihIcon size={24} color={theme.colors.primary} />}
+          title="Tasbih"
+          description="Tell dhikr etter bønnen"
+          onPress={() => router.push('/tasbih')}
+          style={{ marginTop: spacing.lg }}
+        />
+      )}
       <Card padding="sm" rounded="xl" style={{ marginTop: spacing.lg }}>
         {categories.map((entry, index) => (
           <Fragment key={entry.id}>
@@ -62,6 +67,7 @@ function CategoryList() {
 
 function CategoryReader({ category }: { category: DuaCategory }) {
   const router = useRouter();
+  const tasbihEnabled = useFeature('tasbih');
   const duas = duasIn(category.id);
   const scrollRef = useRef<ScrollView>(null);
   const listTop = useRef(0);
@@ -101,7 +107,7 @@ function CategoryReader({ category }: { category: DuaCategory }) {
             <DuaCard
               dua={dua}
               footer={
-                dua.id === DUA_LINKS.tasbih ? (
+                tasbihEnabled && dua.id === DUA_LINKS.tasbih ? (
                   <Button
                     label="Tell med tasbih"
                     variant="secondary"
@@ -114,5 +120,13 @@ function CategoryReader({ category }: { category: DuaCategory }) {
         ))}
       </View>
     </Screen>
+  );
+}
+
+export default function DuasScreenRoute() {
+  return (
+    <FeatureGate flag="duas">
+      <DuasScreen />
+    </FeatureGate>
   );
 }

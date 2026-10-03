@@ -8,6 +8,7 @@ import type { PrayerName } from '@/lib/prayerSchedule';
 import type { ArabicFontKey } from '@/theme/tokens';
 import { addActiveDay, localDayKey } from '@/lib/reviewTrigger';
 import { migrateSettings } from './settingsMigration';
+import { useFeature } from '@/hooks/useFeature';
 
 export type LocationMode = 'norway' | 'calculated';
 
@@ -327,7 +328,9 @@ export function useHomeLocation(): SavedLocation | null {
 }
 
 export function usePrayerTrackerEnabled(): boolean {
-  return useSettings((state) => state.prayerTrackerEnabled);
+  const enabled = useSettings((state) => state.prayerTrackerEnabled);
+  const allowed = useFeature('prayer-tracker');
+  return enabled && allowed;
 }
 
 export function useHasChosenLocation(): boolean {

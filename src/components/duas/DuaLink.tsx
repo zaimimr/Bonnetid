@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { InlineLink } from '@/components/ui';
+import { useFeature } from '@/hooks/useFeature';
 
 export type DuaLinkProps = {
   label: string;
@@ -7,6 +8,9 @@ export type DuaLinkProps = {
 
 export function DuaLink({ duaId, category, label }: DuaLinkProps) {
   const router = useRouter();
+  const duasEnabled = useFeature('duas');
+
+  if (!duasEnabled) return null;
 
   return (
     <InlineLink

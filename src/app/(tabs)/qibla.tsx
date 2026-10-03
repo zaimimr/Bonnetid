@@ -9,6 +9,7 @@ import { QiblaMap } from '@/components/qibla/QiblaMap';
 import { AppText, Card, EmptyState, Screen } from '@/components/ui';
 import { useCompassHeading } from '@/hooks/useCompassHeading';
 import { usePreciseCoords } from '@/hooks/usePreciseCoords';
+import { useFeature } from '@/hooks/useFeature';
 import { useResponsive } from '@/hooks/useResponsive';
 import {
   bearingUncertaintyDegrees,
@@ -40,7 +41,9 @@ export default function QiblaScreen() {
         : null;
   const { isLandscape } = useResponsive();
   const calculated = useIsCalculatedMode();
-  const [view, setView] = useState<QiblaView>('compass');
+  const [selectedView, setView] = useState<QiblaView>('compass');
+  const arEnabled = useFeature('qibla-ar');
+  const view = arEnabled || selectedView !== '3d' ? selectedView : 'compass';
 
   useFocusEffect(
     useCallback(() => {
@@ -83,6 +86,7 @@ export default function QiblaScreen() {
 
         <ViewSwitcher
           view={view}
+          arEnabled={arEnabled}
           onChange={(next) => {
             setView(next);
             track('qibla_view_changed', { view: next });
@@ -181,13 +185,21 @@ function RotateNotice({ bearing }: { bearing: number }) {
   );
 }
 
-function ViewSwitcher({ view, onChange }: { view: QiblaView; onChange: (view: QiblaView) => void }) {
+function ViewSwitcher({
+  view,
+  arEnabled,
+  onChange,
+}: {
+  view: QiblaView;
+  arEnabled: boolean;
+  onChange: (view: QiblaView) => void;
+}) {
   const theme = useTheme();
 
   const options: { value: QiblaView; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
     { value: 'compass', label: 'Kompass', icon: 'compass-outline' },
     { value: 'map', label: 'Kart', icon: 'map-outline' },
-    { value: '3d', label: 'AR', icon: 'cube-outline' },
+    ...(arEnabled ? [{ value: '3d' as const, label: 'AR', icon: 'cube-outline' as const }] : []),
   ];
 
   return (

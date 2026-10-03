@@ -4,8 +4,9 @@ import { DuaCard } from '@/components/duas/DuaCard';
 import { EmptyState, Screen } from '@/components/ui';
 import { categoryById, duaById } from '@/lib/duas';
 import { spacing } from '@/theme/tokens';
+import { FeatureGate } from '@/components/FeatureGate';
 
-export default function DuaScreen() {
+function DuaScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const dua = id ? duaById(id) : null;
 
@@ -26,5 +27,13 @@ export default function DuaScreen() {
         <DuaCard dua={dua} />
       </View>
     </Screen>
+  );
+}
+
+export default function DuaScreenRoute() {
+  return (
+    <FeatureGate flag="duas">
+      <DuaScreen />
+    </FeatureGate>
   );
 }

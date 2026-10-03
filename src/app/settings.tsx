@@ -29,6 +29,7 @@ import { PRAYER_LABELS } from '@/lib/prayerSchedule';
 import { useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
 import { useAutoCalculationMethod } from '@/hooks/useEffectiveCalculationMethod';
 import { track } from '@/lib/telemetry';
+import { useFeature } from '@/hooks/useFeature';
 import {
   NOTIFIABLE_PRAYERS,
   VOLUNTARY_FAST_KINDS,
@@ -74,7 +75,10 @@ export default function SettingsScreen() {
   const setLiveActivityEnabled = useSettings((state) => state.setLiveActivityEnabled);
   const endReminderEnabled = useSettings((state) => state.endReminderEnabled);
   const setEndReminderEnabled = useSettings((state) => state.setEndReminderEnabled);
-  const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled);
+  const trackerAllowed = useFeature('prayer-tracker');
+  const duasEnabled = useFeature('duas');
+  const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled) && trackerAllowed;
+  const showLockScreenRow = lockScreenSupported && (Platform.OS !== 'android' || trackerEnabled);
   const setTrackerEnabled = useSettings((state) => state.setPrayerTrackerEnabled);
   const asrOverride = useMosqueAsrOverride();
   const ramadanRemindersEnabled = useSettings((state) => state.ramadanRemindersEnabled);
@@ -220,74 +224,80 @@ export default function SettingsScreen() {
         )}
       </Card>
 
-      <SectionHeader title="Bønnesporing" />
-      <Card padding="sm" rounded="xl">
-        <ListRow
-          title="Marker bønner"
-          leading={
-            <Ionicons name="checkmark-done-outline" size={20} color={theme.colors.primary} />
-          }
-          trailing={
-            <Toggle
-              value={trackerEnabled}
-              onValueChange={setTrackerEnabled}
-            />
-          }
-          style={ROW}
-        />
-        {trackerEnabled && notificationsEnabled && (
-          <>
-            <Divider />
-            <ListRow
-              title="Påminnelse før tiden går ut"
-              subtitle="30 minutter før tiden er ute"
-              leading={<Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />}
-              trailing={
-                <Toggle
-                  value={endReminderEnabled}
-                  onValueChange={setEndReminderEnabled}
+      {(trackerAllowed || showLockScreenRow || (widgetJamatSupported && !calculated)) && (
+        <>
+          <SectionHeader title="Bønnesporing" />
+          <Card padding="sm" rounded="xl">
+            {trackerAllowed && (
+              <ListRow
+                title="Marker bønner"
+                leading={
+                  <Ionicons name="checkmark-done-outline" size={20} color={theme.colors.primary} />
+                }
+                trailing={
+                  <Toggle
+                    value={trackerEnabled}
+                    onValueChange={setTrackerEnabled}
+                  />
+                }
+                style={ROW}
+              />
+            )}
+            {trackerEnabled && notificationsEnabled && (
+              <>
+                <Divider />
+                <ListRow
+                  title="Påminnelse før tiden går ut"
+                  subtitle="30 minutter før tiden er ute"
+                  leading={<Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />}
+                  trailing={
+                    <Toggle
+                      value={endReminderEnabled}
+                      onValueChange={setEndReminderEnabled}
+                    />
+                  }
+                  style={ROW}
                 />
-              }
-              style={ROW}
-            />
-          </>
-        )}
-        {lockScreenSupported && (Platform.OS !== 'android' || trackerEnabled) && (
-          <>
-            <Divider />
-            <ListRow
-              title={lockScreenTitle}
-              subtitle={lockScreenSubtitle}
-              leading={<Ionicons name="timer-outline" size={20} color={theme.colors.primary} />}
-              trailing={
-                <Toggle
-                  value={liveActivityEnabled}
-                  onValueChange={toggleLockScreen}
+              </>
+            )}
+            {showLockScreenRow && (
+              <>
+                {trackerAllowed && <Divider />}
+                <ListRow
+                  title={lockScreenTitle}
+                  subtitle={lockScreenSubtitle}
+                  leading={<Ionicons name="timer-outline" size={20} color={theme.colors.primary} />}
+                  trailing={
+                    <Toggle
+                      value={liveActivityEnabled}
+                      onValueChange={toggleLockScreen}
+                    />
+                  }
+                  style={ROW}
                 />
-              }
-              style={ROW}
-            />
-          </>
-        )}
-        {widgetJamatSupported && !calculated && (
-          <>
-            <Divider />
-            <ListRow
-              title="Jamaat-tider i widgeten"
-              subtitle={mosque ? mosque.name : 'Velg en moské først'}
-              leading={<Ionicons name="people-outline" size={20} color={theme.colors.primary} />}
-              trailing={
-                <Toggle
-                  value={widgetShowJamat}
-                  onValueChange={setWidgetShowJamat}
-                  disabled={mosque == null}
+              </>
+            )}
+            {widgetJamatSupported && !calculated && (
+              <>
+                {(trackerAllowed || showLockScreenRow) && <Divider />}
+                <ListRow
+                  title="Jamaat-tider i widgeten"
+                  subtitle={mosque ? mosque.name : 'Velg en moské først'}
+                  leading={<Ionicons name="people-outline" size={20} color={theme.colors.primary} />}
+                  trailing={
+                    <Toggle
+                      value={widgetShowJamat}
+                      onValueChange={setWidgetShowJamat}
+                      disabled={mosque == null}
+                    />
+                  }
+                  style={ROW}
                 />
-              }
-              style={ROW}
-            />
-          </>
-        )}
-      </Card>
+              </>
+            )}
+          </Card>
+        </>
+      )}
 
       <SectionHeader title="Utseende" />
       <Card padding="sm" rounded="xl">
@@ -308,40 +318,44 @@ export default function SettingsScreen() {
         </View>
       </Card>
 
-      <SectionHeader title="Dua og dhikr" />
-      <Card padding="sm" rounded="xl">
-        <ListRow
-          title="Uttale"
-          trailing={
-            <Toggle
-              value={showTransliteration}
-              onValueChange={setShowTransliteration}
-              accessibilityLabel="Uttale"
+      {duasEnabled && (
+        <>
+          <SectionHeader title="Dua og dhikr" />
+          <Card padding="sm" rounded="xl">
+            <ListRow
+              title="Uttale"
+              trailing={
+                <Toggle
+                  value={showTransliteration}
+                  onValueChange={setShowTransliteration}
+                  accessibilityLabel="Uttale"
+                />
+              }
+              style={ROW}
             />
-          }
-          style={ROW}
-        />
-        <Divider />
-        <ListRow
-          title="Oversettelse"
-          trailing={
-            <Toggle
-              value={showMeaning}
-              onValueChange={setShowMeaning}
-              accessibilityLabel="Oversettelse"
+            <Divider />
+            <ListRow
+              title="Oversettelse"
+              trailing={
+                <Toggle
+                  value={showMeaning}
+                  onValueChange={setShowMeaning}
+                  accessibilityLabel="Oversettelse"
+                />
+              }
+              style={ROW}
             />
-          }
-          style={ROW}
-        />
-        <Divider />
-        <ListRow
-          title="Arabisk skrift"
-          subtitle={arabicFonts[arabicFont]?.label ?? arabicFonts.amiri.label}
-          chevron
-          onPress={() => router.push('/arabic-font')}
-          style={ROW}
-        />
-      </Card>
+            <Divider />
+            <ListRow
+              title="Arabisk skrift"
+              subtitle={arabicFonts[arabicFont]?.label ?? arabicFonts.amiri.label}
+              chevron
+              onPress={() => router.push('/arabic-font')}
+              style={ROW}
+            />
+          </Card>
+        </>
+      )}
 
       <SectionHeader title="Om appen" />
       <Card padding="sm" rounded="xl">
