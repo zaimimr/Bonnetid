@@ -61,6 +61,8 @@ export default function SettingsScreen() {
   const showMeaning = useSettings((state) => state.duaShowMeaning);
   const setShowMeaning = useSettings((state) => state.setDuaShowMeaning);
   const arabicFont = useSettings((state) => state.duaArabicFont);
+  const analyticsEnabled = useSettings((state) => state.analyticsEnabled);
+  const setAnalyticsEnabled = useSettings((state) => state.setAnalyticsEnabled);
   const setThemePreference = useSettings((state) => state.setThemePreference);
   const notificationsEnabled = useSettings((state) => state.notificationsEnabled);
   const setNotificationsEnabled = useSettings((state) => state.setNotificationsEnabled);
@@ -348,6 +350,21 @@ export default function SettingsScreen() {
           leading={<Ionicons name="star-outline" size={20} color={theme.colors.primary} />}
           trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
           onPress={() => openStoreReview()}
+          style={ROW}
+        />
+        <Divider />
+        <ListRow
+          title="Del anonym bruksdata"
+          leading={<Ionicons name="analytics-outline" size={20} color={theme.colors.primary} />}
+          trailing={
+            <Toggle
+              value={analyticsEnabled}
+              onValueChange={(next) => {
+                track('analytics_toggled', { enabled: next });
+                setAnalyticsEnabled(next);
+              }}
+            />
+          }
           style={ROW}
         />
         <Divider />
