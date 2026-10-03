@@ -5,6 +5,7 @@ import {
   fetchSupportThread,
   formatFeedback,
   markSupportRead,
+  newSupportSessionId,
   postToSlack,
   sendSupportMessage,
   type FetchLike,
@@ -76,4 +77,12 @@ test('mark read posts the session to the read endpoint', async () => {
   assert.equal(seen.init?.headers?.['X-Conversations-Token'], 't');
   assert.deepEqual(JSON.parse(seen.init?.body ?? '{}'), { widget_session_id: 's1' });
   assert.equal(await markSupportRead(fake(500, {}), { token: 't', sessionId: 's1', ticketId: 'k1' }), false);
+});
+
+test('support session id is unique per call and carries the distinct id', () => {
+  const a = newSupportSessionId('d1', 1000, () => 0.25);
+  const b = newSupportSessionId('d1', 1000, () => 0.75);
+  assert.notEqual(a, b);
+  assert.ok(a.startsWith('d1-'));
+  assert.ok(a.length > 12);
 });

@@ -101,6 +101,17 @@ export async function markSupportRead(
   }
 }
 
+export function newSupportSessionId(
+  distinctId: string,
+  now: number = Date.now(),
+  random: () => number = Math.random,
+): string {
+  const noise = Array.from({ length: 3 }, () =>
+    Math.floor(random() * 36 ** 8).toString(36).padStart(8, '0'),
+  ).join('');
+  return `${distinctId}-${now.toString(36)}-${noise}`;
+}
+
 export function formatFeedback(kind: FeedbackKind, message: string, context: Record<string, string>): string {
   const lines = Object.entries(context).map(([key, value]) => `${key}: ${value}`);
   return `[${kind}] ${message.trim()}\n\n${lines.join('\n')}`;

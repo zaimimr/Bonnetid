@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import * as Crypto from 'expo-crypto';
 import {
   fetchConversationsToken,
   fetchSupportThread,
   markSupportRead,
+  newSupportSessionId,
   postToSlack,
   sendSupportMessage,
   type FetchLike,
@@ -52,7 +52,7 @@ export function useSupportThread(enabled = true) {
 
   const send = useCallback(
     async (text: string, email: string | null): Promise<SendOutcome> => {
-      const session = sessionId ?? Crypto.randomUUID();
+      const session = sessionId ?? newSupportSessionId(posthog.getDistinctId());
       const supportToken = token.data ?? (await fetchConversationsToken(fetcher, POSTHOG_KEY));
       if (supportToken) {
         const result = await sendSupportMessage(fetcher, {
