@@ -24,6 +24,7 @@ import { useTravelMode } from '@/hooks/useTravelMode';
 import { useFastingReminders } from '@/hooks/useFastingReminders';
 import { useNotificationOpenFlag } from '@/hooks/useNotificationOpenFlag';
 import { WhatsNewHost } from '@/components/whatsNew/WhatsNewHost';
+import { SurveyHost } from '@/components/survey/SurveyHost';
 import { useWidgetSync } from '@/hooks/useWidgetSync';
 import { useNow } from '@/hooks/useNow';
 import { usePrayerLogSync } from '@/hooks/usePrayerLogSync';
@@ -299,6 +300,7 @@ function RootNavigator() {
         />
       </Stack>
       <WhatsNewHost />
+      <SurveyHost />
     </>
   );
 }
