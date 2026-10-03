@@ -55,6 +55,7 @@ export function Screen({
     width: '100%',
     maxWidth: cap,
     alignSelf: 'center',
+    flexGrow: 1,
   };
 
   const body = scroll ? (

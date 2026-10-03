@@ -65,7 +65,7 @@ export default function MoreScreen() {
   ];
 
   return (
-    <Screen scroll>
+    <Screen scroll contentStyle={{ flexGrow: 1, paddingBottom: spacing.lg }}>
       <View style={{ marginTop: spacing.lg, marginBottom: spacing.md }}>
         <AppText size="xxl" weight="bold" heading>
           Mer
@@ -92,7 +92,8 @@ export default function MoreScreen() {
         )}
       </View>
 
-      <Card padding="sm" rounded="xl" style={{ marginTop: spacing.xl }}>
+      <View style={{ flexGrow: 1, minHeight: spacing.xl }} />
+      <Card padding="sm" rounded="xl">
         <ListRow
           title={support.hasTicket ? 'Meldinger' : 'Gi tilbakemelding'}
           leading={<Ionicons name="chatbubble-ellipses-outline" size={20} color={theme.colors.primary} />}
