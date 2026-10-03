@@ -18,17 +18,35 @@ export const WHATS_NEW: WhatsNewEntry[] = [
     version: '1.9.0',
     items: [
       {
+        title: 'Dua og dhikr',
+        body: 'Duaer til bønnen, Ramadan og Hajj, med uttale og oversettelse.',
+        icon: 'book-outline',
+        route: '/duas',
+        flag: 'duas',
+      },
+      {
+        title: 'Tasbih',
+        body: 'Tell dhikr etter bønnen med en perlering.',
+        icon: 'ellipse-outline',
+        route: '/tasbih',
+        flag: 'tasbih',
+      },
+      {
+        title: 'Hijri-kalender',
+        body: 'Kalenderen kan vise hijri som hovedkalender, og bønnetider for andre steder.',
+        icon: 'calendar-outline',
+        route: '/calendar',
+      },
+      {
+        title: 'Flere tider på dagsiden',
+        body: 'Se Duha, midnatt og Tahajjud for hver dag.',
+        icon: 'time-outline',
+      },
+      {
         title: 'Gi oss tilbakemelding',
         body: 'Skriv til oss rett fra appen under Mer. Vi svarer i appen.',
         icon: 'chatbubble-ellipses-outline',
         route: '/feedback',
-      },
-      {
-        title: 'Dua og dhikr',
-        body: 'Duaer til bønnen og Ramadan, med tasbih-teller.',
-        icon: 'book-outline',
-        route: '/duas',
-        flag: 'duas',
       },
     ],
   },
