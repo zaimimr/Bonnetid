@@ -71,7 +71,7 @@ export function AppText({
     textAlign: align,
     lineHeight: fontSize[size] * (heading ? lineHeight.tight : lineHeight.normal) * lineHeightScale,
     fontFamily: heading ? fontFamily.heading : fontFamily.body,
-    fontVariant: tabular ? ['tabular-nums'] : undefined,
+    fontVariant: tabular ? ['tabular-nums'] : [],
   };
 
   return (
