@@ -17,7 +17,7 @@ Understand how people use Bønnetid, hear from them directly, and tell them what
 
 ## 1. Analytics base
 
-- `src/lib/analytics.ts` replaces `src/lib/telemetry.ts`. It owns the PostHog client and exports `track(event, props)` and `trackError(error, source, extra)` with the current signatures, so existing call sites only change their import path.
+- `src/lib/telemetry.ts` is rewritten around PostHog. It owns the client and keeps `track(event, props)` and `trackError(error, source, extra)` with the current signatures, so existing call sites are unchanged.
 - Key from `EXPO_PUBLIC_POSTHOG_KEY`, host from `EXPO_PUBLIC_POSTHOG_HOST`. With no key, every export is a no-op.
 - `PostHogProvider` wraps the root layout. Screen views are captured manually from expo-router `usePathname` (route pattern, not raw params).
 - Errors: JS exception autocapture, native crash autocapture via `@posthog/react-native-plugin`, source maps and native symbols uploaded by the `posthog-react-native/expo` plugin when `POSTHOG_PERSONAL_API_KEY` is present at build time.
@@ -38,7 +38,7 @@ Understand how people use Bønnetid, hear from them directly, and tell them what
 - `SurveyHost` mounted once in the root layout. It calls `getActiveMatchingSurveys` on start and on app foreground and shows at most one survey per session.
 - Own themed bottom sheet in Norwegian, built from `src/components/ui`. Supported question types: single choice, multiple choice, rating (1 to 5 and 0 to 10), open text. Branching follows the survey definition.
 - Captures `survey shown`, `survey sent` (with `$survey_response*` and `$survey_questions`) and `survey dismissed`, so results appear in the PostHog survey view.
-- Never shown during onboarding, and not within 30 seconds of the app being opened from a notification.
+- Never shown during onboarding, or in a session opened from a notification. Checked once per app launch.
 - Surveys are created in the dashboard as type "API".
 
 ## 4. Support
