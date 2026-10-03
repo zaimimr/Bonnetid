@@ -4,6 +4,7 @@ import { AppText } from '@/components/ui';
 import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 import { useTheme } from '@/theme';
 import { useOnboardingDone, useSettingsHydrated } from '@/store/settings';
+import { useSupportThread } from '@/hooks/useSupportThread';
 
 const MAX_TAB_FONT_SCALE = 1.15;
 
@@ -25,6 +26,7 @@ export default function TabsLayout() {
   const theme = useTheme();
   const hydrated = useSettingsHydrated();
   const onboardingDone = useOnboardingDone();
+  const { unread } = useSupportThread();
 
   if (hydrated && !onboardingDone) return <OnboardingFlow />;
 
@@ -71,6 +73,13 @@ export default function TabsLayout() {
         name="more"
         options={{
           title: 'Mer',
+          tabBarBadge: unread > 0 ? '' : undefined,
+          tabBarBadgeStyle: {
+            minWidth: 10,
+            maxHeight: 10,
+            borderRadius: 5,
+            backgroundColor: theme.colors.primary,
+          },
           tabBarLabel: ({ color }) => <TabLabel title="Mer" color={color as string} />,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="apps-outline" size={size} color={color} />

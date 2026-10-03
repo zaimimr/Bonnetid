@@ -44,7 +44,7 @@ export const WHATS_NEW: WhatsNewEntry[] = [
       },
       {
         title: 'Gi oss tilbakemelding',
-        body: 'Skriv til oss rett fra appen under Innstillinger. Vi svarer i appen.',
+        body: 'Skriv til oss rett fra appen under Mer. Vi svarer i appen.',
         icon: 'chatbubble-ellipses-outline',
         route: '/feedback',
       },

@@ -1,12 +1,17 @@
 import { View } from 'react-native';
-import { useRouter, type Href } from 'expo-router';
+import { useIsFocused, useRouter, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText, FeatureCard, Screen } from '@/components/ui';
+import { AppText, Badge, Card, Divider, FeatureCard, ListRow, Screen } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { useIsCalculatedMode, usePrayerTrackerEnabled } from '@/store/settings';
 import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
 import { useFeature } from '@/hooks/useFeature';
+import { useSupportThread } from '@/hooks/useSupportThread';
+import { openStoreReview } from '@/lib/review';
+import { appVersion } from '@/lib/telemetry';
+
+const ROW = { paddingHorizontal: spacing.md } as const;
 
 type Feature = {
   href: Href;
@@ -50,6 +55,8 @@ export default function MoreScreen() {
   const calculated = useIsCalculatedMode();
   const duasEnabled = useFeature('duas');
   const tasbihEnabled = useFeature('tasbih');
+  const isFocused = useIsFocused();
+  const support = useSupportThread(isFocused);
   const features = [
     ...(trackerEnabled ? [TRACKER_FEATURE] : []),
     ...(calculated ? [] : [MOSQUE_FEATURE]),
@@ -84,6 +91,34 @@ export default function MoreScreen() {
           />
         )}
       </View>
+
+      <Card padding="sm" rounded="xl" style={{ marginTop: spacing.xl }}>
+        <ListRow
+          title={support.hasTicket ? 'Meldinger' : 'Gi tilbakemelding'}
+          leading={<Ionicons name="chatbubble-ellipses-outline" size={20} color={theme.colors.primary} />}
+          trailing={support.unread > 0 ? <Badge label={String(support.unread)} /> : undefined}
+          chevron
+          onPress={() => router.push('/feedback')}
+          style={ROW}
+        />
+        <Divider />
+        <ListRow
+          title="Hva er nytt"
+          subtitle={`Versjon ${appVersion()}`}
+          leading={<Ionicons name="sparkles-outline" size={20} color={theme.colors.primary} />}
+          chevron
+          onPress={() => router.push('/whats-new')}
+          style={ROW}
+        />
+        <Divider />
+        <ListRow
+          title="Vurder Bønnetid"
+          leading={<Ionicons name="star-outline" size={20} color={theme.colors.primary} />}
+          trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
+          onPress={() => openStoreReview()}
+          style={ROW}
+        />
+      </Card>
     </Screen>
   );
 }
