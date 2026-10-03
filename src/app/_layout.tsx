@@ -23,6 +23,7 @@ import { useAutoLocation } from '@/hooks/useAutoLocation';
 import { useTravelMode } from '@/hooks/useTravelMode';
 import { useFastingReminders } from '@/hooks/useFastingReminders';
 import { useNotificationOpenFlag } from '@/hooks/useNotificationOpenFlag';
+import { WhatsNewHost } from '@/components/whatsNew/WhatsNewHost';
 import { useWidgetSync } from '@/hooks/useWidgetSync';
 import { useNow } from '@/hooks/useNow';
 import { usePrayerLogSync } from '@/hooks/usePrayerLogSync';
@@ -285,7 +286,19 @@ function RootNavigator() {
             headerTintColor: theme.colors.primary,
           }}
         />
+        <Stack.Screen
+          name="whats-new"
+          options={{
+            headerShown: true,
+            title: 'Hva er nytt',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
       </Stack>
+      <WhatsNewHost />
     </>
   );
 }

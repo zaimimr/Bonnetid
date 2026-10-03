@@ -36,6 +36,13 @@ const DUAS_FEATURE: Feature = {
   description: 'Duaer og tasbih til bønnen og Ramadan',
 };
 
+const WHATS_NEW_FEATURE: Feature = {
+  href: '/whats-new',
+  icon: 'sparkles-outline',
+  title: 'Hva er nytt',
+  description: 'Nyheter i siste versjon',
+};
+
 const SETTINGS_FEATURE: Feature = {
   href: '/settings',
   icon: 'settings-outline',
@@ -54,6 +61,7 @@ export default function MoreScreen() {
     ...(trackerEnabled ? [TRACKER_FEATURE] : []),
     ...(calculated ? [] : [MOSQUE_FEATURE]),
     ...(duasEnabled ? [DUAS_FEATURE] : []),
+    WHATS_NEW_FEATURE,
     SETTINGS_FEATURE,
   ];
 
