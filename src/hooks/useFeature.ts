@@ -1,7 +1,7 @@
-import { useFeatureFlag } from 'posthog-react-native';
-import { flagEnabled, type FeatureFlag } from '@/lib/featureFlags';
+import { useFeatureFlagResult } from 'posthog-react-native';
+import { featureResultEnabled, type FeatureFlag } from '@/lib/featureFlags';
 import { posthog } from '@/lib/telemetry';
 
 export function useFeature(flag: FeatureFlag): boolean {
-  return flagEnabled(useFeatureFlag(flag, posthog));
+  return featureResultEnabled(useFeatureFlagResult(flag, posthog));
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { AppText, Button, Sheet } from '@/components/ui';
 import { SurveyQuestionView } from './SurveyQuestionView';
-import { flagEnabled } from '@/lib/featureFlags';
+import { featureResultEnabled } from '@/lib/featureFlags';
 import {
   nextQuestionIndex,
   pickSurvey,
@@ -46,7 +46,7 @@ export function SurveyHost() {
       try {
         const surveys = (await posthog.getSurveys()) as unknown as FlowSurvey[];
         const picked = pickSurvey(surveys, useSettings.getState().seenSurveys, (key) =>
-          flagEnabled(posthog.getFeatureFlag(key)),
+          featureResultEnabled(posthog.getFeatureFlagResult(key)),
         );
         if (!picked || !useSession.getState().claimInterruption('survey')) return;
         posthog.capture('survey shown', { $survey_id: picked.id, $survey_name: picked.name });

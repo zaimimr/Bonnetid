@@ -5,3 +5,7 @@ export type FeatureFlag = (typeof FEATURE_FLAGS)[number];
 export function flagEnabled(value: boolean | string | undefined): boolean {
   return value !== false;
 }
+
+export function featureResultEnabled(result: { enabled: boolean } | undefined): boolean {
+  return result?.enabled !== false;
+}

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Modal, Pressable, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from './AppText';
 import { IconButton } from './IconButton';
@@ -19,7 +19,9 @@ export function Sheet({ visible, onClose, title, children }: SheetProps) {
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1, justifyContent: 'flex-end' }}>
         <Pressable
           accessibilityLabel="Lukk"
           onPress={onClose}
@@ -41,9 +43,11 @@ export function Sheet({ visible, onClose, title, children }: SheetProps) {
             </AppText>
             <IconButton name="close" accessibilityLabel="Lukk" onPress={onClose} />
           </View>
-          <ScrollView bounces={false}>{children}</ScrollView>
+          <ScrollView bounces={false} keyboardShouldPersistTaps="handled">
+            {children}
+          </ScrollView>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

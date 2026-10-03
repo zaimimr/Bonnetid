@@ -6,6 +6,7 @@ import {
   formatFeedback,
   markSupportRead,
   newSupportSessionId,
+  threadView,
   postToSlack,
   sendSupportMessage,
   type FetchLike,
@@ -85,4 +86,11 @@ test('support session id is unique per call and carries the distinct id', () => 
   assert.notEqual(a, b);
   assert.ok(a.startsWith('d1-'));
   assert.ok(a.length > 12);
+});
+
+test('threadView turns any failure into an empty thread instead of throwing', () => {
+  assert.deepEqual(threadView({ ok: false, missing: true }), { messages: [], unread: 0 });
+  assert.deepEqual(threadView({ ok: false, missing: false }), { messages: [], unread: 0 });
+  const messages = [{ id: 'm', content: 'x', authorType: 'team' as const, createdAt: 't' }];
+  assert.deepEqual(threadView({ ok: true, messages, unread: 2 }), { messages, unread: 2 });
 });

@@ -5,6 +5,7 @@ import {
   fetchSupportThread,
   markSupportRead,
   newSupportSessionId,
+  threadView,
   postToSlack,
   sendSupportMessage,
   type FetchLike,
@@ -29,8 +30,8 @@ export function useSupportThread(enabled = true) {
   const token = useQuery({
     queryKey: ['support-token'],
     queryFn: () => fetchConversationsToken(fetcher, POSTHOG_KEY),
-    enabled: POSTHOG_KEY.length > 0,
-    staleTime: DAY,
+    enabled: POSTHOG_KEY.length > 0 && enabled && ticketId != null,
+    staleTime: (query) => (query.state.data ? DAY : 0),
   });
 
   const thread = useQuery({
@@ -42,8 +43,7 @@ export function useSupportThread(enabled = true) {
         ticketId: ticketId ?? '',
       });
       if (!result.ok && result.missing) setSupportTicket(null, sessionId);
-      if (!result.ok) throw new Error('support thread unavailable');
-      return result;
+      return threadView(result);
     },
     enabled: enabled && ticketId != null && sessionId != null && token.data != null,
     staleTime: 0,

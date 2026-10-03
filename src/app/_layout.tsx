@@ -77,8 +77,8 @@ function RootNavigator() {
   useNotificationOpenFlag();
   const registerLaunch = useSettings((state) => state.registerLaunch);
   useEffect(() => {
-    registerLaunch();
-  }, [registerLaunch]);
+    if (hydrated) registerLaunch();
+  }, [hydrated, registerLaunch]);
   useScreenTracking();
   useAnalyticsContext();
   useWidgetSync(now);

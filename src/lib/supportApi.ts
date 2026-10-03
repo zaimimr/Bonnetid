@@ -130,3 +130,7 @@ export async function postToSlack(fetcher: FetchLike, webhook: string, text: str
     return false;
   }
 }
+
+export function threadView(result: ThreadResult): { messages: SupportMessage[]; unread: number } {
+  return result.ok ? { messages: result.messages, unread: result.unread } : { messages: [], unread: 0 };
+}
