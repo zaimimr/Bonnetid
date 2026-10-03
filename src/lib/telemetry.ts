@@ -1,4 +1,4 @@
-import * as Application from 'expo-application';
+import Constants from 'expo-constants';
 import { isRunningInExpoGo } from 'expo';
 import PostHog from 'posthog-react-native';
 import { useSession } from '@/store/session';
@@ -31,7 +31,7 @@ export const posthog = new PostHog(analyticsActive ? POSTHOG_KEY : 'phc_disabled
 export type TrackProps = Record<string, string | number | boolean>;
 
 export function appVersion(): string {
-  return Application.nativeApplicationVersion ?? '0.0.0';
+  return Constants.expoConfig?.version ?? '0.0.0';
 }
 
 export function track(event: string, props?: TrackProps) {
