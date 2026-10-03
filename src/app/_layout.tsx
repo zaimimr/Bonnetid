@@ -4,7 +4,7 @@ import { ScheherazadeNew_400Regular } from '@expo-google-fonts/scheherazade-new/
 import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { QueryCache, QueryClient } from '@tanstack/react-query';
+import { defaultShouldDehydrateQuery, QueryCache, QueryClient } from '@tanstack/react-query';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { Stack } from 'expo-router';
@@ -56,6 +56,10 @@ const persistOptions = {
   persister,
   maxAge: 60 * DAY,
   buster: 'v9',
+  dehydrateOptions: {
+    shouldDehydrateQuery: (query: Parameters<typeof defaultShouldDehydrateQuery>[0]) =>
+      defaultShouldDehydrateQuery(query) && !String(query.queryKey[0]).startsWith('support-'),
+  },
 };
 
 configureNotificationHandler();
@@ -292,6 +296,17 @@ function RootNavigator() {
           options={{
             headerShown: true,
             title: 'Hva er nytt',
+            headerBackTitle: 'Tilbake',
+            headerStyle: { backgroundColor: theme.colors.surface },
+            headerTitleStyle: { color: theme.colors.textPrimary },
+            headerTintColor: theme.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="feedback"
+          options={{
+            headerShown: true,
+            title: 'Tilbakemelding',
             headerBackTitle: 'Tilbake',
             headerStyle: { backgroundColor: theme.colors.surface },
             headerTitleStyle: { color: theme.colors.textPrimary },

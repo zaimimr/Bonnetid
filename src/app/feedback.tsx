@@ -1,0 +1,158 @@
+import { useEffect, useState } from 'react';
+import { Platform, View } from 'react-native';
+import * as Device from 'expo-device';
+import { AppText, Button, Card, SegmentedControl, Screen, TextField } from '@/components/ui';
+import { useNow } from '@/hooks/useNow';
+import { useRefresh } from '@/hooks/useRefresh';
+import { useSupportThread } from '@/hooks/useSupportThread';
+import { formatFeedback, type FeedbackKind } from '@/lib/supportApi';
+import { appVersion, track } from '@/lib/telemetry';
+import { useActiveLocation, useActiveMosque, useIsCalculatedMode } from '@/store/settings';
+import { useTheme } from '@/theme';
+import { radius, spacing } from '@/theme/tokens';
+
+const KINDS: { value: FeedbackKind; label: string }[] = [
+  { value: 'Feil', label: 'Feil' },
+  { value: 'Forslag', label: 'Forslag' },
+  { value: 'Ros', label: 'Ros' },
+  { value: 'Annet', label: 'Annet' },
+];
+
+const COOLDOWN_MS = 60_000;
+
+const timeFormat = new Intl.DateTimeFormat('nb-NO', {
+  day: 'numeric',
+  month: 'short',
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
+type Status = 'idle' | 'sending' | 'thread' | 'slack' | 'failed';
+
+export default function FeedbackScreen() {
+  const theme = useTheme();
+  const { messages, unread, hasTicket, send, markRead } = useSupportThread();
+  const { refreshing, onRefresh } = useRefresh();
+  const location = useActiveLocation();
+  const calculated = useIsCalculatedMode();
+  const mosque = useActiveMosque();
+  const [kind, setKind] = useState<FeedbackKind>('Forslag');
+  const [text, setText] = useState('');
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<Status>('idle');
+  const [lastSentAt, setLastSentAt] = useState(0);
+  const now = useNow(5_000);
+
+  useEffect(() => {
+    track('feedback_opened');
+  }, []);
+
+  useEffect(() => {
+    if (unread > 0) void markRead();
+  }, [unread, markRead]);
+
+  const submit = async () => {
+    const sentAt = Date.now();
+    if (sentAt - lastSentAt < COOLDOWN_MS) return;
+    setStatus('sending');
+    const message = hasTicket
+      ? text.trim()
+      : formatFeedback(kind, text, {
+          versjon: appVersion(),
+          plattform: `${Platform.OS} ${Platform.Version}`,
+          enhet: Device.modelName ?? 'ukjent',
+          sted: location.name,
+          tider: calculated ? 'beregnet' : mosque ? `moské (${mosque.name})` : 'kommune',
+        });
+    const outcome = await send(message, email.trim() || null);
+    if (outcome === 'failed') {
+      track('feedback_failed');
+      setStatus('failed');
+      return;
+    }
+    track('feedback_sent', { kind, channel: outcome });
+    setLastSentAt(sentAt);
+    setText('');
+    setStatus(outcome);
+  };
+
+  const coolingDown = now.getTime() - lastSentAt < COOLDOWN_MS && status !== 'failed';
+
+  return (
+    <Screen scroll edges={[]} refreshing={refreshing} onRefresh={hasTicket ? onRefresh : undefined}>
+      <View style={{ gap: spacing.lg, marginTop: spacing.lg, marginBottom: spacing.xl }}>
+        {messages.length > 0 && (
+          <Card rounded="xl" style={{ gap: spacing.sm }}>
+            {messages.map((message) => {
+              const mine = message.authorType === 'customer';
+              return (
+                <View
+                  key={message.id}
+                  style={{
+                    alignSelf: mine ? 'flex-end' : 'flex-start',
+                    maxWidth: '85%',
+                    backgroundColor: mine ? theme.colors.primarySoft : theme.colors.surfaceSunken,
+                    borderRadius: radius.lg,
+                    paddingHorizontal: spacing.md,
+                    paddingVertical: spacing.sm,
+                    gap: spacing.xxs,
+                  }}>
+                  <AppText tone={mine ? 'onPrimarySoft' : 'textPrimary'}>{message.content}</AppText>
+                  <AppText size="xs" tone="textMuted">
+                    {mine ? 'Du' : 'Bønnetid'} · {timeFormat.format(new Date(message.createdAt))}
+                  </AppText>
+                </View>
+              );
+            })}
+          </Card>
+        )}
+
+        <Card rounded="xl" style={{ gap: spacing.md }}>
+          {!hasTicket && <SegmentedControl value={kind} options={KINDS} onChange={setKind} />}
+          <TextField
+            multiline
+            value={text}
+            onChangeText={(value) => {
+              setText(value);
+              if (status !== 'sending') setStatus('idle');
+            }}
+            placeholder={hasTicket ? 'Skriv et svar' : 'Hva vil du fortelle oss?'}
+            maxLength={2000}
+          />
+          {!hasTicket && (
+            <TextField
+              value={email}
+              onChangeText={setEmail}
+              placeholder="E-post (valgfritt)"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          )}
+          <Button
+            label="Send"
+            fullWidth
+            loading={status === 'sending'}
+            disabled={text.trim().length === 0 || coolingDown}
+            onPress={submit}
+          />
+          {status === 'thread' && (
+            <AppText size="sm" tone="success">
+              Takk! Vi svarer her.
+            </AppText>
+          )}
+          {status === 'slack' && (
+            <AppText size="sm" tone="success">
+              Takk! Meldingen er sendt.
+            </AppText>
+          )}
+          {status === 'failed' && (
+            <AppText size="sm" tone="danger">
+              Kunne ikke sende. Sjekk nettet og prøv igjen.
+            </AppText>
+          )}
+        </Card>
+      </View>
+    </Screen>
+  );
+}

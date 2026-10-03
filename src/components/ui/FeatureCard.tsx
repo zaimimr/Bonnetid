@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { View, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from './AppText';
+import { Badge } from './Badge';
 import { Card } from './Card';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
@@ -11,10 +12,11 @@ export type FeatureCardProps = {
   title: string;
   description: string;
   onPress: () => void;
+  badge?: string;
   style?: StyleProp<ViewStyle>;
 };
 
-export function FeatureCard({ icon, title, description, onPress, style }: FeatureCardProps) {
+export function FeatureCard({ icon, title, description, onPress, badge, style }: FeatureCardProps) {
   const theme = useTheme();
 
   return (
@@ -37,6 +39,7 @@ export function FeatureCard({ icon, title, description, onPress, style }: Featur
             {description}
           </AppText>
         </View>
+        {badge ? <Badge label={badge} /> : null}
         <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
       </View>
     </Card>
