@@ -1,4 +1,4 @@
-import { Platform, View } from 'react-native';
+import { Linking, Platform, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
@@ -46,6 +46,8 @@ const lockScreenTitle =
 const lockScreenSubtitle = hasIsland ? 'Også i Dynamic Island' : undefined;
 const widgetJamatSupported = Platform.OS === 'android' && prayerWidgetAvailable;
 const ROW = { paddingHorizontal: spacing.md } as const;
+
+const PRIVACY_POLICY_URL = 'https://zaimimr.github.io/bonnetid-personvern/';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -397,6 +399,14 @@ export default function SettingsScreen() {
           }
           chevron
           onPress={() => router.push('/irn')}
+          style={ROW}
+        />
+        <Divider />
+        <ListRow
+          title="Personvern"
+          leading={<Ionicons name="shield-checkmark-outline" size={20} color={theme.colors.primary} />}
+          trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
+          onPress={() => Linking.openURL(PRIVACY_POLICY_URL).catch(() => {})}
           style={ROW}
         />
       </Card>
