@@ -55,6 +55,7 @@
   },
   "devDependencies": {
     "@expo/ngrok": "^4.1.3",
+    "@types/node": "^26.6.4",
     "@types/react": "~19.2.4",
     "eslint": "^9.39.5",
     "eslint-config-expo": "~57.0.2",
@@ -67,6 +68,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "ios:sim": "scripts/run-ios-sim.sh",
+    "test": "node --test --no-warnings \"src/**/*.test.ts\"",
     "duas:check": "node --no-warnings scripts/duas.mjs",
     "duas:review": "node --no-warnings scripts/duas.mjs review",
     "web": "expo start --web",
