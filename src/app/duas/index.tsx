@@ -43,7 +43,6 @@ function CategoryList() {
         <FeatureCard
           icon={<TasbihIcon size={24} color={theme.colors.primary} />}
           title="Tasbih"
-          description="Tell dhikr etter bønnen"
           onPress={() => router.push('/tasbih')}
           style={{ marginTop: spacing.lg }}
         />
