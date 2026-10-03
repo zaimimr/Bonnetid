@@ -10,7 +10,6 @@ import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
 import { useFeature } from '@/hooks/useFeature';
 import { useSupportThread } from '@/hooks/useSupportThread';
 import { FeedbackSheet } from '@/components/feedback/FeedbackSheet';
-import { appVersion } from '@/lib/telemetry';
 
 const ROW = { paddingHorizontal: spacing.md } as const;
 
@@ -18,35 +17,30 @@ type Feature = {
   href: Href;
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
-  description: string;
 };
 
 const TRACKER_FEATURE: Feature = {
   href: '/tracker',
   icon: 'checkmark-done-outline',
   title: 'Bønnesporing',
-  description: 'Marker bønner som bedt, og se uken din',
 };
 
 const MOSQUE_FEATURE: Feature = {
   href: '/mosques',
   icon: 'business-outline',
   title: 'Moskeer',
-  description: 'Finn moskeer i nærheten, med kart og jamaat-tider',
 };
 
 const DUAS_FEATURE: Feature = {
   href: '/duas',
   icon: 'book-outline',
   title: 'Dua og dhikr',
-  description: 'Duaer og tasbih til bønnen og Ramadan',
 };
 
 const SETTINGS_FEATURE: Feature = {
   href: '/settings',
   icon: 'settings-outline',
   title: 'Innstillinger',
-  description: 'Sted, moské, asr-metode, tema og varsler',
 };
 
 export default function MoreScreen() {
@@ -80,7 +74,6 @@ export default function MoreScreen() {
             key={feature.title}
             icon={<Ionicons name={feature.icon} size={24} color={theme.colors.primary} />}
             title={feature.title}
-            description={feature.description}
             onPress={() => router.push(feature.href)}
           />
         ))}
@@ -88,7 +81,6 @@ export default function MoreScreen() {
           <FeatureCard
             icon={<TasbihIcon size={24} color={theme.colors.primary} />}
             title="Tasbih"
-            description="Tell dhikr etter bønnen"
             onPress={() => router.push('/tasbih')}
           />
         )}
@@ -107,7 +99,6 @@ export default function MoreScreen() {
         <Divider />
         <ListRow
           title="Hva er nytt"
-          subtitle={`Versjon ${appVersion()}`}
           leading={<Ionicons name="sparkles-outline" size={20} color={theme.colors.primary} />}
           chevron
           onPress={() => router.push('/whats-new')}

@@ -10,7 +10,7 @@ import { radius, spacing } from '@/theme/tokens';
 export type FeatureCardProps = {
   icon: ReactNode;
   title: string;
-  description: string;
+  description?: string;
   onPress: () => void;
   badge?: string;
   style?: StyleProp<ViewStyle>;
@@ -35,9 +35,11 @@ export function FeatureCard({ icon, title, description, onPress, badge, style }:
         </View>
         <View style={{ flex: 1, gap: spacing.xxs }}>
           <AppText weight="semibold">{title}</AppText>
-          <AppText size="sm" tone="textMuted">
-            {description}
-          </AppText>
+          {description ? (
+            <AppText size="sm" tone="textMuted">
+              {description}
+            </AppText>
+          ) : null}
         </View>
         {badge ? <Badge label={badge} /> : null}
         <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
