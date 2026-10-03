@@ -22,11 +22,11 @@ import { useNotificationResponses } from '@/hooks/useNotificationResponses';
 import { useAutoLocation } from '@/hooks/useAutoLocation';
 import { useTravelMode } from '@/hooks/useTravelMode';
 import { useFastingReminders } from '@/hooks/useFastingReminders';
-import { useReviewPrompt } from '@/hooks/useReviewPrompt';
+import { useNotificationOpenFlag } from '@/hooks/useNotificationOpenFlag';
 import { useWidgetSync } from '@/hooks/useWidgetSync';
 import { useNow } from '@/hooks/useNow';
 import { usePrayerLogSync } from '@/hooks/usePrayerLogSync';
-import { useSettingsHydrated } from '@/store/settings';
+import { useSettings, useSettingsHydrated } from '@/store/settings';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -68,7 +68,11 @@ function RootNavigator() {
   useNotificationScheduler();
   useNotificationResponses();
   useFastingReminders(now);
-  useReviewPrompt();
+  useNotificationOpenFlag();
+  const registerLaunch = useSettings((state) => state.registerLaunch);
+  useEffect(() => {
+    registerLaunch();
+  }, [registerLaunch]);
   useScreenTracking();
   useAnalyticsContext();
   useWidgetSync(now);

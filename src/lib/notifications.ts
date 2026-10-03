@@ -403,6 +403,20 @@ export async function addPrayerActionListener(
   return () => subscription.remove();
 }
 
+export async function addNotificationOpenListener(onOpen: () => void): Promise<() => void> {
+  if (!notificationsSupported) return () => {};
+  const Notifications = await getNotifications();
+  const subscription = Notifications.addNotificationResponseReceivedListener(() => onOpen());
+  return () => subscription.remove();
+}
+
+export async function wasOpenedFromNotification(): Promise<boolean> {
+  if (!notificationsSupported) return false;
+  const Notifications = await getNotifications();
+  const response = await Notifications.getLastNotificationResponseAsync();
+  return response != null && shownRecently(response);
+}
+
 function shownAtOf(response: NotificationResponseLike): number | null {
   const raw = response.notification.date;
   if (typeof raw !== 'number' || Number.isNaN(raw)) return null;

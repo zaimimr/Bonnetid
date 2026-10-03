@@ -25,6 +25,7 @@ import { useNow } from '@/hooks/useNow';
 import { useTimezoneNote } from '@/hooks/useTimezoneNote';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { useRefresh } from '@/hooks/useRefresh';
+import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 import { formatGregorianLong, formatHijri } from '@/lib/hijri';
 import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
 import { isoDateIsFriday, parseDayKey } from '@/lib/time';
@@ -35,6 +36,7 @@ const UPCOMING_EVENT_COUNT = 3;
 
 export default function HomeScreen() {
   const router = useRouter();
+  useReviewPrompt();
   const now = useNow();
   const location = useActiveLocation();
   const calculated = location.mode === 'calculated';
