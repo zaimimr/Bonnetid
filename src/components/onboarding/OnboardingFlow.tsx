@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AppState, Linking, Platform, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -71,7 +72,7 @@ export function OnboardingFlow() {
   }, [steps.length]);
 
   const finish = useCallback(() => {
-    completeOnboarding();
+    completeOnboarding(Constants.expoConfig?.version ?? '0.0.0');
     track('onboarding_completed', {
       location: location?.mode ?? 'none',
       mosque: mosque ? 'valgt' : 'ingen',

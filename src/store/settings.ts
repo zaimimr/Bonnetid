@@ -6,6 +6,8 @@ import { DEFAULT_CALCULATION_METHOD, type CalculationMethodKey } from '@/lib/cal
 import type { NotificationSoundKey } from '@/lib/notificationSounds';
 import type { PrayerName } from '@/lib/prayerSchedule';
 import type { ArabicFontKey } from '@/theme/tokens';
+import { addActiveDay, localDayKey } from '@/lib/reviewTrigger';
+import { migrateSettings } from './settingsMigration';
 
 export type LocationMode = 'norway' | 'calculated';
 
@@ -80,7 +82,19 @@ type SettingsState = {
   dhulHijjahRemindersEnabled: boolean;
   voluntaryFasts: Record<VoluntaryFastKind, boolean>;
   launchCount: number;
-  reviewRequested: boolean;
+  activeDays: string[];
+  mosqueSelectedOn: string | null;
+  reviewRequestedAt: number | null;
+  reviewRequestedVersion: string | null;
+  analyticsEnabled: boolean;
+  setAnalyticsEnabled: (enabled: boolean) => void;
+  lastSeenWhatsNew: string | null;
+  setLastSeenWhatsNew: (version: string) => void;
+  seenSurveys: string[];
+  markSurveySeen: (id: string) => void;
+  supportTicketId: string | null;
+  supportSessionId: string | null;
+  setSupportTicket: (ticketId: string | null, sessionId: string | null) => void;
   onboardingDone: boolean;
   calendarPrimary: CalendarPrimary;
   setCalendarPrimary: (calendarPrimary: CalendarPrimary) => void;
@@ -92,9 +106,9 @@ type SettingsState = {
   setDuaArabicFont: (duaArabicFont: ArabicFontKey) => void;
   readAnnouncements: Record<string, string>;
   markAnnouncementRead: (orgNr: string, announcement: string) => void;
-  completeOnboarding: () => void;
+  completeOnboarding: (version: string) => void;
   registerLaunch: () => void;
-  markReviewRequested: () => void;
+  markReviewRequested: (version: string) => void;
   setLocation: (location: SavedLocation) => void;
   setCalculationMethod: (method: CalculationMethodKey | null) => void;
   setMosque: (mosque: SavedMosque | null) => void;
@@ -162,7 +176,23 @@ export const useSettings = create<SettingsState>()(
       dhulHijjahRemindersEnabled: true,
       voluntaryFasts: NO_VOLUNTARY_FASTS,
       launchCount: 0,
-      reviewRequested: false,
+      activeDays: [],
+      mosqueSelectedOn: null,
+      reviewRequestedAt: null,
+      reviewRequestedVersion: null,
+      analyticsEnabled: true,
+      setAnalyticsEnabled: (analyticsEnabled) => set({ analyticsEnabled }),
+      lastSeenWhatsNew: null,
+      setLastSeenWhatsNew: (lastSeenWhatsNew) => set({ lastSeenWhatsNew }),
+      seenSurveys: [],
+      markSurveySeen: (id) =>
+        set((state) => ({
+          seenSurveys: state.seenSurveys.includes(id) ? state.seenSurveys : [...state.seenSurveys, id],
+        })),
+      supportTicketId: null,
+      supportSessionId: null,
+      setSupportTicket: (supportTicketId, supportSessionId) =>
+        set({ supportTicketId, supportSessionId }),
       onboardingDone: false,
       calendarPrimary: 'gregorian',
       setCalendarPrimary: (calendarPrimary) => set({ calendarPrimary }),
@@ -177,9 +207,14 @@ export const useSettings = create<SettingsState>()(
         set((state) => ({
           readAnnouncements: { ...state.readAnnouncements, [orgNr]: announcement },
         })),
-      completeOnboarding: () => set({ onboardingDone: true }),
-      registerLaunch: () => set((state) => ({ launchCount: state.launchCount + 1 })),
-      markReviewRequested: () => set({ reviewRequested: true }),
+      completeOnboarding: (version) => set({ onboardingDone: true, lastSeenWhatsNew: version }),
+      registerLaunch: () =>
+        set((state) => ({
+          launchCount: state.launchCount + 1,
+          activeDays: addActiveDay(state.activeDays, localDayKey(new Date())),
+        })),
+      markReviewRequested: (version) =>
+        set({ reviewRequestedAt: Date.now(), reviewRequestedVersion: version }),
       setLocation: (location) =>
         set((state) => {
           const home = location.mode === 'norway' ? location : state.homeLocation;
@@ -192,7 +227,14 @@ export const useSettings = create<SettingsState>()(
             : { location, homeLocation: home, asrMethod: null, calculationMethod };
         }),
       setCalculationMethod: (calculationMethod) => set({ calculationMethod }),
-      setMosque: (mosque) => set({ mosque }),
+      setMosque: (mosque) =>
+        set((state) => ({
+          mosque,
+          mosqueSelectedOn:
+            mosque && mosque.orgNr !== state.mosque?.orgNr
+              ? localDayKey(new Date())
+              : state.mosqueSelectedOn,
+        })),
       setAsrMethod: (asrMethod) => set({ asrMethod }),
       setThemePreference: (themePreference) => set({ themePreference }),
       setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),
@@ -222,7 +264,7 @@ export const useSettings = create<SettingsState>()(
     {
       name: 'bonnetid-settings',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 4,
+      version: 5,
       migrate: (persisted) => {
         const state = persisted as Partial<SettingsState> | undefined;
         if (!state) return persisted as SettingsState;
@@ -239,7 +281,10 @@ export const useSettings = create<SettingsState>()(
         if (state.calculationMethod === DEFAULT_CALCULATION_METHOD) {
           state.calculationMethod = null;
         }
-        return state as SettingsState;
+        return migrateSettings(
+          state as Record<string, unknown>,
+          '1.8.0',
+        ) as unknown as SettingsState;
       },
     },
   ),
