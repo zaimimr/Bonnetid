@@ -46,7 +46,7 @@ Understand how people use Bønnetid, hear from them directly, and tell them what
 - "Gi tilbakemelding" card in Mer opens `feedback.tsx`: type chips (Feil, Forslag, Ros, Annet), message (required, max 2000 characters), optional e-mail.
 - Sends to `POST /api/conversations/v1/widget/message` with the conversations token from the remote config, the same calls posthog-js makes. This API is not documented for mobile and may change.
 - Ticket id stored locally. Once a ticket exists, the card reads "Meldinger" with an unread badge, and a thread screen lists messages from `/api/conversations/v1/widget/messages/{ticketId}` on open and on pull-to-refresh.
-- On failure the error is shown, the text is kept, and "Send på e-post" opens `mailto:` with the text prefilled.
+- On failure the message is posted to the Slack webhook (`EXPO_PUBLIC_FEEDBACK_WEBHOOK`, public by choice) instead. If that also fails, the error is shown and the text is kept.
 - Events: `feedback_opened`, `feedback_sent`, `feedback_failed`.
 
 ## 5. What's new

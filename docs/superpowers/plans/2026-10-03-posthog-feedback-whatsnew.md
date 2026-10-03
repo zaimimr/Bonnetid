@@ -28,7 +28,7 @@
 
 ## Review Focus
 
-- Offline first launch: PostHog unreachable. Expect every flagged feature visible, no survey, no crash, support form shows the error with the mailto fallback. Pinned by `featureFlags.test.ts` (undefined means enabled) and `supportApi.test.ts` (non-2xx and thrown fetch both map to a failure result).
+- Offline first launch: PostHog unreachable. Expect every flagged feature visible, no survey, no crash, support form falls back to the Slack webhook, and shows the error only if that fails too. Pinned by `featureFlags.test.ts` (undefined means enabled) and `supportApi.test.ts` (non-2xx and thrown fetch both map to a failure result).
 - Upgrading user with old persisted settings (version 4, `reviewRequested: true`, no new fields). Expect migration to fill defaults, no what's-new for a fresh install, what's-new for an upgrader. Pinned in Task 3 migration test via `migrateSettings`.
 - Two interruptions competing in one session (what's new pending and review trigger met). Expect only the first to show. Pinned by `reviewTrigger.test.ts` (`suppressed: true` returns null) plus the session store gate in Task 9 and Task 11.
 - Survey with branching that points past the last question or to `end`. Expect the survey to finish, not crash. Pinned by `surveyFlow.test.ts`.
@@ -1558,12 +1558,7 @@ git commit -m "feat: themed in-app PostHog surveys"
   - `fetchSupportThread(fetcher: FetchLike, args: { token: string; sessionId: string; ticketId: string }): Promise<ThreadResult>`
   - `formatFeedback(kind: FeedbackKind, message: string, context: Record<string, string>): string`
   - `type FeedbackKind = 'Feil' | 'Forslag' | 'Ros' | 'Annet'`
-  - `mailtoUrl(message: string): string` (opens a mail to `SUPPORT_EMAIL`)
-  - `SUPPORT_EMAIL` (address confirmed by the user in Step 0)
-
-- [ ] **Step 0: Confirm the fallback e-mail address with the user**
-
-Ask: "Which e-mail address should 'Send på e-post' use?" Put the answer in `export const SUPPORT_EMAIL = '...'` in `supportApi.ts`. Do not guess.
+  - `postToSlack(fetcher: FetchLike, webhook: string, text: string): Promise<boolean>` (fallback when Support fails; webhook from `EXPO_PUBLIC_FEEDBACK_WEBHOOK`, public by the user's choice)
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1574,6 +1569,7 @@ import {
   fetchConversationsToken,
   fetchSupportThread,
   formatFeedback,
+  postToSlack,
   sendSupportMessage,
   type FetchLike,
 } from './supportApi.ts';
@@ -1622,6 +1618,16 @@ test('thread maps messages and flags a deleted ticket', async () => {
   assert.deepEqual(await fetchSupportThread(fake(500, {}), { token: 't', sessionId: 's', ticketId: 'k1' }), { ok: false, missing: false });
 });
 
+test('slack fallback posts text and reports failure', async () => {
+  const seen: { url?: string; init?: { body?: string } } = {};
+  assert.equal(await postToSlack(fake(200, {}, seen as never), 'https://hooks.slack.com/x', 'hei'), true);
+  assert.equal(seen.url, 'https://hooks.slack.com/x');
+  assert.deepEqual(JSON.parse(seen.init?.body ?? '{}'), { text: 'hei' });
+  assert.equal(await postToSlack(fake(500, {}), 'https://hooks.slack.com/x', 'hei'), false);
+  assert.equal(await postToSlack(fake(200, {}), '', 'hei'), false);
+  assert.equal(await postToSlack(async () => { throw new Error('offline'); }, 'https://hooks.slack.com/x', 'hei'), false);
+});
+
 test('formatFeedback prefixes kind and appends context', () => {
   assert.equal(formatFeedback('Feil', 'Krasjer', { versjon: '1.9.0', enhet: 'iPhone' }), '[Feil] Krasjer\n\nversjon: 1.9.0\nenhet: iPhone');
 });
@@ -1635,7 +1641,6 @@ Expected: FAIL, module not found.
 - [ ] **Step 3: Implement `supportApi.ts`**
 
 ```ts
-export const SUPPORT_EMAIL = '<confirmed in Step 0>';
 const API_HOST = 'https://eu.i.posthog.com';
 const CONFIG_HOST = 'https://eu-assets.i.posthog.com';
 
@@ -1728,17 +1733,29 @@ export function formatFeedback(kind: FeedbackKind, message: string, context: Rec
   return `[${kind}] ${message.trim()}\n\n${lines.join('\n')}`;
 }
 
-export function mailtoUrl(message: string): string {
-  return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Tilbakemelding Bønnetid')}&body=${encodeURIComponent(message)}`;
+export async function postToSlack(fetcher: FetchLike, webhook: string, text: string): Promise<boolean> {
+  if (!webhook) return false;
+  try {
+    const response = await fetcher(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
 }
 ```
-
-Remove the angle-bracket placeholder by Step 0's answer before running tests; the tests do not read `SUPPORT_EMAIL`.
 
 - [ ] **Step 4: Run tests**
 
 Run: `npm test`
 Expected: all passing.
+
+- [ ] **Step 5a: Webhook env**
+
+Add to `.env`: `EXPO_PUBLIC_FEEDBACK_WEBHOOK=https://hooks.slack.com/services/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` and to EAS env (production, preview, development, plaintext) the same way as the PostHog key in Task 5.
 
 - [ ] **Step 5: `useSupportThread` hook**
 
@@ -1765,7 +1782,7 @@ Layout (inside `Screen scroll edges={[]}`):
 - Optional e-mail `TextInput` (`keyboardType="email-address"`, `autoCapitalize="none"`), placeholder `E-post (valgfritt, hvis du vil ha svar på e-post)`; only before the first message.
 - Primary `Button` `Send` (loading while sending, disabled when text is blank or within 60 s of the last send).
 - On success: clear text, `track('feedback_sent', { kind })`, refresh thread, show inline `Takk! Vi svarer her.` under the button.
-- On failure: `track('feedback_failed')`, show `Kunne ikke sende. Sjekk nettet og prøv igjen.` in `danger`, keep the text, and show a secondary `Button` `Send på e-post` that opens `mailtoUrl(formatted)` via `Linking.openURL`.
+- On Support failure: automatically try `postToSlack(fetch, process.env.EXPO_PUBLIC_FEEDBACK_WEBHOOK ?? '', formatted)` (append `e-post: <email>` to the text when given). If Slack succeeds: clear text, `track('feedback_sent', { kind, channel: 'slack' })`, show `Takk! Meldingen er sendt.` (no thread, since Slack cannot reply in the app). If both fail: `track('feedback_failed')`, show `Kunne ikke sende. Sjekk nettet og prøv igjen.` in `danger` and keep the text.
 - `track('feedback_opened')` once on mount.
 - Context passed to `formatFeedback`: `versjon` (appVersion), `plattform` (`Platform.OS` + `Platform.Version`), `enhet` (`Device.modelName` from `expo-device`), `sted` (active location name), `tider` (`moské` or `beregnet`).
 
