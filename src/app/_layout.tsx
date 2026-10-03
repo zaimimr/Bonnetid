@@ -7,13 +7,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { QueryCache, QueryClient } from '@tanstack/react-query';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { Stack, useNavigationContainerRef } from 'expo-router';
+import { Stack } from 'expo-router';
+import { PostHogProvider } from 'posthog-react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useTheme } from '@/theme';
 import { configureNotificationHandler } from '@/lib/notifications';
-import { initTelemetry, navigationIntegration, Sentry, trackError } from '@/lib/telemetry';
+import { posthog, trackError } from '@/lib/telemetry';
+import { useScreenTracking } from '@/hooks/useScreenTracking';
+import { useAnalyticsContext } from '@/hooks/useAnalyticsContext';
 import { useNotificationScheduler } from '@/hooks/useNotificationScheduler';
 import { useNotificationResponses } from '@/hooks/useNotificationResponses';
 import { useAutoLocation } from '@/hooks/useAutoLocation';
@@ -24,8 +27,6 @@ import { useWidgetSync } from '@/hooks/useWidgetSync';
 import { useNow } from '@/hooks/useNow';
 import { usePrayerLogSync } from '@/hooks/usePrayerLogSync';
 import { useSettingsHydrated } from '@/store/settings';
-
-initTelemetry();
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -68,6 +69,8 @@ function RootNavigator() {
   useNotificationResponses();
   useFastingReminders(now);
   useReviewPrompt();
+  useScreenTracking();
+  useAnalyticsContext();
   useWidgetSync(now);
   usePrayerLogSync(now);
 
@@ -283,22 +286,16 @@ function RootNavigator() {
   );
 }
 
-function RootLayout() {
-  const navigationRef = useNavigationContainerRef();
-
-  useEffect(() => {
-    navigationIntegration.registerNavigationContainer(navigationRef);
-  }, [navigationRef]);
-
+export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
-        <ThemeProvider>
-          <RootNavigator />
-        </ThemeProvider>
-      </PersistQueryClientProvider>
+      <PostHogProvider client={posthog} autocapture={false}>
+        <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
+          <ThemeProvider>
+            <RootNavigator />
+          </ThemeProvider>
+        </PersistQueryClientProvider>
+      </PostHogProvider>
     </GestureHandlerRootView>
   );
 }
-
-export default Sentry.wrap(RootLayout);

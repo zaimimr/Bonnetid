@@ -1,5 +1,5 @@
-import Constants from 'expo-constants';
 import { useEffect } from 'react';
+import { appVersion } from '@/lib/telemetry';
 import { useSettings } from '@/store/settings';
 import { requestInAppReview } from '@/lib/review';
 
@@ -21,7 +21,7 @@ export function useReviewPrompt() {
     if (reviewRequested || !hasLocation || launchCount < LAUNCHES_BEFORE_PROMPT) return;
     const timer = setTimeout(async () => {
       const shown = await requestInAppReview();
-      if (shown) markReviewRequested(Constants.expoConfig?.version ?? '0.0.0');
+      if (shown) markReviewRequested(appVersion());
     }, PROMPT_DELAY_MS);
     return () => clearTimeout(timer);
   }, [launchCount, reviewRequested, hasLocation, markReviewRequested]);

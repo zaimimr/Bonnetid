@@ -1,33 +1,44 @@
-import * as Sentry from '@sentry/react-native';
+import * as Application from 'expo-application';
 import { isRunningInExpoGo } from 'expo';
+import PostHog from 'posthog-react-native';
+import { useSession } from '@/store/session';
 
-const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN ?? '';
+const POSTHOG_KEY = process.env.EXPO_PUBLIC_POSTHOG_KEY ?? '';
+const POSTHOG_HOST = 'https://eu.i.posthog.com';
 
-export const navigationIntegration = Sentry.reactNavigationIntegration({
-  enableTimeToInitialDisplay: !isRunningInExpoGo(),
+export const analyticsActive = POSTHOG_KEY.length > 0;
+
+export const posthog = new PostHog(analyticsActive ? POSTHOG_KEY : 'phc_disabled', {
+  host: POSTHOG_HOST,
+  disabled: !analyticsActive,
+  captureAppLifecycleEvents: true,
+  enableSessionReplay: analyticsActive && !isRunningInExpoGo(),
+  sessionReplayConfig: {
+    maskAllTextInputs: true,
+    maskAllImages: false,
+    captureLog: false,
+  },
+  errorTracking: {
+    autocapture: {
+      uncaughtExceptions: true,
+      unhandledRejections: true,
+      nativeCrashes: !isRunningInExpoGo(),
+      androidNdkCrashes: !isRunningInExpoGo(),
+    },
+  },
 });
-
-export function initTelemetry() {
-  Sentry.init({
-    dsn: SENTRY_DSN,
-    enabled: SENTRY_DSN.length > 0,
-    sendDefaultPii: false,
-    tracesSampleRate: 1,
-    enableLogs: true,
-    enableNativeFramesTracking: !isRunningInExpoGo(),
-    integrations: [navigationIntegration],
-  });
-}
 
 export type TrackProps = Record<string, string | number | boolean>;
 
+export function appVersion(): string {
+  return Application.nativeApplicationVersion ?? '0.0.0';
+}
+
 export function track(event: string, props?: TrackProps) {
-  Sentry.addBreadcrumb({ category: 'feature', message: event, data: props, level: 'info' });
-  Sentry.logger.info(event, props);
+  posthog.capture(event, props);
 }
 
 export function trackError(error: unknown, source: string, extra?: TrackProps) {
-  Sentry.captureException(error, { tags: { source }, extra });
+  useSession.getState().setErrorTracked();
+  posthog.captureException(error, { source, ...extra });
 }
-
-export { Sentry };

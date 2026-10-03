@@ -1,4 +1,3 @@
-import Constants from 'expo-constants';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AppState, Linking, Platform, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -18,7 +17,7 @@ import { formatDurationShort } from '@/lib/time';
 import { resolvePlace, requestCoords } from '@/hooks/useTravelDetection';
 import { isInsideNorwayBounds } from '@/lib/travelMode';
 import { notificationsSupported, requestNotificationPermission } from '@/lib/notifications';
-import { track, trackError } from '@/lib/telemetry';
+import { appVersion, track, trackError } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
 import {
@@ -72,7 +71,7 @@ export function OnboardingFlow() {
   }, [steps.length]);
 
   const finish = useCallback(() => {
-    completeOnboarding(Constants.expoConfig?.version ?? '0.0.0');
+    completeOnboarding(appVersion());
     track('onboarding_completed', {
       location: location?.mode ?? 'none',
       mosque: mosque ? 'valgt' : 'ingen',

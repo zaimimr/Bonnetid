@@ -100,20 +100,20 @@
       ],
       "expo-font",
       "expo-web-browser",
-      [
-        "@sentry/react-native/expo",
-        {
-          "organization": "zaim-imran",
-          "project": "bonnetid"
-        }
-      ],
       "./plugins/withCarFormFactors",
       "./plugins/withTrimmedPermissions",
       "./plugins/withPodDeploymentTarget",
       "./plugins/withSceneLifecycle",
-      "@sentry/react-native",
       "expo-image",
-      "expo-status-bar"
+      "expo-status-bar",
+      "expo-localization",
+      [
+        "posthog-react-native/expo",
+        {
+          "dotenvFile": ".env",
+          "skipOnConflict": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
