@@ -1,4 +1,4 @@
-import { isoDateIsFriday, osloTimeToLocalClock, osloWallClockToDate } from './time';
+import { isoDateIsFriday, osloTimeToLocalClock, osloWallClockToDate } from './time.ts';
 
 const MINUTE_MS = 60_000;
 

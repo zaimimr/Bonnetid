@@ -1,6 +1,6 @@
 import type { PrayerDay } from '@/api/types';
 import type { AsrMethodPreference } from '@/store/settings';
-import { jummahSlotFor, jummahSlotIsOpen } from './jummah';
+import { jummahSlotFor, jummahSlotIsOpen } from './jummah.ts';
 import {
   addMinutesToTime,
   formatZonedClock,
@@ -9,7 +9,7 @@ import {
   todayKey,
   wallClockToDate,
   type PrayerTimeZone,
-} from './time';
+} from './time.ts';
 
 export type PrayerName = 'fajr' | 'fajr_endtime' | 'duhr' | 'asr' | 'maghrib' | 'isha';
 

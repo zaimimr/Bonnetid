@@ -1,4 +1,4 @@
-import { zoneOffsetMinutes } from './timezone';
+import { zoneOffsetMinutes } from './timezone.ts';
 
 const MINUTE_MS = 60_000;
 const OSLO_STANDARD_OFFSET = 60;

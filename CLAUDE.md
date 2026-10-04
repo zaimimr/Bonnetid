@@ -39,3 +39,8 @@ bridge is a `requireOptionalNativeModule`, so every call no-ops there.
 - Path alias `@/*` maps to `src/*`.
 - Telemetry is PostHog EU through `src/lib/telemetry.ts` (`track`, `trackError`, `posthog`). Sentry is gone. Feature flags via `useFeature(flag)` / `FeatureGate`, default ON unless PostHog returns `false`.
 - Interruptions (review prompt, survey, what's new) go through `useSession().claimInterruption`, so at most one shows per session. New release notes go in `src/lib/whatsNew.ts`.
+
+## Release freeze
+
+- Ramadan 1448 starts 8 Feb 2027. From 15 Jan 2027 until Eid al-Fitr, ship only bug fixes: no new features, no dependency or SDK upgrades, no notification or schedule refactors. Users drop prayer apps that break during Ramadan.
+- Daylight saving changes are covered by `src/lib/dst.test.ts`. Run it under several zones before a release that touches time code: `TZ=Asia/Karachi npm test`.
