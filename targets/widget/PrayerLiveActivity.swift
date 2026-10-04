@@ -50,7 +50,6 @@ private struct ActivityPhase {
     showMarkButtons = state.showMarkButtons ?? true
   }
 
-  var question: String { "Har du bedt \(label)?" }
   var statusLine: String { windowOver ? "\(label)-tiden er over" : "Går ut om" }
   var upcomingLine: String? {
     guard let upcoming else { return nil }
@@ -272,7 +271,7 @@ private struct LockScreenActivityView: View {
   let phase: ActivityPhase
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
+    VStack(alignment: .leading, spacing: 6) {
       HStack(alignment: .firstTextBaseline, spacing: 8) {
         Image(systemName: PrayerFormat.symbol(for: phase.kind))
           .font(.subheadline)
@@ -288,12 +287,6 @@ private struct LockScreenActivityView: View {
         Text(PrayerFormat.time(phase.prayerAt))
           .prayerTime(.system(.title, design: .default).weight(.bold))
           .foregroundStyle(PrayerColor.ink)
-      }
-
-      if phase.showMarkButtons {
-        Text(phase.question)
-          .font(.subheadline)
-          .foregroundStyle(PrayerColor.inkSecondary)
       }
 
       if !phase.windowOver {
@@ -333,6 +326,7 @@ private struct LockScreenActivityView: View {
           .padding(.top, 2)
       }
     }
-    .padding(14)
+    .padding(.horizontal, 14)
+    .padding(.vertical, 12)
   }
 }
