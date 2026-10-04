@@ -1,6 +1,13 @@
 package no.irn.bonnetid.widget
 
+import android.app.AlarmManager
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.PowerManager
+import android.provider.Settings
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
@@ -45,6 +52,41 @@ class PrayerWidgetModule : Module() {
     }
 
     Function("areLiveActivitiesEnabled") { false }
+
+    Function("canScheduleExactAlarms") {
+      val context = appContext.reactContext ?: return@Function true
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return@Function true
+      val alarms = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+      alarms?.canScheduleExactAlarms() ?: true
+    }
+
+    Function("isIgnoringBatteryOptimizations") {
+      val context = appContext.reactContext ?: return@Function true
+      val power = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+      power?.isIgnoringBatteryOptimizations(context.packageName) ?: true
+    }
+
+    Function("openSystemSettings") { kind: String ->
+      val context = appContext.reactContext ?: return@Function
+      val packageUri = Uri.parse("package:${context.packageName}")
+      val intent = when {
+        kind == "exactAlarm" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
+          Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, packageUri)
+        kind == "battery" -> Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+        kind == "notifications" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
+          Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+        else -> Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri)
+      }.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      try {
+        context.startActivity(intent)
+      } catch (_: ActivityNotFoundException) {
+        context.startActivity(
+          Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+        )
+      }
+    }
 
     AsyncFunction("startOrUpdateActivity") { _: Map<String, Any?> ->
       // Android has no ActivityKit equivalent; the home screen widget carries the same data.

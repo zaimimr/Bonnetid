@@ -28,7 +28,12 @@ type PrayerWidgetNativeModule = {
   getPrayerLog: () => string | null;
   setPrayerLog: (json: string) => void;
   setNotificationQueue?: (json: string) => void;
+  canScheduleExactAlarms?: () => boolean;
+  isIgnoringBatteryOptimizations?: () => boolean;
+  openSystemSettings?: (kind: SystemSettingsKind) => void;
 };
+
+export type SystemSettingsKind = 'notifications' | 'exactAlarm' | 'battery';
 
 export type QueuedNotification = {
   identifier: string;
@@ -92,5 +97,31 @@ export function setNativeNotificationQueue(queue: QueuedNotification[]) {
     native?.setNotificationQueue?.(JSON.stringify(queue));
   } catch {
     return;
+  }
+}
+
+export function canScheduleExactAlarms(): boolean | null {
+  try {
+    return native?.canScheduleExactAlarms?.() ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export function isIgnoringBatteryOptimizations(): boolean | null {
+  try {
+    return native?.isIgnoringBatteryOptimizations?.() ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export function openSystemSettings(kind: SystemSettingsKind): boolean {
+  if (!native?.openSystemSettings) return false;
+  try {
+    native.openSystemSettings(kind);
+    return true;
+  } catch {
+    return false;
   }
 }
