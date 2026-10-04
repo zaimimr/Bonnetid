@@ -368,8 +368,8 @@ export default function SettingsScreen() {
       <SectionHeader title="Om appen" />
       <Card padding="sm" rounded="xl">
         <ListRow
-          title="Del nyttig data"
-          subtitle="Krasjrapporter og ytelse"
+          title="Hjelp oss å forbedre Bønnetid"
+          subtitle="Del nyttig data"
           leading={<Ionicons name="analytics-outline" size={20} color={theme.colors.primary} />}
           trailing={
             <Toggle
