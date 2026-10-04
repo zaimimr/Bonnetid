@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
 import * as Device from 'expo-device';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { AppText, Button, Card, SegmentedControl, Screen, TextField } from '@/components/ui';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useSupportThread } from '@/hooks/useSupportThread';
@@ -28,6 +30,7 @@ type Status = 'idle' | 'sending' | 'thread' | 'slack' | 'failed';
 
 export default function FeedbackScreen() {
   const theme = useTheme();
+  const router = useRouter();
   const { messages, unread, hasTicket, send, markRead } = useSupportThread();
   const { refreshing, onRefresh } = useRefresh();
   const location = useActiveLocation();
@@ -68,6 +71,28 @@ export default function FeedbackScreen() {
     setText('');
     setStatus(outcome);
   };
+
+  if (status === 'thread' || status === 'slack') {
+    return (
+      <Screen edges={['bottom']}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md }}>
+          <Ionicons name="checkmark-circle" size={72} color={theme.colors.success} />
+          <AppText size="xl" weight="semibold" align="center">
+            Takk for tilbakemeldingen!
+          </AppText>
+          {status === 'thread' && (
+            <AppText tone="textSecondary" align="center">
+              Vi svarer her.
+            </AppText>
+          )}
+        </View>
+        <View style={{ gap: spacing.sm, marginBottom: spacing.lg }}>
+          <Button label="Ferdig" fullWidth onPress={() => router.back()} />
+          <Button label="Send en til" variant="ghost" fullWidth onPress={() => setStatus('idle')} />
+        </View>
+      </Screen>
+    );
+  }
 
   return (
     <Screen scroll edges={[]} refreshing={refreshing} onRefresh={hasTicket ? onRefresh : undefined}>
@@ -127,16 +152,6 @@ export default function FeedbackScreen() {
             disabled={text.trim().length === 0}
             onPress={submit}
           />
-          {status === 'thread' && (
-            <AppText size="sm" tone="success">
-              Takk! Vi svarer her.
-            </AppText>
-          )}
-          {status === 'slack' && (
-            <AppText size="sm" tone="success">
-              Takk! Meldingen er sendt.
-            </AppText>
-          )}
           {status === 'failed' && (
             <AppText size="sm" tone="danger">
               Kunne ikke sende. Sjekk nettet og prøv igjen.
