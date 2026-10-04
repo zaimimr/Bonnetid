@@ -336,7 +336,7 @@ export const DUAS: Dua[] = [
 ];
 
 const AFTER_ADHAN_MS = 5 * 60 * 1000;
-const AFTER_SALAH_MS = 60 * 60 * 1000;
+const AFTER_SALAH_MS = 20 * 60 * 1000;
 
 export function duaCategoryForNow({
   eid,
@@ -348,16 +348,20 @@ export function duaCategoryForNow({
   sinceAdhanMs: number | null;
   atMosque: boolean;
   activeSeason: 'ramadan' | 'dhul-hijjah' | null;
-}): DuaCategoryId {
+}): DuaCategoryId | null {
   if (eid) return 'eid';
-  if (sinceAdhanMs != null && sinceAdhanMs >= 0) {
-    if (sinceAdhanMs < AFTER_ADHAN_MS) return 'after-adhan';
-    if (sinceAdhanMs < AFTER_SALAH_MS) return 'after-salah';
+  if (atMosque) {
+    if (sinceAdhanMs != null && sinceAdhanMs >= 0 && sinceAdhanMs < AFTER_ADHAN_MS) {
+      return 'after-adhan';
+    }
+    if (sinceAdhanMs != null && sinceAdhanMs >= 0 && sinceAdhanMs < AFTER_SALAH_MS) {
+      return 'after-salah';
+    }
+    return 'wudu-mosque';
   }
-  if (atMosque) return 'wudu-mosque';
   if (activeSeason === 'ramadan') return 'ramadan';
   if (activeSeason === 'dhul-hijjah') return 'hajj';
-  return 'after-salah';
+  return null;
 }
 
 export function duasIn(category: DuaCategoryId): Dua[] {
