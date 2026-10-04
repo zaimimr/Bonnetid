@@ -8,6 +8,7 @@ import { AppText, Card, Divider, ListRow } from '@/components/ui';
 import { useEidMode } from '@/hooks/useEidMode';
 import { useFeature } from '@/hooks/useFeature';
 import { useHijriSeasonNow } from '@/hooks/useHijriSeason';
+import { useMosquePresence } from '@/hooks/useMosquePresence';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
 import {
   DUA_CATEGORIES,
@@ -64,6 +65,7 @@ function useHubCategories() {
   const { now, status } = useHijriSeasonNow();
   const eidMode = useEidMode();
   const { nextPrayer } = usePrayerDay(now);
+  const presence = useMosquePresence();
 
   const visible = DUA_CATEGORIES.filter(
     (entry) =>
@@ -76,6 +78,7 @@ function useHubCategories() {
     sinceAdhanMs: nextPrayer?.current
       ? now.getTime() - nextPrayer.current.date.getTime()
       : null,
+    atMosque: presence != null,
     activeSeason: status?.isActive ? status.id : null,
   });
   const featured = visible.find((entry) => entry.id === nowId) ?? visible[0];
