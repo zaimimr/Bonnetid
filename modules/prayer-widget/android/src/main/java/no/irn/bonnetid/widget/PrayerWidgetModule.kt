@@ -11,8 +11,6 @@ import android.provider.Settings
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
-const val SNAPSHOT_PREFS = "prayer_widget"
-const val SNAPSHOT_KEY = "prayer_snapshot_v1"
 const val PRAYER_LOG_KEY = "prayer_log_v1"
 
 class PrayerWidgetModule : Module() {

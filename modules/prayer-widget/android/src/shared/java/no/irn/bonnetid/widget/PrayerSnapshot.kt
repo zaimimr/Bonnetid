@@ -8,6 +8,9 @@ import java.util.Locale
 import java.util.TimeZone
 import org.json.JSONObject
 
+const val SNAPSHOT_PREFS = "prayer_widget"
+const val SNAPSHOT_KEY = "prayer_snapshot_v1"
+
 data class PrayerEntry(
   val kind: String,
   val label: String,

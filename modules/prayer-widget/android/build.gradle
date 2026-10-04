@@ -21,6 +21,12 @@ android {
     buildConfigField "String", "SUPABASE_KEY", "\"${System.getenv('EXPO_PUBLIC_SUPABASE_KEY') ?: ''}\""
   }
 
+  sourceSets {
+    main {
+      java.srcDirs += 'src/shared/java'
+    }
+  }
+
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_17
     targetCompatibility JavaVersion.VERSION_17
