@@ -53,13 +53,18 @@ export function initialTasbih(mode: TasbihMode = 'sequence', goal: TasbihGoal = 
   return { mode, step: 0, count: 0, goal, done: false };
 }
 
+export function isClosing(state: TasbihState): boolean {
+  return state.mode === 'sequence' && state.step >= SEQUENCE.length;
+}
+
 export function targetOf(state: TasbihState): number | null {
-  return state.mode === 'sequence' ? SEQUENCE_TARGET : state.goal;
+  if (state.mode !== 'sequence') return state.goal;
+  return isClosing(state) ? SEQUENCE_TOTAL : SEQUENCE_TARGET;
 }
 
 export function phraseOf(state: TasbihState): TasbihPhrase | null {
   if (state.mode !== 'sequence') return null;
-  if (state.done) return COMPLETION_PHRASE;
+  if (state.done || isClosing(state)) return COMPLETION_PHRASE;
   return SEQUENCE[state.step] ?? null;
 }
 
@@ -76,9 +81,15 @@ export function advance(state: TasbihState): { next: TasbihState; result: Tasbih
     };
   }
 
+  if (isClosing(state)) {
+    return { next: { ...state, count: SEQUENCE_TOTAL, done: true }, result: 'done' };
+  }
   if (count < SEQUENCE_TARGET) return { next: { ...state, count }, result: 'count' };
   if (state.step < SEQUENCE.length - 1) {
     return { next: { ...state, step: state.step + 1, count: 0 }, result: 'step' };
   }
-  return { next: { ...state, count, done: true }, result: 'done' };
+  if (COMPLETION_PHRASE) {
+    return { next: { ...state, step: SEQUENCE.length, count: SEQUENCE_TOTAL - 1 }, result: 'step' };
+  }
+  return { next: { ...state, count: SEQUENCE_TOTAL, done: true }, result: 'done' };
 }

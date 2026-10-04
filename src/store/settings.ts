@@ -5,7 +5,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { DEFAULT_CALCULATION_METHOD, type CalculationMethodKey } from '@/lib/calculationMethods';
 import type { NotificationSoundKey } from '@/lib/notificationSounds';
 import type { PrayerName } from '@/lib/prayerSchedule';
-import type { ArabicFontKey } from '@/theme/tokens';
+import type { ArabicFontKey, ArabicSizeKey } from '@/theme/tokens';
 import { addActiveDay, localDayKey } from '@/lib/reviewTrigger';
 import { migrateSettings } from './settingsMigration';
 import { useFeature } from '@/hooks/useFeature';
@@ -105,6 +105,8 @@ type SettingsState = {
   setDuaShowMeaning: (duaShowMeaning: boolean) => void;
   duaArabicFont: ArabicFontKey;
   setDuaArabicFont: (duaArabicFont: ArabicFontKey) => void;
+  duaArabicSize: ArabicSizeKey;
+  setDuaArabicSize: (duaArabicSize: ArabicSizeKey) => void;
   readAnnouncements: Record<string, string>;
   markAnnouncementRead: (orgNr: string, announcement: string) => void;
   dismissedEidLeave: string[];
@@ -205,6 +207,8 @@ export const useSettings = create<SettingsState>()(
       setDuaShowMeaning: (duaShowMeaning) => set({ duaShowMeaning }),
       duaArabicFont: 'amiri',
       setDuaArabicFont: (duaArabicFont) => set({ duaArabicFont }),
+      duaArabicSize: 'medium',
+      setDuaArabicSize: (duaArabicSize) => set({ duaArabicSize }),
       readAnnouncements: {},
       markAnnouncementRead: (orgNr, announcement) =>
         set((state) => ({

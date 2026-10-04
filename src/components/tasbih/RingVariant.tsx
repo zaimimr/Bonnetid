@@ -10,8 +10,9 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/components/ui';
-import { BEADS_PER_ROUND, SEQUENCE, SEQUENCE_TOTAL } from '@/lib/tasbih';
+import { BEADS_PER_ROUND, SEQUENCE, isClosing } from '@/lib/tasbih';
 import { useTheme } from '@/theme';
 import { counterType, radius, spacing } from '@/theme/tokens';
 import { PhraseBlock } from './PhraseBlock';
@@ -103,6 +104,50 @@ function PulseCount({ count }: { count: number }) {
   );
 }
 
+function CompleteCheck({ size }: { size: number }) {
+  const theme = useTheme();
+  const circle = useSharedValue(0);
+  const tick = useSharedValue(0);
+
+  useEffect(() => {
+    circle.value = withSpring(1, { damping: 12, stiffness: 180, reduceMotion: ReduceMotion.System });
+    tick.value = withDelay(
+      180,
+      withSpring(1, { damping: 9, stiffness: 220, reduceMotion: ReduceMotion.System }),
+    );
+  }, [circle, tick]);
+
+  const circleStyle = useAnimatedStyle(() => ({
+    opacity: circle.value,
+    transform: [{ scale: 0.3 + circle.value * 0.7 }],
+  }));
+  const tickStyle = useAnimatedStyle(() => ({
+    opacity: tick.value,
+    transform: [{ scale: tick.value }, { rotate: `${(1 - tick.value) * -25}deg` }],
+  }));
+
+  return (
+    <Animated.View
+      accessibilityLabel="Fullført"
+      style={[
+        {
+          position: 'absolute',
+          width: size,
+          height: size,
+          borderRadius: radius.full,
+          backgroundColor: theme.colors.primary,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        circleStyle,
+      ]}>
+      <Animated.View style={tickStyle}>
+        <Ionicons name="checkmark" size={size * 0.55} color={theme.colors.onPrimary} />
+      </Animated.View>
+    </Animated.View>
+  );
+}
+
 export function RingVariant({ session }: { session: TasbihSession }) {
   const { width } = useWindowDimensions();
   const { state, phrase, target } = session;
@@ -111,12 +156,27 @@ export function RingVariant({ session }: { session: TasbihSession }) {
   const ringRadius = size / 2 - BEAD;
   const sequence = state.mode === 'sequence';
   const complete = sequence && state.done;
-  const filled = state.done
+  const closing = isClosing(state) && !state.done;
+  const filled = state.done || closing
     ? BEADS_PER_ROUND
     : sequence
       ? state.count
       : state.count % BEADS_PER_ROUND;
   const scale = useSharedValue(1);
+  const beads = useSharedValue(1);
+
+  useEffect(() => {
+    beads.value = withTiming(complete ? 0 : 1, {
+      duration: complete ? 260 : 0,
+      easing: Easing.out(Easing.cubic),
+      reduceMotion: ReduceMotion.System,
+    });
+  }, [complete, beads]);
+
+  const beadsStyle = useAnimatedStyle(() => ({
+    opacity: beads.value,
+    transform: [{ scale: 0.6 + beads.value * 0.4 }],
+  }));
 
   useEffect(() => {
     if (fit === null) return;
@@ -131,7 +191,11 @@ export function RingVariant({ session }: { session: TasbihSession }) {
 
   return (
     <View style={{ flex: 1, alignItems: 'center', gap: spacing.md }}>
-      <PhraseBlock phrase={phrase} note={complete ? 'Sies én gang' : undefined} compact={complete} />
+      <PhraseBlock
+        phrase={phrase}
+        note={complete || closing ? 'Sies én gang' : undefined}
+        compact={complete || closing}
+      />
       <View
         onLayout={(event) => {
           const { width: w, height: h } = event.nativeEvent.layout;
@@ -140,29 +204,33 @@ export function RingVariant({ session }: { session: TasbihSession }) {
         style={{ flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center' }}>
         <Animated.View
           style={[{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }, ringStyle]}>
-          {Array.from({ length: BEADS_PER_ROUND }, (_, index) => {
-            const angle = (index / BEADS_PER_ROUND) * Math.PI * 2 - Math.PI / 2;
-            return (
-              <Bead
-                key={index}
-                index={index}
-                filled={index < filled}
-                current={!state.done && index === filled}
-                x={size / 2 + Math.cos(angle) * ringRadius}
-                y={size / 2 + Math.sin(angle) * ringRadius}
-              />
-            );
-          })}
-          <PulseCount count={complete ? SEQUENCE_TOTAL : state.count} />
+          <Animated.View style={[{ position: 'absolute', width: size, height: size }, beadsStyle]}>
+            {Array.from({ length: BEADS_PER_ROUND }, (_, index) => {
+              const angle = (index / BEADS_PER_ROUND) * Math.PI * 2 - Math.PI / 2;
+              return (
+                <Bead
+                  key={index}
+                  index={index}
+                  filled={index < filled}
+                  current={!state.done && index === filled}
+                  x={size / 2 + Math.cos(angle) * ringRadius}
+                  y={size / 2 + Math.sin(angle) * ringRadius}
+                />
+              );
+            })}
+          </Animated.View>
           {complete ? (
-            <AppText size="sm" tone="textMuted">
-              til sammen
-            </AppText>
-          ) : target ? (
-            <AppText size="sm" tone="textMuted" tabular>
-              av {target}
-            </AppText>
-          ) : null}
+            <CompleteCheck size={size * 0.6} />
+          ) : (
+            <>
+              <PulseCount count={state.count} />
+              {target ? (
+                <AppText size="sm" tone="textMuted" tabular>
+                  av {target}
+                </AppText>
+              ) : null}
+            </>
+          )}
         </Animated.View>
       </View>
       <View style={{ height: 8 }}>

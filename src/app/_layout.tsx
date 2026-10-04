@@ -240,10 +240,10 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
-          name="arabic-font"
+          name="dua-settings"
           options={{
             headerShown: true,
-            title: 'Arabisk skrift',
+            title: 'Duainnstillinger',
             headerBackTitle: 'Tilbake',
           }}
         />

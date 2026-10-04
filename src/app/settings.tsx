@@ -14,7 +14,7 @@ import {
   Toggle,
 } from '@/components/ui';
 import { useTheme } from '@/theme';
-import { arabicFonts, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import { notificationsSupported, requestNotificationPermission } from '@/lib/notifications';
 import {
   dynamicIslandAvailable,
@@ -55,11 +55,6 @@ export default function SettingsScreen() {
   const mosque = useActiveMosque();
   const asrMethod = useSettings((state) => state.asrMethod);
   const themePreference = useSettings((state) => state.themePreference);
-  const showTransliteration = useSettings((state) => state.duaShowTransliteration);
-  const setShowTransliteration = useSettings((state) => state.setDuaShowTransliteration);
-  const showMeaning = useSettings((state) => state.duaShowMeaning);
-  const setShowMeaning = useSettings((state) => state.setDuaShowMeaning);
-  const arabicFont = useSettings((state) => state.duaArabicFont);
   const analyticsEnabled = useSettings((state) => state.analyticsEnabled);
   const setAnalyticsEnabled = useSettings((state) => state.setAnalyticsEnabled);
   const setThemePreference = useSettings((state) => state.setThemePreference);
@@ -339,35 +334,9 @@ export default function SettingsScreen() {
           <SectionHeader title="Duaer" />
           <Card padding="sm" rounded="xl">
             <ListRow
-              title="Vis uttale under duaene"
-              subtitle="Arabisk skrevet med latinske bokstaver"
-              trailing={
-                <Toggle
-                  value={showTransliteration}
-                  onValueChange={setShowTransliteration}
-                  accessibilityLabel="Vis uttale under duaene"
-                />
-              }
-              style={ROW}
-            />
-            <Divider />
-            <ListRow
-              title="Vis norsk oversettelse under duaene"
-              trailing={
-                <Toggle
-                  value={showMeaning}
-                  onValueChange={setShowMeaning}
-                  accessibilityLabel="Vis norsk oversettelse under duaene"
-                />
-              }
-              style={ROW}
-            />
-            <Divider />
-            <ListRow
-              title="Arabisk skrift"
-              subtitle={arabicFonts[arabicFont]?.label ?? arabicFonts.amiri.label}
+              title="Duainnstillinger"
               chevron
-              onPress={() => router.push('/arabic-font')}
+              onPress={() => router.push('/dua-settings')}
               style={ROW}
             />
           </Card>

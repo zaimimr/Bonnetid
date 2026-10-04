@@ -122,6 +122,14 @@ export const arabicFonts = {
 
 export type ArabicFontKey = keyof typeof arabicFonts;
 
+export const arabicSizes = {
+  small: { label: 'Liten', scale: 0.85 },
+  medium: { label: 'Vanlig', scale: 1 },
+  large: { label: 'Stor', scale: 1.2 },
+} as const;
+
+export type ArabicSizeKey = keyof typeof arabicSizes;
+
 export const counterType = {
   size: 64,
   maxScale: 1.2,
