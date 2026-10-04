@@ -369,7 +369,7 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <ListRow
           title="Hjelp oss å forbedre Bønnetid"
-          subtitle="Ingen navn eller presis posisjon"
+          subtitle="Krasjrapporter og ytelse"
           leading={<Ionicons name="analytics-outline" size={20} color={theme.colors.primary} />}
           trailing={
             <Toggle
