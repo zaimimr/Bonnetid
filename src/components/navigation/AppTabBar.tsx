@@ -11,7 +11,7 @@ import { AppText } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { duration, spacing } from '@/theme/tokens';
 
-export type AndroidTabBarProps = Parameters<
+export type AppTabBarProps = Parameters<
   NonNullable<ComponentProps<typeof Tabs>['tabBar']>
 >[0];
 
@@ -61,7 +61,7 @@ function SlidingPill({
   );
 }
 
-export function AndroidTabBar({ state, descriptors, navigation, insets }: AndroidTabBarProps) {
+export function AppTabBar({ state, descriptors, navigation, insets }: AppTabBarProps) {
   const theme = useTheme();
   const [width, setWidth] = useState(0);
   const itemWidth = width / state.routes.length;
