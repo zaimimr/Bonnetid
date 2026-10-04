@@ -164,24 +164,33 @@ private fun NextPrayerCard(next: PrayerEntry, showJamat: Boolean, now: Long) {
 private fun PrayerRow(prayer: PrayerEntry, showJamat: Boolean, isNext: Boolean) {
   val printed = prayer.printedAt(showJamat)
   val jamat = prayer.jamat
-  Row(
+  Column(
     modifier = Modifier
       .fillMaxWidth()
       .background(if (isNext) BrandContainer else Surface, RoundedCornerShape(20.dp))
       .padding(horizontal = 16.dp, vertical = 10.dp),
-    horizontalArrangement = Arrangement.SpaceBetween,
-    verticalAlignment = Alignment.CenterVertically,
+    horizontalAlignment = Alignment.End,
   ) {
-    Text(
-      prayer.displayLabel,
-      color = if (isNext) Brand else Ink,
-      fontWeight = if (isNext) FontWeight.SemiBold else FontWeight.Normal,
-    )
-    Column(horizontalAlignment = Alignment.End) {
-      Text(PrayerFormat.time(printed), color = Ink, fontWeight = FontWeight.SemiBold)
-      if (jamat != null && jamat != printed) {
-        Text("Jamat ${PrayerFormat.time(jamat)}", style = MaterialTheme.typography.labelSmall, color = InkMuted)
-      }
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text(
+        prayer.displayLabel,
+        color = if (isNext) Brand else Ink,
+        fontWeight = if (isNext) FontWeight.SemiBold else FontWeight.Normal,
+        maxLines = 1,
+      )
+      Text(PrayerFormat.time(printed), color = Ink, fontWeight = FontWeight.SemiBold, softWrap = false)
+    }
+    if (jamat != null && jamat != printed) {
+      Text(
+        "Jamat ${PrayerFormat.time(jamat)}",
+        style = MaterialTheme.typography.labelSmall,
+        color = InkMuted,
+        softWrap = false,
+      )
     }
   }
 }
