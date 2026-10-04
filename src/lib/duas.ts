@@ -1,3 +1,5 @@
+import type { PrayerLog } from './prayerLog';
+
 export type DuaCategoryId =
   | 'after-adhan'
   | 'wudu-mosque'
@@ -378,4 +380,12 @@ export function duaById(id: string): Dua | null {
 
 export function categoryById(id: string): DuaCategory | null {
   return DUA_CATEGORIES.find((category) => category.id === id) ?? null;
+}
+
+export const AFTER_PRAYER_WINDOW_MS = 10 * 60_000;
+
+export function prayedRecently(log: PrayerLog, now: number): boolean {
+  return Object.values(log).some(
+    (entry) => entry.status === 'prayed' && entry.at <= now && now - entry.at < AFTER_PRAYER_WINDOW_MS,
+  );
 }

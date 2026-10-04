@@ -67,6 +67,53 @@ function CategoryIcon({ category }: { category: DuaCategory }) {
   );
 }
 
+export function FeaturedCategoryCard({ category }: { category: DuaCategory }) {
+  const router = useRouter();
+  const theme = useTheme();
+  const preview = duasIn(category.id)[0];
+  return (
+    <Card
+      rounded="xl"
+      padding="lg"
+      elevated
+      onPress={() => router.push({ pathname: '/duas', params: { category: category.id } })}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
+        <CategoryIcon category={category} />
+        <View style={{ flex: 1, gap: spacing.xxs }}>
+          <AppText size="sm" tone="textMuted">
+            Nå
+          </AppText>
+          <AppText size="lg" weight="semibold">
+            {category.title}
+          </AppText>
+        </View>
+        <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
+      </View>
+      {preview && <ArabicText>{preview.arabic}</ArabicText>}
+    </Card>
+  );
+}
+
+export function TasbihRow({ from }: { from?: string }) {
+  const router = useRouter();
+  const theme = useTheme();
+  return (
+    <Card padding="sm" rounded="xl">
+      <ListRow
+        title="Tasbih"
+        leading={
+          <Tile>
+            <TasbihIcon size={22} color={theme.colors.primary} />
+          </Tile>
+        }
+        chevron
+        onPress={() => router.push({ pathname: '/tasbih', params: from ? { from } : {} })}
+        style={{ paddingHorizontal: spacing.md }}
+      />
+    </Card>
+  );
+}
+
 function useHubCategories() {
   const { now, status } = useHijriSeasonNow();
   const eidMode = useEidMode();
@@ -106,47 +153,15 @@ function useHubCategories() {
 
 export function DuaHub() {
   const router = useRouter();
-  const theme = useTheme();
   const tasbihEnabled = useFeature('tasbih');
   const { featured, others } = useHubCategories();
-  const preview = featured ? duasIn(featured.id)[0] : null;
   const open = (id: DuaCategoryId) => router.push({ pathname: '/duas', params: { category: id } });
 
   return (
     <View style={{ gap: spacing.lg, marginTop: spacing.lg }}>
-      {featured && (
-        <Card rounded="xl" padding="lg" elevated onPress={() => open(featured.id)}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-            <CategoryIcon category={featured} />
-            <View style={{ flex: 1, gap: spacing.xxs }}>
-              <AppText size="sm" tone="textMuted">
-                Nå
-              </AppText>
-              <AppText size="lg" weight="semibold">
-                {featured.title}
-              </AppText>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
-          </View>
-          {preview && <ArabicText>{preview.arabic}</ArabicText>}
-        </Card>
-      )}
+      {featured && <FeaturedCategoryCard category={featured} />}
 
-      {tasbihEnabled && (
-        <Card padding="sm" rounded="xl">
-          <ListRow
-            title="Tasbih"
-            leading={
-              <Tile>
-                <TasbihIcon size={22} color={theme.colors.primary} />
-              </Tile>
-            }
-            chevron
-            onPress={() => router.push('/tasbih')}
-            style={{ paddingHorizontal: spacing.md }}
-          />
-        </Card>
-      )}
+      {tasbihEnabled && <TasbihRow />}
 
       <Card padding="sm" rounded="xl">
         {others.map((entry, index) => (

@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
+import { AfterPrayerCard } from '@/components/duas/AfterPrayerCard';
 import { NextPrayerHero } from '@/components/prayer/NextPrayerHero';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { EventCard } from '@/components/calendar/EventCard';
@@ -126,6 +127,8 @@ export default function HomeScreen() {
             }
           />
         )}
+
+        <AfterPrayerCard now={now} />
 
         {mosque && myAnnouncement && (
           <Card

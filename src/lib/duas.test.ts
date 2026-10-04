@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { duaCategoryForNow } from './duas.ts';
+import { duaCategoryForNow, prayedRecently } from './duas.ts';
 
 const base = {
   eid: false,
@@ -42,4 +42,17 @@ test('an active season picks its category, otherwise nothing', () => {
   assert.equal(duaCategoryForNow({ ...base, activeSeason: 'ramadan' }), 'ramadan');
   assert.equal(duaCategoryForNow({ ...base, activeSeason: 'dhul-hijjah' }), 'hajj');
   assert.equal(duaCategoryForNow(base), null);
+});
+
+test('prayedRecently is true only for a prayed mark in the last ten minutes', () => {
+  const at = 1_000 * MINUTE;
+  const log = {
+    '2026-10-04|duhr': { status: 'prayed' as const, at: at - 9 * MINUTE },
+    '2026-10-04|fajr': { status: 'skipped' as const, at: at - MINUTE },
+  };
+  assert.equal(prayedRecently(log, at), true);
+  assert.equal(prayedRecently(log, at + 2 * MINUTE), false);
+  assert.equal(prayedRecently({ 'x|asr': { status: 'skipped', at } }, at), false);
+  assert.equal(prayedRecently({ 'x|asr': { status: null, at } }, at), false);
+  assert.equal(prayedRecently({}, at), false);
 });

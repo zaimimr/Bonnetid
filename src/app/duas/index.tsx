@@ -7,7 +7,7 @@ import { categoryById, DUA_LINKS, duasIn, type DuaCategory } from '@/lib/duas';
 import { spacing } from '@/theme/tokens';
 import { useTasbihReturn } from '@/store/tasbihReturn';
 import { FeatureGate } from '@/components/FeatureGate';
-import { DuaHub } from '@/components/duas/DuaHub';
+import { DuaHub, TasbihRow } from '@/components/duas/DuaHub';
 import { useFeature } from '@/hooks/useFeature';
 
 function DuasScreen() {
@@ -67,6 +67,7 @@ function CategoryReader({ category }: { category: DuaCategory }) {
           listTop.current = event.nativeEvent.layout.y;
         }}
         style={{ gap: spacing.lg, marginTop: spacing.md }}>
+        {tasbihEnabled && category.id === 'after-salah' && <TasbihRow from="duas" />}
         {duas.map((dua) => (
           <View
             key={dua.id}
