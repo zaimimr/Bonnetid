@@ -335,26 +335,30 @@ export const DUAS: Dua[] = [
   },
 ];
 
-const AFTER_ADHAN_MS = 5 * 60 * 1000;
+const FALLBACK_JAMAT_MS = 5 * 60 * 1000;
 const AFTER_SALAH_MS = 20 * 60 * 1000;
 
 export function duaCategoryForNow({
   eid,
   sinceAdhanMs,
+  jamatAfterAdhanMs,
   atMosque,
   activeSeason,
 }: {
   eid: boolean;
   sinceAdhanMs: number | null;
+  jamatAfterAdhanMs: number | null;
   atMosque: boolean;
   activeSeason: 'ramadan' | 'dhul-hijjah' | null;
 }): DuaCategoryId | null {
   if (eid) return 'eid';
   if (atMosque) {
-    if (sinceAdhanMs != null && sinceAdhanMs >= 0 && sinceAdhanMs < AFTER_ADHAN_MS) {
+    const jamatMs =
+      jamatAfterAdhanMs != null && jamatAfterAdhanMs > 0 ? jamatAfterAdhanMs : FALLBACK_JAMAT_MS;
+    if (sinceAdhanMs != null && sinceAdhanMs >= 0 && sinceAdhanMs < jamatMs) {
       return 'after-adhan';
     }
-    if (sinceAdhanMs != null && sinceAdhanMs >= 0 && sinceAdhanMs < AFTER_SALAH_MS) {
+    if (sinceAdhanMs != null && sinceAdhanMs >= 0 && sinceAdhanMs < jamatMs + AFTER_SALAH_MS) {
       return 'after-salah';
     }
     return 'wudu-mosque';

@@ -1,15 +1,18 @@
 import { Fragment, type ReactNode } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useMosque } from '@/api/queries';
 import { Ionicons } from '@expo/vector-icons';
 import { ArabicText } from '@/components/duas/ArabicText';
 import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
 import { AppText, Card, Divider, ListRow } from '@/components/ui';
+import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEidMode } from '@/hooks/useEidMode';
 import { useFeature } from '@/hooks/useFeature';
 import { useHijriSeasonNow } from '@/hooks/useHijriSeason';
 import { useMosquePresence } from '@/hooks/useMosquePresence';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
+import { zoneFor } from '@/hooks/usePrayerMonth';
 import {
   DUA_CATEGORIES,
   duaCategoryForNow,
@@ -17,6 +20,9 @@ import {
   type DuaCategory,
   type DuaCategoryId,
 } from '@/lib/duas';
+import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
+import { wallClockToDate } from '@/lib/time';
+import { useActiveLocation } from '@/store/settings';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
 
@@ -64,8 +70,22 @@ function CategoryIcon({ category }: { category: DuaCategory }) {
 function useHubCategories() {
   const { now, status } = useHijriSeasonNow();
   const eidMode = useEidMode();
-  const { nextPrayer } = usePrayerDay(now);
+  const { nextPrayer, todaySchedule } = usePrayerDay(now);
   const presence = useMosquePresence();
+  const location = useActiveLocation();
+  const { isoDate } = useActiveDayKeys(now);
+  const presenceDetails = useMosque(presence?.mosque.org_nr ?? '', { enabled: presence != null });
+  const current = nextPrayer?.current ?? null;
+  const jamatClock = current
+    ? jamatTimesForDate(
+        presenceDetails.data?.jamat,
+        isoDate,
+        adhanTimesFromSchedule(todaySchedule),
+        presenceDetails.data?.jummah ?? [],
+        now,
+      )[current.name]
+    : null;
+  const jamatAt = jamatClock ? wallClockToDate(isoDate, jamatClock, zoneFor(location)) : null;
 
   const visible = DUA_CATEGORIES.filter(
     (entry) =>
@@ -75,9 +95,8 @@ function useHubCategories() {
   );
   const nowId = duaCategoryForNow({
     eid: eidMode != null,
-    sinceAdhanMs: nextPrayer?.current
-      ? now.getTime() - nextPrayer.current.date.getTime()
-      : null,
+    sinceAdhanMs: current ? now.getTime() - current.date.getTime() : null,
+    jamatAfterAdhanMs: current && jamatAt ? jamatAt.getTime() - current.date.getTime() : null,
     atMosque: presence != null,
     activeSeason: status?.isActive ? status.id : null,
   });
