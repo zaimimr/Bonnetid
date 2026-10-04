@@ -25,6 +25,7 @@ object CarDataSource {
   private const val TAG = "BonnetidCar"
   private const val SNAPSHOT_DAYS = 3
   private const val OSLO = "Europe/Oslo"
+  private val OSLO_CENTRE = SnapshotCoords(59.9139, 10.7522)
 
   private val PRAYER_COLUMNS = listOf(
     "date",
@@ -50,10 +51,7 @@ object CarDataSource {
     if (!configured()) return false
     return try {
       val locations = fetchLocations()
-      val origin = from ?: run {
-        Log.w(TAG, "Ingen posisjon å regne kommune fra")
-        return false
-      }
+      val origin = from ?: OSLO_CENTRE
       val location = locations.minByOrNull { distanceKm(origin, it) } ?: run {
         Log.w(TAG, "Fant ingen kommuner (${locations.size} rader)")
         return false

@@ -1,5 +1,6 @@
 package no.irn.bonnetid.car
 
+import android.Manifest
 import androidx.car.app.CarContext
 import androidx.car.app.Screen
 import androidx.car.app.model.Action
@@ -21,6 +22,7 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
   private var fetching = false
   private var fetchFailed = false
   private var lastAttemptAt = 0L
+  private var askedForLocation = false
 
   init {
     lifecycle.addObserver(CarMinuteTicker { invalidate() })
@@ -29,6 +31,7 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
   override fun onGetTemplate(): Template {
     val snapshot = PrayerSnapshot.load(carContext)
     val now = System.currentTimeMillis()
+    requestLocationOnce()
 
     // Automotive OS has no phone app behind it, so the car fills its own snapshot.
     if (CarDataSource.needsRefresh(snapshot, now) && CarDataSource.configured() && mayRetry(now)) {
@@ -83,6 +86,20 @@ class CarHomeScreen(carContext: CarContext) : Screen(carContext) {
 
   private fun mayRetry(now: Long): Boolean =
     !fetchFailed || now - lastAttemptAt >= RETRY_AFTER_MS
+
+  private fun requestLocationOnce() {
+    if (askedForLocation || CarPlaces.hasLocationPermission(carContext)) return
+    askedForLocation = true
+    try {
+      carContext.requestPermissions(
+        listOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+      ) { granted, _ ->
+        if (granted.isNotEmpty() && CarDataSource.configured()) startRefresh(System.currentTimeMillis())
+      }
+    } catch (error: Exception) {
+      invalidate()
+    }
+  }
 
   private fun startRefresh(now: Long) {
     if (fetching) return
