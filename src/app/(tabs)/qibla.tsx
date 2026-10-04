@@ -226,7 +226,7 @@ function ViewSwitcher({
                 gap: spacing.xs,
                 paddingVertical: spacing.md,
                 borderRadius: radius.sm,
-                backgroundColor: isActive ? theme.colors.surface : 'transparent',
+                backgroundColor: isActive ? theme.colors.segmentActive : 'transparent',
                 borderWidth: isActive ? 1 : 0,
                 borderColor: theme.colors.border,
               },

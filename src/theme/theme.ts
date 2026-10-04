@@ -5,6 +5,7 @@ export type ThemeColors = {
   surface: string;
   surfaceElevated: string;
   surfaceSunken: string;
+  segmentActive: string;
   primary: string;
   onPrimary: string;
   primarySoft: string;
@@ -57,6 +58,7 @@ export const lightTheme: Theme = {
     surface: palette.neutral0,
     surfaceElevated: palette.neutral0,
     surfaceSunken: palette.neutral100,
+    segmentActive: palette.neutral0,
     primary: palette.emerald600,
     onPrimary: palette.neutral0,
     primarySoft: palette.emerald50,
@@ -105,6 +107,7 @@ export const darkTheme: Theme = {
     surface: palette.night900,
     surfaceElevated: palette.night800,
     surfaceSunken: palette.night800,
+    segmentActive: palette.night700,
     primary: palette.emerald400,
     onPrimary: palette.night950,
     primarySoft: palette.night700,

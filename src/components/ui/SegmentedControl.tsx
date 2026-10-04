@@ -54,7 +54,7 @@ export function SegmentedControl<T extends string>({
                 flex: 1,
                 paddingVertical: spacing.md,
                 borderRadius: radius.sm,
-                backgroundColor: isActive ? theme.colors.surface : 'transparent',
+                backgroundColor: isActive ? theme.colors.segmentActive : 'transparent',
                 alignItems: 'center',
                 borderWidth: isActive ? 1 : 0,
                 borderColor: theme.colors.border,

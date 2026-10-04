@@ -241,7 +241,7 @@ export function ModeToggle({ view, onChange }: { view: MosqueViewMode; onChange:
                 paddingVertical: spacing.sm,
                 paddingHorizontal: spacing.lg,
                 borderRadius: radius.full,
-                backgroundColor: isActive ? theme.colors.surface : 'transparent',
+                backgroundColor: isActive ? theme.colors.segmentActive : 'transparent',
               },
               pressed && { opacity: opacity.pressed },
             ]}>
