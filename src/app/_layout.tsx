@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { defaultShouldDehydrateQuery, QueryCache, QueryClient } from '@tanstack/react-query';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { Stack } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider } from 'expo-router';
 import { PostHogProvider } from 'posthog-react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -98,8 +98,21 @@ function RootNavigator() {
     SplashScreen.hideAsync().catch(() => {});
   }, [hydrated, fontsLoaded, fontError]);
 
+  const baseNavigationTheme = theme.scheme === 'dark' ? DarkTheme : DefaultTheme;
+  const navigationTheme = {
+    ...baseNavigationTheme,
+    colors: {
+      ...baseNavigationTheme.colors,
+      primary: theme.colors.primary,
+      background: theme.colors.background,
+      card: theme.colors.surface,
+      text: theme.colors.textPrimary,
+      border: theme.colors.border,
+    },
+  };
+
   return (
-    <>
+    <NavigationThemeProvider value={navigationTheme}>
       <StatusBar style={theme.scheme === 'dark' ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
@@ -111,7 +124,6 @@ function RootNavigator() {
           headerShadowVisible: !isAndroid,
           headerTitleStyle: { color: theme.colors.textPrimary },
           headerTintColor: theme.colors.primary,
-          fullScreenGestureEnabled: false,
         }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
@@ -277,7 +289,7 @@ function RootNavigator() {
       </Stack>
       <WhatsNewHost />
       <SurveyHost />
-    </>
+    </NavigationThemeProvider>
   );
 }
 
