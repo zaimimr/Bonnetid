@@ -47,7 +47,7 @@ export function usePrayerTimes(
       const hijri = await queryClient.ensureQueryData(hijriYearOptions(year));
       return fetchPrayerTimes(locationIso, year, month, hijri);
     },
-    staleTime: 3 * DAY,
+    staleTime: (query) => (query.state.data?.length ? 3 * DAY : HOUR),
     gcTime: 60 * DAY,
     enabled: options?.enabled ?? true,
   });

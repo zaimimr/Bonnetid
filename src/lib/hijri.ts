@@ -97,3 +97,7 @@ export function shiftHijriMonth(cursor: HijriMonthCursor, delta: number): HijriM
   const index = cursor.year * 12 + (cursor.month - 1) + delta;
   return { year: Math.floor(index / 12), month: (index % 12) + 1 };
 }
+
+export function monthYearLabel(date: Date): string {
+  return `${NORWEGIAN_MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+}

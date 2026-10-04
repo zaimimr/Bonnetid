@@ -19,7 +19,9 @@ export function ErrorState({
       <AppText tone="textSecondary" align="center">
         {message}
       </AppText>
-      {onRetry && <Button label="Prøv igjen" variant="secondary" onPress={onRetry} />}
+      {onRetry && (
+        <Button label="Prøv igjen" variant="secondary" onPress={onRetry} style={{ alignSelf: 'center' }} />
+      )}
     </View>
   );
 }
@@ -38,6 +40,19 @@ export function EmptyState({
       <AppText tone="textSecondary" align="center">
         {message}
       </AppText>
+    </View>
+  );
+}
+
+export function NoTimesState({ period, onRetry }: { period: string; onRetry: () => void }) {
+  const theme = useTheme();
+  return (
+    <View style={{ alignItems: 'center', gap: spacing.md, paddingVertical: spacing.xxxl }}>
+      <Ionicons name="calendar-clear-outline" size={40} color={theme.colors.textMuted} />
+      <AppText tone="textSecondary" align="center">
+        {`Bønnetidene for ${period} er ikke publisert ennå`}
+      </AppText>
+      <Button label="Prøv igjen" variant="secondary" onPress={onRetry} style={{ alignSelf: 'center' }} />
     </View>
   );
 }

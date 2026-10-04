@@ -9,6 +9,7 @@ import {
   EmptyState,
   ErrorState,
   IconButton,
+  NoTimesState,
   Screen,
   Skeleton,
 } from '@/components/ui';
@@ -21,7 +22,7 @@ import {
   nextPrayerDay,
 } from '@/lib/prayerSchedule';
 import { buildExtraTimes } from '@/lib/extraTimes';
-import { formatGregorianLong, formatHijri } from '@/lib/hijri';
+import { formatGregorianLong, formatHijri, monthYearLabel } from '@/lib/hijri';
 import { isoDateKey, todayKey } from '@/lib/time';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { useNow } from '@/hooks/useNow';
@@ -169,7 +170,7 @@ export default function DayScreen() {
         {month.isLoading && <Skeleton height={360} rounded="xl" />}
         {month.isError && <ErrorState onRetry={month.refetch} />}
         {!month.isLoading && !month.isError && !day && (
-          <EmptyState message="Ingen bønnetider for denne datoen" icon="calendar-clear-outline" />
+          <NoTimesState period={monthYearLabel(date)} onRetry={month.refetch} />
         )}
         {schedule.length > 0 && (
           <PrayerTimesCard

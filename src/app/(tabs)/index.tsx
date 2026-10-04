@@ -13,8 +13,8 @@ import {
   AppText,
   Badge,
   Card,
-  EmptyState,
   ErrorState,
+  NoTimesState,
   Screen,
   SectionHeader,
   Skeleton,
@@ -26,7 +26,7 @@ import { useTimezoneNote } from '@/hooks/useTimezoneNote';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useReviewPrompt } from '@/hooks/useReviewPrompt';
-import { formatGregorianLong, formatHijri } from '@/lib/hijri';
+import { formatGregorianLong, formatHijri, monthYearLabel } from '@/lib/hijri';
 import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
 import { isoDateIsFriday, parseDayKey } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
@@ -91,7 +91,7 @@ export default function HomeScreen() {
         {isError && <ErrorState onRetry={refetch} />}
 
         {!isLoading && !isError && todaySchedule.length === 0 && (
-          <EmptyState message="Ingen bønnetider for dette stedet i dag" icon="time-outline" />
+          <NoTimesState period={monthYearLabel(today)} onRetry={refetch} />
         )}
 
         {nextPrayer && (

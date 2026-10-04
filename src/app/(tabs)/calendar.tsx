@@ -13,6 +13,7 @@ import {
   AppText,
   EmptyState,
   ErrorState,
+  NoTimesState,
   Screen,
   SectionHeader,
   SegmentedControl,
@@ -29,6 +30,7 @@ import { useTimezoneNote } from '@/hooks/useTimezoneNote';
 import { spacing } from '@/theme/tokens';
 import {
   monthName,
+  monthYearLabel,
   parseHijriDate,
   shiftHijriMonth,
   type HijriMonthCursor,
@@ -392,7 +394,17 @@ function TimesView({
 
       {isLoading && <Skeleton height={480} rounded="xl" />}
       {isError && <ErrorState onRetry={refetch} />}
-      {rows && (
+      {rows?.length === 0 && (
+        <NoTimesState
+          period={monthYearLabel(
+            firstMonth.data?.length === 0
+              ? new Date(first.year, first.monthIndex, 1)
+              : new Date(last.year, last.monthIndex, 1),
+          )}
+          onRetry={refetch}
+        />
+      )}
+      {rows && rows.length > 0 && (
         <MonthPrayerTable
           days={rows}
           asrMethod={asrMethod}
