@@ -106,6 +106,7 @@
       "./plugins/withPodDeploymentTarget",
       "./plugins/withSceneLifecycle",
       "./plugins/withSiriShortcuts",
+      "./plugins/withCarPlay",
       "expo-image",
       "expo-status-bar",
       "expo-localization",
