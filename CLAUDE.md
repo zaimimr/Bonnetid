@@ -18,6 +18,9 @@ bridge is a `requireOptionalNativeModule`, so every call no-ops there.
 - Siri/Snarveier: `plugins/withSiriShortcuts.js` copies `plugins/siri/` into the main app target,
   so `Metadata.appintents` lands in `Bnnetid.app`. The app targets iOS 16.4, so phrases are
   localized with `nb.lproj/AppShortcuts.strings`, not an xcstrings catalog.
+- CarPlay (Driving Task): `plugins/withCarPlay.js` copies `plugins/carplay/` into the main app
+  target and adds the CarPlay scene to the manifest `withSceneLifecycle.js` writes. Both plugins
+  merge the manifest, so order does not matter. The car only reads the app-group snapshot.
 - Apple Watch: `targets/watch` (app) and `targets/watchcomplication` (complications). The
   directory names must sort watch app first or the complication gets embedded in the iPhone app.
   The phone pushes a trimmed, lzfse-compressed snapshot over WatchConnectivity
