@@ -105,6 +105,7 @@
       "./plugins/withTrimmedPermissions",
       "./plugins/withPodDeploymentTarget",
       "./plugins/withSceneLifecycle",
+      "./plugins/withSiriShortcuts",
       "expo-image",
       "expo-status-bar",
       "expo-localization",
