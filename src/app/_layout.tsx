@@ -194,6 +194,14 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="notification-check"
+          options={{
+            headerShown: true,
+            title: 'Varselsjekk',
+            headerBackTitle: 'Tilbake',
+          }}
+        />
+        <Stack.Screen
           name="fasting-reminders"
           options={{
             headerShown: true,

@@ -7,6 +7,7 @@ import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { EventCard } from '@/components/calendar/EventCard';
 import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosquePresenceCard } from '@/components/mosque/MosquePresenceCard';
+import { NotificationCheckCard } from '@/components/notifications/NotificationCheckCard';
 import { EidLeaveCard } from '@/components/season/EidLeaveCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import { NightCard } from '@/components/season/NightCard';
@@ -86,6 +87,8 @@ export default function HomeScreen() {
     <Screen scroll refreshing={refreshing} onRefresh={onRefresh}>
       <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
         <MosquePresenceCard />
+
+        <NotificationCheckCard />
 
         {isLoading && <Skeleton height={220} rounded="xl" />}
 

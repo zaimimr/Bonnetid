@@ -35,6 +35,16 @@ export type DeliveredAdhan = {
   deliveredAt: number;
 };
 
+export const NOTIFICATION_ISSUE_LABELS: Record<NotificationIssueKey, string> = {
+  permission: 'Varsler er ikke tillatt',
+  channel: 'Bønnevarsler er slått av i telefonen',
+  exactAlarm: 'Alarmer og påminnelser er ikke tillatt',
+  emptyQueue: 'Ingen varsler er planlagt',
+  noPrayers: 'Ingen bønner er valgt',
+  sound: 'Lyd er slått av',
+  battery: 'Batterisparing er på',
+};
+
 export function notificationIssues(status: NotificationHealthStatus): NotificationIssue[] {
   if (!status.enabled) return [];
   const issues: NotificationIssue[] = [];

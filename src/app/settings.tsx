@@ -216,6 +216,14 @@ export default function SettingsScreen() {
               onPress={() => router.push('/fasting-reminders')}
               style={ROW}
             />
+            <Divider />
+            <ListRow
+              title="Varselsjekk"
+              leading={<Ionicons name="pulse-outline" size={20} color={theme.colors.primary} />}
+              chevron
+              onPress={() => router.push('/notification-check')}
+              style={ROW}
+            />
             {trackerAllowed && (
               <>
                 <Divider />

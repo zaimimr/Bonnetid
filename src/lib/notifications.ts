@@ -10,6 +10,7 @@ import {
   type NotificationSoundOption,
 } from './notificationSounds';
 import { track } from './telemetry';
+import type { DeliveredAdhan, ScheduledAdhan } from './notificationHealth';
 import { setNativeNotificationQueue } from '../../modules/prayer-widget';
 
 const MAX_SCHEDULED = Platform.OS === 'ios' ? 50 : 150;
@@ -46,6 +47,12 @@ export function prayerNotificationId(isoDate: string, prayer: string): string {
 
 export function reminderNotificationId(isoDate: string, prayer: string): string {
   return `${REMINDER_PREFIX}${isoDate}|${prayer}`;
+}
+
+function parsePrayerNotificationId(identifier: string): { isoDate: string; prayer: string } | null {
+  if (!identifier.startsWith(PRAYER_PREFIX)) return null;
+  const [isoDate, prayer] = identifier.slice(PRAYER_PREFIX.length).split('|');
+  return isoDate && prayer ? { isoDate, prayer } : null;
 }
 
 function isOwned(identifier: string): boolean {
@@ -124,13 +131,17 @@ function channelSoundMatches(
   return sound.fileName ? channelSound === 'custom' : channelSound !== null;
 }
 
+function adhanChannelId(soundKey: NotificationSoundKey): string {
+  return `prayer-${getNotificationSound(soundKey).key}-v${ADHAN_CHANNEL_GENERATION}`;
+}
+
 async function ensureAdhanChannel(
   Notifications: NotificationsModule,
   soundKey: NotificationSoundKey,
 ): Promise<string | undefined> {
   if (Platform.OS !== 'android') return undefined;
   const sound = getNotificationSound(soundKey);
-  const channelId = `prayer-${sound.key}-v${ADHAN_CHANNEL_GENERATION}`;
+  const channelId = adhanChannelId(soundKey);
   await removeLegacyAdhanChannels(Notifications);
   const channel = await Notifications.setNotificationChannelAsync(channelId, {
     name: `Bønnetid (${sound.label})`,
@@ -417,10 +428,13 @@ export async function wasOpenedFromNotification(): Promise<boolean> {
   return response != null && shownRecently(response);
 }
 
-function shownAtOf(response: NotificationResponseLike): number | null {
-  const raw = response.notification.date;
+function epochMs(raw: unknown): number | null {
   if (typeof raw !== 'number' || Number.isNaN(raw)) return null;
   return raw < SECONDS_SCALE_LIMIT ? raw * 1000 : raw;
+}
+
+function shownAtOf(response: NotificationResponseLike): number | null {
+  return epochMs(response.notification.date);
 }
 
 function shownRecently(response: NotificationResponseLike): boolean {
@@ -434,4 +448,52 @@ export async function consumeLastPrayerAction(handler: PrayerActionHandler) {
   const Notifications = await getNotifications();
   const response = await Notifications.getLastNotificationResponseAsync();
   if (response && shownRecently(response)) applyResponse(response, handler);
+}
+
+export type NotificationSystemState = {
+  permissionGranted: boolean;
+  soundAllowed: boolean | null;
+  channelBlocked: boolean | null;
+  scheduled: ScheduledAdhan[];
+  delivered: DeliveredAdhan[];
+};
+
+export async function readNotificationSystemState(
+  soundKey: NotificationSoundKey,
+): Promise<NotificationSystemState | null> {
+  if (!notificationsSupported) return null;
+  return serialize(() => readSystemState(soundKey));
+}
+
+async function readSystemState(soundKey: NotificationSoundKey): Promise<NotificationSystemState> {
+  const Notifications = await getNotifications();
+  const [permissions, requests, presented, channel] = await Promise.all([
+    Notifications.getPermissionsAsync(),
+    Notifications.getAllScheduledNotificationsAsync(),
+    Notifications.getPresentedNotificationsAsync(),
+    Platform.OS === 'android'
+      ? Notifications.getNotificationChannelAsync(adhanChannelId(soundKey))
+      : Promise.resolve(null),
+  ]);
+
+  const scheduled: ScheduledAdhan[] = [];
+  for (const request of requests) {
+    const parsed = parsePrayerNotificationId(request.identifier);
+    if (parsed) scheduled.push({ ...parsed, title: request.content.title ?? '' });
+  }
+
+  const delivered: DeliveredAdhan[] = [];
+  for (const notification of presented) {
+    const parsed = parsePrayerNotificationId(notification.request.identifier);
+    const deliveredAt = epochMs(notification.date);
+    if (parsed && deliveredAt != null) delivered.push({ ...parsed, deliveredAt });
+  }
+
+  return {
+    permissionGranted: permissions.granted,
+    soundAllowed: permissions.ios?.allowsSound ?? null,
+    channelBlocked: channel ? channel.importance === Notifications.AndroidImportance.NONE : null,
+    scheduled,
+    delivered,
+  };
 }
