@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <receiver
+      android:name="no.irn.bonnetid.wear.WearSnapshotReceiver"
+      android:exported="false">
+      <intent-filter>
+        <action android:name="no.irn.bonnetid.SNAPSHOT_WRITTEN" />
+      </intent-filter>
+    </receiver>
+  </application>
+</manifest>

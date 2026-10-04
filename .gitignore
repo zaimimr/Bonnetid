@@ -54,6 +54,7 @@ credentials.json
 # Local Expo module Gradle output
 modules/*/android/build/
 modules/*/android/.gradle/
+wear/watch/build/
 
 # Agent worktrees
 .claude/worktrees/

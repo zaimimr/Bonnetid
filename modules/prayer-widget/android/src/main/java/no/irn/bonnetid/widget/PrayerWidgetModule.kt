@@ -29,6 +29,7 @@ class PrayerWidgetModule : Module() {
       PrayerTimelineWidget.updateAll(context)
       PrayerStatusNotifier.sync(context)
       PrayerShortcuts.update(context)
+      context.sendBroadcast(Intent(WearSnapshot.ACTION_WRITTEN).setPackage(context.packageName))
     }
 
     Function("getPrayerLog") {

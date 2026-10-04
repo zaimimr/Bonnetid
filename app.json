@@ -101,6 +101,7 @@
       "expo-font",
       "expo-web-browser",
       "./plugins/withCarFormFactors",
+      "./plugins/withWearOs",
       "./plugins/withTrimmedPermissions",
       "./plugins/withPodDeploymentTarget",
       "./plugins/withSceneLifecycle",
