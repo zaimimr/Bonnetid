@@ -216,6 +216,28 @@ export default function SettingsScreen() {
               onPress={() => router.push('/fasting-reminders')}
               style={ROW}
             />
+            {trackerAllowed && (
+              <>
+                <Divider />
+                <ListRow
+                  title="Påminnelse før tiden går ut"
+                  subtitle={
+                    trackerEnabled
+                      ? '30 minutter før, hvis bønnen ikke er markert'
+                      : 'Slå på Marker bønner først'
+                  }
+                  leading={<Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />}
+                  trailing={
+                    <Toggle
+                      value={trackerEnabled && endReminderEnabled}
+                      onValueChange={setEndReminderEnabled}
+                      disabled={!trackerEnabled}
+                    />
+                  }
+                  style={ROW}
+                />
+              </>
+            )}
           </>
         )}
       </Card>
@@ -233,28 +255,6 @@ export default function SettingsScreen() {
               trailing={<Toggle value={trackerEnabled} onValueChange={setTrackerEnabled} />}
               style={ROW}
             />
-            {trackerEnabled && (
-              <>
-                <Divider />
-                <ListRow
-                  title="Påminnelse før tiden går ut"
-                  subtitle={
-                    notificationsEnabled
-                      ? '30 minutter før, hvis bønnen ikke er markert'
-                      : 'Slå på varsler først'
-                  }
-                  leading={<Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />}
-                  trailing={
-                    <Toggle
-                      value={notificationsEnabled && endReminderEnabled}
-                      onValueChange={setEndReminderEnabled}
-                      disabled={!notificationsEnabled}
-                    />
-                  }
-                  style={ROW}
-                />
-              </>
-            )}
             {trackerEnabled && lockScreenSupported && Platform.OS === 'android' && (
               <>
                 <Divider />
