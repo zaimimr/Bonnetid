@@ -8,7 +8,6 @@ import { EventCard } from '@/components/calendar/EventCard';
 import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosquePresenceCard } from '@/components/mosque/MosquePresenceCard';
 import { EidNearbyCard } from '@/components/eid/EidNearbyCard';
-import { TakbirCard } from '@/components/eid/TakbirCard';
 import { NotificationCheckCard } from '@/components/notifications/NotificationCheckCard';
 import { EidLeaveCard } from '@/components/season/EidLeaveCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
@@ -143,8 +142,6 @@ export default function HomeScreen() {
             />
           </Card>
         )}
-
-        {eidMode && <TakbirCard />}
 
         <EidNearbyCard mosques={eidPrayers.nearby} />
 

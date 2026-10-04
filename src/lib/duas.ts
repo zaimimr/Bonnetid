@@ -1,6 +1,12 @@
-export type DuaCategoryId = 'after-adhan' | 'wudu-mosque' | 'after-salah' | 'ramadan' | 'hajj';
+export type DuaCategoryId =
+  | 'after-adhan'
+  | 'wudu-mosque'
+  | 'after-salah'
+  | 'ramadan'
+  | 'eid'
+  | 'hajj';
 
-export type DuaSeason = 'ramadan' | 'dhul-hijjah';
+export type DuaSeason = 'ramadan' | 'eid' | 'dhul-hijjah';
 
 export type DuaCategory = {
   id: DuaCategoryId;
@@ -30,6 +36,12 @@ export const DUA_CATEGORIES: DuaCategory[] = [
     title: 'Ramadan',
     description: 'Iftar, fasten og Laylat-ul-Qadr',
     season: 'ramadan',
+  },
+  {
+    id: 'eid',
+    title: 'Eid',
+    description: 'Takbir og hilsen',
+    season: 'eid',
   },
   {
     id: 'hajj',
@@ -298,6 +310,28 @@ export const DUAS: Dua[] = [
     transliteration: 'Bismillahi wallahu akbar',
     meaning: 'I Allahs navn, og Allah er størst.',
     source: 'Sahih Muslim 1966',
+  },
+  {
+    id: 'takbir-eid',
+    category: 'eid',
+    title: 'Takbir',
+    arabic:
+      'اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، لَا إِلَٰهَ إِلَّا اللَّهُ، وَاللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، وَلِلَّهِ الْحَمْدُ',
+    transliteration: 'Allahu akbar, Allahu akbar, la ilaha illallah, wallahu akbar, Allahu akbar, wa lillahil-hamd',
+    meaning:
+      'Allah er størst, Allah er størst, ingen har rett til å tilbes unntatt Allah. Allah er størst, Allah er størst, og all lovprisning tilhører Allah.',
+    note: 'Sies fra kvelden før Eid al-Fitr til Eid-bønnen, og etter bønnene fra Arafah-dagen til og med 13. Dhul-Hijjah.',
+    source: 'Musannaf Ibn Abi Shaybah, fra Abdullah ibn Masud',
+  },
+  {
+    id: 'eid-greeting',
+    category: 'eid',
+    title: 'Eid-hilsen',
+    arabic: 'تَقَبَّلَ اللَّهُ مِنَّا وَمِنْكُمْ',
+    transliteration: 'Taqabbalallahu minna wa minkum',
+    meaning: 'Må Allah ta imot fra oss og fra dere.',
+    note: 'Følgesvennene hilste hverandre slik når de møttes på Eid.',
+    source: "Fath al-Bari, fra Jubayr ibn Nufayr",
   },
 ];
 

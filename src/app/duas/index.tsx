@@ -4,6 +4,7 @@ import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-rou
 import { DuaCard } from '@/components/duas/DuaCard';
 import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
 import { Button, Card, Divider, EmptyState, FeatureCard, ListRow, Screen } from '@/components/ui';
+import { useEidMode } from '@/hooks/useEidMode';
 import { useHijriSeasonNow } from '@/hooks/useHijriSeason';
 import { categoryById, DUA_CATEGORIES, DUA_LINKS, duasIn, type DuaCategory } from '@/lib/duas';
 import { useTheme } from '@/theme';
@@ -33,8 +34,12 @@ function CategoryList() {
   const theme = useTheme();
   const { status } = useHijriSeasonNow();
   const tasbihEnabled = useFeature('tasbih');
+  const eidMode = useEidMode();
   const categories = DUA_CATEGORIES.filter(
-    (entry) => !entry.season || entry.season === status?.id,
+    (entry) =>
+      !entry.season ||
+      entry.season === status?.id ||
+      (entry.season === 'eid' && (status != null || eidMode != null)),
   );
 
   return (
