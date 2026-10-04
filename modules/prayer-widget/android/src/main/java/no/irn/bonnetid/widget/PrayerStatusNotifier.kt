@@ -198,7 +198,6 @@ object PrayerStatusNotifier {
       )
 
     if (endsAt != null) {
-      builder.setSubText("Varer til ${PrayerFormat.time(endsAt)}")
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         builder
           .setWhen(endsAt)
