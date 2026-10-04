@@ -29,7 +29,16 @@ test('items behind a disabled flag are hidden', () => {
     { title: 'x', body: 'x', icon: 'a', flag: 'duas' as const },
     { title: 'y', body: 'y', icon: 'b' },
   ];
-  assert.deepEqual(visibleItems(items, (flag) => flag !== 'duas').map((i) => i.title), ['y']);
+  assert.deepEqual(visibleItems(items, (flag) => flag !== 'duas', 'ios').map((i) => i.title), ['y']);
+});
+
+test('items for another platform are hidden', () => {
+  const items = [
+    { title: 'x', body: 'x', icon: 'a', platform: 'ios' as const },
+    { title: 'y', body: 'y', icon: 'b', platform: 'android' as const },
+    { title: 'z', body: 'z', icon: 'c' },
+  ];
+  assert.deepEqual(visibleItems(items, () => true, 'android').map((i) => i.title), ['y', 'z']);
 });
 
 test('shipped content is sorted newest first', () => {

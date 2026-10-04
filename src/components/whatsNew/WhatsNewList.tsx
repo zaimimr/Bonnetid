@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Pressable, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText, Card, Divider } from '@/components/ui';
@@ -82,7 +82,7 @@ export function WhatsNewList({ entries, onNavigate }: WhatsNewListProps) {
   return (
     <View style={{ gap: spacing.xl }}>
       {entries.map((entry) => {
-        const items = visibleItems(entry.items, isEnabled);
+        const items = visibleItems(entry.items, isEnabled, Platform.OS);
         if (items.length === 0) return null;
         return (
           <View key={entry.version} style={{ gap: spacing.md }}>

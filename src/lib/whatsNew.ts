@@ -6,6 +6,7 @@ export type WhatsNewItem = {
   icon: string;
   route?: string;
   flag?: FeatureFlag;
+  platform?: 'ios' | 'android';
 };
 
 export type WhatsNewEntry = {
@@ -17,6 +18,36 @@ export const WHATS_NEW: WhatsNewEntry[] = [
   {
     version: '1.9.0',
     items: [
+      {
+        title: 'Siri',
+        body: 'Spør Siri «Når er neste bønn?» eller be om dagens bønnetider.',
+        icon: 'mic-outline',
+        platform: 'ios',
+      },
+      {
+        title: 'Apple Watch',
+        body: 'Neste bønn og dagens tider på klokka, med komplikasjoner til urskiven.',
+        icon: 'watch-outline',
+        platform: 'ios',
+      },
+      {
+        title: 'CarPlay',
+        body: 'Se neste bønn, dagens tider og moskeer i nærheten i bilen.',
+        icon: 'car-outline',
+        platform: 'ios',
+      },
+      {
+        title: 'Snarveier',
+        body: 'Hold inne app-ikonet for neste bønn, Qibla og kalenderen.',
+        icon: 'flash-outline',
+        platform: 'android',
+      },
+      {
+        title: 'Wear OS',
+        body: 'Neste bønn og dagens tider på klokka, med flis og komplikasjon.',
+        icon: 'watch-outline',
+        platform: 'android',
+      },
       {
         title: 'Dua og dhikr',
         body: 'Duaer til bønnen, Ramadan og Hajj, med uttale og oversettelse.',
@@ -76,6 +107,9 @@ export function pendingWhatsNew(
 export function visibleItems(
   items: WhatsNewItem[],
   isEnabled: (flag: FeatureFlag) => boolean,
+  platform: string,
 ): WhatsNewItem[] {
-  return items.filter((item) => item.flag == null || isEnabled(item.flag));
+  return items.filter(
+    (item) => (item.flag == null || isEnabled(item.flag)) && (item.platform == null || item.platform === platform),
+  );
 }
