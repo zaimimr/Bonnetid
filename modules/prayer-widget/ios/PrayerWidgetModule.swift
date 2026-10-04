@@ -2,8 +2,8 @@ import ActivityKit
 import ExpoModulesCore
 import WidgetKit
 
-private let appGroupIdentifier = "group.no.irn.bonnetid"
-private let snapshotKey = "prayer_snapshot_v1"
+let appGroupIdentifier = "group.no.irn.bonnetid"
+let snapshotKey = "prayer_snapshot_v1"
 private let logKey = "prayer_log_v1"
 
 struct PrayerActivityState: Record {
@@ -38,6 +38,7 @@ public class PrayerWidgetModule: Module {
       }
       defaults.set(json, forKey: snapshotKey)
       WidgetCenter.shared.reloadAllTimelines()
+      PrayerWatchSync.push()
     }
 
     Function("getPrayerLog") { () -> String? in

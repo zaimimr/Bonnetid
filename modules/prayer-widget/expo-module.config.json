@@ -2,7 +2,7 @@
   "platforms": ["apple", "android"],
   "apple": {
     "modules": ["PrayerWidgetModule"],
-    "appDelegateSubscribers": ["PrayerBackgroundRefresh"]
+    "appDelegateSubscribers": ["PrayerBackgroundRefresh", "PrayerWatchSync"]
   },
   "android": {
     "modules": ["no.irn.bonnetid.widget.PrayerWidgetModule"]
