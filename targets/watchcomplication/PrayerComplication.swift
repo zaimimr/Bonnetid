@@ -61,9 +61,10 @@ struct ComplicationView: View {
             Text(timerInterval: PrayerFormat.countdownRange(to: next.at, from: entry.date), countsDown: true)
               .font(.system(size: 12, weight: .semibold))
               .monospacedDigit()
-              .minimumScaleFactor(0.6)
+              .lineLimit(1)
+              .minimumScaleFactor(0.5)
           }
-          .gaugeStyle(.accessoryCircular)
+          .gaugeStyle(.accessoryCircularCapacity)
           .tint(Color.accentColor)
         case .accessoryInline:
           Text("\(next.printedLabel) \(time) · \(countdown)")
