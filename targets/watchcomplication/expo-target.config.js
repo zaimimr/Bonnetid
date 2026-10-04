@@ -2,7 +2,7 @@ module.exports = (config) => ({
   type: 'watch-widget',
   name: 'bonnetidcomplication',
   displayName: 'Bønnetid',
-  bundleIdentifier: '.watchkitapp.complication',
+  bundleIdentifier: '.watchkitapp.widget',
   deploymentTarget: '10.0',
   colors: {
     $accent: '#6FBA9D',
