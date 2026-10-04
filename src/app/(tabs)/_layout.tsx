@@ -1,4 +1,4 @@
-import { Platform, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/components/ui';
@@ -74,6 +74,10 @@ export default function TabsLayout() {
           borderTopColor: theme.colors.border,
         },
         tabBarItemStyle: Platform.OS === 'android' ? { paddingTop: 6 } : undefined,
+        tabBarButton:
+          Platform.OS === 'android'
+            ? ({ ref: _ref, android_ripple: _ripple, ...props }) => <Pressable {...props} />
+            : undefined,
       }}>
       <Tabs.Screen
         name="index"
