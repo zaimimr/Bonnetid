@@ -13,6 +13,15 @@ bridge is a `requireOptionalNativeModule`, so every call no-ops there.
 - Shared payload: `src/lib/widgetSnapshot.ts` writes absolute ISO instants into the app group
   `group.no.irn.bonnetid` (iOS) / SharedPreferences `prayer_widget` (Android). Widgets never call
   Supabase; they build a WidgetKit timeline from the snapshot, so they work offline.
+- `targets/_shared/Snapshot.swift` compiles into every target (main app, widget, watch app,
+  complication); `targets/widget/_shared/Theme.swift` into the widget and the main app.
+- Siri/Snarveier: `plugins/withSiriShortcuts.js` copies `plugins/siri/` into the main app target,
+  so `Metadata.appintents` lands in `Bnnetid.app`. The app targets iOS 16.4, so phrases are
+  localized with `nb.lproj/AppShortcuts.strings`, not an xcstrings catalog.
+- Apple Watch: `targets/watch` (app) and `targets/watchcomplication` (complications). The
+  directory names must sort watch app first or the complication gets embedded in the iPhone app.
+  The phone pushes a trimmed, lzfse-compressed snapshot over WatchConnectivity
+  (`modules/prayer-widget/ios/PrayerWatchSync.swift`).
 - `PrayerActivityAttributes.swift` exists twice on purpose (target + module). ActivityKit needs the
   same type in both binaries; keep the copies identical.
 - `ios/` and `android/` are generated (CNG) and gitignored: `npx expo prebuild -p ios --clean`,
