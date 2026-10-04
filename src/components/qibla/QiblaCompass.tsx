@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { View } from 'react-native';
 import Animated, {
+  type SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -45,6 +46,21 @@ function sectorPath(size: number, centreBearing: number, halfAngle: number): str
   return `M ${centre} ${centre} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArc} 1 ${endX} ${endY} Z`;
 }
 
+function UprightLabel({
+  rotation,
+  angle,
+  children,
+}: {
+  rotation: SharedValue<number>;
+  angle: number;
+  children: ReactNode;
+}) {
+  const style = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${-angle - rotation.value}deg` }],
+  }));
+  return <Animated.View style={[{ marginTop: spacing.sm }, style]}>{children}</Animated.View>;
+}
+
 export type QiblaCompassProps = {
   heading: number;
   qiblaBearing: number;
@@ -75,6 +91,10 @@ export function QiblaCompass({
       duration: 200,
     });
   }, [heading, roseRotation]);
+
+  const kaabaStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${-qiblaBearing - roseRotation.value}deg` }],
+  }));
 
   const roseStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${roseRotation.value}deg` }],
@@ -127,13 +147,14 @@ export function QiblaCompass({
                 alignItems: 'center',
                 transform: [{ rotate: `${cardinal.angle}deg` }],
               }}>
-              <AppText
-                size="sm"
-                weight={cardinal.label === 'N' ? 'bold' : 'medium'}
-                tone={cardinal.label === 'N' ? 'danger' : 'textMuted'}
-                style={{ marginTop: spacing.sm }}>
-                {cardinal.label}
-              </AppText>
+              <UprightLabel rotation={roseRotation} angle={cardinal.angle}>
+                <AppText
+                  size="sm"
+                  weight={cardinal.label === 'N' ? 'bold' : 'medium'}
+                  tone={cardinal.label === 'N' ? 'danger' : 'textMuted'}>
+                  {cardinal.label}
+                </AppText>
+              </UprightLabel>
             </View>
           ))}
 
@@ -145,25 +166,27 @@ export function QiblaCompass({
               alignItems: 'center',
               transform: [{ rotate: `${qiblaBearing}deg` }],
             }}>
-            <View
-              style={{
-                marginTop: 20,
-                width: 48,
-                height: 48,
-                borderRadius: radius.full,
-                backgroundColor: isAligned ? theme.colors.primary : theme.colors.primarySoft,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderWidth: 2,
-                borderColor: isAligned ? theme.colors.primary : theme.colors.border,
-                transform: [{ rotate: `${-qiblaBearing}deg` }],
-              }}>
+            <Animated.View
+              style={[
+                {
+                  marginTop: 20,
+                  width: 48,
+                  height: 48,
+                  borderRadius: radius.full,
+                  backgroundColor: isAligned ? theme.colors.primary : theme.colors.primarySoft,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 2,
+                  borderColor: isAligned ? theme.colors.primary : theme.colors.border,
+                },
+                kaabaStyle,
+              ]}>
               <Ionicons
                 name="cube"
                 size={22}
                 color={isAligned ? theme.colors.onPrimary : theme.colors.onPrimarySoft}
               />
-            </View>
+            </Animated.View>
           </View>
 
           <View

@@ -185,8 +185,14 @@ function OsmQiblaMap({
     () =>
       buildLeafletHtml({
         background: theme.colors.surfaceSunken,
+        scheme: theme.scheme,
+        attribution: { background: theme.colors.surface, text: theme.colors.textMuted },
         styles: `
-  .kaaba-icon { font-size: 26px; line-height: 1; text-align: center; }
+  .kaaba-icon {
+    box-sizing: border-box; width: 16px; height: 16px; border-radius: 4px;
+    background: ${theme.colors.textPrimary}; border: 3px solid ${theme.colors.accent};
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
   .user-dot {
     width: 16px; height: 16px; border-radius: 50%;
     background: ${theme.colors.mapFacing}; border: 3px solid ${theme.colors.mapPinRing};
@@ -231,11 +237,14 @@ function OsmQiblaMap({
   };
 
   L.marker([${KAABA.lat}, ${KAABA.lon}], {
-    icon: L.divIcon({ className: '', html: '<div class="kaaba-icon">🕋</div>', iconSize: [26, 26], iconAnchor: [13, 13] })
+    icon: L.divIcon({ className: '', html: '<div class="kaaba-icon"></div>', iconSize: [16, 16], iconAnchor: [8, 8] })
   }).addTo(map).bindPopup('Kaba, Mekka');`,
       }),
     [
       initial,
+      theme.scheme,
+      theme.colors.accent,
+      theme.colors.textMuted,
       theme.colors.mapFacing,
       theme.colors.mapPinRing,
       theme.colors.primary,

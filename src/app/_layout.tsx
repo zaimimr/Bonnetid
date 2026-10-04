@@ -3,6 +3,7 @@ import { NotoNaskhArabic_400Regular } from '@expo-google-fonts/noto-naskh-arabic
 import { ScheherazadeNew_400Regular } from '@expo-google-fonts/scheherazade-new/400Regular';
 import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { defaultShouldDehydrateQuery, QueryCache, QueryClient } from '@tanstack/react-query';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
@@ -65,6 +66,8 @@ const persistOptions = {
 configureNotificationHandler();
 void SplashScreen.preventAutoHideAsync();
 
+const isAndroid = Platform.OS === 'android';
+
 function RootNavigator() {
   const theme = useTheme();
   const now = useNow(60_000);
@@ -102,6 +105,12 @@ function RootNavigator() {
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: theme.colors.background },
+          headerStyle: {
+            backgroundColor: isAndroid ? theme.colors.background : theme.colors.surface,
+          },
+          headerShadowVisible: !isAndroid,
+          headerTitleStyle: { color: theme.colors.textPrimary },
+          headerTintColor: theme.colors.primary,
         }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
@@ -110,9 +119,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Moskeer',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -121,9 +127,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Velg sted',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -132,9 +135,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Bønnesporing',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -143,9 +143,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Innstillinger',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -154,9 +151,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Tasbih',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -165,9 +159,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Dua og dhikr',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -176,9 +167,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Dua',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -187,9 +175,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Islamsk Råd Norge',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -198,9 +183,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Varsellyd',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -209,9 +191,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Bønnetider',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -220,9 +199,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Faste og merkedager',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -231,9 +207,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Beregningsmetode',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -242,9 +215,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Asr-metode',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -253,9 +223,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Arabisk skrift',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -264,9 +231,6 @@ function RootNavigator() {
             presentation: 'modal',
             headerShown: true,
             title: 'Velg moské',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -275,9 +239,6 @@ function RootNavigator() {
             headerShown: true,
             title: '',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -286,9 +247,6 @@ function RootNavigator() {
             headerShown: true,
             title: '',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -297,9 +255,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Hva er nytt',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
         <Stack.Screen
@@ -308,9 +263,6 @@ function RootNavigator() {
             headerShown: true,
             title: 'Tilbakemelding',
             headerBackTitle: 'Tilbake',
-            headerStyle: { backgroundColor: theme.colors.surface },
-            headerTitleStyle: { color: theme.colors.textPrimary },
-            headerTintColor: theme.colors.primary,
           }}
         />
       </Stack>

@@ -104,7 +104,7 @@ export const darkTheme: Theme = {
     background: palette.night950,
     surface: palette.night900,
     surfaceElevated: palette.night800,
-    surfaceSunken: palette.night950,
+    surfaceSunken: palette.night800,
     primary: palette.emerald400,
     onPrimary: palette.night950,
     primarySoft: palette.night700,

@@ -203,7 +203,7 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Søk etter moské, sted eller kommune"
+              placeholder="Søk etter moské eller sted"
               placeholderTextColor={theme.colors.textMuted}
               autoCorrect={false}
               maxFontSizeMultiplier={1.6}

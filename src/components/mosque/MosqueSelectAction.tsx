@@ -41,6 +41,7 @@ export function MosqueSelectAction({
           flexDirection: 'row',
           alignItems: 'center',
           alignSelf: 'flex-start',
+          maxWidth: '100%',
           gap: spacing.xs,
           paddingVertical: spacing.xs,
           paddingHorizontal: spacing.md,
@@ -50,7 +51,7 @@ export function MosqueSelectAction({
         pressed && { opacity: opacity.pressed },
       ]}>
       <Ionicons name="add-circle-outline" size={15} color={theme.colors.onPrimarySoft} />
-      <AppText size="sm" weight="semibold" tone="onPrimarySoft">
+      <AppText size="sm" weight="semibold" tone="onPrimarySoft" style={{ flexShrink: 1 }}>
         Velg som min moské
       </AppText>
     </Pressable>

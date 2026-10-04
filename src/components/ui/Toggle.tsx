@@ -66,7 +66,7 @@ export function Toggle({ value, onValueChange, disabled = false, accessibilityLa
               shadowOpacity: 0.15,
               shadowRadius: 2,
               shadowOffset: { width: 0, height: 1 },
-              elevation: 2,
+              elevation: disabled ? 0 : 2,
             },
             thumbStyle,
           ]}

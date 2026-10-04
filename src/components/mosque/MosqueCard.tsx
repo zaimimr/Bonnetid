@@ -5,6 +5,7 @@ import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import type { Mosque } from '@/api/types';
 import { formatDistance } from '@/lib/geo';
+import { mosqueCardSubtitle } from '@/lib/mosqueAddress';
 import { eidBadgeLabel, type EidPeriod } from '@/lib/hijri';
 import { JUMMAH_MISSING_SHORT } from '@/lib/jummahCopy';
 
@@ -36,7 +37,7 @@ export function MosqueCard({
     .join(' · ');
   const eidTimes = eidPeriod && mosque.show_eid ? mosque.eid_prayers : [];
   const missingJummah = showMissingJummah && !jummahLabel;
-  const subtitle = [mosque.address, place].filter(Boolean).join(' · ');
+  const subtitle = mosqueCardSubtitle(mosque.address, place);
 
   return (
     <Card onPress={onPress} rounded="xl">

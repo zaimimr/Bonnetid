@@ -14,6 +14,7 @@ import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { MosqueSelectAction } from '@/components/mosque/MosqueSelectAction';
 import { AppText, Card, ErrorState, ListRow, Screen, SectionHeader, Skeleton } from '@/components/ui';
 import { openVipps } from '@/lib/mosqueDonations';
+import { mosqueAddressLine } from '@/lib/mosqueAddress';
 import { useFeature } from '@/hooks/useFeature';
 import { track } from '@/lib/telemetry';
 import { useIsCalculatedMode, useSettings } from '@/store/settings';
@@ -115,6 +116,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
     adhan: adhanTimes[name] ?? null,
     jamat: jamatTimes[name] ?? null,
   })).filter((row) => row.adhan != null || row.jamat != null);
+  const hasJamatTimes = jamatRows.some((row) => row.jamat != null);
 
   const chooseMosque = () => {
     setMosque({ orgNr: mosque.org_nr, name: mosque.name });
@@ -178,8 +180,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                   size="sm"
                   tone={mosque.lat && mosque.lon ? 'primary' : 'textSecondary'}
                   style={{ flex: 1 }}>
-                  {mosque.address}
-                  {mosque.post ? `, ${mosque.post.code} ${mosque.post.city}` : ''}
+                  {mosqueAddressLine(mosque.address, mosque.post)}
                 </AppText>
               </Pressable>
             ) : null}
@@ -243,7 +244,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
             }
           />
           <Card padding="sm" rounded="xl">
-            {!stacked && (
+            {!stacked && hasJamatTimes && (
               <View
                 style={{
                   flexDirection: 'row',
@@ -277,18 +278,20 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                 <>
                   <TimeCell
                     value={row.adhan ?? '–'}
-                    label="Adhan"
+                    label={hasJamatTimes ? 'Adhan' : ''}
                     stacked={stacked}
                     width={columnWidth}
                   />
-                  <TimeCell
-                    value={row.jamat ?? '–'}
-                    label="Jamaat"
-                    stacked={stacked}
-                    width={columnWidth}
-                    weight="semibold"
-                    tone={row.jamat ? 'primary' : 'textMuted'}
-                  />
+                  {hasJamatTimes && (
+                    <TimeCell
+                      value={row.jamat ?? '–'}
+                      label="Jamaat"
+                      stacked={stacked}
+                      width={columnWidth}
+                      weight="semibold"
+                      tone={row.jamat ? 'primary' : 'textMuted'}
+                    />
+                  )}
                 </>
               );
               return (

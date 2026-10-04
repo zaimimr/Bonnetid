@@ -1,8 +1,10 @@
+import { Platform, View } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/components/ui';
 import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 import { useTheme } from '@/theme';
+import { radius } from '@/theme/tokens';
 import { useOnboardingDone, useSettingsHydrated } from '@/store/settings';
 import { useSupportThread } from '@/hooks/useSupportThread';
 
@@ -19,6 +21,37 @@ function TabLabel({ title, color }: { title: string; color: string }) {
       numberOfLines={1}>
       {title}
     </AppText>
+  );
+}
+
+type IconName = keyof typeof Ionicons.glyphMap;
+
+function TabIcon({
+  name,
+  activeName,
+  focused,
+  color,
+}: {
+  name: IconName;
+  activeName: IconName;
+  focused: boolean;
+  color: string;
+}) {
+  const theme = useTheme();
+  const icon = <Ionicons name={focused ? activeName : name} size={22} color={color} />;
+  if (Platform.OS !== 'android') return icon;
+  return (
+    <View
+      style={{
+        width: 56,
+        height: 30,
+        borderRadius: radius.full,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: focused ? theme.colors.primarySoft : 'transparent',
+      }}>
+      {icon}
+    </View>
   );
 }
 
@@ -40,13 +73,16 @@ export default function TabsLayout() {
           backgroundColor: theme.colors.tabBarBackground,
           borderTopColor: theme.colors.border,
         },
+        tabBarItemStyle: Platform.OS === 'android' ? { paddingTop: 6 } : undefined,
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Oversikt',
           tabBarLabel: ({ color }) => <TabLabel title="Oversikt" color={color as string} />,
-          tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="home-outline" activeName="home" focused={focused} color={color as string} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -54,8 +90,8 @@ export default function TabsLayout() {
         options={{
           title: 'Kalender',
           tabBarLabel: ({ color }) => <TabLabel title="Kalender" color={color as string} />,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar-outline" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="calendar-outline" activeName="calendar" focused={focused} color={color as string} />
           ),
         }}
       />
@@ -64,8 +100,8 @@ export default function TabsLayout() {
         options={{
           title: 'Qibla',
           tabBarLabel: ({ color }) => <TabLabel title="Qibla" color={color as string} />,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="compass-outline" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="compass-outline" activeName="compass" focused={focused} color={color as string} />
           ),
         }}
       />
@@ -81,8 +117,8 @@ export default function TabsLayout() {
             backgroundColor: theme.colors.primary,
           },
           tabBarLabel: ({ color }) => <TabLabel title="Mer" color={color as string} />,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="apps-outline" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="apps-outline" activeName="apps" focused={focused} color={color as string} />
           ),
         }}
       />

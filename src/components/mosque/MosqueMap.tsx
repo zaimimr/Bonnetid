@@ -35,6 +35,7 @@ export function MosqueMap(props: MosqueMapProps) {
 
 const PIN_SIZE = 16;
 const PIN_SIZE_ACTIVE = 24;
+const CLEAR_MESSAGE = 'clear';
 const FIT_PADDING = { top: 64, right: 48, bottom: 200, left: 48 };
 
 function NativeMosqueMap({
@@ -176,102 +177,117 @@ function MosquePinCard({
   );
 }
 
-function OsmMosqueMap({ pins, center, actionLabel, onSelect }: MosqueMapProps) {
+function OsmMosqueMap({
+  pins,
+  center,
+  actionLabel = 'Vis moské',
+  myOrgNr,
+  fitToPins,
+  onSelect,
+}: MosqueMapProps) {
   const theme = useTheme();
   const mapRef = useRef<LeafletMapHandle>(null);
+  const [activeOrgNr, setActiveOrgNr] = useState<string | null>(null);
+  const active = pins.find((pin) => pin.orgNr === activeOrgNr) ?? null;
 
   const html = useMemo(
     () =>
       buildLeafletHtml({
         background: theme.colors.surfaceSunken,
+        scheme: theme.scheme,
+        attribution: { background: theme.colors.surface, text: theme.colors.textMuted },
         styles: `
   .pin {
-    width: 18px; height: 18px; border-radius: 50%;
+    box-sizing: border-box; border-radius: 50%;
     background: ${theme.colors.primary}; border: 3px solid ${theme.colors.mapPinRing};
-    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    width: ${PIN_SIZE}px; height: ${PIN_SIZE}px;
   }
-  .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-    background: ${theme.colors.surface}; color: ${theme.colors.textPrimary};
-  }
-  .popup-name { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
-  .popup-address { font-size: 13px; color: ${theme.colors.textSecondary}; }
-  .popup-open {
-    display: inline-block; margin-top: 8px; padding: 6px 12px; border-radius: 999px;
-    background: ${theme.colors.primary}; color: ${theme.colors.onPrimary}; border: 0;
-    font-weight: 600; font-size: 13px;
-  }`,
+  .pin.mine { background: ${theme.colors.accent}; }
+  .pin.active { width: ${PIN_SIZE_ACTIVE}px; height: ${PIN_SIZE_ACTIVE}px; border-width: 4px; }`,
         script: `
-  var map = createMap(${center.lat}, ${center.lon}, 11);
+  var map = createMap(${center.lat}, ${center.lon}, 12);
   var pinLayer = L.layerGroup().addTo(map);
-  var pinIcon = L.divIcon({
-    className: '',
-    html: '<div class="pin"></div>',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12]
+  var fitted = false;
+
+  map.on('click', function () {
+    window.ReactNativeWebView.postMessage('${CLEAR_MESSAGE}');
   });
 
-  function popupContent(pin) {
-    var wrap = document.createElement('div');
-    var name = document.createElement('div');
-    name.className = 'popup-name';
-    name.textContent = pin.name;
-    wrap.appendChild(name);
-    if (pin.address) {
-      var address = document.createElement('div');
-      address.className = 'popup-address';
-      address.textContent = pin.address;
-      wrap.appendChild(address);
-    }
-    var button = document.createElement('button');
-    button.className = 'popup-open';
-    button.textContent = ${JSON.stringify(actionLabel ?? 'Vis moské')};
-    button.addEventListener('click', function () {
-      window.ReactNativeWebView.postMessage(pin.orgNr);
+  function pinIcon(className) {
+    var size = className.indexOf('active') >= 0 ? ${PIN_SIZE_ACTIVE + 8} : ${PIN_SIZE + 8};
+    return L.divIcon({
+      className: '',
+      html: '<div class="' + className + '"></div>',
+      iconSize: [size, size],
+      iconAnchor: [size / 2 - 4, size / 2 - 4]
     });
-    wrap.appendChild(button);
-    return wrap;
   }
 
-  window.setPins = function (pins) {
+  window.setPins = function (pins, activeOrgNr, myOrgNr, fit) {
     pinLayer.clearLayers();
     pins.forEach(function (pin) {
-      L.marker([pin.lat, pin.lon], { icon: pinIcon })
-        .bindPopup(function () {
-          return popupContent(pin);
+      var className = 'pin' + (pin.orgNr === myOrgNr ? ' mine' : '') + (pin.orgNr === activeOrgNr ? ' active' : '');
+      L.marker([pin.lat, pin.lon], {
+        icon: pinIcon(className),
+        zIndexOffset: pin.orgNr === activeOrgNr ? 1000 : pin.orgNr === myOrgNr ? 500 : 0
+      })
+        .on('click', function (event) {
+          L.DomEvent.stopPropagation(event);
+          window.ReactNativeWebView.postMessage(pin.orgNr);
         })
         .addTo(pinLayer);
     });
+    if (fit && !fitted && pins.length > 1) {
+      fitted = true;
+      map.fitBounds(pins.map(function (pin) { return [pin.lat, pin.lon]; }), {
+        paddingTopLeft: [32, 48],
+        paddingBottomRight: [32, 160]
+      });
+    }
   };`,
       }),
     [
-      actionLabel,
       center.lat,
       center.lon,
+      theme.scheme,
+      theme.colors.accent,
       theme.colors.mapPinRing,
-      theme.colors.onPrimary,
       theme.colors.primary,
       theme.colors.surface,
       theme.colors.surfaceSunken,
-      theme.colors.textPrimary,
-      theme.colors.textSecondary,
+      theme.colors.textMuted,
     ],
   );
 
   const pushPins = useCallback(() => {
-    mapRef.current?.run(`window.setPins && window.setPins(${JSON.stringify(pins)});`);
-  }, [pins]);
+    mapRef.current?.run(
+      `window.setPins && window.setPins(${JSON.stringify(pins)}, ${JSON.stringify(activeOrgNr)}, ${JSON.stringify(myOrgNr ?? null)}, ${fitToPins ? 'true' : 'false'});`,
+    );
+  }, [pins, activeOrgNr, myOrgNr, fitToPins]);
 
   useEffect(() => {
     pushPins();
   }, [pushPins]);
 
   return (
-    <LeafletMap
-      ref={mapRef}
-      html={html}
-      onReady={pushPins}
-      onMessage={onSelect}
-      fallbackMessage="Kartet ble avsluttet av systemet. Bruk listevisningen hvis det skjer igjen."
-    />
+    <View style={{ flex: 1 }}>
+      <LeafletMap
+        ref={mapRef}
+        html={html}
+        onReady={pushPins}
+        onMessage={(message) => setActiveOrgNr(message === CLEAR_MESSAGE ? null : message)}
+        fallbackMessage="Kartet ble avsluttet av systemet. Bruk listevisningen hvis det skjer igjen."
+      />
+      {active && (
+        <MosquePinCard
+          pin={active}
+          mine={active.orgNr === myOrgNr}
+          actionLabel={actionLabel}
+          onClose={() => setActiveOrgNr(null)}
+          onSelect={() => onSelect(active.orgNr)}
+        />
+      )}
+    </View>
   );
 }
