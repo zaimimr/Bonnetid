@@ -107,6 +107,8 @@ type SettingsState = {
   setDuaArabicFont: (duaArabicFont: ArabicFontKey) => void;
   readAnnouncements: Record<string, string>;
   markAnnouncementRead: (orgNr: string, announcement: string) => void;
+  dismissedEidLeave: string[];
+  dismissEidLeave: (eidIso: string) => void;
   completeOnboarding: (version: string) => void;
   registerLaunch: () => void;
   markReviewRequested: (version: string) => void;
@@ -208,6 +210,9 @@ export const useSettings = create<SettingsState>()(
         set((state) => ({
           readAnnouncements: { ...state.readAnnouncements, [orgNr]: announcement },
         })),
+      dismissedEidLeave: [],
+      dismissEidLeave: (eidIso) =>
+        set((state) => ({ dismissedEidLeave: [...state.dismissedEidLeave, eidIso] })),
       completeOnboarding: (version) => set({ onboardingDone: true, lastSeenWhatsNew: version }),
       registerLaunch: () =>
         set((state) => ({

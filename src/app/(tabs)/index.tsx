@@ -7,6 +7,7 @@ import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { EventCard } from '@/components/calendar/EventCard';
 import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosquePresenceCard } from '@/components/mosque/MosquePresenceCard';
+import { EidLeaveCard } from '@/components/season/EidLeaveCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import { NightCard } from '@/components/season/NightCard';
 import {
@@ -121,6 +122,8 @@ export default function HomeScreen() {
             />
           </Card>
         )}
+
+        <EidLeaveCard now={now} />
 
         <SeasonCard />
 
