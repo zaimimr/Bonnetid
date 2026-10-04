@@ -336,27 +336,28 @@ export default function SettingsScreen() {
 
       {duasEnabled && (
         <>
-          <SectionHeader title="Dua og dhikr" />
+          <SectionHeader title="Duaer" />
           <Card padding="sm" rounded="xl">
             <ListRow
-              title="Uttale"
+              title="Vis uttale under duaene"
+              subtitle="Arabisk skrevet med latinske bokstaver"
               trailing={
                 <Toggle
                   value={showTransliteration}
                   onValueChange={setShowTransliteration}
-                  accessibilityLabel="Uttale"
+                  accessibilityLabel="Vis uttale under duaene"
                 />
               }
               style={ROW}
             />
             <Divider />
             <ListRow
-              title="Oversettelse"
+              title="Vis norsk oversettelse under duaene"
               trailing={
                 <Toggle
                   value={showMeaning}
                   onValueChange={setShowMeaning}
-                  accessibilityLabel="Oversettelse"
+                  accessibilityLabel="Vis norsk oversettelse under duaene"
                 />
               }
               style={ROW}
