@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
 import * as Device from 'expo-device';
 import { AppText, Button, Card, SegmentedControl, Screen, TextField } from '@/components/ui';
-import { useNow } from '@/hooks/useNow';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useSupportThread } from '@/hooks/useSupportThread';
 import { formatFeedback, type FeedbackKind } from '@/lib/supportApi';
@@ -17,8 +16,6 @@ const KINDS: { value: FeedbackKind; label: string }[] = [
   { value: 'Ros', label: 'Ros' },
   { value: 'Annet', label: 'Annet' },
 ];
-
-const COOLDOWN_MS = 60_000;
 
 const timeFormat = new Intl.DateTimeFormat('nb-NO', {
   day: 'numeric',
@@ -40,8 +37,6 @@ export default function FeedbackScreen() {
   const [text, setText] = useState('');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<Status>('idle');
-  const [lastSentAt, setLastSentAt] = useState(0);
-  const now = useNow(5_000);
 
   useEffect(() => {
     track('feedback_opened');
@@ -52,8 +47,7 @@ export default function FeedbackScreen() {
   }, [unread, markRead]);
 
   const submit = async () => {
-    const sentAt = Date.now();
-    if (sentAt - lastSentAt < COOLDOWN_MS) return;
+    if (status === 'sending') return;
     setStatus('sending');
     const message = hasTicket
       ? text.trim()
@@ -71,12 +65,9 @@ export default function FeedbackScreen() {
       return;
     }
     track('feedback_sent', { kind, channel: outcome });
-    setLastSentAt(sentAt);
     setText('');
     setStatus(outcome);
   };
-
-  const coolingDown = now.getTime() - lastSentAt < COOLDOWN_MS && status !== 'failed';
 
   return (
     <Screen scroll edges={[]} refreshing={refreshing} onRefresh={hasTicket ? onRefresh : undefined}>
@@ -133,7 +124,7 @@ export default function FeedbackScreen() {
             label="Send"
             fullWidth
             loading={status === 'sending'}
-            disabled={text.trim().length === 0 || coolingDown}
+            disabled={text.trim().length === 0}
             onPress={submit}
           />
           {status === 'thread' && (
