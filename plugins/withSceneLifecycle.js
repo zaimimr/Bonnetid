@@ -26,9 +26,12 @@ module.exports = function withSceneLifecycle(config) {
   });
 
   return withInfoPlist(config, (modConfig) => {
+    const manifest = modConfig.modResults.UIApplicationSceneManifest ?? {};
     modConfig.modResults.UIApplicationSceneManifest = {
-      UIApplicationSupportsMultipleScenes: false,
+      ...manifest,
+      UIApplicationSupportsMultipleScenes: manifest.UIApplicationSupportsMultipleScenes ?? false,
       UISceneConfigurations: {
+        ...manifest.UISceneConfigurations,
         UIWindowSceneSessionRoleApplication: [
           {
             UISceneConfigurationName: 'Default Configuration',
