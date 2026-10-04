@@ -12,6 +12,7 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import org.json.JSONArray
 
 object PrayerStatusNotifier {
@@ -27,6 +28,7 @@ object PrayerStatusNotifier {
   private const val START_HOST = "start"
   private const val MARK_HOST = "mark"
   private const val END_HOST = "end"
+  private const val EXTRA_REQUEST_PROMOTED_ONGOING = "android.requestPromotedOngoing"
 
   fun sync(context: Context) {
     val snapshot = PrayerSnapshot.load(context)
@@ -187,6 +189,7 @@ object PrayerStatusNotifier {
       .setCategory(Notification.CATEGORY_REMINDER)
       .setVisibility(Notification.VISIBILITY_PUBLIC)
       .setContentIntent(openAppIntent(context))
+      .addExtras(Bundle().apply { putBoolean(EXTRA_REQUEST_PROMOTED_ONGOING, true) })
       .addAction(
         action(context, R.drawable.prayer_widget_check, "Bedt", date, kind, PrayerLogStore.STATUS_PRAYED),
       )
