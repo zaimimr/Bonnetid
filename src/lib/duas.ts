@@ -335,6 +335,26 @@ export const DUAS: Dua[] = [
   },
 ];
 
+const AFTER_ADHAN_MS = 15 * 60 * 1000;
+
+export function duaCategoryForNow({
+  eid,
+  sinceAdhanMs,
+  activeSeason,
+}: {
+  eid: boolean;
+  sinceAdhanMs: number | null;
+  activeSeason: 'ramadan' | 'dhul-hijjah' | null;
+}): DuaCategoryId {
+  if (eid) return 'eid';
+  if (sinceAdhanMs != null && sinceAdhanMs >= 0 && sinceAdhanMs < AFTER_ADHAN_MS) {
+    return 'after-adhan';
+  }
+  if (activeSeason === 'ramadan') return 'ramadan';
+  if (activeSeason === 'dhul-hijjah') return 'hajj';
+  return 'after-salah';
+}
+
 export function duasIn(category: DuaCategoryId): Dua[] {
   return DUAS.filter((dua) => dua.category === category);
 }
