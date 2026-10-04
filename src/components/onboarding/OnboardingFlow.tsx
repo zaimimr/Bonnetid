@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, Linking, Platform, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
@@ -286,9 +286,11 @@ function LocationStep({ onNext }: { onNext: () => void }) {
   const setLocation = useSettings((state) => state.setLocation);
   const [busy, setBusy] = useState(false);
   const [denied, setDenied] = useState(false);
+  const running = useRef(false);
 
   const detect = useCallback(async () => {
-    if (!locations) return;
+    if (!locations || running.current) return;
+    running.current = true;
     setBusy(true);
     setDenied(false);
     try {
@@ -299,6 +301,7 @@ function LocationStep({ onNext }: { onNext: () => void }) {
       trackError(error, 'onboarding-location');
       setDenied(true);
     } finally {
+      running.current = false;
       setBusy(false);
     }
   }, [locations, setLocation, onNext]);
@@ -307,9 +310,9 @@ function LocationStep({ onNext }: { onNext: () => void }) {
     if (!locations) return;
     let cancelled = false;
     const detectIfGranted = () => {
-      Location.getForegroundPermissionsAsync()
-        .then((permission) => {
-          if (!cancelled && permission.granted) return detect();
+      Promise.all([Location.getForegroundPermissionsAsync(), Location.hasServicesEnabledAsync()])
+        .then(([permission, servicesEnabled]) => {
+          if (!cancelled && permission.granted && servicesEnabled) return detect();
         })
         .catch((error) => trackError(error, 'onboarding-location'));
     };
