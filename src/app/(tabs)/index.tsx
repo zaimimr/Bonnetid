@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
@@ -7,6 +7,8 @@ import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
 import { EventCard } from '@/components/calendar/EventCard';
 import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosquePresenceCard } from '@/components/mosque/MosquePresenceCard';
+import { EidNearbyCard } from '@/components/eid/EidNearbyCard';
+import { TakbirCard } from '@/components/eid/TakbirCard';
 import { NotificationCheckCard } from '@/components/notifications/NotificationCheckCard';
 import { EidLeaveCard } from '@/components/season/EidLeaveCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
@@ -22,6 +24,8 @@ import {
   Skeleton,
 } from '@/components/ui';
 import { useActiveDayKeys } from '@/hooks/useActiveDay';
+import { useEidMode } from '@/hooks/useEidMode';
+import { useEidPrayers } from '@/hooks/useEidPrayers';
 import { useMosquePresence } from '@/hooks/useMosquePresence';
 import { useNow } from '@/hooks/useNow';
 import { useTimezoneNote } from '@/hooks/useTimezoneNote';
@@ -30,6 +34,7 @@ import { useRefresh } from '@/hooks/useRefresh';
 import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 import { formatGregorianLong, formatHijri, monthYearLabel } from '@/lib/hijri';
 import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
+import { track } from '@/lib/telemetry';
 import { isoDateIsFriday, parseDayKey } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
 import { useActiveLocation, useActiveMosque, useUnreadAnnouncement } from '@/store/settings';
@@ -68,6 +73,18 @@ export default function HomeScreen() {
     mosqueDetails.data?.announcement,
   );
   const myAnnouncement = presence?.mosque.org_nr !== mosque?.orgNr ? unreadAnnouncement : null;
+  const eidMode = useEidMode();
+  const eidKey = eidMode ? `${eidMode.eid}:${eidMode.phase}` : null;
+  useEffect(() => {
+    if (!eidKey) return;
+    const [eid, phase] = eidKey.split(':');
+    track('eid_mode_viewed', { eid, phase });
+  }, [eidKey]);
+  const eidPrayers = useEidPrayers(
+    calculated ? null : eidMode,
+    mosqueDetails.data ?? null,
+    now,
+  );
   const jamatTimes = jamatTimesForDate(
     mosqueInLocation ? mosqueDetails.data?.jamat : null,
     todayIso,
@@ -98,9 +115,10 @@ export default function HomeScreen() {
           <NoTimesState period={monthYearLabel(today)} onRetry={refetch} />
         )}
 
-        {nextPrayer && (
+        {(nextPrayer || eidPrayers.hero) && (
           <NextPrayerHero
             nextPrayer={nextPrayer}
+            eidPrayer={eidPrayers.hero}
             now={now}
             hijriText={hijriText}
             gregorianText={formatGregorianLong(today)}
@@ -125,6 +143,10 @@ export default function HomeScreen() {
             />
           </Card>
         )}
+
+        {eidMode && <TakbirCard />}
+
+        <EidNearbyCard mosques={eidPrayers.nearby} />
 
         <EidLeaveCard now={now} />
 

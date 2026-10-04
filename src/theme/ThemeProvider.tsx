@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, type PropsWithChildren } from 'react';
 import { useColorScheme } from 'react-native';
-import { darkTheme, lightTheme, travelTheme, type Theme } from './theme';
+import { darkTheme, eidTheme, lightTheme, travelTheme, type Theme } from './theme';
+import { useEidMode } from '@/hooks/useEidMode';
 import { useIsCalculatedMode, useSettings } from '@/store/settings';
 
 type ThemePreference = 'system' | 'light' | 'dark';
@@ -19,10 +20,14 @@ export function ThemeProvider({ children }: PropsWithChildren) {
   const setThemePreference = useSettings((state) => state.setThemePreference);
 
   const travelling = useIsCalculatedMode();
+  const eid = useEidMode() != null;
 
   const scheme = preference === 'system' ? (systemScheme ?? 'light') : preference;
   const base = scheme === 'dark' ? darkTheme : lightTheme;
-  const theme = useMemo(() => (travelling ? travelTheme(base) : base), [travelling, base]);
+  const theme = useMemo(() => {
+    if (travelling) return travelTheme(base);
+    return eid ? eidTheme(base) : base;
+  }, [travelling, eid, base]);
 
   const value = useMemo(
     () => ({ theme, preference, setPreference: setThemePreference }),

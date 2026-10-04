@@ -45,6 +45,9 @@ export type ThemeColors = {
   travelSurface: string;
   onTravelSurface: string;
   travelSurfaceMuted: string;
+  eidSurface: string;
+  onEidSurface: string;
+  eidSurfaceMuted: string;
 };
 
 export type Theme = {
@@ -99,6 +102,9 @@ export const lightTheme: Theme = {
     travelSurface: palette.travel50,
     onTravelSurface: palette.travel700,
     travelSurfaceMuted: palette.travel500,
+    eidSurface: palette.gold50,
+    onEidSurface: palette.gold700,
+    eidSurfaceMuted: palette.gold600,
   },
 };
 
@@ -149,6 +155,9 @@ export const darkTheme: Theme = {
     travelSurface: palette.travel900,
     onTravelSurface: palette.travel100,
     travelSurfaceMuted: palette.travel200,
+    eidSurface: palette.gold900,
+    onEidSurface: palette.gold100,
+    eidSurfaceMuted: palette.gold200,
   },
 };
 
@@ -176,5 +185,30 @@ const TRAVEL_DARK: Partial<ThemeColors> = {
 
 export function travelTheme(theme: Theme): Theme {
   const overrides = theme.scheme === 'dark' ? TRAVEL_DARK : TRAVEL_LIGHT;
+  return { scheme: theme.scheme, colors: { ...theme.colors, ...overrides } };
+}
+
+const EID_LIGHT: Partial<ThemeColors> = {
+  primary: palette.gold600,
+  primarySoft: palette.gold50,
+  onPrimarySoft: palette.gold700,
+  tabBarActive: palette.gold600,
+  filterActiveSurface: palette.gold50,
+  filterActiveBorder: palette.gold200,
+  filterActiveText: palette.gold700,
+};
+
+const EID_DARK: Partial<ThemeColors> = {
+  primary: palette.gold400,
+  primarySoft: palette.gold900,
+  onPrimarySoft: palette.gold100,
+  tabBarActive: palette.gold400,
+  filterActiveSurface: palette.gold900,
+  filterActiveBorder: palette.gold700,
+  filterActiveText: palette.gold100,
+};
+
+export function eidTheme(theme: Theme): Theme {
+  const overrides = theme.scheme === 'dark' ? EID_DARK : EID_LIGHT;
   return { scheme: theme.scheme, colors: { ...theme.colors, ...overrides } };
 }

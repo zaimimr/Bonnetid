@@ -2,6 +2,7 @@ import type { PropsWithChildren, Ref } from 'react';
 import { ScrollView, StyleSheet, View, type ViewStyle, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useResponsive } from '@/hooks/useResponsive';
+import { EidBanner } from '@/components/eid/EidBanner';
 import { TravelBanner } from '@/components/travel/TravelBanner';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
@@ -84,6 +85,7 @@ export function Screen({
   return (
     <View style={shell}>
       <TravelBanner />
+      <EidBanner />
       {body}
     </View>
   );
