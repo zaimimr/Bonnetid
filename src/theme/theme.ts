@@ -38,6 +38,7 @@ export type ThemeColors = {
   tabBarInactive: string;
   skeleton: string;
   overlay: string;
+  pressedLayer: string;
   mapPinRing: string;
   mapFacing: string;
   mapFacingFill: string;
@@ -91,6 +92,7 @@ export const lightTheme: Theme = {
     tabBarInactive: palette.neutral500,
     skeleton: palette.neutral200,
     overlay: 'rgba(24, 36, 32, 0.5)',
+    pressedLayer: 'rgba(24, 36, 32, 0.08)',
     mapPinRing: palette.neutral0,
     mapFacing: palette.mapBlue,
     mapFacingFill: 'rgba(26, 115, 232, 0.25)',
@@ -140,6 +142,7 @@ export const darkTheme: Theme = {
     tabBarInactive: palette.mist500,
     skeleton: palette.night700,
     overlay: 'rgba(0, 0, 0, 0.6)',
+    pressedLayer: 'rgba(255, 255, 255, 0.1)',
     mapPinRing: palette.neutral0,
     mapFacing: palette.mapBlue,
     mapFacingFill: 'rgba(26, 115, 232, 0.25)',

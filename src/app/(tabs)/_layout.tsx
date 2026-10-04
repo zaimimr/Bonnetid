@@ -1,10 +1,10 @@
-import { Platform, Pressable, View } from 'react-native';
+import { Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/components/ui';
+import { AndroidTabBar } from '@/components/navigation/AndroidTabBar';
 import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 import { useTheme } from '@/theme';
-import { radius } from '@/theme/tokens';
 import { useOnboardingDone, useSettingsHydrated } from '@/store/settings';
 import { useSupportThread } from '@/hooks/useSupportThread';
 
@@ -37,22 +37,7 @@ function TabIcon({
   focused: boolean;
   color: string;
 }) {
-  const theme = useTheme();
-  const icon = <Ionicons name={focused ? activeName : name} size={22} color={color} />;
-  if (Platform.OS !== 'android') return icon;
-  return (
-    <View
-      style={{
-        width: 56,
-        height: 30,
-        borderRadius: radius.full,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: focused ? theme.colors.primarySoft : 'transparent',
-      }}>
-      {icon}
-    </View>
-  );
+  return <Ionicons name={focused ? activeName : name} size={22} color={color} />;
 }
 
 export default function TabsLayout() {
@@ -65,6 +50,7 @@ export default function TabsLayout() {
 
   return (
     <Tabs
+      tabBar={Platform.OS === 'android' ? (props) => <AndroidTabBar {...props} /> : undefined}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: theme.colors.tabBarActive,
@@ -73,11 +59,6 @@ export default function TabsLayout() {
           backgroundColor: theme.colors.tabBarBackground,
           borderTopColor: theme.colors.border,
         },
-        tabBarItemStyle: Platform.OS === 'android' ? { paddingTop: 6 } : undefined,
-        tabBarButton:
-          Platform.OS === 'android'
-            ? ({ ref: _ref, android_ripple: _ripple, ...props }) => <Pressable {...props} />
-            : undefined,
       }}>
       <Tabs.Screen
         name="index"
