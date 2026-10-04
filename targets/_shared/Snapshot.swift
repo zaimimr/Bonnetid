@@ -53,6 +53,19 @@ struct PrayerDaySnapshot: Codable, Hashable {
   let prayers: [PrayerEntry]
 }
 
+struct SnapshotPoint: Codable, Hashable {
+  let lat: Double
+  let lon: Double
+}
+
+struct SnapshotMosque: Codable, Hashable {
+  let orgNr: String
+  let name: String
+  let address: String?
+  let lat: Double
+  let lon: Double
+}
+
 struct PrayerSnapshot: Codable, Hashable {
   let version: Int
   let generatedAt: Date
@@ -60,6 +73,8 @@ struct PrayerSnapshot: Codable, Hashable {
   let mosqueName: String?
   let mode: String?
   let days: [PrayerDaySnapshot]
+  var origin: SnapshotPoint?
+  var mosques: [SnapshotMosque]?
 
   var usesDeviceTimeZone: Bool { mode == "calculated" }
 
