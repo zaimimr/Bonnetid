@@ -40,9 +40,6 @@ import {
 const lockScreenSupported =
   prayerWidgetAvailable && (Platform.OS === 'android' || liveActivitiesEnabled());
 const hasIsland = Platform.OS === 'ios' && dynamicIslandAvailable();
-const lockScreenTitle =
-  Platform.OS === 'android' ? 'Varsel på låseskjermen' : 'Nedtelling på låseskjermen';
-const lockScreenSubtitle = hasIsland ? 'Også i Dynamic Island' : undefined;
 const widgetJamatSupported = Platform.OS === 'android' && prayerWidgetAvailable;
 const ROW = { paddingHorizontal: spacing.md } as const;
 
@@ -79,7 +76,6 @@ export default function SettingsScreen() {
   const trackerAllowed = useFeature('prayer-tracker');
   const duasEnabled = useFeature('duas');
   const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled) && trackerAllowed;
-  const showLockScreenRow = lockScreenSupported && (Platform.OS !== 'android' || trackerEnabled);
   const setTrackerEnabled = useSettings((state) => state.setPrayerTrackerEnabled);
   const asrOverride = useMosqueAsrOverride();
   const ramadanRemindersEnabled = useSettings((state) => state.ramadanRemindersEnabled);
@@ -185,7 +181,6 @@ export default function SettingsScreen() {
         )}
       </Card>
 
-
       <SectionHeader title="Varsler" />
       <Card padding="sm" rounded="xl">
         <ListRow
@@ -205,7 +200,7 @@ export default function SettingsScreen() {
           <>
             <Divider />
             <ListRow
-              title="Bønnetider"
+              title="Bønnevarsler"
               subtitle={`${prayerSummary} · ${getNotificationSound(notificationSound).label}`}
               leading={<Ionicons name="time-outline" size={20} color={theme.colors.primary} />}
               chevron
@@ -225,77 +220,89 @@ export default function SettingsScreen() {
         )}
       </Card>
 
-      {(trackerAllowed || showLockScreenRow || (widgetJamatSupported && !calculated)) && (
+      {trackerAllowed && (
         <>
           <SectionHeader title="Bønnesporing" />
           <Card padding="sm" rounded="xl">
-            {trackerAllowed && (
-              <ListRow
-                title="Marker bønner"
-                leading={
-                  <Ionicons name="checkmark-done-outline" size={20} color={theme.colors.primary} />
-                }
-                trailing={
-                  <Toggle
-                    value={trackerEnabled}
-                    onValueChange={setTrackerEnabled}
-                  />
-                }
-                style={ROW}
-              />
-            )}
-            {trackerEnabled && notificationsEnabled && (
+            <ListRow
+              title="Marker bønner"
+              subtitle="Huk av bønnene du har bedt"
+              leading={
+                <Ionicons name="checkmark-done-outline" size={20} color={theme.colors.primary} />
+              }
+              trailing={<Toggle value={trackerEnabled} onValueChange={setTrackerEnabled} />}
+              style={ROW}
+            />
+            {trackerEnabled && (
               <>
                 <Divider />
                 <ListRow
                   title="Påminnelse før tiden går ut"
-                  subtitle="30 minutter før tiden er ute"
+                  subtitle={
+                    notificationsEnabled
+                      ? '30 minutter før, hvis bønnen ikke er markert'
+                      : 'Slå på varsler først'
+                  }
                   leading={<Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />}
                   trailing={
                     <Toggle
-                      value={endReminderEnabled}
+                      value={notificationsEnabled && endReminderEnabled}
                       onValueChange={setEndReminderEnabled}
+                      disabled={!notificationsEnabled}
                     />
                   }
                   style={ROW}
                 />
               </>
             )}
-            {showLockScreenRow && (
+            {trackerEnabled && lockScreenSupported && Platform.OS === 'android' && (
               <>
-                {trackerAllowed && <Divider />}
+                <Divider />
                 <ListRow
-                  title={lockScreenTitle}
-                  subtitle={lockScreenSubtitle}
+                  title="Bønnekort på låseskjermen"
+                  subtitle="Nedtelling med Bedt og Hopp over"
                   leading={<Ionicons name="timer-outline" size={20} color={theme.colors.primary} />}
-                  trailing={
-                    <Toggle
-                      value={liveActivityEnabled}
-                      onValueChange={toggleLockScreen}
-                    />
-                  }
+                  trailing={<Toggle value={liveActivityEnabled} onValueChange={toggleLockScreen} />}
                   style={ROW}
                 />
               </>
             )}
-            {widgetJamatSupported && !calculated && (
-              <>
-                {(trackerAllowed || showLockScreenRow) && <Divider />}
-                <ListRow
-                  title="Jamaat-tider i widgeten"
-                  subtitle={mosque ? mosque.name : 'Velg en moské først'}
-                  leading={<Ionicons name="people-outline" size={20} color={theme.colors.primary} />}
-                  trailing={
-                    <Toggle
-                      value={widgetShowJamat}
-                      onValueChange={setWidgetShowJamat}
-                      disabled={mosque == null}
-                    />
-                  }
-                  style={ROW}
+          </Card>
+        </>
+      )}
+
+      {lockScreenSupported && Platform.OS === 'ios' && (
+        <>
+          <SectionHeader title="Låseskjerm" />
+          <Card padding="sm" rounded="xl">
+            <ListRow
+              title="Nedtelling på låseskjermen"
+              subtitle={hasIsland ? 'Også i Dynamic Island' : undefined}
+              leading={<Ionicons name="timer-outline" size={20} color={theme.colors.primary} />}
+              trailing={<Toggle value={liveActivityEnabled} onValueChange={toggleLockScreen} />}
+              style={ROW}
+            />
+          </Card>
+        </>
+      )}
+
+      {widgetJamatSupported && !calculated && (
+        <>
+          <SectionHeader title="Widget" />
+          <Card padding="sm" rounded="xl">
+            <ListRow
+              title="Vis jamaat-tider"
+              subtitle={mosque ? mosque.name : 'Velg en moské først'}
+              leading={<Ionicons name="people-outline" size={20} color={theme.colors.primary} />}
+              trailing={
+                <Toggle
+                  value={widgetShowJamat}
+                  onValueChange={setWidgetShowJamat}
+                  disabled={mosque == null}
                 />
-              </>
-            )}
+              }
+              style={ROW}
+            />
           </Card>
         </>
       )}

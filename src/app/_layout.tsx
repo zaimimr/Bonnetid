@@ -189,7 +189,7 @@ function RootNavigator() {
           name="notification-prayers"
           options={{
             headerShown: true,
-            title: 'Bønnetider',
+            title: 'Bønnevarsler',
             headerBackTitle: 'Tilbake',
           }}
         />
