@@ -111,6 +111,7 @@ function RootNavigator() {
           headerShadowVisible: !isAndroid,
           headerTitleStyle: { color: theme.colors.textPrimary },
           headerTintColor: theme.colors.primary,
+          fullScreenGestureEnabled: false,
         }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
