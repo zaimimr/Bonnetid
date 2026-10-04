@@ -5,6 +5,7 @@ import {
   fetchSupportThread,
   formatFeedback,
   markSupportRead,
+  isSupportSessionId,
   newSupportSessionId,
   threadView,
   postToSlack,
@@ -80,12 +81,14 @@ test('mark read posts the session to the read endpoint', async () => {
   assert.equal(await markSupportRead(fake(500, {}), { token: 't', sessionId: 's1', ticketId: 'k1' }), false);
 });
 
-test('support session id is unique per call and carries the distinct id', () => {
-  const a = newSupportSessionId('d1', 1000, () => 0.25);
-  const b = newSupportSessionId('d1', 1000, () => 0.75);
+test('support session id is a v4 UUID, unique per call', () => {
+  const a = newSupportSessionId(() => 0.25);
+  const b = newSupportSessionId(() => 0.75);
   assert.notEqual(a, b);
-  assert.ok(a.startsWith('d1-'));
-  assert.ok(a.length > 12);
+  assert.ok(isSupportSessionId(a));
+  assert.ok(isSupportSessionId(newSupportSessionId()));
+  assert.equal(isSupportSessionId('d1-abc-xyz'), false);
+  assert.equal(isSupportSessionId(null), false);
 });
 
 test('threadView turns any failure into an empty thread instead of throwing', () => {

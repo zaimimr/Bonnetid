@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchConversationsToken,
   fetchSupportThread,
+  isSupportSessionId,
   markSupportRead,
   newSupportSessionId,
   threadView,
@@ -52,7 +53,7 @@ export function useSupportThread(enabled = true) {
 
   const send = useCallback(
     async (text: string, email: string | null): Promise<SendOutcome> => {
-      const session = sessionId ?? newSupportSessionId(posthog.getDistinctId());
+      const session = isSupportSessionId(sessionId) ? sessionId : newSupportSessionId();
       const supportToken = token.data ?? (await fetchConversationsToken(fetcher, POSTHOG_KEY));
       if (supportToken) {
         const result = await sendSupportMessage(fetcher, {

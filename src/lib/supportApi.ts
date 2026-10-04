@@ -101,15 +101,18 @@ export async function markSupportRead(
   }
 }
 
-export function newSupportSessionId(
-  distinctId: string,
-  now: number = Date.now(),
-  random: () => number = Math.random,
-): string {
-  const noise = Array.from({ length: 3 }, () =>
-    Math.floor(random() * 36 ** 8).toString(36).padStart(8, '0'),
-  ).join('');
-  return `${distinctId}-${now.toString(36)}-${noise}`;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+
+export function isSupportSessionId(value: string | null): value is string {
+  return value != null && UUID.test(value);
+}
+
+export function newSupportSessionId(random: () => number = Math.random): string {
+  const hex = Array.from({ length: 32 }, () => Math.floor(random() * 16).toString(16));
+  hex[12] = '4';
+  hex[16] = ((parseInt(hex[16], 16) & 0x3) | 0x8).toString(16);
+  const s = hex.join('');
+  return `${s.slice(0, 8)}-${s.slice(8, 12)}-${s.slice(12, 16)}-${s.slice(16, 20)}-${s.slice(20)}`;
 }
 
 export function formatFeedback(kind: FeedbackKind, message: string, context: Record<string, string>): string {
