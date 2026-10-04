@@ -15,7 +15,9 @@ class PrayerBootReceiver : BroadcastReceiver() {
         PrayerDayWidget.updateAll(app)
         PrayerTimelineWidget.updateAll(app)
         PrayerStatusNotifier.sync(app)
+        PrayerShortcuts.update(app)
       }
+      PrayerShortcuts.ACTION_REFRESH -> PrayerShortcuts.update(context.applicationContext)
     }
   }
 }

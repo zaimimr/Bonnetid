@@ -30,6 +30,7 @@ class PrayerWidgetModule : Module() {
       PrayerDayWidget.updateAll(context)
       PrayerTimelineWidget.updateAll(context)
       PrayerStatusNotifier.sync(context)
+      PrayerShortcuts.update(context)
     }
 
     Function("getPrayerLog") {
