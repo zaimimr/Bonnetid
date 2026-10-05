@@ -23,6 +23,8 @@ export const posthog = new PostHog(analyticsActive ? POSTHOG_KEY : 'phc_disabled
   },
 });
 
+void posthog.register({ app_name: 'bonnetid' });
+
 export type TrackProps = Record<string, string | number | boolean>;
 
 export function appVersion(): string {
