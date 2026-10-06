@@ -25,8 +25,11 @@ export const MARK_PRAYED_ACTION = 'prayed';
 export const MARK_SKIPPED_ACTION = 'skipped';
 
 const REMINDER_CHANNEL_ID = 'prayer-reminder';
-const ADHAN_CHANNEL_GENERATION = 2;
-const LEGACY_ADHAN_CHANNEL_IDS = NOTIFICATION_SOUNDS.map((sound) => `prayer-${sound.key}`);
+const ADHAN_CHANNEL_GENERATION = 3;
+const LEGACY_ADHAN_CHANNEL_IDS = NOTIFICATION_SOUNDS.flatMap((sound) => [
+  `prayer-${sound.key}`,
+  `prayer-${sound.key}-v2`,
+]);
 
 export const notificationsSupported = !(
   Platform.OS === 'android' && Constants.executionEnvironment === ExecutionEnvironment.StoreClient

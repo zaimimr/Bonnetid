@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 export type NotificationSoundKey = 'default' | 'adhan' | 'adhan_kort';
 
 export type NotificationSoundOption = {
@@ -26,9 +28,17 @@ export const NOTIFICATION_SOUNDS: NotificationSoundOption[] = [
   {
     key: 'adhan',
     label: 'Adhan',
-    description: 'Takbir og shahada, ca. 29 sekunder',
-    fileName: 'adhan.wav',
-    previewName: 'adhan',
+    ...(Platform.OS === 'android'
+      ? {
+          description: 'Hele adhan, ca. 2,5 minutter',
+          fileName: 'adhan_full.mp3',
+          previewName: 'adhan_full',
+        }
+      : {
+          description: 'Takbir og shahada, ca. 29 sekunder',
+          fileName: 'adhan.wav',
+          previewName: 'adhan',
+        }),
   },
 ];
 

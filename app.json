@@ -94,7 +94,8 @@
         {
           "sounds": [
             "./assets/sounds/adhan.wav",
-            "./assets/sounds/adhan_kort.wav"
+            "./assets/sounds/adhan_kort.wav",
+            "./assets/sounds/adhan_full.mp3"
           ]
         }
       ],
