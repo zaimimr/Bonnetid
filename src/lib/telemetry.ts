@@ -29,9 +29,9 @@ export const posthog = new PostHog(analyticsActive ? POSTHOG_KEY : 'phc_disabled
   },
 });
 
-function distribution(): 'local' | 'testflight' | 'production' {
-  if (__DEV__) return 'local';
-  return isTestFlight() ? 'testflight' : 'production';
+function distribution(): 'dev' | 'qa' | 'prod' {
+  if (__DEV__) return 'dev';
+  return isTestFlight() ? 'qa' : 'prod';
 }
 
 void posthog.register({ app_name: 'bonnetid', distribution: distribution() });
