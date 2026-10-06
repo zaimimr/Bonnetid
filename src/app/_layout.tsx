@@ -4,6 +4,7 @@ import { ScheherazadeNew_400Regular } from '@expo-google-fonts/scheherazade-new/
 import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
+import { TRACKER_TITLE } from '@/components/settings/shared';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { defaultShouldDehydrateQuery, QueryCache, QueryClient } from '@tanstack/react-query';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
@@ -162,14 +163,6 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
-          name="settings-prayer-times"
-          options={{
-            headerShown: true,
-            title: t({ nb: 'Bønnetider', en: 'Prayer times', ar: 'مواقيت الصلاة', ur: 'نماز کے اوقات' }),
-            headerBackTitle: BACK,
-          }}
-        />
-        <Stack.Screen
           name="settings-notifications"
           options={{
             headerShown: true,
@@ -181,18 +174,7 @@ function RootNavigator() {
           name="settings-tracker"
           options={{
             headerShown: true,
-            title: t({ nb: 'Bønnesporing', en: 'Prayer tracker', ar: 'متابعة الصلوات', ur: 'نماز ٹریکر' }),
-            headerBackTitle: BACK,
-          }}
-        />
-        <Stack.Screen
-          name="settings-lock-screen"
-          options={{
-            headerShown: true,
-            title:
-              Platform.OS === 'ios'
-                ? t({ nb: 'Låseskjerm', en: 'Lock screen', ar: 'شاشة القفل', ur: 'لاک اسکرین' })
-                : t({ nb: 'Widget', en: 'Widget', ar: 'الأداة', ur: 'ویجیٹ' }),
+            title: TRACKER_TITLE,
             headerBackTitle: BACK,
           }}
         />

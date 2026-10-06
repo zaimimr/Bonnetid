@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react';
-import { Linking, Platform, View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
@@ -13,17 +13,31 @@ import {
   SettingsPage,
   lockScreenSupported,
   widgetJamatSupported,
+  TRACKER_TITLE,
 } from '@/components/settings/shared';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
 import { track } from '@/lib/telemetry';
 import { useFeature } from '@/hooks/useFeature';
-import { useActiveLocation, useSettings } from '@/store/settings';
+import { asrMethodLabel } from '@/lib/asrMethods';
+import { calculationMethodLabel } from '@/lib/calculationMethods';
+import { useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
+import { useAutoCalculationMethod } from '@/hooks/useEffectiveCalculationMethod';
+import { useActiveLocation, useActiveMosque, useSettings } from '@/store/settings';
 import { t } from '@/lib/i18n';
 
 const PRIVACY_POLICY_URL = 'https://zaimimr.github.io/bonnetid-personvern/';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
+
+function Tile({ icon }: { icon: IconName }) {
+  const theme = useTheme();
+  return (
+    <IconTile>
+      <Ionicons name={icon} size={20} color={theme.colors.primary} />
+    </IconTile>
+  );
+}
 
 function HubRow({
   title,
@@ -37,15 +51,10 @@ function HubRow({
   href: Href;
 }) {
   const router = useRouter();
-  const theme = useTheme();
   return (
     <ListRow
       title={title}
-      leading={
-        <IconTile>
-          <Ionicons name={icon} size={20} color={theme.colors.primary} />
-        </IconTile>
-      }
+      leading={<Tile icon={icon} />}
       trailing={
         value ? (
           <AppText size="sm" tone="textMuted" numberOfLines={1}>
@@ -65,17 +74,18 @@ export default function SettingsScreen() {
   const theme = useTheme();
   const location = useActiveLocation();
   const calculated = location.mode === 'calculated';
+  const calculationMethod = useSettings((state) => state.calculationMethod);
+  const autoCalculationMethod = useAutoCalculationMethod(location);
+  const mosque = useActiveMosque();
+  const asrMethod = useSettings((state) => state.asrMethod);
+  const asrOverride = useMosqueAsrOverride();
   const themePreference = useSettings((state) => state.themePreference);
   const analyticsEnabled = useSettings((state) => state.analyticsEnabled);
   const setAnalyticsEnabled = useSettings((state) => state.setAnalyticsEnabled);
   const notificationsEnabled = useSettings((state) => state.notificationsEnabled);
-  const liveActivityEnabled = useSettings((state) => state.liveActivityEnabled);
-  const widgetShowJamat = useSettings((state) => state.widgetShowJamat);
   const trackerAllowed = useFeature('prayer-tracker');
   const duasEnabled = useFeature('duas');
-  const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled) && trackerAllowed;
 
-  const lockScreenRow = Platform.OS === 'ios' && lockScreenSupported;
   const widgetRow = widgetJamatSupported && !calculated;
   const themeLabel = {
     system: t({ nb: 'System', en: 'System', ar: 'النظام', ur: 'سسٹم' }),
@@ -87,43 +97,91 @@ export default function SettingsScreen() {
     <SettingsPage>
       <Card padding="sm" rounded="xl">
         <PostHogMaskView>
-          <HubRow
-            title={t({ nb: 'Bønnetider', en: 'Prayer times', ar: 'مواقيت الصلاة', ur: 'نماز کے اوقات' })}
-            icon="location-outline"
-            value={location.name}
-            href="/settings-prayer-times"
+          <ListRow
+            title={t({ nb: 'Sted', en: 'Location', ar: 'الموقع', ur: 'مقام' })}
+            subtitle={
+              calculated
+                ? t({
+                    nb: `${location.name} · lokale tider, følger posisjonen din`,
+                    en: `${location.name} · local times, follows your location`,
+                    ar: `${location.name} · أوقات محلية، يتبع موقعك`,
+                    ur: `${location.name} · مقامی اوقات، آپ کے مقام کے مطابق`,
+                  })
+                : t({
+                    nb: `${location.name} · følger posisjonen din`,
+                    en: `${location.name} · follows your location`,
+                    ar: `${location.name} · يتبع موقعك`,
+                    ur: `${location.name} · آپ کے مقام کے مطابق`,
+                  })
+            }
+            leading={<Tile icon="location-outline" />}
+            style={ROW}
           />
         </PostHogMaskView>
+        {!calculated && (
+          <>
+            <Divider />
+            <ListRow
+              title={t({ nb: 'Min moské', en: 'My mosque', ar: 'مسجدي', ur: 'میری مسجد' })}
+              subtitle={mosque?.name ?? t({ nb: 'Ikke valgt', en: 'Not selected', ar: 'غير محدد', ur: 'منتخب نہیں' })}
+              leading={<Tile icon="business-outline" />}
+              chevron
+              onPress={() => router.push('/mosque-picker')}
+              style={ROW}
+            />
+          </>
+        )}
         <Divider />
+        <ListRow
+          title={t({ nb: 'Asr-metode', en: 'Asr method', ar: 'طريقة العصر', ur: 'عصر کا طریقہ' })}
+          subtitle={
+            asrOverride && mosque
+              ? t({
+                  nb: `Styres av ${mosque.name}`,
+                  en: `Set by ${mosque.name}`,
+                  ar: `يحددها ${mosque.name}`,
+                  ur: `${mosque.name} کی طرف سے طے شدہ`,
+                })
+              : asrMethodLabel(asrMethod ?? 'irn')
+          }
+          leading={<Tile icon="partly-sunny-outline" />}
+          chevron
+          onPress={() => router.push('/asr-method')}
+          style={ROW}
+        />
+        {calculated && (
+          <>
+            <Divider />
+            <ListRow
+              title={t({ nb: 'Beregningsmetode', en: 'Calculation method', ar: 'طريقة الحساب', ur: 'حساب کا طریقہ' })}
+              subtitle={
+                calculationMethod
+                  ? calculationMethodLabel(calculationMethod)
+                  : `${t({ nb: 'Automatisk', en: 'Automatic', ar: 'تلقائي', ur: 'خودکار' })} · ${calculationMethodLabel(autoCalculationMethod)}`
+              }
+              leading={<Tile icon="calculator-outline" />}
+              chevron
+              onPress={() => router.push('/calculation-method')}
+              style={ROW}
+            />
+          </>
+        )}
+      </Card>
+
+      <Card padding="sm" rounded="xl">
         <HubRow
           title={t({ nb: 'Varsler', en: 'Notifications', ar: 'الإشعارات', ur: 'اطلاعات' })}
           icon="notifications-outline"
           value={notificationsEnabled ? ON : OFF}
           href="/settings-notifications"
         />
-        {trackerAllowed && (
+        {(trackerAllowed || lockScreenSupported || widgetRow) && (
           <>
             <Divider />
             <HubRow
-              title={t({ nb: 'Bønnesporing', en: 'Prayer tracker', ar: 'متابعة الصلوات', ur: 'نماز ٹریکر' })}
+              title={TRACKER_TITLE}
               icon="checkmark-done-outline"
-              value={trackerEnabled ? ON : OFF}
               href="/settings-tracker"
-            />
-          </>
-        )}
-        {(lockScreenRow || widgetRow) && (
-          <>
-            <Divider />
-            <HubRow
-              title={
-                lockScreenRow
-                  ? t({ nb: 'Låseskjerm', en: 'Lock screen', ar: 'شاشة القفل', ur: 'لاک اسکرین' })
-                  : t({ nb: 'Widget', en: 'Widget', ar: 'الأداة', ur: 'ویجیٹ' })
-              }
-              icon={lockScreenRow ? 'timer-outline' : 'grid-outline'}
-              value={(lockScreenRow ? liveActivityEnabled : widgetShowJamat) ? ON : OFF}
-              href="/settings-lock-screen"
             />
           </>
         )}
@@ -171,9 +229,7 @@ export default function SettingsScreen() {
           title={t({ nb: 'Hjelp oss bli bedre', en: 'Help us improve', ar: 'ساعدنا على التحسين', ur: 'بہتر بنانے میں ہماری مدد کریں' })}
           subtitle={t({ nb: 'Del nyttig data', en: 'Share useful data', ar: 'شارك بيانات مفيدة', ur: 'مفید ڈیٹا شیئر کریں' })}
           leading={
-            <IconTile>
-              <Ionicons name="analytics-outline" size={20} color={theme.colors.primary} />
-            </IconTile>
+<Tile icon="analytics-outline" />
           }
           trailing={
             <Toggle
@@ -190,9 +246,7 @@ export default function SettingsScreen() {
         <ListRow
           title={t({ nb: 'Personvern', en: 'Privacy', ar: 'الخصوصية', ur: 'رازداری' })}
           leading={
-            <IconTile>
-              <Ionicons name="shield-checkmark-outline" size={20} color={theme.colors.primary} />
-            </IconTile>
+<Tile icon="shield-checkmark-outline" />
           }
           trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
           onPress={() => Linking.openURL(PRIVACY_POLICY_URL).catch(() => {})}

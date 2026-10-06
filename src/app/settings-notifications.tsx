@@ -102,28 +102,18 @@ export default function NotificationSettingsScreen() {
             onPress={() => router.push('/fasting-reminders')}
             style={ROW}
           />
-          {trackerAllowed && (
-            <>
-              <Divider />
-              <ListRow
-                title={t({ nb: 'Påminnelse før tiden går ut', en: 'Reminder before time runs out', ar: 'تذكير قبل خروج الوقت', ur: 'وقت ختم ہونے سے پہلے یاد دہانی' })}
-                subtitle={
-                  trackerEnabled
-                    ? t({ nb: '30 minutter før, hvis bønnen ikke er markert', en: '30 minutes before, if the prayer is not marked', ar: 'قبل 30 دقيقة، إذا لم تُعلَّم الصلاة', ur: '30 منٹ پہلے، اگر نماز نشان زد نہ ہو' })
-                    : t({ nb: 'Slå på Marker bønner først', en: 'Turn on Mark prayers first', ar: 'فعّل تعليم الصلوات أولًا', ur: 'پہلے نمازیں نشان زد کریں آن کریں' })
-                }
-                leading={<Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />}
-                trailing={
-                  <Toggle
-                    value={trackerEnabled && endReminderEnabled}
-                    onValueChange={setEndReminderEnabled}
-                    disabled={!trackerEnabled}
-                  />
-                }
-                style={ROW}
-              />
-            </>
-          )}
+          <Divider />
+          <ListRow
+            title={t({ nb: 'Påminnelse før tiden går ut', en: 'Reminder before time runs out', ar: 'تذكير قبل خروج الوقت', ur: 'وقت ختم ہونے سے پہلے یاد دہانی' })}
+            subtitle={
+              trackerEnabled
+                ? t({ nb: '30 minutter før, hvis bønnen ikke er markert', en: '30 minutes before, if the prayer is not marked', ar: 'قبل 30 دقيقة، إذا لم تُعلَّم الصلاة', ur: '30 منٹ پہلے، اگر نماز نشان زد نہ ہو' })
+                : t({ nb: '30 minutter før', en: '30 minutes before', ar: 'قبل 30 دقيقة', ur: '30 منٹ پہلے' })
+            }
+            leading={<Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />}
+            trailing={<Toggle value={endReminderEnabled} onValueChange={setEndReminderEnabled} />}
+            style={ROW}
+          />
         </Card>
       )}
 

@@ -90,8 +90,9 @@ export function useNotificationScheduler() {
         .map((entry) => ({ isoDate: day.isoDate, entry })),
     );
 
-    const reminders =
-      trackerEnabled && endReminderEnabled ? buildPrayerReminders(days, log, now, isEnabled) : [];
+    const reminders = endReminderEnabled
+      ? buildPrayerReminders(days, trackerEnabled ? log : {}, now, isEnabled)
+      : [];
 
     syncPrayerNotifications({
       adhan,
