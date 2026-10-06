@@ -1,0 +1,31 @@
+{
+  "prayerNotificationsAreNot": "نماز کی اطلاعات کام نہیں کر رہیں",
+  "fasting": "روزہ",
+  "notificationIssueLabels": {
+    "permission": "اطلاعات کی اجازت نہیں ہے",
+    "channel": "فون میں نماز کی اطلاعات بند ہیں",
+    "exactAlarm": "الارم اور یاد دہانیوں کی اجازت نہیں ہے",
+    "emptyQueue": "کوئی اطلاع شیڈول نہیں ہے",
+    "noPrayers": "کوئی نماز منتخب نہیں کی گئی",
+    "sound": "آواز بند ہے",
+    "battery": "بیٹری سیور آن ہے"
+  },
+  "default": {
+    "label": "ڈیفالٹ",
+    "description": "سسٹم کی اطلاع کی آواز"
+  },
+  "adhanKort": {
+    "label": "اذان (مختصر)",
+    "description": "تکبیر، تقریباً 4 سیکنڈ"
+  },
+  "adhan": {
+    "label": "اذان"
+  },
+  "fullAdhanAbout2": "مکمل اذان، تقریباً ڈھائی منٹ",
+  "takbirAndShahadaAbout": "تکبیر اور شہادت، تقریباً 29 سیکنڈ",
+  "prayed": "ادا کی",
+  "skip": "چھوڑ دیں",
+  "reminders": "یاد دہانیاں",
+  "itIsTimeFor": "{{locationName}} میں {{label}} کا وقت ہو گیا ہے۔",
+  "lastsUntil": "{{start}}\n{{endClock}} تک ({{duration}})۔"
+}

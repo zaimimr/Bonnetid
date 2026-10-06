@@ -93,18 +93,8 @@ export function QiblaMap({
         <Ionicons name="information-circle-outline" size={18} color={theme.colors.primary} />
         <AppText size="sm" tone="textSecondary" style={{ flex: 1 }}>
           {heading == null
-            ? t({
-                nb: 'Den grønne linjen peker mot Kaba.',
-                en: 'The green line points to the Kaaba.',
-                ar: 'يشير الخط الأخضر إلى الكعبة.',
-                ur: 'سبز لکیر کعبہ کی طرف اشارہ کرتی ہے۔',
-              })
-            : t({
-                nb: 'Den grønne linjen peker mot Kaba. Snu deg til den blå kjeglen dekker linjen.',
-                en: 'The green line points to the Kaaba. Turn until the blue cone covers the line.',
-                ar: 'يشير الخط الأخضر إلى الكعبة. استدر حتى يغطي المخروط الأزرق الخط.',
-                ur: 'سبز لکیر کعبہ کی طرف اشارہ کرتی ہے۔ اتنا مڑیں کہ نیلی مخروطی شکل لکیر کو ڈھانپ لے۔',
-              })}
+            ? t('qibla.theGreenLinePoints')
+            : t('qibla.theGreenLinePoints2')}
         </AppText>
       </View>
     </View>
@@ -169,20 +159,15 @@ function NativeQiblaMap({
       )}
       <Marker
         coordinate={{ latitude: KAABA.lat, longitude: KAABA.lon }}
-        title={t({ nb: 'Kaba', en: 'Kaaba', ar: 'الكعبة', ur: 'کعبہ' })}
-        description={t({
-          nb: 'Mekka, Saudi-Arabia',
-          en: 'Makkah, Saudi Arabia',
-          ar: 'مكة المكرمة، السعودية',
-          ur: 'مکہ مکرمہ، سعودی عرب',
-        })}
+        title={t('qibla.kaaba')}
+        description={t('qibla.makkahSaudiArabia')}
         pinColor={theme.colors.primary}
       />
     </MapView>
   );
 }
 
-const KAABA_POPUP = t({ nb: 'Kaba, Mekka', en: 'Kaaba, Makkah', ar: 'الكعبة، مكة المكرمة', ur: 'کعبہ، مکہ مکرمہ' });
+const KAABA_POPUP = t('qibla.kaabaMakkah');
 
 function OsmQiblaMap({
   lat,
@@ -308,12 +293,7 @@ function OsmQiblaMap({
         pushUser();
         pushCone();
       }}
-      fallbackMessage={t({
-        nb: 'Kartet ble avsluttet av systemet. Kompassvisningen virker fortsatt.',
-        en: 'The system closed the map. The compass view still works.',
-        ar: 'أغلق النظام الخريطة. لا يزال عرض البوصلة يعمل.',
-        ur: 'سسٹم نے نقشہ بند کر دیا۔ قطب نما کا منظر اب بھی کام کرتا ہے۔',
-      })}
+      fallbackMessage={t('qibla.theSystemClosedThe2')}
     />
   );
 }

@@ -1,0 +1,16 @@
+{
+  "complete": "Fullført",
+  "saidOnce": "Sies én gang",
+  "of": "av {{target}}",
+  "allRoundsComplete": "Alle runder fullført",
+  "roundOf": "Runde {{value}} av {{total}}",
+  "afterPrayer": "Etter bønnen",
+  "freeCount": "Fri telling",
+  "noGoal": "Uten mål",
+  "reset": "Nullstill",
+  "done": "Ferdig",
+  "startOver": "Begynn på nytt",
+  "countOf": "Tell, {{count}} av {{target}}",
+  "count": "Tell, {{count}}",
+  "tapAnywhereToCount": "Trykk hvor som helst for å telle"
+}

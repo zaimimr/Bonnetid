@@ -72,7 +72,7 @@ function TrackerScreen() {
     [selectedDate, todayIso, todaySchedule, log, at],
   );
 
-  const dayLabel = isToday ? t({ nb: 'I dag', en: 'Today', ar: 'اليوم', ur: 'آج' }) : formatGregorianLong(selectedDate);
+  const dayLabel = isToday ? t('tracker.today') : formatGregorianLong(selectedDate);
   const loading = isLoading || (!isToday && month.isLoading);
   const failed = isError || (!isToday && month.isError);
 
@@ -120,7 +120,7 @@ function TrackerScreen() {
           {loading && <Skeleton height={240} rounded="xl" />}
           {!loading && failed && <ErrorState onRetry={refetch} />}
           {!loading && !failed && schedule.length === 0 && (
-            <EmptyState message={t({ nb: 'Ingen bønnetider for denne dagen', en: 'No prayer times for this day', ar: 'لا توجد مواقيت صلاة لهذا اليوم', ur: 'اس دن کے لیے نماز کے اوقات نہیں' })} icon="time-outline" />
+            <EmptyState message={t('tracker.noPrayerTimesFor')} icon="time-outline" />
           )}
 
           {!loading && !failed && schedule.length > 0 && (
@@ -143,18 +143,8 @@ function TrackerScreen() {
                       accessibilityLabel={
                         started
                           ? status === 'prayed'
-                            ? t({
-                                nb: `${entry.label}, markert som bedt`,
-                                en: `${entry.label}, marked as prayed`,
-                                ar: `${entry.label}، مُعلَّمة كمُصلّاة`,
-                                ur: `${entry.label}، ادا شدہ کے طور پر نشان زد`,
-                              })
-                            : t({
-                                nb: `${entry.label}, ikke markert`,
-                                en: `${entry.label}, not marked`,
-                                ar: `${entry.label}، غير مُعلَّمة`,
-                                ur: `${entry.label}، نشان زد نہیں`,
-                              })
+                            ? t('tracker.markedAsPrayed', { label: entry.label })
+                            : t('tracker.notMarked', { label: entry.label })
                           : undefined
                       }
                       accessibilityState={started ? { expanded: open } : undefined}
@@ -222,7 +212,7 @@ function DayArrow({
       disabled={disabled}
       hitSlop={hitSlop}
       accessibilityRole="button"
-      accessibilityLabel={direction === 'back' ? t({ nb: 'Forrige dag', en: 'Previous day', ar: 'اليوم السابق', ur: 'پچھلا دن' }) : t({ nb: 'Neste dag', en: 'Next day', ar: 'اليوم التالي', ur: 'اگلا دن' })}
+      accessibilityLabel={direction === 'back' ? t('tracker.previousDay') : t('tracker.nextDay')}
       accessibilityState={{ disabled }}
       style={({ pressed }) => [
         {

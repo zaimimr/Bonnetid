@@ -24,9 +24,9 @@ export type DhulHijjahCardProps = {
 };
 
 function badgeLabel(day: number | null): string | null {
-  if (day === ARAFAH_DAY) return t({ nb: 'Arafah', en: 'Arafah', ar: 'يوم عرفة', ur: 'یومِ عرفہ' });
+  if (day === ARAFAH_DAY) return t('season.arafah');
   if (day === EID_AL_ADHA_DAY)
-    return t({ nb: 'Eid al-Adha', en: 'Eid al-Adha', ar: 'عيد الأضحى', ur: 'عید الاضحیٰ' });
+    return t('season.eidAlAdha');
   return null;
 }
 
@@ -71,12 +71,7 @@ export function DhulHijjahCard({ status }: DhulHijjahCardProps) {
 
       <View
         accessibilityRole="progressbar"
-        accessibilityLabel={t({
-          nb: 'De ti første dagene i Dhul Hijjah',
-          en: 'The first ten days of Dhul Hijjah',
-          ar: 'العشر الأوائل من ذي الحجة',
-          ur: 'ذوالحجہ کے پہلے دس دن',
-        })}
+        accessibilityLabel={t('season.theFirstTenDays')}
         accessibilityValue={{ min: 1, max: DHUL_HIJJAH_SEASON.lastDay, now: day ?? 1 }}
         style={{
           marginTop: spacing.md,
@@ -109,12 +104,7 @@ export function DhulHijjahCard({ status }: DhulHijjahCardProps) {
         {MOON_SIGHTING_NOTE}
       </AppText>
 
-      <DuaLink category={DUA_LINKS.hajj} label={t({
-          nb: 'Duaer for Hajj og Dhul-Hijjah',
-          en: 'Duas for Hajj and Dhul Hijjah',
-          ar: 'أدعية الحج وذي الحجة',
-          ur: 'حج اور ذوالحجہ کی دعائیں',
-        })} />
+      <DuaLink category={DUA_LINKS.hajj} label={t('season.duasForHajjAnd')} />
     </Card>
   );
 }

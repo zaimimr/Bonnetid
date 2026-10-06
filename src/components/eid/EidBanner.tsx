@@ -14,8 +14,8 @@ export function EidBanner() {
 
   const name =
     mode.eid === 'adha'
-      ? t({ nb: 'Eid al-Adha', en: 'Eid al-Adha', ar: 'عيد الأضحى', ur: 'عید الاضحیٰ' })
-      : t({ nb: 'Eid al-Fitr', en: 'Eid al-Fitr', ar: 'عيد الفطر', ur: 'عید الفطر' });
+      ? t('season.eidAlAdha')
+      : t('season.eidAlFitr');
 
   return (
     <View
@@ -31,8 +31,8 @@ export function EidBanner() {
       <View style={{ flex: 1 }}>
         <AppText size="sm" weight="semibold" style={{ color: theme.colors.onEidSurface }}>
           {mode.phase === 'eve'
-            ? t({ nb: `${name} i morgen`, en: `${name} tomorrow`, ar: `${name} غدًا`, ur: `${name} کل` })
-            : t({ nb: 'Eid Mubarak', en: 'Eid Mubarak', ar: 'عيد مبارك', ur: 'عید مبارک' })}
+            ? t('season.tomorrow', { name })
+            : t('season.eidMubarak')}
         </AppText>
         {mode.phase === 'day' && (
           <AppText size="xs" style={{ color: theme.colors.eidSurfaceMuted }}>

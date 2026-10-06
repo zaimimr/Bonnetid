@@ -1,0 +1,31 @@
+{
+  "prayerNotificationsAreNot": "إشعارات الصلاة لا تعمل",
+  "fasting": "الصيام",
+  "notificationIssueLabels": {
+    "permission": "الإشعارات غير مسموح بها",
+    "channel": "إشعارات الصلاة معطلة في الهاتف",
+    "exactAlarm": "المنبهات والتذكيرات غير مسموح بها",
+    "emptyQueue": "لا توجد إشعارات مجدولة",
+    "noPrayers": "لم يتم اختيار أي صلاة",
+    "sound": "الصوت متوقف",
+    "battery": "توفير البطارية مفعّل"
+  },
+  "default": {
+    "label": "افتراضي",
+    "description": "صوت إشعارات النظام"
+  },
+  "adhanKort": {
+    "label": "الأذان (قصير)",
+    "description": "التكبير، نحو 4 ثوانٍ"
+  },
+  "adhan": {
+    "label": "الأذان"
+  },
+  "fullAdhanAbout2": "الأذان كاملًا، نحو دقيقتين ونصف",
+  "takbirAndShahadaAbout": "التكبير والشهادة، نحو 29 ثانية",
+  "prayed": "صلّيت",
+  "skip": "تخطٍّ",
+  "reminders": "التذكيرات",
+  "itIsTimeFor": "حان وقت {{label}} في {{locationName}}.",
+  "lastsUntil": "{{start}}\nيستمر حتى {{endClock}} ({{duration}})."
+}

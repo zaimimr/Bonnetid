@@ -1,0 +1,15 @@
+{
+  "searchForAPlace": "مقام، میونسپلٹی یا کاؤنٹی تلاش کریں",
+  "clearSearch": "تلاش صاف کریں",
+  "myLocation": "میرا مقام",
+  "allPlaces": "تمام مقامات",
+  "prayerTimesFor": "{{name}} کے نماز کے اوقات",
+  "showMosquesAcrossThe": "پورے ملک کی مساجد دکھائیں",
+  "places": "{{length}} مقامات",
+  "places2": "{{totalMatches}} مقامات",
+  "placesWithRegisteredMosques": "رجسٹرڈ مساجد والے {{totalMatches}} مقامات",
+  "noPlacesMatch": "«{{value}}» سے کوئی مقام نہیں ملا",
+  "otherPlaces": "دیگر مقامات",
+  "n1Mosque": "1 مسجد",
+  "mosques": "{{count}} مساجد"
+}

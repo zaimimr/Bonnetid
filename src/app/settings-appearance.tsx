@@ -11,7 +11,7 @@ export default function AppearanceSettingsScreen() {
   return (
     <SettingsPage>
       <Card padding="sm" rounded="xl">
-        <Field label={t({ nb: 'Tema', en: 'Theme', ar: 'السمة', ur: 'تھیم' })}>
+        <Field label={t('settings.theme')}>
           <SegmentedControl
             value={themePreference}
             onChange={(preference) => {
@@ -19,9 +19,9 @@ export default function AppearanceSettingsScreen() {
               track('theme_changed', { theme: preference });
             }}
             options={[
-              { value: 'system', label: t({ nb: 'System', en: 'System', ar: 'النظام', ur: 'سسٹم' }) },
-              { value: 'light', label: t({ nb: 'Lys', en: 'Light', ar: 'فاتح', ur: 'روشن' }) },
-              { value: 'dark', label: t({ nb: 'Mørk', en: 'Dark', ar: 'داكن', ur: 'تاریک' }) },
+              { value: 'system', label: t('settings.system') },
+              { value: 'light', label: t('settings.light') },
+              { value: 'dark', label: t('settings.dark') },
             ]}
           />
         </Field>

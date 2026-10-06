@@ -1,0 +1,89 @@
+{
+  "eidAlAdhaPrayer": "Eid al-Adha prayer",
+  "eidAlFitrPrayer": "Eid al-Fitr prayer",
+  "eidAlAdha": "Eid al-Adha",
+  "eid": "Eid",
+  "months": {
+    "1": {
+      "name": "Muharram",
+      "start": "1 Muharram - The first month (Islamic New Year)"
+    },
+    "2": {
+      "name": "Safar",
+      "start": "1 Safar - The second month"
+    },
+    "3": {
+      "name": "Rabi al-Awwal",
+      "start": "1 Rabi al-Awwal - The third month"
+    },
+    "4": {
+      "name": "Rabi al-Thani",
+      "start": "1 Rabi al-Thani - The fourth month"
+    },
+    "5": {
+      "name": "Jumada al-Ula",
+      "start": "1 Jumada al-Ula - The fifth month"
+    },
+    "6": {
+      "name": "Jumada al-Akhirah",
+      "start": "1 Jumada al-Akhirah - The sixth month"
+    },
+    "7": {
+      "name": "Rajab",
+      "start": "1 Rajab - The seventh month"
+    },
+    "8": {
+      "name": "Shaban",
+      "start": "1 Shaban - The eighth month"
+    },
+    "9": {
+      "name": "Ramadan",
+      "start": "1 Ramadan - The ninth month (The month of fasting)"
+    },
+    "10": {
+      "name": "Shawwal",
+      "start": "1 Shawwal - The tenth month (Eid al-Fitr)"
+    },
+    "11": {
+      "name": "Dhul Qadah",
+      "start": "1 Dhul Qadah - The eleventh month"
+    },
+    "12": {
+      "name": "Dhul Hijjah",
+      "start": "1 Dhul Hijjah - The twelfth month (Hajj)"
+    }
+  },
+  "yearlyEvents": {
+    "1-10": "10 Muharram - Ashura",
+    "3-12": "12 Rabi al-Awwal - Mawlid an-Nabi (The Prophet's birthday)",
+    "7-27": "27 Rajab - Shab-e-Miraj (Night of Isra)",
+    "8-15": "15 Shaban - Laylat al-Baraat (Night of Forgiveness)",
+    "9-21": "21 Ramadan - Last Ashra (3rd Ashra)",
+    "9-27": "27 Ramadan - Laylat al-Qadr (Night of Decree)",
+    "12-9": "9 Dhul Hijjah - Arafah",
+    "12-10": "10 Dhul Hijjah - Eid al-Adha"
+  },
+  "gregorianMonths": [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ],
+  "weekdays": [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+  ]
+}

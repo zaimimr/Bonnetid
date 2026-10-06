@@ -1,0 +1,22 @@
+{
+  "close": "Close",
+  "somethingWentWrongTry": "Something went wrong. Try again.",
+  "tryAgain": "Try again",
+  "prayerTimesForHave": "Prayer times for {{period}} have not been published yet",
+  "small": "Small",
+  "normal": "Normal",
+  "large": "Large",
+  "duration": {
+    "units": [
+      "h",
+      "m",
+      "s"
+    ],
+    "hoursShort_other": "{{count}}h",
+    "minutesShort_other": "{{count}}m",
+    "hours_other": "{{count}} h",
+    "minutes_other": "{{count}} min",
+    "days_other": "{{count}} days",
+    "joiner": " "
+  }
+}

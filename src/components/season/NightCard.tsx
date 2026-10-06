@@ -41,12 +41,7 @@ export function NightCard({ now, onPress }: NightCardProps) {
       <AppText size="xs" tone="textMuted" style={{ marginTop: spacing.sm }}>
         {MOON_SIGHTING_NOTE}
       </AppText>
-      {night.duaId && <DuaLink duaId={night.duaId} label={t({
-            nb: `Dua for ${night.title}`,
-            en: `Dua for ${night.title}`,
-            ar: `دعاء ${night.title}`,
-            ur: `${night.title} کی دعا`,
-          })} />}
+      {night.duaId && <DuaLink duaId={night.duaId} label={t('season.duaFor', { title: night.title })} />}
     </Card>
   );
 }

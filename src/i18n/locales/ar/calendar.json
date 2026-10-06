@@ -1,0 +1,27 @@
+{
+  "month": "الشهر",
+  "prayerTimes": "مواقيت الصلاة",
+  "showGregorianCalendar": "عرض التقويم الميلادي",
+  "showHijriCalendar": "عرض التقويم الهجري",
+  "specialDaysIn": "مناسبات شهر {{monthLabel}}",
+  "noSpecialDaysThis": "لا توجد مناسبات هذا الشهر",
+  "localTimes": "{{name}} · أوقات محلية",
+  "invalidDate": "تاريخ غير صالح",
+  "previousDay": "اليوم السابق",
+  "nextDay": "اليوم التالي",
+  "theMosqueIsIn": "المسجد في بلدية أخرى، لذا تأتي صلاة الجمعة فقط من {{value3}}",
+  "weekdayLabels": [
+    "اثنين",
+    "ثلاثاء",
+    "أربعاء",
+    "خميس",
+    "جمعة",
+    "سبت",
+    "أحد"
+  ],
+  "combined": "{{primary}}، {{special_date_name}}",
+  "goToThisMonth": "الانتقال إلى هذا الشهر",
+  "today": "اليوم",
+  "previousMonth": "الشهر السابق",
+  "nextMonth": "الشهر التالي"
+}

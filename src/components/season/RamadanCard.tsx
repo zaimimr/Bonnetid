@@ -89,13 +89,8 @@ function FastingDayCard({
         }}>
         <AppText weight="semibold">
           {dayOfRamadan != null
-            ? t({
-                nb: `Ramadan dag ${dayOfRamadan}`,
-                en: `Ramadan day ${dayOfRamadan}`,
-                ar: `اليوم ${dayOfRamadan} من رمضان`,
-                ur: `رمضان کا ${dayOfRamadan} واں دن`,
-              })
-            : t({ nb: 'Ramadan', en: 'Ramadan', ar: 'رمضان', ur: 'رمضان' })}
+            ? t('season.ramadanDay', { dayOfRamadan })
+            : t('season.ramadan')}
         </AppText>
         {hijriYear != null && (
           <AppText size="sm" tone="textMuted" tabular>
@@ -114,12 +109,12 @@ function FastingDayCard({
             gap: isStacked ? spacing.sm : spacing.lg,
           }}>
           <FastingBoundary
-            label={t({ nb: 'Suhoor slutter', en: 'Suhoor ends', ar: 'نهاية السحور', ur: 'سحری کا اختتام' })}
+            label={t('season.suhoorEnds')}
             time={fajr.time}
             stacked={isStacked}
           />
           <FastingBoundary
-            label={t({ nb: 'Iftar', en: 'Iftar', ar: 'الإفطار', ur: 'افطار' })}
+            label={t('season.iftar')}
             time={maghrib.time}
             stacked={isStacked}
             alignEnd={!isStacked}
@@ -130,12 +125,7 @@ function FastingDayCard({
       {progress != null && (
         <View
           accessibilityRole="progressbar"
-          accessibilityLabel={t({
-            nb: 'Fasten fra Fajr til Maghrib',
-            en: 'The fast from Fajr to Maghrib',
-            ar: 'الصيام من الفجر إلى المغرب',
-            ur: 'فجر سے مغرب تک روزہ',
-          })}
+          accessibilityLabel={t('season.theFastFromFajr')}
           accessibilityValue={{ min: 0, max: 100, now: Math.round(progress * 100) }}
           style={{
             marginTop: spacing.md,
@@ -162,16 +152,11 @@ function FastingDayCard({
           tone="textSecondary"
           tabular
           style={{ marginTop: spacing.sm }}>
-          {t({
-            nb: `${countdown.label} om ${formatDurationShort(countdown.target.getTime() - now.getTime())}`,
-            en: `${countdown.label} in ${formatDurationShort(countdown.target.getTime() - now.getTime())}`,
-            ar: `${countdown.label} بعد ${formatDurationShort(countdown.target.getTime() - now.getTime())}`,
-            ur: `${countdown.label} ${formatDurationShort(countdown.target.getTime() - now.getTime())} میں`,
-          })}
+          {t('season.in', { label: countdown.label, value: formatDurationShort(countdown.target.getTime() - now.getTime()) })}
         </AppText>
       )}
 
-      <DuaLink duaId={DUA_LINKS.iftar} label={t({ nb: 'Dua ved iftar', en: 'Dua at iftar', ar: 'دعاء الإفطار', ur: 'افطار کی دعا' })} />
+      <DuaLink duaId={DUA_LINKS.iftar} label={t('season.duaAtIftar')} />
     </Card>
   );
 }

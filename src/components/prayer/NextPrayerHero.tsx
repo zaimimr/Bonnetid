@@ -8,12 +8,7 @@ import type { NextPrayerResult } from '@/lib/prayerSchedule';
 import { formatCountdown } from '@/lib/time';
 
 function inCountdown(countdown: string): string {
-  return t({
-    nb: `om ${countdown}`,
-    en: `in ${countdown}`,
-    ar: `بعد ${countdown}`,
-    ur: `${countdown} میں`,
-  });
+  return t('prayer.in', { countdown });
 }
 
 export type EidHeroPrayer = {
@@ -90,10 +85,10 @@ function NextPrayerBlock({ nextPrayer, now }: { nextPrayer: NextPrayerResult; no
     <View style={{ gap: spacing.xxs }}>
       <AppText size="sm" weight="medium" tone="textMuted">
         {current
-          ? t({ nb: 'Nåværende bønn', en: 'Current prayer', ar: 'الصلاة الحالية', ur: 'موجودہ نماز' })
+          ? t('prayer.currentPrayer')
           : nextPrayer.isTomorrow
-            ? t({ nb: 'Neste bønn i morgen', en: 'Next prayer tomorrow', ar: 'الصلاة التالية غدًا', ur: 'اگلی نماز کل' })
-            : t({ nb: 'Neste bønn', en: 'Next prayer', ar: 'الصلاة التالية', ur: 'اگلی نماز' })}
+            ? t('prayer.nextPrayerTomorrow')
+            : t('prayer.nextPrayer')}
       </AppText>
       <View
         style={{
@@ -117,12 +112,7 @@ function NextPrayerBlock({ nextPrayer, now }: { nextPrayer: NextPrayerResult; no
       </View>
       <AppText size="sm" weight="medium" tone="textSecondary" tabular>
         {countdownLabel
-          ? t({
-              nb: `${countdownLabel} om ${formatCountdown(remaining)}`,
-              en: `${countdownLabel} in ${formatCountdown(remaining)}`,
-              ar: `${countdownLabel} بعد ${formatCountdown(remaining)}`,
-              ur: `${countdownLabel} ${formatCountdown(remaining)} میں`,
-            })
+          ? t('prayer.in2', { countdownLabel, value: formatCountdown(remaining) })
           : inCountdown(formatCountdown(remaining))}
       </AppText>
     </View>
@@ -144,7 +134,7 @@ function EidPrayerBlock({ prayer, now }: { prayer: EidHeroPrayer; now: Date }) {
       <AppText size="sm" weight="medium" tone="textSecondary" tabular>
         {prayer.next
           ? inCountdown(formatCountdown(prayer.next.getTime() - now.getTime()))
-          : t({ nb: 'Pågår', en: 'In progress', ar: 'جارية الآن', ur: 'جاری ہے' })}
+          : t('prayer.inProgress')}
       </AppText>
     </View>
   );

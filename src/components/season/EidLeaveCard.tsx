@@ -38,32 +38,17 @@ export function EidLeaveCard({ now }: { now: Date }) {
             <Ionicons name="megaphone-outline" size={15} color={theme.colors.primary} />
             <AppText size="xs" weight="semibold" tone="primary" style={{ flex: 1 }}>
               {leave.eid === 'adha'
-                ? t({
-                    nb: 'Fri til Eid al-Adha',
-                    en: 'Time off for Eid al-Adha',
-                    ar: 'إجازة عيد الأضحى',
-                    ur: 'عید الاضحیٰ کی چھٹی',
-                  })
-                : t({
-                    nb: 'Fri til Eid al-Fitr',
-                    en: 'Time off for Eid al-Fitr',
-                    ar: 'إجازة عيد الفطر',
-                    ur: 'عید الفطر کی چھٹی',
-                  })}
+                ? t('season.timeOffForEid')
+                : t('season.timeOffForEid2')}
             </AppText>
           </View>
           <AppText size="sm" tone="textSecondary">
-            {t({
-              nb: `Eid er ${eidDate}. Gi beskjed til arbeidsgiver ${today ? 'i dag' : `innen ${deadlineDate}`}.`,
-              en: `Eid is on ${eidDate}. Let your employer know ${today ? 'today' : `by ${deadlineDate}`}.`,
-              ar: `العيد في ${eidDate}. أبلغ صاحب العمل ${today ? 'اليوم' : `قبل ${deadlineDate}`}.`,
-              ur: `عید ${eidDate} کو ہے۔ اپنے آجر کو ${today ? 'آج' : `${deadlineDate} تک`} مطلع کریں۔`,
-            })}
+            {t('season.eidIsOnLet', { eidDate, value: today ? 'i dag' : `innen ${deadlineDate}`, value2: today ? 'today' : `by ${deadlineDate}`, value3: today ? 'اليوم' : `قبل ${deadlineDate}`, value4: today ? 'آج' : `${deadlineDate} تک` })}
           </AppText>
         </View>
         <IconButton
           name="close"
-          accessibilityLabel={t({ nb: 'Skjul', en: 'Hide', ar: 'إخفاء', ur: 'چھپائیں' })}
+          accessibilityLabel={t('season.hide')}
           onPress={() => {
             track('eid_leave_dismissed', { eid: leave.eid });
             dismiss(leave.eidIso);

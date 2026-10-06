@@ -1,0 +1,31 @@
+{
+  "prayerNotificationsAreNot": "Bønnevarsler virker ikke",
+  "fasting": "Faste",
+  "notificationIssueLabels": {
+    "permission": "Varsler er ikke tillatt",
+    "channel": "Bønnevarsler er slått av i telefonen",
+    "exactAlarm": "Alarmer og påminnelser er ikke tillatt",
+    "emptyQueue": "Ingen varsler er planlagt",
+    "noPrayers": "Ingen bønner er valgt",
+    "sound": "Lyd er slått av",
+    "battery": "Batterisparing er på"
+  },
+  "default": {
+    "label": "Standard",
+    "description": "Systemets varsellyd"
+  },
+  "adhanKort": {
+    "label": "Adhan (kort)",
+    "description": "Takbir, ca. 4 sekunder"
+  },
+  "adhan": {
+    "label": "Adhan"
+  },
+  "fullAdhanAbout2": "Hele adhan, ca. 2,5 minutter",
+  "takbirAndShahadaAbout": "Takbir og shahada, ca. 29 sekunder",
+  "prayed": "Bedt",
+  "skip": "Hopp over",
+  "reminders": "Påminnelser",
+  "itIsTimeFor": "Det er tid for {{label}} i {{locationName}}.",
+  "lastsUntil": "{{start}}\nVarer til {{endClock}} ({{duration}})."
+}

@@ -37,19 +37,9 @@ export default function QiblaScreen() {
     Platform.OS === 'android' && headingAccuracy != null && headingAccuracy <= 1;
   const calibrationNote =
     heading == null
-      ? t({
-          nb: 'Venter på kompasset. Beveg telefonen i en åttetallsbevegelse hvis nålen ikke flytter seg.',
-          en: 'Waiting for the compass. Move your phone in a figure-eight if the needle does not move.',
-          ar: 'في انتظار البوصلة. حرّك هاتفك على شكل الرقم 8 إذا لم تتحرك الإبرة.',
-          ur: 'کمپاس کا انتظار ہے۔ اگر سوئی نہ ہلے تو فون کو 8 کی شکل میں گھمائیں۔',
-        })
+      ? t('qibla.waitingForTheCompass')
       : lowAndroidAccuracy
-        ? t({
-            nb: 'Kompasset er unøyaktig. Beveg telefonen i en åttetallsbevegelse for å kalibrere det.',
-            en: 'The compass is inaccurate. Move your phone in a figure-eight to calibrate it.',
-            ar: 'البوصلة غير دقيقة. حرّك هاتفك على شكل الرقم 8 لمعايرتها.',
-            ur: 'کمپاس درست نہیں ہے۔ اسے کیلیبریٹ کرنے کے لیے فون کو 8 کی شکل میں گھمائیں۔',
-          })
+        ? t('qibla.theCompassIsInaccurate')
         : null;
   const { isLandscape } = useResponsive();
   const calculated = useIsCalculatedMode();
@@ -82,20 +72,15 @@ export default function QiblaScreen() {
             rowGap: spacing.xxs,
           }}>
           <AppText size="xxl" weight="bold" heading>
-            {t({ nb: 'Qibla', en: 'Qibla', ar: 'القبلة', ur: 'قبلہ' })}
+            {t('qibla.qibla')}
           </AppText>
           <View style={{ alignItems: 'flex-end' }}>
             <AppText size="sm" tone="textMuted">
-              {t({
-                nb: `${formatDistance(kaabaDistance)} til Mekka`,
-                en: `${formatDistance(kaabaDistance)} to Makkah`,
-                ar: `${formatDistance(kaabaDistance)} إلى مكة`,
-                ur: `مکہ تک ${formatDistance(kaabaDistance)}`,
-              })}
+              {t('qibla.toMakkah', { value: formatDistance(kaabaDistance) })}
             </AppText>
             {coords.accuracyM != null && (
               <AppText size="xs" tone="textMuted">
-                {t({ nb: 'Posisjon', en: 'Location', ar: 'الموقع', ur: 'مقام' })} ±{formatAccuracy(coords.accuracyM)}
+                {t('qibla.location')} ±{formatAccuracy(coords.accuracyM)}
               </AppText>
             )}
           </View>
@@ -112,12 +97,7 @@ export default function QiblaScreen() {
 
         {permissionDenied && view === 'compass' ? (
           <EmptyState
-            message={t({
-              nb: 'Gi appen tilgang til posisjon for å bruke kompasset',
-              en: 'Allow location access to use the compass',
-              ar: 'اسمح للتطبيق بالوصول إلى الموقع لاستخدام البوصلة',
-              ur: 'کمپاس استعمال کرنے کے لیے ایپ کو مقام تک رسائی دیں',
-            })}
+            message={t('qibla.allowLocationAccessTo')}
             icon="compass-outline"
           />
         ) : null}
@@ -158,18 +138,8 @@ export default function QiblaScreen() {
                     align="center"
                     style={{ marginTop: spacing.lg }}>
                     {calculated
-                      ? t({
-                          nb: 'Basert på posisjonen du valgte reisemodus for. Gi posisjonstilgang for mer nøyaktig retning.',
-                          en: 'Based on the location you chose travel mode for. Allow location access for a more accurate direction.',
-                          ar: 'بناءً على الموقع الذي اخترت له وضع السفر. اسمح بالوصول إلى الموقع لاتجاه أدق.',
-                          ur: 'اس مقام کی بنیاد پر جس کے لیے آپ نے سفر موڈ منتخب کیا۔ زیادہ درست سمت کے لیے مقام تک رسائی دیں۔',
-                        })
-                      : t({
-                          nb: 'Basert på valgt sted. Gi posisjonstilgang for mer nøyaktig retning.',
-                          en: 'Based on the selected location. Allow location access for a more accurate direction.',
-                          ar: 'بناءً على الموقع المحدد. اسمح بالوصول إلى الموقع لاتجاه أدق.',
-                          ur: 'منتخب مقام کی بنیاد پر۔ زیادہ درست سمت کے لیے مقام تک رسائی دیں۔',
-                        })}
+                      ? t('qibla.basedOnTheLocation')
+                      : t('qibla.basedOnTheSelected')}
                   </AppText>
                 )}
               </>
@@ -213,12 +183,7 @@ function RotateNotice({ bearing }: { bearing: number }) {
         {Math.round(bearing)}°
       </AppText>
       <AppText tone="textSecondary" align="center">
-        {t({
-          nb: `Qibla ligger ${Math.round(bearing)}° fra nord. Vend enheten til stående for å bruke kompasset.`,
-          en: `The Qibla is ${Math.round(bearing)}° from north. Turn your device to portrait to use the compass.`,
-          ar: `تقع القبلة على بُعد ${Math.round(bearing)}° من الشمال. أدر جهازك إلى الوضع العمودي لاستخدام البوصلة.`,
-          ur: `قبلہ شمال سے ${Math.round(bearing)}° پر ہے۔ کمپاس استعمال کرنے کے لیے آلے کو عمودی کریں۔`,
-        })}
+        {t('qibla.theQiblaIsFrom', { value: Math.round(bearing) })}
       </AppText>
     </Card>
   );
@@ -236,8 +201,8 @@ function ViewSwitcher({
   const theme = useTheme();
 
   const options: { value: QiblaView; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { value: 'compass', label: t({ nb: 'Kompass', en: 'Compass', ar: 'البوصلة', ur: 'کمپاس' }), icon: 'compass-outline' },
-    { value: 'map', label: t({ nb: 'Kart', en: 'Map', ar: 'الخريطة', ur: 'نقشہ' }), icon: 'map-outline' },
+    { value: 'compass', label: t('qibla.compass'), icon: 'compass-outline' },
+    { value: 'map', label: t('qibla.map'), icon: 'map-outline' },
     ...(arEnabled ? [{ value: '3d' as const, label: 'AR', icon: 'cube-outline' as const }] : []),
   ];
 

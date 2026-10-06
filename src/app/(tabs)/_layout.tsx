@@ -34,7 +34,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: t({ nb: 'Oversikt', en: 'Today', ar: 'اليوم', ur: 'آج' }),
+          title: t('navigation.today'),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="home-outline" activeName="home" focused={focused} color={color as string} />
           ),
@@ -43,7 +43,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="calendar"
         options={{
-          title: t({ nb: 'Kalender', en: 'Calendar', ar: 'التقويم', ur: 'کیلنڈر' }),
+          title: t('navigation.calendar'),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="calendar-outline" activeName="calendar" focused={focused} color={color as string} />
           ),
@@ -52,7 +52,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="qibla"
         options={{
-          title: t({ nb: 'Qibla', en: 'Qibla', ar: 'القبلة', ur: 'قبلہ' }),
+          title: t('navigation.qibla'),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="compass-outline" activeName="compass" focused={focused} color={color as string} />
           ),
@@ -61,7 +61,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="more"
         options={{
-          title: t({ nb: 'Mer', en: 'More', ar: 'المزيد', ur: 'مزید' }),
+          title: t('navigation.more'),
           tabBarBadge: unread > 0 ? '' : undefined,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="apps-outline" activeName="apps" focused={focused} color={color as string} />

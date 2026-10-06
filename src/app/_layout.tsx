@@ -34,7 +34,7 @@ import { useSettings, useSettingsHydrated } from '@/store/settings';
 import { language, t } from '@/lib/i18n';
 
 const DAY = 24 * 60 * 60 * 1000;
-const BACK = t({ nb: 'Tilbake', en: 'Back', ar: 'رجوع', ur: 'واپس' });
+const BACK = t('navigation.back');
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -134,7 +134,7 @@ function RootNavigator() {
           name="mosques"
           options={{
             headerShown: true,
-            title: t({ nb: 'Moskeer', en: 'Mosques', ar: 'المساجد', ur: 'مساجد' }),
+            title: t('navigation.mosques'),
             headerBackTitle: BACK,
           }}
         />
@@ -142,7 +142,7 @@ function RootNavigator() {
           name="place-picker"
           options={{
             headerShown: true,
-            title: t({ nb: 'Velg sted', en: 'Choose location', ar: 'اختر الموقع', ur: 'مقام منتخب کریں' }),
+            title: t('navigation.chooseLocation'),
             headerBackTitle: BACK,
           }}
         />
@@ -150,7 +150,7 @@ function RootNavigator() {
           name="tracker"
           options={{
             headerShown: true,
-            title: t({ nb: 'Bønnesporing', en: 'Prayer tracker', ar: 'متابعة الصلوات', ur: 'نماز ٹریکر' }),
+            title: t('navigation.prayerTracker'),
             headerBackTitle: BACK,
           }}
         />
@@ -158,7 +158,7 @@ function RootNavigator() {
           name="settings"
           options={{
             headerShown: true,
-            title: t({ nb: 'Innstillinger', en: 'Settings', ar: 'الإعدادات', ur: 'ترتیبات' }),
+            title: t('navigation.settings'),
             headerBackTitle: BACK,
           }}
         />
@@ -166,7 +166,7 @@ function RootNavigator() {
           name="settings-notifications"
           options={{
             headerShown: true,
-            title: t({ nb: 'Varsler', en: 'Notifications', ar: 'الإشعارات', ur: 'اطلاعات' }),
+            title: t('navigation.notifications'),
             headerBackTitle: BACK,
           }}
         />
@@ -182,7 +182,7 @@ function RootNavigator() {
           name="settings-appearance"
           options={{
             headerShown: true,
-            title: t({ nb: 'Utseende', en: 'Appearance', ar: 'المظهر', ur: 'ظاہری شکل' }),
+            title: t('navigation.appearance'),
             headerBackTitle: BACK,
           }}
         />
@@ -190,7 +190,7 @@ function RootNavigator() {
           name="tasbih"
           options={{
             headerShown: true,
-            title: t({ nb: 'Tasbih', en: 'Tasbih', ar: 'المسبحة', ur: 'تسبیح' }),
+            title: t('navigation.tasbih'),
             headerBackTitle: BACK,
           }}
         />
@@ -198,7 +198,7 @@ function RootNavigator() {
           name="duas/index"
           options={{
             headerShown: true,
-            title: t({ nb: 'Dua og dhikr', en: 'Dua and dhikr', ar: 'الأدعية والأذكار', ur: 'دعا اور ذکر' }),
+            title: t('navigation.duaAndDhikr'),
             headerBackTitle: BACK,
           }}
         />
@@ -206,7 +206,7 @@ function RootNavigator() {
           name="duas/[id]"
           options={{
             headerShown: true,
-            title: t({ nb: 'Dua', en: 'Dua', ar: 'دعاء', ur: 'دعا' }),
+            title: t('navigation.dua'),
             headerBackTitle: BACK,
           }}
         />
@@ -214,7 +214,7 @@ function RootNavigator() {
           name="irn"
           options={{
             headerShown: true,
-            title: t({ nb: 'Islamsk Råd Norge', en: 'Islamic Council of Norway', ar: 'المجلس الإسلامي النرويجي', ur: 'اسلامک کونسل ناروے' }),
+            title: t('navigation.islamicCouncilOfNorway'),
             headerBackTitle: BACK,
           }}
         />
@@ -222,7 +222,7 @@ function RootNavigator() {
           name="notification-sound"
           options={{
             headerShown: true,
-            title: t({ nb: 'Varsellyd', en: 'Notification sound', ar: 'صوت الإشعار', ur: 'اطلاع کی آواز' }),
+            title: t('navigation.notificationSound'),
             headerBackTitle: BACK,
           }}
         />
@@ -230,7 +230,7 @@ function RootNavigator() {
           name="notification-prayers"
           options={{
             headerShown: true,
-            title: t({ nb: 'Bønnevarsler', en: 'Prayer notifications', ar: 'إشعارات الصلاة', ur: 'نماز کی اطلاعات' }),
+            title: t('navigation.prayerNotifications'),
             headerBackTitle: BACK,
           }}
         />
@@ -238,7 +238,7 @@ function RootNavigator() {
           name="notification-check"
           options={{
             headerShown: true,
-            title: t({ nb: 'Varselsjekk', en: 'Notification check', ar: 'فحص الإشعارات', ur: 'اطلاعات کی جانچ' }),
+            title: t('navigation.notificationCheck'),
             headerBackTitle: BACK,
           }}
         />
@@ -246,7 +246,7 @@ function RootNavigator() {
           name="fasting-reminders"
           options={{
             headerShown: true,
-            title: t({ nb: 'Faste og merkedager', en: 'Fasting and special days', ar: 'الصيام والمناسبات', ur: 'روزے اور خاص دن' }),
+            title: t('navigation.fastingAndSpecialDays'),
             headerBackTitle: BACK,
           }}
         />
@@ -254,7 +254,7 @@ function RootNavigator() {
           name="calculation-method"
           options={{
             headerShown: true,
-            title: t({ nb: 'Beregningsmetode', en: 'Calculation method', ar: 'طريقة الحساب', ur: 'حساب کا طریقہ' }),
+            title: t('navigation.calculationMethod'),
             headerBackTitle: BACK,
           }}
         />
@@ -262,7 +262,7 @@ function RootNavigator() {
           name="asr-method"
           options={{
             headerShown: true,
-            title: t({ nb: 'Asr-metode', en: 'Asr method', ar: 'طريقة العصر', ur: 'عصر کا طریقہ' }),
+            title: t('navigation.asrMethod'),
             headerBackTitle: BACK,
           }}
         />
@@ -270,7 +270,7 @@ function RootNavigator() {
           name="dua-settings"
           options={{
             headerShown: true,
-            title: t({ nb: 'Duainnstillinger', en: 'Dua settings', ar: 'إعدادات الأدعية', ur: 'دعا کی ترتیبات' }),
+            title: t('navigation.duaSettings'),
             headerBackTitle: BACK,
           }}
         />
@@ -279,7 +279,7 @@ function RootNavigator() {
           options={{
             presentation: 'modal',
             headerShown: true,
-            title: t({ nb: 'Velg moské', en: 'Choose mosque', ar: 'اختر المسجد', ur: 'مسجد منتخب کریں' }),
+            title: t('navigation.chooseMosque'),
           }}
         />
         <Stack.Screen
@@ -302,7 +302,7 @@ function RootNavigator() {
           name="whats-new"
           options={{
             headerShown: true,
-            title: t({ nb: 'Hva er nytt', en: "What's new", ar: 'ما الجديد', ur: 'نیا کیا ہے' }),
+            title: t('navigation.whatSNew'),
             headerBackTitle: BACK,
           }}
         />
@@ -310,7 +310,7 @@ function RootNavigator() {
           name="feedback"
           options={{
             headerShown: true,
-            title: t({ nb: 'Tilbakemelding', en: 'Feedback', ar: 'الملاحظات', ur: 'رائے' }),
+            title: t('navigation.feedback'),
             headerBackTitle: BACK,
           }}
         />

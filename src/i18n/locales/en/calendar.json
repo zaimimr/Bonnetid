@@ -1,0 +1,27 @@
+{
+  "month": "Month",
+  "prayerTimes": "Prayer times",
+  "showGregorianCalendar": "Show Gregorian calendar",
+  "showHijriCalendar": "Show Hijri calendar",
+  "specialDaysIn": "Special days in {{monthLabel}}",
+  "noSpecialDaysThis": "No special days this month",
+  "localTimes": "{{name}} · local times",
+  "invalidDate": "Invalid date",
+  "previousDay": "Previous day",
+  "nextDay": "Next day",
+  "theMosqueIsIn": "The mosque is in another municipality, so only Jumuah comes from {{value2}}",
+  "weekdayLabels": [
+    "Mon",
+    "Tue",
+    "Wed",
+    "Thu",
+    "Fri",
+    "Sat",
+    "Sun"
+  ],
+  "combined": "{{primary}}, {{special_date_name}}",
+  "goToThisMonth": "Go to this month",
+  "today": "Today",
+  "previousMonth": "Previous month",
+  "nextMonth": "Next month"
+}

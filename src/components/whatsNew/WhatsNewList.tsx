@@ -88,12 +88,7 @@ export function WhatsNewList({ entries, onNavigate }: WhatsNewListProps) {
         return (
           <View key={entry.version} style={{ gap: spacing.md }}>
             <AppText size="lg" weight="bold" heading>
-              {t({
-                nb: `Versjon ${entry.version}`,
-                en: `Version ${entry.version}`,
-                ar: `الإصدار ${entry.version}`,
-                ur: `ورژن ${entry.version}`,
-              })}
+              {t('whatsNew.version', { version: entry.version })}
             </AppText>
             <Card padding="xs" rounded="xl">
               {items.map((item, index) => (

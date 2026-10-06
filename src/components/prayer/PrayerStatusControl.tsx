@@ -19,12 +19,7 @@ export function PrayerStatusMark({ label }: PrayerStatusMarkProps) {
       name="checkmark"
       size={STATUS_MARK_SIZE}
       color={theme.colors.textMuted}
-      accessibilityLabel={t({
-        nb: `${label} er markert som bedt`,
-        en: `${label} is marked as prayed`,
-        ar: `${label} مُعلَّمة كمؤدّاة`,
-        ur: `${label} ادا شدہ کے طور پر نشان زد ہے`,
-      })}
+      accessibilityLabel={t('prayer.isMarkedAsPrayed', { label })}
     />
   );
 }
@@ -46,18 +41,8 @@ export function PrayerActionButton({ label, marked, onPress }: PrayerActionButto
         accessibilityRole="button"
         accessibilityLabel={
           marked
-            ? t({
-                nb: `Fjern markeringen for ${label}`,
-                en: `Remove the mark for ${label}`,
-                ar: `إزالة التعليم عن ${label}`,
-                ur: `${label} سے نشان ہٹائیں`,
-              })
-            : t({
-                nb: `Marker ${label} som bedt`,
-                en: `Mark ${label} as prayed`,
-                ar: `تعليم ${label} كمؤدّاة`,
-                ur: `${label} کو ادا شدہ نشان زد کریں`,
-              })
+            ? t('prayer.removeTheMarkFor', { label })
+            : t('prayer.markAsPrayed', { label })
         }
         style={({ pressed }) => [
           {
@@ -85,8 +70,8 @@ export function PrayerActionButton({ label, marked, onPress }: PrayerActionButto
           color={marked ? theme.colors.textSecondary : theme.colors.onPrimary}
           maxFontSizeMultiplier={1.4}>
           {marked
-            ? t({ nb: 'Angre', en: 'Undo', ar: 'تراجع', ur: 'واپس لیں' })
-            : t({ nb: 'Bedt', en: 'Prayed', ar: 'صلّيت', ur: 'ادا کی' })}
+            ? t('prayer.undo')
+            : t('prayer.prayed')}
         </AppText>
       </Pressable>
     </View>

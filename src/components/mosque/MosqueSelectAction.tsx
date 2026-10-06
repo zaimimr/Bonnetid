@@ -21,7 +21,7 @@ export function MosqueSelectAction({
     return (
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
         <Ionicons name="checkmark-circle" size={15} color={theme.colors.primary} />
-        <Badge label={t({ nb: 'Min moské', en: 'My mosque', ar: 'مسجدي', ur: 'میری مسجد' })} variant="primary" />
+        <Badge label={t('mosque.myMosque')} variant="primary" />
       </View>
     );
   }
@@ -36,12 +36,7 @@ export function MosqueSelectAction({
       onPress={select}
       hitSlop={spacing.sm}
       accessibilityRole="button"
-      accessibilityLabel={t({
-        nb: `Velg ${mosqueName} som min moské`,
-        en: `Choose ${mosqueName} as my mosque`,
-        ar: `اختيار ${mosqueName} مسجدًا لي`,
-        ur: `${mosqueName} کو اپنی مسجد منتخب کریں`,
-      })}
+      accessibilityLabel={t('mosque.chooseAsMyMosque', { mosqueName })}
       style={({ pressed }) => [
         {
           flexDirection: 'row',
@@ -58,12 +53,7 @@ export function MosqueSelectAction({
       ]}>
       <Ionicons name="add-circle-outline" size={15} color={theme.colors.onPrimarySoft} />
       <AppText size="sm" weight="semibold" tone="onPrimarySoft" style={{ flexShrink: 1 }}>
-        {t({
-          nb: 'Velg som min moské',
-          en: 'Choose as my mosque',
-          ar: 'اختيار كمسجدي',
-          ur: 'اپنی مسجد منتخب کریں',
-        })}
+        {t('mosque.chooseAsMyMosque2')}
       </AppText>
     </Pressable>
   );

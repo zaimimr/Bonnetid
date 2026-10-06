@@ -28,11 +28,11 @@ export function TravelBanner() {
       <View style={{ flex: 1 }}>
         <PostHogMaskView>
           <AppText size="sm" weight="semibold" style={{ color: theme.colors.onTravelSurface }}>
-            {`${t({ nb: 'Reisemodus', en: 'Travel mode', ar: 'وضع السفر', ur: 'سفر موڈ' })} · ${location.name}`}
+            {`${t('travel.travelMode')} · ${location.name}`}
           </AppText>
         </PostHogMaskView>
         <AppText size="xs" style={{ color: theme.colors.travelSurfaceMuted }}>
-          {t({ nb: 'Lokale tider', en: 'Local times', ar: 'الأوقات المحلية', ur: 'مقامی اوقات' })}
+          {t('travel.localTimes')}
         </AppText>
       </View>
     </View>

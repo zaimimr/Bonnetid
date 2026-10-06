@@ -70,19 +70,9 @@ export function buildPrayerReminders(
 }
 
 export function reminderTitle(label: string): string {
-  return t({
-    nb: `Har du bedt ${label}?`,
-    en: `Have you prayed ${label}?`,
-    ar: `هل صلّيت ${label}؟`,
-    ur: `کیا آپ نے ${label} ادا کی؟`,
-  });
+  return t('prayer.haveYouPrayed', { label });
 }
 
 export function reminderBody(reminder: PrayerReminder): string {
-  return t({
-    nb: `${reminder.label} går ut kl. ${reminder.endClock} (${reminder.endLabel})`,
-    en: `${reminder.label} ends at ${reminder.endClock} (${reminder.endLabel})`,
-    ar: `ينتهي وقت ${reminder.label} الساعة ${reminder.endClock} (${reminder.endLabel})`,
-    ur: `${reminder.label} کا وقت ${reminder.endClock} پر ختم ہوتا ہے (${reminder.endLabel})`,
-  });
+  return t('prayer.endsAt', { label: reminder.label, endClock: reminder.endClock, endLabel: reminder.endLabel });
 }

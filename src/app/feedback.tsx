@@ -14,10 +14,10 @@ import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
 
 const KINDS: { value: FeedbackKind; label: string }[] = [
-  { value: 'Feil', label: t({ nb: 'Feil', en: 'Bug', ar: 'خطأ', ur: 'خرابی' }) },
-  { value: 'Forslag', label: t({ nb: 'Forslag', en: 'Idea', ar: 'اقتراح', ur: 'تجویز' }) },
-  { value: 'Ros', label: t({ nb: 'Ros', en: 'Praise', ar: 'إشادة', ur: 'تعریف' }) },
-  { value: 'Annet', label: t({ nb: 'Annet', en: 'Other', ar: 'أخرى', ur: 'دیگر' }) },
+  { value: 'Feil', label: t('feedback.bug') },
+  { value: 'Forslag', label: t('feedback.idea') },
+  { value: 'Ros', label: t('feedback.praise') },
+  { value: 'Annet', label: t('feedback.other') },
 ];
 
 const timeFormat = new Intl.DateTimeFormat(intlLocale(), {
@@ -79,17 +79,17 @@ export default function FeedbackScreen() {
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md }}>
           <Ionicons name="checkmark-circle" size={72} color={theme.colors.success} />
           <AppText size="xl" weight="semibold" align="center">
-            {t({ nb: 'Takk for tilbakemeldingen!', en: 'Thanks for your feedback!', ar: 'شكرًا على ملاحظاتك!', ur: 'آپ کی رائے کا شکریہ!' })}
+            {t('feedback.thanksForYourFeedback')}
           </AppText>
           {status === 'thread' && (
             <AppText tone="textSecondary" align="center">
-              {t({ nb: 'Vi svarer her.', en: 'We will reply here.', ar: 'سنرد عليك هنا.', ur: 'ہم یہیں جواب دیں گے۔' })}
+              {t('feedback.weWillReplyHere')}
             </AppText>
           )}
         </View>
         <View style={{ gap: spacing.sm, marginBottom: spacing.lg }}>
-          <Button label={t({ nb: 'Ferdig', en: 'Done', ar: 'تم', ur: 'ہو گیا' })} fullWidth onPress={() => router.back()} />
-          <Button label={t({ nb: 'Send en til', en: 'Send another', ar: 'أرسل رسالة أخرى', ur: 'ایک اور بھیجیں' })} variant="ghost" fullWidth onPress={() => setStatus('idle')} />
+          <Button label={t('feedback.done')} fullWidth onPress={() => router.back()} />
+          <Button label={t('feedback.sendAnother')} variant="ghost" fullWidth onPress={() => setStatus('idle')} />
         </View>
       </Screen>
     );
@@ -116,7 +116,7 @@ export default function FeedbackScreen() {
                   }}>
                   <AppText tone={mine ? 'onPrimarySoft' : 'textPrimary'}>{message.content}</AppText>
                   <AppText size="xs" tone="textMuted">
-                    {mine ? t({ nb: 'Du', en: 'You', ar: 'أنت', ur: 'آپ' }) : 'Bønnetid'} · {timeFormat.format(new Date(message.createdAt))}
+                    {mine ? t('feedback.you') : 'Bønnetid'} · {timeFormat.format(new Date(message.createdAt))}
                   </AppText>
                 </View>
               );
@@ -135,8 +135,8 @@ export default function FeedbackScreen() {
             }}
             placeholder={
               hasTicket
-                ? t({ nb: 'Skriv et svar', en: 'Write a reply', ar: 'اكتب ردًا', ur: 'جواب لکھیں' })
-                : t({ nb: 'Hva vil du fortelle oss?', en: 'What would you like to tell us?', ar: 'ماذا تود أن تخبرنا؟', ur: 'آپ ہمیں کیا بتانا چاہتے ہیں؟' })
+                ? t('feedback.writeAReply')
+                : t('feedback.whatWouldYouLike')
             }
             maxLength={2000}
           />
@@ -144,14 +144,14 @@ export default function FeedbackScreen() {
             <TextField
               value={email}
               onChangeText={setEmail}
-              placeholder={t({ nb: 'E-post (valgfritt)', en: 'Email (optional)', ar: 'البريد الإلكتروني (اختياري)', ur: 'ای میل (اختیاری)' })}
+              placeholder={t('feedback.emailOptional')}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
             />
           )}
           <Button
-            label={t({ nb: 'Send', en: 'Send', ar: 'إرسال', ur: 'بھیجیں' })}
+            label={t('feedback.send')}
             fullWidth
             loading={status === 'sending'}
             disabled={text.trim().length === 0}
@@ -159,12 +159,7 @@ export default function FeedbackScreen() {
           />
           {status === 'failed' && (
             <AppText size="sm" tone="danger">
-              {t({
-                nb: 'Kunne ikke sende. Sjekk nettet og prøv igjen.',
-                en: 'Could not send. Check your connection and try again.',
-                ar: 'تعذّر الإرسال. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.',
-                ur: 'بھیجا نہیں جا سکا۔ انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں۔',
-              })}
+              {t('feedback.couldNotSendCheck')}
             </AppText>
           )}
         </Card>

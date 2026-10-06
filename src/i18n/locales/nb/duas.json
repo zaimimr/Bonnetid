@@ -1,0 +1,154 @@
+{
+  "couldNotFindThis": "Fant ikke denne duaen",
+  "dua": "Dua",
+  "couldNotFindThis2": "Fant ikke denne kategorien",
+  "countWithTasbih": "Tell med tasbih",
+  "repeatedTimes": "Gjentas {{repeat}} ganger",
+  "pronunciation": "Uttale: {{transliteration}}",
+  "source": "Kilde: {{source}}",
+  "now": "Nå",
+  "tasbih": "Tasbih",
+  "afterAdhan": {
+    "title": "Etter adhan",
+    "description": "Svar på kallet og duaen etterpå"
+  },
+  "wuduMosque": {
+    "title": "Wudu og moské",
+    "description": "Etter wudu, inn og ut av moskeen"
+  },
+  "afterSalah": {
+    "title": "Etter bønnen",
+    "description": "Dhikr og duaer etter hver bønn"
+  },
+  "ramadan": {
+    "title": "Ramadan",
+    "description": "Iftar, fasten og Laylat-ul-Qadr"
+  },
+  "eid": {
+    "title": "Eid",
+    "description": "Takbir og hilsen"
+  },
+  "hajj": {
+    "title": "Hajj og Dhul-Hijjah",
+    "description": "Talbiyah, Arafah, takbir og qurbani"
+  },
+  "answerMuezzin": {
+    "title": "Når muezzinen kaller",
+    "meaning": "Det finnes ingen kraft og ingen styrke unntatt hos Allah.",
+    "note": "Gjenta det muezzinen sier. Når han sier «hayya ala as-salah» og «hayya ala al-falah», sier du dette i stedet."
+  },
+  "testimonyAfterAdhan": {
+    "title": "Vitnesbyrd etter adhan",
+    "meaning": "Jeg vitner om at ingen har rett til å tilbes unntatt Allah alene, uten partner, og at Muhammad er Hans tjener og sendebud. Jeg er tilfreds med Allah som Herre, med Muhammad som sendebud og med islam som religion."
+  },
+  "adhanDua": {
+    "title": "Dua etter adhan",
+    "meaning": "Allah, Herre over dette fullkomne kallet og bønnen som skal holdes: Gi Muhammad al-wasila og den høye rangen, og reis ham opp til den priste plassen Du har lovet ham."
+  },
+  "afterWudu": {
+    "title": "Etter wudu",
+    "meaning": "Jeg vitner om at ingen har rett til å tilbes unntatt Allah alene, uten partner, og jeg vitner om at Muhammad er Hans tjener og sendebud."
+  },
+  "enteringMosque": {
+    "title": "Når du går inn i moskeen",
+    "meaning": "Allah, åpne dørene til Din nåde for meg."
+  },
+  "leavingMosque": {
+    "title": "Når du går ut av moskeen",
+    "meaning": "Allah, jeg ber Deg om Din gavmildhet."
+  },
+  "istighfar": {
+    "title": "Be om tilgivelse",
+    "meaning": "Jeg ber Allah om tilgivelse."
+  },
+  "antaAsSalam": {
+    "title": "Allahumma anta as-salam",
+    "meaning": "Allah, Du er Fred, og fra Deg kommer fred. Velsignet er Du, Du som eier majestet og ære."
+  },
+  "laIlahaIllallahAfter": {
+    "title": "La ilaha illallah",
+    "meaning": "Ingen har rett til å tilbes unntatt Allah alene, uten partner. Hans er herredømmet og Hans er lovprisningen, og Han har makt over alle ting. Allah, ingen kan holde tilbake det Du gir, og ingen kan gi det Du holder tilbake. Rikdom og status hjelper ingen mot Deg."
+  },
+  "tasbih2": {
+    "title": "Subhanallah, Alhamdulillah, Allahu akbar",
+    "meaning": "Allah er hevet over alle mangler.\nAll lovprisning tilhører Allah.\nAllah er størst.",
+    "note": "Si hver av dem 33 ganger."
+  },
+  "tasbihCompletion": {
+    "title": "Til sammen hundre",
+    "meaning": "Ingen har rett til å tilbes unntatt Allah alene, uten partner. Hans er herredømmet og Hans er lovprisningen, og Han har makt over alle ting.",
+    "note": "Sies én gang etter de tre rundene med 33, så det blir hundre til sammen."
+  },
+  "ayatAlKursi": {
+    "title": "Ayat al-Kursi",
+    "meaning": "Allah, ingen har rett til å tilbes unntatt Ham, Den Levende, Den som opprettholder alt. Verken slummer eller søvn tar Ham. Hans er alt i himlene og på jorden. Hvem kan gå i forbønn hos Ham uten Hans tillatelse? Han vet hva som ligger foran dem og hva som ligger bak dem, og de fatter ingenting av Hans kunnskap unntatt det Han vil. Hans trone omfatter himlene og jorden, og å bevare dem tretter Ham ikke. Han er Den Opphøyde, Den Veldige.",
+    "source": "Koranen 2:255. Etter bønnen: an-Nasa'i, as-Sunan al-Kubra 9848"
+  },
+  "muawwidhat": {
+    "title": "De tre siste surene",
+    "meaning": "Al-Ikhlas: Si: Han er Allah, Den Ene. Allah, Den alle trenger. Han har ikke fått barn og er ikke født. Og ingen er Hans like.\n\nAl-Falaq: Si: Jeg søker tilflukt hos morgengryets Herre, mot ondskapen i det Han har skapt, mot ondskapen i mørket når det senker seg, mot ondskapen hos dem som blåser på knuter, og mot ondskapen hos den misunnelige når han misunner.\n\nAn-Nas: Si: Jeg søker tilflukt hos menneskenes Herre, menneskenes Konge, menneskenes Gud, mot ondskapen hos hviskeren som trekker seg unna, han som hvisker i menneskenes bryst, blant jinn og mennesker.",
+    "note": "Leses én gang etter hver bønn.",
+    "source": "Koranen 112-114. Etter bønnen: Sunan Abi Dawud 1523, Jami' at-Tirmidhi 2903"
+  },
+  "helpMeRemember": {
+    "title": "Hjelp meg å minnes Deg",
+    "meaning": "Allah, hjelp meg å minnes Deg, å takke Deg og å tilbe Deg på best mulig måte."
+  },
+  "iftar": {
+    "title": "Dua ved iftar",
+    "meaning": "Tørsten er borte, årene er fuktet, og lønnen er sikret, om Allah vil.",
+    "note": "Sies når du bryter fasten."
+  },
+  "laylatAlQadr": {
+    "title": "Dua for Laylat-ul-Qadr",
+    "meaning": "Allah, Du er Den som tilgir, og Du elsker å tilgi, så tilgi meg.",
+    "note": "Profeten lærte Aisha å si denne duaen."
+  },
+  "iAmFasting": {
+    "title": "Når noen provoserer deg",
+    "meaning": "Jeg faster.",
+    "note": "Sies hvis noen krangler med deg eller fornærmer deg mens du faster."
+  },
+  "iftarAsGuest": {
+    "title": "Når du bryter fasten hos andre",
+    "meaning": "Må de fastende bryte fasten hos dere, må de rettskafne spise maten deres, og må englene be for dere."
+  },
+  "talbiyah": {
+    "title": "Talbiyah",
+    "meaning": "Her er jeg, Allah, her er jeg. Her er jeg, Du har ingen partner, her er jeg. All lovprisning og all nåde tilhører Deg, og herredømmet. Du har ingen partner.",
+    "note": "Sies av pilegrimer fra de går i ihram til de kaster steiner på Eid-dagen."
+  },
+  "arafah": {
+    "title": "Den beste duaen på Arafah-dagen",
+    "meaning": "Ingen har rett til å tilbes unntatt Allah alene, uten partner. Herredømmet og all lovprisning tilhører Ham, og Han har makt over alle ting.",
+    "note": "Profeten sa at den beste duaen er duaen på Arafah-dagen, og at dette er det beste han og profetene før ham har sagt."
+  },
+  "takbirDhulHijjah": {
+    "title": "Takbir i Dhul-Hijjah",
+    "meaning": "Allah er størst, Allah er størst, ingen har rett til å tilbes unntatt Allah. Allah er størst, Allah er størst, og all lovprisning tilhører Allah.",
+    "note": "Sies ofte de ti første dagene, og etter bønnene fra Arafah-dagen til og med 13. Dhul-Hijjah.",
+    "source": "Musannaf Ibn Abi Shaybah, fra Abdullah ibn Masud"
+  },
+  "betweenTheCorners": {
+    "title": "Mellom Rukn al-Yamani og Den svarte steinen",
+    "meaning": "Vår Herre, gi oss det gode i dette livet og det gode i det neste, og vern oss mot straffen i Ilden.",
+    "note": "Sies under tawaf, på strekningen mellom de to hjørnene av Kaba.",
+    "source": "Sunan Abi Dawud 1892. Koranen 2:201"
+  },
+  "qurbani": {
+    "title": "Når du slakter qurbani",
+    "meaning": "I Allahs navn, og Allah er størst."
+  },
+  "takbirEid": {
+    "title": "Takbir",
+    "meaning": "Allah er størst, Allah er størst, ingen har rett til å tilbes unntatt Allah. Allah er størst, Allah er størst, og all lovprisning tilhører Allah.",
+    "note": "Sies fra kvelden før Eid al-Fitr til Eid-bønnen, og etter bønnene fra Arafah-dagen til og med 13. Dhul-Hijjah.",
+    "source": "Musannaf Ibn Abi Shaybah, fra Abdullah ibn Masud"
+  },
+  "eidGreeting": {
+    "title": "Eid-hilsen",
+    "meaning": "Må Allah ta imot fra oss og fra dere.",
+    "note": "Følgesvennene hilste hverandre slik når de møttes på Eid.",
+    "source": "Fath al-Bari, fra Jubayr ibn Nufayr"
+  }
+}

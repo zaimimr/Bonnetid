@@ -30,12 +30,7 @@ export function PickActions({
         onPress={onUsePosition}
         disabled={gpsStatus === 'locating' || disabled}
         accessibilityRole="button"
-        accessibilityLabel={t({
-          nb: 'Bruk min posisjon, velger moskeen nærmest deg',
-          en: 'Use my location, picks the mosque nearest you',
-          ar: 'استخدام موقعي، يختار أقرب مسجد إليك',
-          ur: 'میرا مقام استعمال کریں، آپ کے قریب ترین مسجد منتخب کرتا ہے',
-        })}
+        accessibilityLabel={t('mosque.useMyLocationPicks')}
         style={({ pressed }) => [
           {
             flexDirection: 'row',
@@ -55,37 +50,22 @@ export function PickActions({
         )}
         <View style={{ flex: 1 }}>
           <AppText weight="semibold" tone="onPrimarySoft">
-            {t({ nb: 'Bruk min posisjon', en: 'Use my location', ar: 'استخدام موقعي', ur: 'میرا مقام استعمال کریں' })}
+            {t('mosque.useMyLocation')}
           </AppText>
           <AppText size="xs" tone="onPrimarySoft">
-            {t({
-              nb: 'Velger moskeen nærmest deg',
-              en: 'Picks the mosque nearest you',
-              ar: 'يختار أقرب مسجد إليك',
-              ur: 'آپ کے قریب ترین مسجد منتخب کرتا ہے',
-            })}
+            {t('mosque.picksTheMosqueNearest')}
           </AppText>
         </View>
       </Pressable>
 
       {gpsStatus === 'denied' && (
         <AppText size="sm" tone="danger">
-          {t({
-            nb: 'Posisjonstilgang avslått. Gi tilgang i systeminnstillinger, eller velg moské manuelt.',
-            en: 'Location access denied. Allow access in system settings, or choose a mosque manually.',
-            ar: 'تم رفض الوصول إلى الموقع. اسمح بالوصول من إعدادات النظام، أو اختر المسجد يدويًا.',
-            ur: 'مقام تک رسائی مسترد کر دی گئی۔ سسٹم کی ترتیبات میں اجازت دیں، یا مسجد خود منتخب کریں۔',
-          })}
+          {t('mosque.locationAccessDeniedAllow')}
         </AppText>
       )}
       {gpsStatus === 'error' && (
         <AppText size="sm" tone="danger">
-          {t({
-            nb: 'Fant ikke posisjonen din. Velg moské manuelt.',
-            en: 'Could not find your location. Choose a mosque manually.',
-            ar: 'تعذّر تحديد موقعك. اختر المسجد يدويًا.',
-            ur: 'آپ کا مقام نہیں مل سکا۔ مسجد خود منتخب کریں۔',
-          })}
+          {t('mosque.couldNotFindYour')}
         </AppText>
       )}
 
@@ -93,7 +73,7 @@ export function PickActions({
         <Pressable
           onPress={onClear}
           accessibilityRole="button"
-          accessibilityLabel={t({ nb: 'Fjern valgt moské', en: 'Remove selected mosque', ar: 'إزالة المسجد المختار', ur: 'منتخب مسجد ہٹائیں' })}
+          accessibilityLabel={t('mosque.removeSelectedMosque')}
           style={({ pressed }) => [
             {
               flexDirection: 'row',
@@ -109,7 +89,7 @@ export function PickActions({
           <Ionicons name="close-circle-outline" size={18} color={theme.colors.danger} />
           <View style={{ flex: 1 }}>
             <AppText weight="semibold" tone="danger">
-              {t({ nb: 'Fjern valgt moské', en: 'Remove selected mosque', ar: 'إزالة المسجد المختار', ur: 'منتخب مسجد ہٹائیں' })}
+              {t('mosque.removeSelectedMosque')}
             </AppText>
             <AppText size="xs" tone="textMuted">
               {selectedName}
@@ -126,7 +106,7 @@ export function PlaceFilterButton({
   disabled,
   onPress,
   onClear,
-  emptyLabel = t({ nb: 'Alle steder', en: 'All places', ar: 'كل الأماكن', ur: 'تمام مقامات' }),
+  emptyLabel = t('mosque.allPlaces'),
 }: {
   place: Place | null;
   disabled: boolean;
@@ -144,18 +124,8 @@ export function PlaceFilterButton({
       accessibilityRole="button"
       accessibilityLabel={
         active
-          ? t({
-              nb: `Filtrer på sted, ${place.name}`,
-              en: `Filter by place, ${place.name}`,
-              ar: `تصفية حسب المكان، ${place.name}`,
-              ur: `مقام کے لحاظ سے فلٹر، ${place.name}`,
-            })
-          : t({
-              nb: 'Filtrer på sted',
-              en: 'Filter by place',
-              ar: 'تصفية حسب المكان',
-              ur: 'مقام کے لحاظ سے فلٹر',
-            })
+          ? t('mosque.filterByPlace', { name: place.name })
+          : t('mosque.filterByPlace2')
       }
       style={({ pressed }) => [
         {
@@ -187,12 +157,7 @@ export function PlaceFilterButton({
         {active ? place.name : emptyLabel}
       </AppText>
       {active ? (
-        <Pressable onPress={onClear} hitSlop={8} accessibilityLabel={t({
-            nb: 'Fjern stedsfilter',
-            en: 'Remove place filter',
-            ar: 'إزالة تصفية المكان',
-            ur: 'مقام کا فلٹر ہٹائیں',
-          })}>
+        <Pressable onPress={onClear} hitSlop={8} accessibilityLabel={t('mosque.removePlaceFilter')}>
           <Ionicons name="close-circle" size={16} color={theme.colors.filterActiveText} />
         </Pressable>
       ) : (
@@ -258,12 +223,12 @@ export function ModeToggle({ view, onChange }: { view: MosqueViewMode; onChange:
     {
       value: 'list',
       icon: 'list',
-      label: t({ nb: 'Listevisning', en: 'List view', ar: 'عرض القائمة', ur: 'فہرست' }),
+      label: t('mosque.listView'),
     },
     {
       value: 'map',
       icon: 'map-outline',
-      label: t({ nb: 'Kartvisning', en: 'Map view', ar: 'عرض الخريطة', ur: 'نقشہ' }),
+      label: t('mosque.mapView'),
     },
   ];
 

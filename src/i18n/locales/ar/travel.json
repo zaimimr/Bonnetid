@@ -1,0 +1,7 @@
+{
+  "travelMode": "وضع السفر",
+  "localTimes": "الأوقات المحلية",
+  "timesAreShownIn": "تُعرض الأوقات بالتوقيت المحلي لـ {{name}} ({{localOffset}}). هاتفك مضبوط على {{deviceOffset}}",
+  "timesAreForIn": "الأوقات خاصة بـ {{name}} بتوقيت النرويج، معروضة بتوقيتك المحلي ({{deviceOffset}})",
+  "yourLocation": "موقعك"
+}

@@ -33,16 +33,11 @@ export function WhatsNewHost() {
   };
 
   return (
-    <Sheet visible={interruption === 'whats_new' && !dismissed} onClose={close} title={t({ nb: 'Hva er nytt', en: "What's new", ar: 'ما الجديد', ur: 'نیا کیا ہے' })}>
+    <Sheet visible={interruption === 'whats_new' && !dismissed} onClose={close} title={t('whatsNew.whatSNew')}>
       <WhatsNewList entries={pending} onNavigate={close} />
       <View style={{ marginTop: spacing.xl, gap: spacing.sm }}>
         <Button
-          label={t({
-            nb: 'Gi Bønnetid en vurdering',
-            en: 'Rate Bønnetid',
-            ar: 'قيّم Bønnetid',
-            ur: 'Bønnetid کی درجہ بندی کریں',
-          })}
+          label={t('whatsNew.rateBNnetid')}
           variant="secondary"
           fullWidth
           onPress={() => {
@@ -50,7 +45,7 @@ export function WhatsNewHost() {
             openStoreReview();
           }}
         />
-        <Button label={t({ nb: 'Fortsett', en: 'Continue', ar: 'متابعة', ur: 'جاری رکھیں' })} fullWidth onPress={close} />
+        <Button label={t('whatsNew.continue')} fullWidth onPress={close} />
       </View>
     </Sheet>
   );

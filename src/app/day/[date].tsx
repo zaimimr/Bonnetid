@@ -105,7 +105,7 @@ export default function DayScreen() {
   if (!valid) {
     return (
       <Screen edges={[]}>
-        <EmptyState message={t({ nb: 'Ugyldig dato', en: 'Invalid date', ar: 'تاريخ غير صالح', ur: 'غلط تاریخ' })} icon="calendar-clear-outline" />
+        <EmptyState message={t('calendar.invalidDate')} icon="calendar-clear-outline" />
       </Screen>
     );
   }
@@ -135,7 +135,7 @@ export default function DayScreen() {
         }}>
         <IconButton
           name={isRTL() ? 'chevron-forward' : 'chevron-back'}
-          accessibilityLabel={t({ nb: 'Forrige dag', en: 'Previous day', ar: 'اليوم السابق', ur: 'پچھلا دن' })}
+          accessibilityLabel={t('calendar.previousDay')}
           onPress={() => goToDay(-1)}
         />
         <View
@@ -168,7 +168,7 @@ export default function DayScreen() {
         </View>
         <IconButton
           name={isRTL() ? 'chevron-back' : 'chevron-forward'}
-          accessibilityLabel={t({ nb: 'Neste dag', en: 'Next day', ar: 'اليوم التالي', ur: 'اگلا دن' })}
+          accessibilityLabel={t('calendar.nextDay')}
           onPress={() => goToDay(1)}
         />
       </View>
@@ -192,12 +192,7 @@ export default function DayScreen() {
             mosqueNote={
               mosqueInLocation
                 ? undefined
-                : t({
-                    nb: `Moskeen er i en annen kommune, så bare Jumuah kommer fra ${mosque?.name ?? 'moskeen'}`,
-                    en: `The mosque is in another municipality, so only Jumuah comes from ${mosque?.name ?? 'the mosque'}`,
-                    ar: `المسجد في بلدية أخرى، لذا تأتي صلاة الجمعة فقط من ${mosque?.name ?? 'المسجد'}`,
-                    ur: `مسجد کسی دوسری میونسپلٹی میں ہے، اس لیے صرف جمعہ ${mosque?.name ?? 'مسجد'} سے آتا ہے`,
-                  })
+                : t('calendar.theMosqueIsIn', { value: mosque?.name ?? 'moskeen', value2: mosque?.name ?? 'the mosque', value3: mosque?.name ?? 'المسجد', value4: mosque?.name ?? 'مسجد' })
             }
             jamatTimes={jamatTimes}
             jummah={isFriday ? jummahTimes : []}

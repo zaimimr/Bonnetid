@@ -1,0 +1,16 @@
+{
+  "complete": "اكتمل",
+  "saidOnce": "تُقال مرة واحدة",
+  "of": "من {{target}}",
+  "allRoundsComplete": "اكتملت جميع الجولات",
+  "roundOf": "الجولة {{value}} من {{total}}",
+  "afterPrayer": "بعد الصلاة",
+  "freeCount": "عدّ حر",
+  "noGoal": "بلا هدف",
+  "reset": "إعادة الضبط",
+  "done": "تم",
+  "startOver": "البدء من جديد",
+  "countOf": "عُدّ، {{count}} من {{target}}",
+  "count": "عُدّ، {{count}}",
+  "tapAnywhereToCount": "اضغط في أي مكان للعدّ"
+}

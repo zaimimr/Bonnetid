@@ -105,12 +105,12 @@ async function ensurePrayerCategory(Notifications: NotificationsModule) {
   await Notifications.setNotificationCategoryAsync(PRAYER_CATEGORY, [
     {
       identifier: MARK_PRAYED_ACTION,
-      buttonTitle: t({ nb: 'Bedt', en: 'Prayed', ar: 'صلّيت', ur: 'ادا کی' }),
+      buttonTitle: t('notifications.prayed'),
       options: { opensAppToForeground: false },
     },
     {
       identifier: MARK_SKIPPED_ACTION,
-      buttonTitle: t({ nb: 'Hopp over', en: 'Skip', ar: 'تخطٍّ', ur: 'چھوڑ دیں' }),
+      buttonTitle: t('notifications.skip'),
       options: { opensAppToForeground: false },
     },
   ]);
@@ -172,7 +172,7 @@ async function ensureReminderChannel(
 ): Promise<string | undefined> {
   if (Platform.OS !== 'android') return undefined;
   await Notifications.setNotificationChannelAsync(REMINDER_CHANNEL_ID, {
-    name: t({ nb: 'Påminnelser', en: 'Reminders', ar: 'التذكيرات', ur: 'یاد دہانیاں' }),
+    name: t('notifications.reminders'),
     importance: Notifications.AndroidImportance.DEFAULT,
   });
   return REMINDER_CHANNEL_ID;
@@ -228,21 +228,11 @@ function serialize<T>(task: () => Promise<T>): Promise<T> {
 }
 
 function adhanBody(entry: PrayerEntry, locationName: string, zone: PrayerTimeZone): string {
-  const start = t({
-    nb: `Det er tid for ${entry.label} i ${locationName}.`,
-    en: `It is time for ${entry.label} in ${locationName}.`,
-    ar: `حان وقت ${entry.label} في ${locationName}.`,
-    ur: `${locationName} میں ${entry.label} کا وقت ہو گیا ہے۔`,
-  });
+  const start = t('notifications.itIsTimeFor', { label: entry.label, locationName });
   if (!entry.end) return start;
   const endClock = formatZonedClock(entry.end.date, zone);
   const duration = formatDurationSpaced(entry.end.date.getTime() - entry.date.getTime());
-  return t({
-    nb: `${start}\nVarer til ${endClock} (${duration}).`,
-    en: `${start}\nLasts until ${endClock} (${duration}).`,
-    ar: `${start}\nيستمر حتى ${endClock} (${duration}).`,
-    ur: `${start}\n${endClock} تک (${duration})۔`,
-  });
+  return t('notifications.lastsUntil', { start, endClock, duration });
 }
 
 export function syncPrayerNotifications(plan: PrayerNotificationPlan): Promise<number> {

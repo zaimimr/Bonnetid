@@ -20,7 +20,7 @@ function DuasScreen() {
   if (!selected) {
     return (
       <Screen edges={[]}>
-        <EmptyState message={t({ nb: 'Fant ikke denne kategorien', en: 'Could not find this category', ar: 'تعذّر العثور على هذه الفئة', ur: 'یہ زمرہ نہیں ملا' })} icon="book-outline" />
+        <EmptyState message={t('duas.couldNotFindThis2')} icon="book-outline" />
       </Screen>
     );
   }
@@ -80,7 +80,7 @@ function CategoryReader({ category }: { category: DuaCategory }) {
               footer={
                 tasbihEnabled && dua.id === DUA_LINKS.tasbih ? (
                   <Button
-                    label={t({ nb: 'Tell med tasbih', en: 'Count with tasbih', ar: 'العدّ بالمسبحة', ur: 'تسبیح سے گنیں' })}
+                    label={t('duas.countWithTasbih')}
                     variant="secondary"
                     onPress={() => router.push({ pathname: '/tasbih', params: { from: 'duas' } })}
                   />

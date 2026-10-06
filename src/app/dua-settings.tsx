@@ -26,8 +26,8 @@ const SIZES = (Object.keys(arabicSizes) as ArabicSizeKey[]).map((key) => ({
 
 const ROW = { paddingHorizontal: spacing.md } as const;
 
-const PRONUNCIATION = t({ nb: 'Uttale', en: 'Pronunciation', ar: 'النطق', ur: 'تلفظ' });
-const TRANSLATION = t({ nb: 'Norsk oversettelse', en: 'English translation', ar: 'الترجمة', ur: 'اردو ترجمہ' });
+const PRONUNCIATION = t('settings.pronunciation');
+const TRANSLATION = t('settings.englishTranslation');
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -58,10 +58,10 @@ export default function DuaSettingsScreen() {
         {EXAMPLE ? <DuaCard dua={EXAMPLE} /> : null}
 
         <Card padding="sm" rounded="xl">
-          <Field label={t({ nb: 'Arabisk skrift', en: 'Arabic script', ar: 'الخط العربي', ur: 'عربی رسم الخط' })}>
+          <Field label={t('settings.arabicScript')}>
             <SegmentedControl value={font} options={FONTS} onChange={setFont} />
           </Field>
-          <Field label={t({ nb: 'Tekststørrelse', en: 'Text size', ar: 'حجم النص', ur: 'متن کا سائز' })}>
+          <Field label={t('settings.textSize')}>
             <SegmentedControl value={size} options={SIZES} onChange={setSize} />
           </Field>
           {showPronunciationSetting && (

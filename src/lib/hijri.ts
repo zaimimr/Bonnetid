@@ -1,4 +1,4 @@
-import { language, t, type Translations } from './i18n.ts';
+import { language, t } from './i18n.ts';
 
 export type ParsedHijri = {
   year: number;
@@ -25,14 +25,14 @@ export function eidPeriodOf(hijri: ParsedHijri): EidPeriod | null {
 
 export function eidPrayerTitle(period: EidPeriod): string {
   return period === 'adha'
-    ? t({ nb: 'Eid al-Adha-bønn', en: 'Eid al-Adha prayer', ar: 'صلاة عيد الأضحى', ur: 'عید الاضحی کی نماز' })
-    : t({ nb: 'Eid al-Fitr-bønn', en: 'Eid al-Fitr prayer', ar: 'صلاة عيد الفطر', ur: 'عید الفطر کی نماز' });
+    ? t('hijri.eidAlAdhaPrayer')
+    : t('hijri.eidAlFitrPrayer');
 }
 
 export function eidBadgeLabel(period: EidPeriod): string {
   return period === 'adha'
-    ? t({ nb: 'Eid al-Adha', en: 'Eid al-Adha', ar: 'عيد الأضحى', ur: 'عید الاضحی' })
-    : t({ nb: 'Eid', en: 'Eid', ar: 'العيد', ur: 'عید' });
+    ? t('hijri.eidAlAdha')
+    : t('hijri.eid');
 }
 
 export function formatHijri(hijriDate: string, monthText: string): string {
@@ -41,26 +41,12 @@ export function formatHijri(hijriDate: string, monthText: string): string {
   return language() === 'nb' ? `${parsed.day}. ${monthText} ${parsed.year}` : `${parsed.day} ${monthText} ${parsed.year}`;
 }
 
-const MONTHS: Translations<readonly string[]> = {
-  nb: ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'],
-  en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-  ar: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
-  ur: ['جنوری', 'فروری', 'مارچ', 'اپریل', 'مئی', 'جون', 'جولائی', 'اگست', 'ستمبر', 'اکتوبر', 'نومبر', 'دسمبر'],
-};
-
-const WEEKDAYS: Translations<readonly string[]> = {
-  nb: ['søndag', 'mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag'],
-  en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-  ar: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
-  ur: ['اتوار', 'پیر', 'منگل', 'بدھ', 'جمعرات', 'جمعہ', 'ہفتہ'],
-};
-
 export function weekdayName(dayIndex: number): string {
-  return t(WEEKDAYS)[dayIndex] ?? '';
+  return t('hijri.weekdays', { returnObjects: true })[dayIndex] ?? '';
 }
 
 function gregorianMonth(monthIndex: number): string {
-  return t(MONTHS)[monthIndex] ?? '';
+  return t('hijri.gregorianMonths', { returnObjects: true })[monthIndex] ?? '';
 }
 
 function dayAndMonth(date: Date): string {

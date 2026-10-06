@@ -60,18 +60,13 @@ export function MosqueCard({
               rowGap: spacing.xs,
               marginTop: spacing.xxs,
             }}>
-            {selected && <Badge label={t({ nb: 'Min moské', en: 'My mosque', ar: 'مسجدي', ur: 'میری مسجد' })} variant="primary" />}
+            {selected && <Badge label={t('mosque.myMosque')} variant="primary" />}
             {distanceKm != null && <Badge label={formatDistance(distanceKm)} variant="neutral" />}
             {eidPeriod && eidTimes.length > 0 && (
               <Badge label={`${eidBadgeLabel(eidPeriod)} ${eidTimes.join(' · ')}`} variant="primary" />
             )}
             {jummahLabel ? <Badge
-                label={t({
-                  nb: `Jumuah ${jummahLabel}`,
-                  en: `Jumuah ${jummahLabel}`,
-                  ar: `الجمعة ${jummahLabel}`,
-                  ur: `جمعہ ${jummahLabel}`,
-                })}
+                label={t('mosque.jumuah2', { jummahLabel })}
                 variant="primary"
               /> : null}
           </View>

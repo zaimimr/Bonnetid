@@ -32,12 +32,7 @@ export function DuaCard({ dua, footer }: DuaCardProps) {
           {dua.title}
         </AppText>
         {dua.repeat ? (
-          <View accessible accessibilityLabel={t({
-              nb: `Gjentas ${dua.repeat} ganger`,
-              en: `Repeated ${dua.repeat} times`,
-              ar: `عدد التكرار: ${dua.repeat}`,
-              ur: `${dua.repeat} بار دہرائیں`,
-            })}>
+          <View accessible accessibilityLabel={t('duas.repeatedTimes', { repeat: dua.repeat })}>
             <Badge label={`${dua.repeat}×`} variant="primary" />
           </View>
         ) : null}
@@ -54,12 +49,7 @@ export function DuaCard({ dua, footer }: DuaCardProps) {
       </View>
 
       {showTransliteration && (
-        <AppText tone="textSecondary" accessibilityLabel={t({
-            nb: `Uttale: ${dua.transliteration}`,
-            en: `Pronunciation: ${dua.transliteration}`,
-            ar: `النطق: ${dua.transliteration}`,
-            ur: `تلفظ: ${dua.transliteration}`,
-          })}>
+        <AppText tone="textSecondary" accessibilityLabel={t('duas.pronunciation', { transliteration: dua.transliteration })}>
           {dua.transliteration}
         </AppText>
       )}
@@ -71,12 +61,7 @@ export function DuaCard({ dua, footer }: DuaCardProps) {
         </>
       )}
       <AppText size="xs" tone="textMuted">
-        {t({
-          nb: `Kilde: ${dua.source}`,
-          en: `Source: ${dua.source}`,
-          ar: `المصدر: ${dua.source}`,
-          ur: `حوالہ: ${dua.source}`,
-        })}
+        {t('duas.source', { source: dua.source })}
       </AppText>
       {footer}
     </Card>

@@ -1,0 +1,27 @@
+{
+  "month": "Måned",
+  "prayerTimes": "Bønnetider",
+  "showGregorianCalendar": "Vis gregoriansk kalender",
+  "showHijriCalendar": "Vis hijri-kalender",
+  "specialDaysIn": "Merkedager i {{monthLabel}}",
+  "noSpecialDaysThis": "Ingen merkedager denne måneden",
+  "localTimes": "{{name}} · lokale tider",
+  "invalidDate": "Ugyldig dato",
+  "previousDay": "Forrige dag",
+  "nextDay": "Neste dag",
+  "theMosqueIsIn": "Moskeen er i en annen kommune, så bare Jumuah kommer fra {{value}}",
+  "weekdayLabels": [
+    "man",
+    "tir",
+    "ons",
+    "tor",
+    "fre",
+    "lør",
+    "søn"
+  ],
+  "combined": "{{primary}}. {{special_date_name}}",
+  "goToThisMonth": "Gå til denne måneden",
+  "today": "I dag",
+  "previousMonth": "Forrige måned",
+  "nextMonth": "Neste måned"
+}

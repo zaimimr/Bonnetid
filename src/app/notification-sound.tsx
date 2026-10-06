@@ -50,12 +50,7 @@ export default function NotificationSoundScreen() {
         size="xs"
         tone="textMuted"
         style={{ marginTop: spacing.sm, paddingHorizontal: spacing.md }}>
-        {t({
-          nb: 'Lyden spilles av når du velger den. Adhan innspilt av Ahmed Al-Haddad.',
-          en: 'The sound plays when you select it. Adhan recorded by Ahmed Al-Haddad.',
-          ar: 'يُشغَّل الصوت عند اختياره. الأذان بصوت أحمد الحداد.',
-          ur: 'آواز منتخب کرنے پر چلتی ہے۔ اذان احمد الحداد کی آواز میں۔',
-        })}
+        {t('settings.theSoundPlaysWhen')}
       </AppText>
     </Screen>
   );

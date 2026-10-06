@@ -45,23 +45,18 @@ export default function NotificationSettingsScreen() {
   ].filter(Boolean).length;
   const fastingSummary =
     chosenFasts === 0
-      ? t({ nb: 'Ingen påminnelser', en: 'No reminders', ar: 'لا توجد تذكيرات', ur: 'کوئی یاد دہانی نہیں' })
+      ? t('settings.noReminders')
       : chosenFasts === 1
-        ? t({ nb: '1 påminnelse er på', en: '1 reminder is on', ar: 'التذكيرات المفعّلة: 1', ur: '1 یاد دہانی آن ہے' })
-        : t({
-            nb: `${chosenFasts} påminnelser er på`,
-            en: `${chosenFasts} reminders are on`,
-            ar: `التذكيرات المفعّلة: ${chosenFasts}`,
-            ur: `${chosenFasts} یاد دہانیاں آن ہیں`,
-          });
+        ? t('settings.n1ReminderIsOn')
+        : t('settings.remindersAreOn', { chosenFasts });
 
   const chosenPrayers = NOTIFIABLE_PRAYERS.filter((prayer) => notificationPrayers[prayer]);
   const prayerSummary =
     chosenPrayers.length === NOTIFIABLE_PRAYERS.length
-      ? t({ nb: 'Alle bønner', en: 'All prayers', ar: 'كل الصلوات', ur: 'تمام نمازیں' })
+      ? t('settings.allPrayers')
       : chosenPrayers.length === 0
-        ? t({ nb: 'Ingen valgt', en: 'None selected', ar: 'لم يُحدَّد شيء', ur: 'کوئی منتخب نہیں' })
-        : chosenPrayers.map((prayer) => PRAYER_LABELS[prayer]).join(t({ nb: ', ', en: ', ', ar: '، ', ur: '، ' }));
+        ? t('settings.noneSelected')
+        : chosenPrayers.map((prayer) => PRAYER_LABELS[prayer]).join(t('settings.separator'));
 
   return (
     <SettingsPage>
@@ -69,8 +64,8 @@ export default function NotificationSettingsScreen() {
 
       <Card padding="sm" rounded="xl">
         <ListRow
-          title={t({ nb: 'Slå på varsler', en: 'Turn on notifications', ar: 'تفعيل الإشعارات', ur: 'اطلاعات آن کریں' })}
-          subtitle={notificationsSupported ? undefined : t({ nb: 'Ikke tilgjengelig i Expo Go på Android', en: 'Not available in Expo Go on Android', ar: 'غير متاح في Expo Go على أندرويد', ur: 'اینڈرائیڈ پر Expo Go میں دستیاب نہیں' })}
+          title={t('settings.turnOnNotifications')}
+          subtitle={notificationsSupported ? undefined : t('settings.notAvailableInExpo')}
           leading={<Ionicons name="notifications-outline" size={20} color={theme.colors.primary} />}
           trailing={
             <Toggle
@@ -86,7 +81,7 @@ export default function NotificationSettingsScreen() {
       {notificationsEnabled && (
         <Card padding="sm" rounded="xl">
           <ListRow
-            title={t({ nb: 'Bønnevarsler', en: 'Prayer notifications', ar: 'إشعارات الصلاة', ur: 'نماز کی اطلاعات' })}
+            title={t('settings.prayerNotifications')}
             subtitle={`${prayerSummary} · ${getNotificationSound(notificationSound).label}`}
             leading={<Ionicons name="time-outline" size={20} color={theme.colors.primary} />}
             chevron
@@ -95,7 +90,7 @@ export default function NotificationSettingsScreen() {
           />
           <Divider />
           <ListRow
-            title={t({ nb: 'Faste og merkedager', en: 'Fasting and special days', ar: 'الصيام والمناسبات', ur: 'روزے اور خاص دن' })}
+            title={t('settings.fastingAndSpecialDays')}
             subtitle={fastingSummary}
             leading={<Ionicons name="moon-outline" size={20} color={theme.colors.primary} />}
             chevron
@@ -104,11 +99,11 @@ export default function NotificationSettingsScreen() {
           />
           <Divider />
           <ListRow
-            title={t({ nb: 'Påminnelse før tiden går ut', en: 'Reminder before time runs out', ar: 'تذكير قبل خروج الوقت', ur: 'وقت ختم ہونے سے پہلے یاد دہانی' })}
+            title={t('settings.reminderBeforeTimeRuns')}
             subtitle={
               trackerEnabled
-                ? t({ nb: '30 minutter før, hvis bønnen ikke er markert', en: '30 minutes before, if the prayer is not marked', ar: 'قبل 30 دقيقة، إذا لم تُعلَّم الصلاة', ur: '30 منٹ پہلے، اگر نماز نشان زد نہ ہو' })
-                : t({ nb: '30 minutter før', en: '30 minutes before', ar: 'قبل 30 دقيقة', ur: '30 منٹ پہلے' })
+                ? t('settings.n30MinutesBeforeIf')
+                : t('settings.n30MinutesBefore')
             }
             leading={<Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />}
             trailing={<Toggle value={endReminderEnabled} onValueChange={setEndReminderEnabled} />}
@@ -120,7 +115,7 @@ export default function NotificationSettingsScreen() {
       {notificationsEnabled && (
         <Card padding="sm" rounded="xl">
           <ListRow
-            title={t({ nb: 'Varselsjekk', en: 'Notification check', ar: 'فحص الإشعارات', ur: 'اطلاعات کی جانچ' })}
+            title={t('settings.notificationCheck')}
             leading={<Ionicons name="pulse-outline" size={20} color={theme.colors.primary} />}
             chevron
             onPress={() => router.push('/notification-check')}

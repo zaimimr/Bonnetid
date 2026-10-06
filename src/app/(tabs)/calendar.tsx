@@ -45,8 +45,8 @@ import { language, t } from '@/lib/i18n';
 type MonthView = 'dates' | 'times';
 
 const VIEW_OPTIONS: { value: MonthView; label: string }[] = [
-  { value: 'dates', label: t({ nb: 'Måned', en: 'Month', ar: 'الشهر', ur: 'مہینہ' }) },
-  { value: 'times', label: t({ nb: 'Bønnetider', en: 'Prayer times', ar: 'مواقيت الصلاة', ur: 'نماز کے اوقات' }) },
+  { value: 'dates', label: t('calendar.month') },
+  { value: 'times', label: t('calendar.prayerTimes') },
 ];
 
 function gregorianLabel(iso: string): { month: string; year: number } {
@@ -208,8 +208,8 @@ export default function CalendarScreen() {
           onSwap={swapCalendar}
           swapLabel={
             isHijri
-              ? t({ nb: 'Vis gregoriansk kalender', en: 'Show Gregorian calendar', ar: 'عرض التقويم الميلادي', ur: 'عیسوی کیلنڈر دکھائیں' })
-              : t({ nb: 'Vis hijri-kalender', en: 'Show Hijri calendar', ar: 'عرض التقويم الهجري', ur: 'ہجری کیلنڈر دکھائیں' })
+              ? t('calendar.showGregorianCalendar')
+              : t('calendar.showHijriCalendar')
           }
         />
 
@@ -307,18 +307,13 @@ function DatesView({
 
       <View>
         <SectionHeader
-          title={t({
-            nb: `Merkedager i ${monthLabel}`,
-            en: `Special days in ${monthLabel}`,
-            ar: `مناسبات شهر ${monthLabel}`,
-            ur: `${monthLabel} کے خاص دن`,
-          })}
+          title={t('calendar.specialDaysIn', { monthLabel })}
           style={{ marginTop: 0 }}
         />
         {eventsLoading && <Skeleton height={180} rounded="xl" />}
         {eventsError && <ErrorState onRetry={onEventsRetry} />}
         {!eventsLoading && !eventsError && events.length === 0 && (
-          <EmptyState message={t({ nb: 'Ingen merkedager denne måneden', en: 'No special days this month', ar: 'لا توجد مناسبات هذا الشهر', ur: 'اس مہینے کوئی خاص دن نہیں' })} icon="calendar-clear-outline" />
+          <EmptyState message={t('calendar.noSpecialDaysThis')} icon="calendar-clear-outline" />
         )}
         <View style={{ gap: spacing.md }}>
           {events.map((event) => (
@@ -392,12 +387,7 @@ function TimesView({
             disabled={placesLoading}
             emptyLabel={
               activeLocation.mode === 'calculated'
-                ? t({
-                    nb: `${activeLocation.name} · lokale tider`,
-                    en: `${activeLocation.name} · local times`,
-                    ar: `${activeLocation.name} · أوقات محلية`,
-                    ur: `${activeLocation.name} · مقامی اوقات`,
-                  })
+                ? t('calendar.localTimes', { name: activeLocation.name })
                 : activeLocation.name
             }
             onPress={() => router.push({ pathname: '/place-picker', params: { scope: 'times' } })}

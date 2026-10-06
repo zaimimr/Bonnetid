@@ -14,7 +14,7 @@ function DuaScreen() {
   if (!dua) {
     return (
       <Screen edges={[]}>
-        <EmptyState message={t({ nb: 'Fant ikke denne duaen', en: 'Could not find this dua', ar: 'تعذّر العثور على هذا الدعاء', ur: 'یہ دعا نہیں ملی' })} icon="book-outline" />
+        <EmptyState message={t('duas.couldNotFindThis')} icon="book-outline" />
       </Screen>
     );
   }
@@ -22,7 +22,7 @@ function DuaScreen() {
   return (
     <Screen scroll edges={[]}>
       <Stack.Screen
-        options={{ title: categoryById(dua.category)?.title ?? t({ nb: 'Dua', en: 'Dua', ar: 'دعاء', ur: 'دعا' }) }}
+        options={{ title: categoryById(dua.category)?.title ?? t('duas.dua') }}
       />
       <View style={{ gap: spacing.lg, marginTop: spacing.md }}>
         <DuaCard dua={dua} />

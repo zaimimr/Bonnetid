@@ -129,7 +129,7 @@ function CompleteCheck({ size }: { size: number }) {
 
   return (
     <Animated.View
-      accessibilityLabel={t({ nb: 'Fullført', en: 'Complete', ar: 'اكتمل', ur: 'مکمل' })}
+      accessibilityLabel={t('tasbih.complete')}
       style={[
         {
           position: 'absolute',
@@ -196,7 +196,7 @@ export function RingVariant({ session }: { session: TasbihSession }) {
         phrase={phrase}
         note={
           complete || closing
-            ? t({ nb: 'Sies én gang', en: 'Said once', ar: 'تُقال مرة واحدة', ur: 'ایک بار پڑھیں' })
+            ? t('tasbih.saidOnce')
             : undefined
         }
         compact={complete || closing}
@@ -231,7 +231,7 @@ export function RingVariant({ session }: { session: TasbihSession }) {
               <PulseCount count={state.count} />
               {target ? (
                 <AppText size="sm" tone="textMuted" tabular>
-                  {t({ nb: `av ${target}`, en: `of ${target}`, ar: `من ${target}`, ur: `${target} میں سے` })}
+                  {t('tasbih.of', { target })}
                 </AppText>
               ) : null}
             </>

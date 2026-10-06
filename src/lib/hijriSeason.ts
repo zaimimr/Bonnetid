@@ -43,65 +43,30 @@ export const SEASONS: SeasonDefinition[] = [RAMADAN_SEASON, DHUL_HIJJAH_SEASON];
 export const ARAFAH_DAY = 9;
 export const EID_AL_ADHA_DAY = 10;
 
-export const MOON_SIGHTING_NOTE = t({
-  nb: 'Datoene følger hijri-kalenderen til Islamsk Råd Norge og kan flytte seg ved månesikting.',
-  en: 'Dates follow the Hijri calendar of the Islamic Council of Norway and may shift with moon sighting.',
-  ar: 'تتبع التواريخ التقويم الهجري للمجلس الإسلامي النرويجي وقد تتغير بحسب رؤية الهلال.',
-  ur: 'تاریخیں اسلامک کونسل ناروے کے ہجری کیلنڈر کے مطابق ہیں اور چاند نظر آنے پر بدل سکتی ہیں۔',
-});
+export const MOON_SIGHTING_NOTE = t('season.datesFollowTheHijri');
 
 export function dhulHijjahDayTitle(day: number | null): string {
-  const month = t({ nb: 'Dhul Hijjah', en: 'Dhul Hijjah', ar: 'ذو الحجة', ur: 'ذوالحجہ' });
+  const month = t('season.dhulHijjah');
   if (day == null) return month;
-  return t({
-    nb: `Dhul Hijjah dag ${day}`,
-    en: `Dhul Hijjah day ${day}`,
-    ar: `اليوم ${day} من ذي الحجة`,
-    ur: `ذوالحجہ، دن ${day}`,
-  });
+  return t('season.dhulHijjahDay', { day });
 }
 
 export function dhulHijjahHighlight(day: number | null): string | null {
   if (day === ARAFAH_DAY) {
-    return t({
-      nb: 'Arafah. Fasten er anbefalt for alle som ikke er på hajj.',
-      en: 'Arafah. Fasting is recommended for everyone not performing Hajj.',
-      ar: 'يوم عرفة. يُستحب صيامه لغير الحاج.',
-      ur: 'یوم عرفہ۔ حج نہ کرنے والوں کے لیے روزہ مستحب ہے۔',
-    });
+    return t('season.arafahFastingIsRecommended');
   }
   if (day === EID_AL_ADHA_DAY) {
-    return t({
-      nb: 'Eid al-Adha. I dag faster vi ikke.',
-      en: 'Eid al-Adha. We do not fast today.',
-      ar: 'عيد الأضحى. لا صيام اليوم.',
-      ur: 'عید الاضحی۔ آج روزہ نہیں رکھا جاتا۔',
-    });
+    return t('season.eidAlAdhaWe');
   }
   if (day == null) return null;
-  return t({
-    nb: 'De ti første dagene i Dhul Hijjah. Gode gjerninger teller ekstra i disse dagene.',
-    en: 'The first ten days of Dhul Hijjah. Good deeds count extra in these days.',
-    ar: 'العشر الأوائل من ذي الحجة. للعمل الصالح فيها فضل عظيم.',
-    ur: 'ذوالحجہ کے پہلے دس دن۔ ان دنوں میں نیک اعمال کا خاص اجر ہے۔',
-  });
+  return t('season.theFirstTenDays2');
 }
 
 export function dhulHijjahCountdownText(days: number): string {
   if (days <= 1) {
-    return t({
-      nb: 'Dhul Hijjah begynner i morgen',
-      en: 'Dhul Hijjah begins tomorrow',
-      ar: 'يبدأ ذو الحجة غدًا',
-      ur: 'ذوالحجہ کل شروع ہو گا',
-    });
+    return t('season.dhulHijjahBeginsTomorrow');
   }
-  return t({
-    nb: `Dhul Hijjah begynner om ${days} dager`,
-    en: `Dhul Hijjah begins in ${formatDayCount(days)}`,
-    ar: `يبدأ ذو الحجة بعد ${formatDayCount(days)}`,
-    ur: `ذوالحجہ ${formatDayCount(days)} میں شروع ہو گا`,
-  });
+  return t('season.dhulHijjahBeginsIn', { days, value: formatDayCount(days) });
 }
 
 export function hijriOn(rows: HijriDay[], isoDate: string): ParsedHijri | null {

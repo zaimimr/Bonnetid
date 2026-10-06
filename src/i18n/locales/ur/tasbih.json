@@ -1,0 +1,16 @@
+{
+  "complete": "مکمل",
+  "saidOnce": "ایک بار پڑھیں",
+  "of": "{{target}} میں سے",
+  "allRoundsComplete": "تمام چکر مکمل",
+  "roundOf": "{{total}} میں سے چکر {{value}}",
+  "afterPrayer": "نماز کے بعد",
+  "freeCount": "آزاد گنتی",
+  "noGoal": "بغیر ہدف",
+  "reset": "دوبارہ شروع کریں",
+  "done": "مکمل",
+  "startOver": "نئے سرے سے شروع کریں",
+  "countOf": "گنیں، {{target}} میں سے {{count}}",
+  "count": "گنیں، {{count}}",
+  "tapAnywhereToCount": "گننے کے لیے کہیں بھی دبائیں"
+}

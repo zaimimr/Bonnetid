@@ -1,0 +1,89 @@
+{
+  "eidAlAdhaPrayer": "Eid al-Adha-bønn",
+  "eidAlFitrPrayer": "Eid al-Fitr-bønn",
+  "eidAlAdha": "Eid al-Adha",
+  "eid": "Eid",
+  "months": {
+    "1": {
+      "name": "Muharram",
+      "start": "01. Muharram – Den første måned (Islamsk Nyttår)"
+    },
+    "2": {
+      "name": "Safar",
+      "start": "01. Safar – Den andre måned"
+    },
+    "3": {
+      "name": "Rabi al-Awal",
+      "start": "01. Rabi al-Awal – Den tredje måned"
+    },
+    "4": {
+      "name": "Rabi at-thani",
+      "start": "01. Rabi at-thani – Den fjerne måned"
+    },
+    "5": {
+      "name": "Jumadi al-Awwal",
+      "start": "01. Jumadi al-Awwal – Den femte måned"
+    },
+    "6": {
+      "name": "Jumadi al-Thani",
+      "start": "01. Jumadi al-Thani – Den sjette måned"
+    },
+    "7": {
+      "name": "Rajab",
+      "start": "01. Rajab – Den syvende måned"
+    },
+    "8": {
+      "name": "Sha'ban",
+      "start": "01. Sha'ban – Den åttende måned"
+    },
+    "9": {
+      "name": "Ramadan",
+      "start": "01. Ramadan – Den niende måned (Fastemåneden)"
+    },
+    "10": {
+      "name": "Shawwal",
+      "start": "01. Shawwal - Den tiende måned - (Eid ul-Fitr)"
+    },
+    "11": {
+      "name": "Dhul Qa’da",
+      "start": "01. Dhul Qa’da – Den ellevte måned"
+    },
+    "12": {
+      "name": "Dhul-hijja",
+      "start": "01. Dhul-hijja – Den tolvte måned (Pilgrimsreisen)"
+    }
+  },
+  "yearlyEvents": {
+    "1-10": "10. MUHARRAM – AASHARA",
+    "3-12": "12. Rabi al-Awal – Mawlid an-Nabi (Profetens fødselsdag)",
+    "7-27": "27. Rajab – Shab-e-Miraj (Isra-natten)",
+    "8-15": "15. Sha'ban – Laylat-ul-Barat (Tilgivelsesnatten)",
+    "9-21": "21. Ramadan – Siste Ashra (3. Ashra)",
+    "9-27": "27. Ramadan – Laylat-ul-Qadr (Skjebnenatten)",
+    "12-9": "9. Dhul-Hijja – Arafah",
+    "12-10": "10. Dhul-Hijja – Eid al-Adha"
+  },
+  "gregorianMonths": [
+    "januar",
+    "februar",
+    "mars",
+    "april",
+    "mai",
+    "juni",
+    "juli",
+    "august",
+    "september",
+    "oktober",
+    "november",
+    "desember"
+  ],
+  "weekdays": [
+    "søndag",
+    "mandag",
+    "tirsdag",
+    "onsdag",
+    "torsdag",
+    "fredag",
+    "lørdag"
+  ]
+}

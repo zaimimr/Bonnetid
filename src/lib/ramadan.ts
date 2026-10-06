@@ -58,8 +58,8 @@ export function ramadanCountdown(
   maghrib: Date | null,
   tomorrowFajr: Date | null,
 ): RamadanCountdown | null {
-  const suhoorEnds = t({ nb: 'Suhoor slutter', en: 'Suhoor ends', ar: 'ينتهي السحور', ur: 'سحری ختم' });
-  const iftar = t({ nb: 'Iftar', en: 'Iftar', ar: 'الإفطار', ur: 'افطار' });
+  const suhoorEnds = t('season.suhoorEnds2');
+  const iftar = t('season.iftar');
   if (fajr && now.getTime() < fajr.getTime()) return { label: suhoorEnds, target: fajr };
   if (maghrib && now.getTime() < maghrib.getTime()) return { label: iftar, target: maghrib };
   if (tomorrowFajr && now.getTime() < tomorrowFajr.getTime()) {
@@ -70,17 +70,7 @@ export function ramadanCountdown(
 
 export function ramadanCountdownText(days: number): string {
   if (days <= 1) {
-    return t({
-      nb: 'Ramadan begynner i morgen',
-      en: 'Ramadan begins tomorrow',
-      ar: 'يبدأ رمضان غدًا',
-      ur: 'رمضان کل شروع ہو گا',
-    });
+    return t('season.ramadanBeginsTomorrow');
   }
-  return t({
-    nb: `Ramadan begynner om ${days} dager`,
-    en: `Ramadan begins in ${formatDayCount(days)}`,
-    ar: `يبدأ رمضان بعد ${formatDayCount(days)}`,
-    ur: `رمضان ${formatDayCount(days)} میں شروع ہو گا`,
-  });
+  return t('season.ramadanBeginsIn', { days, value: formatDayCount(days) });
 }

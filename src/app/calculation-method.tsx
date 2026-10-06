@@ -28,19 +28,14 @@ export default function CalculationMethodScreen() {
   const checkmark = <Ionicons name="checkmark" size={22} color={theme.colors.primary} />;
   const autoLabel = calculationMethodLabel(autoMethod);
   const autoSubtitle = location.country
-    ? t({
-        nb: `${autoLabel}, vanlig i ${location.country}`,
-        en: `${autoLabel}, common in ${location.country}`,
-        ar: `${autoLabel}، الشائعة في ${location.country}`,
-        ur: `${autoLabel}، ${location.country} میں عام`,
-      })
+    ? t('settings.commonIn', { autoLabel, country: location.country })
     : autoLabel;
 
   return (
     <Screen scroll edges={[]}>
       <Card padding="sm" rounded="xl" style={{ marginTop: spacing.lg }}>
         <ListRow
-          title={t({ nb: 'Automatisk', en: 'Automatic', ar: 'تلقائي', ur: 'خودکار' })}
+          title={t('settings.automatic')}
           subtitle={autoSubtitle}
           trailing={chosen == null ? checkmark : undefined}
           onPress={() => select(null)}
@@ -52,12 +47,7 @@ export default function CalculationMethodScreen() {
         size="xs"
         tone="textMuted"
         style={{ marginTop: spacing.sm, paddingHorizontal: spacing.md }}>
-        {t({
-          nb: 'Appen velger metoden som brukes i landet du er i. Du kan overstyre den under.',
-          en: 'The app picks the method used in the country you are in. You can override it below.',
-          ar: 'يختار التطبيق الطريقة المعتمدة في البلد الذي أنت فيه. يمكنك تغييرها أدناه.',
-          ur: 'ایپ وہ طریقہ منتخب کرتی ہے جو آپ کے موجودہ ملک میں رائج ہے۔ آپ اسے نیچے تبدیل کر سکتے ہیں۔',
-        })}
+        {t('settings.theAppPicksThe')}
       </AppText>
 
       <Card padding="sm" rounded="xl" style={{ marginTop: spacing.lg }}>
@@ -79,12 +69,7 @@ export default function CalculationMethodScreen() {
         size="xs"
         tone="textMuted"
         style={{ marginTop: spacing.sm, paddingHorizontal: spacing.md }}>
-        {t({
-          nb: 'Metoden bestemmer solvinklene for fajr og isha. Den brukes bare når appen regner ut tidene selv, ikke for norske byer.',
-          en: 'The method sets the sun angles for Fajr and Isha. It is only used when the app calculates the times itself, not for Norwegian cities.',
-          ar: 'تحدد الطريقة زوايا الشمس للفجر والعشاء. ولا تُستخدم إلا عندما يحسب التطبيق الأوقات بنفسه، وليس للمدن النرويجية.',
-          ur: 'یہ طریقہ فجر اور عشاء کے لیے سورج کے زاویے طے کرتا ہے۔ یہ صرف تب استعمال ہوتا ہے جب ایپ خود اوقات کا حساب لگاتی ہے، نارویجن شہروں کے لیے نہیں۔',
-        })}
+        {t('settings.theMethodSetsThe')}
       </AppText>
     </Screen>
   );

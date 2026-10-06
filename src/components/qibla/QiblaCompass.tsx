@@ -28,10 +28,10 @@ function shortestRotation(from: number, to: number): number {
 }
 
 const CARDINALS = [
-  { label: t({ nb: 'N', en: 'N', ar: 'ش', ur: 'N' }), angle: 0 },
-  { label: t({ nb: 'Ø', en: 'E', ar: 'ق', ur: 'E' }), angle: 90 },
-  { label: t({ nb: 'S', en: 'S', ar: 'ج', ur: 'S' }), angle: 180 },
-  { label: t({ nb: 'V', en: 'W', ar: 'غ', ur: 'W' }), angle: 270 },
+  { label: t('qibla.n'), angle: 0 },
+  { label: t('qibla.e'), angle: 90 },
+  { label: t('qibla.s'), angle: 180 },
+  { label: t('qibla.w'), angle: 270 },
 ];
 
 function sectorPath(size: number, centreBearing: number, halfAngle: number): string {
@@ -206,38 +206,18 @@ export function QiblaCompass({
           {Math.round(qiblaBearing)}°
         </AppText>
         <AppText tone="textMuted">
-          {t({
-            nb: 'Qibla-retning fra din posisjon',
-            en: 'Qibla direction from your location',
-            ar: 'اتجاه القبلة من موقعك',
-            ur: 'آپ کے مقام سے قبلہ کی سمت',
-          })}
+          {t('qibla.qiblaDirectionFromYour')}
         </AppText>
         {!trustworthy && accuracyM != null && (
           <AppText size="sm" tone="notice" align="center">
-            {t({
-              nb: `Posisjonen er usikker (±${formatAccuracy(accuracyM)}). Retningen kan være opptil ${Math.round(uncertaintyDegrees)}° feil. Gå ut i åpent lende og vent noen sekunder.`,
-              en: `Your location is uncertain (±${formatAccuracy(accuracyM)}). The direction may be off by up to ${Math.round(uncertaintyDegrees)}°. Go out into the open and wait a few seconds.`,
-              ar: `موقعك غير دقيق (±${formatAccuracy(accuracyM)}). قد يخطئ الاتجاه بما يصل إلى ${Math.round(uncertaintyDegrees)}°. اخرج إلى مكان مفتوح وانتظر بضع ثوانٍ.`,
-              ur: `آپ کا مقام غیر یقینی ہے (±${formatAccuracy(accuracyM)})۔ سمت میں ${Math.round(uncertaintyDegrees)}° تک غلطی ہو سکتی ہے۔ کھلی جگہ پر جائیں اور چند سیکنڈ انتظار کریں۔`,
-            })}
+            {t('qibla.yourLocationIsUncertain', { value: formatAccuracy(accuracyM), value2: Math.round(uncertaintyDegrees) })}
           </AppText>
         )}
         {isAligned && (
           <AppText weight="semibold" tone="primary">
             {trustworthy
-              ? t({
-                  nb: 'Du peker mot Qibla',
-                  en: 'You are facing the Qibla',
-                  ar: 'أنت متجه نحو القبلة',
-                  ur: 'آپ کا رخ قبلہ کی طرف ہے',
-                })
-              : t({
-                  nb: 'Du peker innenfor det usikre området',
-                  en: 'You are pointing within the uncertain range',
-                  ar: 'أنت متجه ضمن النطاق غير المؤكد',
-                  ur: 'آپ کا رخ غیر یقینی دائرے کے اندر ہے',
-                })}
+              ? t('qibla.youAreFacingThe')
+              : t('qibla.youArePointingWithin')}
           </AppText>
         )}
       </View>

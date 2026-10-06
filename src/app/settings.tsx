@@ -88,9 +88,9 @@ export default function SettingsScreen() {
 
   const widgetRow = widgetJamatSupported && !calculated;
   const themeLabel = {
-    system: t({ nb: 'System', en: 'System', ar: 'النظام', ur: 'سسٹم' }),
-    light: t({ nb: 'Lys', en: 'Light', ar: 'فاتح', ur: 'روشن' }),
-    dark: t({ nb: 'Mørk', en: 'Dark', ar: 'داكن', ur: 'تاریک' }),
+    system: t('settings.system'),
+    light: t('settings.light'),
+    dark: t('settings.dark'),
   }[themePreference];
 
   return (
@@ -98,21 +98,11 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <PostHogMaskView>
           <ListRow
-            title={t({ nb: 'Sted', en: 'Location', ar: 'الموقع', ur: 'مقام' })}
+            title={t('settings.location')}
             subtitle={
               calculated
-                ? t({
-                    nb: `${location.name} · lokale tider, følger posisjonen din`,
-                    en: `${location.name} · local times, follows your location`,
-                    ar: `${location.name} · أوقات محلية، يتبع موقعك`,
-                    ur: `${location.name} · مقامی اوقات، آپ کے مقام کے مطابق`,
-                  })
-                : t({
-                    nb: `${location.name} · følger posisjonen din`,
-                    en: `${location.name} · follows your location`,
-                    ar: `${location.name} · يتبع موقعك`,
-                    ur: `${location.name} · آپ کے مقام کے مطابق`,
-                  })
+                ? t('settings.localTimesFollowsYour', { name: location.name })
+                : t('settings.followsYourLocation', { name: location.name })
             }
             leading={<Tile icon="location-outline" />}
             style={ROW}
@@ -122,8 +112,8 @@ export default function SettingsScreen() {
           <>
             <Divider />
             <ListRow
-              title={t({ nb: 'Min moské', en: 'My mosque', ar: 'مسجدي', ur: 'میری مسجد' })}
-              subtitle={mosque?.name ?? t({ nb: 'Ikke valgt', en: 'Not selected', ar: 'غير محدد', ur: 'منتخب نہیں' })}
+              title={t('settings.myMosque')}
+              subtitle={mosque?.name ?? t('settings.notSelected')}
               leading={<Tile icon="business-outline" />}
               chevron
               onPress={() => router.push('/mosque-picker')}
@@ -133,15 +123,10 @@ export default function SettingsScreen() {
         )}
         <Divider />
         <ListRow
-          title={t({ nb: 'Asr-metode', en: 'Asr method', ar: 'طريقة العصر', ur: 'عصر کا طریقہ' })}
+          title={t('settings.asrMethod')}
           subtitle={
             asrOverride && mosque
-              ? t({
-                  nb: `Styres av ${mosque.name}`,
-                  en: `Set by ${mosque.name}`,
-                  ar: `يحددها ${mosque.name}`,
-                  ur: `${mosque.name} کی طرف سے طے شدہ`,
-                })
+              ? t('settings.setBy', { name: mosque.name })
               : asrMethodLabel(asrMethod ?? 'irn')
           }
           leading={<Tile icon="partly-sunny-outline" />}
@@ -153,11 +138,11 @@ export default function SettingsScreen() {
           <>
             <Divider />
             <ListRow
-              title={t({ nb: 'Beregningsmetode', en: 'Calculation method', ar: 'طريقة الحساب', ur: 'حساب کا طریقہ' })}
+              title={t('settings.calculationMethod')}
               subtitle={
                 calculationMethod
                   ? calculationMethodLabel(calculationMethod)
-                  : `${t({ nb: 'Automatisk', en: 'Automatic', ar: 'تلقائي', ur: 'خودکار' })} · ${calculationMethodLabel(autoCalculationMethod)}`
+                  : `${t('settings.automatic')} · ${calculationMethodLabel(autoCalculationMethod)}`
               }
               leading={<Tile icon="calculator-outline" />}
               chevron
@@ -170,7 +155,7 @@ export default function SettingsScreen() {
 
       <Card padding="sm" rounded="xl">
         <HubRow
-          title={t({ nb: 'Varsler', en: 'Notifications', ar: 'الإشعارات', ur: 'اطلاعات' })}
+          title={t('settings.notifications')}
           icon="notifications-outline"
           value={notificationsEnabled ? ON : OFF}
           href="/settings-notifications"
@@ -187,7 +172,7 @@ export default function SettingsScreen() {
         )}
         <Divider />
         <HubRow
-          title={t({ nb: 'Utseende', en: 'Appearance', ar: 'المظهر', ur: 'ظاہری شکل' })}
+          title={t('settings.appearance')}
           icon="contrast-outline"
           value={themeLabel}
           href="/settings-appearance"
@@ -196,7 +181,7 @@ export default function SettingsScreen() {
           <>
             <Divider />
             <HubRow
-              title={t({ nb: 'Duaer', en: 'Duas', ar: 'الأدعية', ur: 'دعائیں' })}
+              title={t('settings.duas')}
               icon="book-outline"
               href="/dua-settings"
             />
@@ -206,7 +191,7 @@ export default function SettingsScreen() {
 
       <Card padding="sm" rounded="xl">
         <ListRow
-          title={t({ nb: 'Islamsk Råd Norge', en: 'Islamic Council of Norway', ar: 'المجلس الإسلامي النرويجي', ur: 'اسلامک کونسل ناروے' })}
+          title={t('settings.islamicCouncilOfNorway')}
           leading={
             <IconTile>
               <Image
@@ -226,8 +211,8 @@ export default function SettingsScreen() {
         />
         <Divider />
         <ListRow
-          title={t({ nb: 'Hjelp oss bli bedre', en: 'Help us improve', ar: 'ساعدنا على التحسين', ur: 'بہتر بنانے میں ہماری مدد کریں' })}
-          subtitle={t({ nb: 'Del nyttig data', en: 'Share useful data', ar: 'شارك بيانات مفيدة', ur: 'مفید ڈیٹا شیئر کریں' })}
+          title={t('settings.helpUsImprove')}
+          subtitle={t('settings.shareUsefulData')}
           leading={
 <Tile icon="analytics-outline" />
           }
@@ -244,7 +229,7 @@ export default function SettingsScreen() {
         />
         <Divider />
         <ListRow
-          title={t({ nb: 'Personvern', en: 'Privacy', ar: 'الخصوصية', ur: 'رازداری' })}
+          title={t('settings.privacy')}
           leading={
 <Tile icon="shield-checkmark-outline" />
           }
@@ -262,10 +247,10 @@ export default function SettingsScreen() {
         />
         <AppText weight="semibold">Bønnetid</AppText>
         <AppText size="xs" tone="textMuted">
-          {t({ nb: 'Versjon', en: 'Version', ar: 'الإصدار', ur: 'ورژن' })} {Constants.expoConfig?.version ?? '1.0.0'}
+          {t('settings.version')} {Constants.expoConfig?.version ?? '1.0.0'}
         </AppText>
         <AppText size="xs" tone="textMuted">
-          {t({ nb: 'Laget av Zaim Imran', en: 'Made by Zaim Imran', ar: 'من تطوير Zaim Imran', ur: 'Zaim Imran کی تیار کردہ' })}
+          {t('settings.madeByZaimImran')}
         </AppText>
       </View>
     </SettingsPage>

@@ -33,12 +33,7 @@ export const LeafletMap = forwardRef<LeafletMapHandle, LeafletMapProps>(function
     html,
     onReady,
     onMessage,
-    fallbackMessage = t({
-      nb: 'Kartet ble avsluttet av systemet, sannsynligvis fordi enheten gikk tom for minne.',
-      en: 'The system closed the map, probably because the device ran out of memory.',
-      ar: 'أغلق النظام الخريطة، على الأرجح بسبب نفاد ذاكرة الجهاز.',
-      ur: 'سسٹم نے نقشہ بند کر دیا، غالباً اس لیے کہ آلے کی میموری ختم ہو گئی۔',
-    }),
+    fallbackMessage = t('qibla.theSystemClosedThe'),
   },
   ref,
 ) {
@@ -94,7 +89,7 @@ export const LeafletMap = forwardRef<LeafletMapHandle, LeafletMapProps>(function
           {fallbackMessage}
         </AppText>
         <Button
-          label={t({ nb: 'Prøv igjen', en: 'Try again', ar: 'حاول مرة أخرى', ur: 'دوبارہ کوشش کریں' })}
+          label={t('qibla.tryAgain')}
           variant="secondary"
           onPress={handleRetry}
         />

@@ -38,7 +38,7 @@ const PIN_SIZE = 16;
 const PIN_SIZE_ACTIVE = 24;
 const CLEAR_MESSAGE = 'clear';
 const FIT_PADDING = { top: 64, right: 48, bottom: 200, left: 48 };
-const VIEW_MOSQUE = t({ nb: 'Vis moské', en: 'View mosque', ar: 'عرض المسجد', ur: 'مسجد دیکھیں' });
+const VIEW_MOSQUE = t('mosque.viewMosque');
 
 function NativeMosqueMap({
   pins,
@@ -165,14 +165,14 @@ function MosquePinCard({
           ) : null}
           {(pin.distanceKm != null || mine) && (
             <View style={{ flexDirection: 'row', gap: spacing.xs, marginTop: spacing.xs }}>
-              {mine && <Badge label={t({ nb: 'Din moské', en: 'Your mosque', ar: 'مسجدك', ur: 'آپ کی مسجد' })} variant="accent" />}
+              {mine && <Badge label={t('mosque.yourMosque')} variant="accent" />}
               {pin.distanceKm != null && (
                 <Badge label={formatDistance(pin.distanceKm)} variant="neutral" />
               )}
             </View>
           )}
         </View>
-        <IconButton name="close" accessibilityLabel={t({ nb: 'Lukk', en: 'Close', ar: 'إغلاق', ur: 'بند کریں' })} onPress={onClose} />
+        <IconButton name="close" accessibilityLabel={t('mosque.close')} onPress={onClose} />
       </View>
       <Button label={actionLabel} onPress={onSelect} fullWidth style={{ marginTop: spacing.md }} />
     </Card>
@@ -279,12 +279,7 @@ function OsmMosqueMap({
         html={html}
         onReady={pushPins}
         onMessage={(message) => setActiveOrgNr(message === CLEAR_MESSAGE ? null : message)}
-        fallbackMessage={t({
-          nb: 'Kartet ble avsluttet av systemet. Bruk listevisningen hvis det skjer igjen.',
-          en: 'The system closed the map. Use the list view if it happens again.',
-          ar: 'أغلق النظام الخريطة. استخدم عرض القائمة إذا تكرر ذلك.',
-          ur: 'سسٹم نے نقشہ بند کر دیا۔ اگر دوبارہ ایسا ہو تو فہرست استعمال کریں۔',
-        })}
+        fallbackMessage={t('mosque.theSystemClosedThe')}
       />
       {active && (
         <MosquePinCard

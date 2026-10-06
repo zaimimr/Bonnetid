@@ -15,15 +15,15 @@ import type { TasbihSession } from './useTasbih';
 const MODES: { value: TasbihMode; label: string }[] = [
   {
     value: 'sequence',
-    label: t({ nb: 'Etter bønnen', en: 'After prayer', ar: 'بعد الصلاة', ur: 'نماز کے بعد' }),
+    label: t('tasbih.afterPrayer'),
   },
-  { value: 'free', label: t({ nb: 'Fri telling', en: 'Free count', ar: 'عدّ حر', ur: 'آزاد گنتی' }) },
+  { value: 'free', label: t('tasbih.freeCount') },
 ];
 
 const GOALS: { value: string; label: string }[] = [
   { value: '33', label: '33' },
   { value: '100', label: '100' },
-  { value: 'none', label: t({ nb: 'Uten mål', en: 'No goal', ar: 'بلا هدف', ur: 'بغیر ہدف' }) },
+  { value: 'none', label: t('tasbih.noGoal') },
 ];
 
 function goalFrom(value: string): TasbihGoal {
@@ -43,7 +43,7 @@ function ResetButton({ onPress }: { onPress: () => void }) {
       onPress={onPress}
       hitSlop={hitSlop}
       accessibilityRole="button"
-      accessibilityLabel={t({ nb: 'Nullstill', en: 'Reset', ar: 'إعادة الضبط', ur: 'دوبارہ شروع کریں' })}
+      accessibilityLabel={t('tasbih.reset')}
       style={({ pressed }) => ({ padding: 6, opacity: pressed ? opacity.pressed : 1 })}>
       <Ionicons name="refresh" size={24} color={theme.colors.primary} />
     </Pressable>
@@ -58,7 +58,7 @@ function FinishAction({ session, fromDuas }: { session: TasbihSession; fromDuas:
   if (fromDuas && state.mode === 'sequence') {
     return (
       <Button
-        label={t({ nb: 'Ferdig', en: 'Done', ar: 'تم', ur: 'مکمل' })}
+        label={t('tasbih.done')}
         onPress={() => {
           setScrollPast(COMPLETION?.id ?? null);
           router.back();
@@ -69,7 +69,7 @@ function FinishAction({ session, fromDuas }: { session: TasbihSession; fromDuas:
   }
   return (
     <Button
-      label={t({ nb: 'Begynn på nytt', en: 'Start over', ar: 'البدء من جديد', ur: 'نئے سرے سے شروع کریں' })}
+      label={t('tasbih.startOver')}
       variant="secondary"
       onPress={reset}
       style={{ alignSelf: 'center', minWidth: 200 }}
@@ -88,18 +88,8 @@ export function TasbihShell({ session, fromDuas = false, children }: TasbihShell
   const { state, target, tap, reset, setMode, setGoal } = session;
   const untouched = state.count === 0 && state.step === 0;
   const label = target
-    ? t({
-        nb: `Tell, ${state.count} av ${target}`,
-        en: `Count, ${state.count} of ${target}`,
-        ar: `عُدّ، ${state.count} من ${target}`,
-        ur: `گنیں، ${target} میں سے ${state.count}`,
-      })
-    : t({
-        nb: `Tell, ${state.count}`,
-        en: `Count, ${state.count}`,
-        ar: `عُدّ، ${state.count}`,
-        ur: `گنیں، ${state.count}`,
-      });
+    ? t('tasbih.countOf', { count: state.count, target })
+    : t('tasbih.count', { count: state.count });
 
   return (
     <>
@@ -140,12 +130,7 @@ export function TasbihShell({ session, fromDuas = false, children }: TasbihShell
           ) : untouched ? (
             <Animated.View entering={fade} exiting={fadeOut}>
               <AppText size="sm" tone="textMuted" align="center">
-                {t({
-                  nb: 'Trykk hvor som helst for å telle',
-                  en: 'Tap anywhere to count',
-                  ar: 'اضغط في أي مكان للعدّ',
-                  ur: 'گننے کے لیے کہیں بھی دبائیں',
-                })}
+                {t('tasbih.tapAnywhereToCount')}
               </AppText>
             </Animated.View>
           ) : null}

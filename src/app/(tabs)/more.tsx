@@ -23,25 +23,25 @@ type Feature = {
 const TRACKER_FEATURE: Feature = {
   href: '/tracker',
   icon: 'checkmark-done-outline',
-  title: t({ nb: 'Bønnesporing', en: 'Prayer tracker', ar: 'متابعة الصلوات', ur: 'نماز ٹریکر' }),
+  title: t('more.prayerTracker'),
 };
 
 const MOSQUE_FEATURE: Feature = {
   href: '/mosques',
   icon: 'business-outline',
-  title: t({ nb: 'Moskeer', en: 'Mosques', ar: 'المساجد', ur: 'مساجد' }),
+  title: t('more.mosques'),
 };
 
 const DUAS_FEATURE: Feature = {
   href: '/duas',
   icon: 'book-outline',
-  title: t({ nb: 'Dua og dhikr', en: 'Dua and dhikr', ar: 'الأدعية والأذكار', ur: 'دعا اور ذکر' }),
+  title: t('more.duaAndDhikr'),
 };
 
 const SETTINGS_FEATURE: Feature = {
   href: '/settings',
   icon: 'settings-outline',
-  title: t({ nb: 'Innstillinger', en: 'Settings', ar: 'الإعدادات', ur: 'ترتیبات' }),
+  title: t('more.settings'),
 };
 
 export default function MoreScreen() {
@@ -65,7 +65,7 @@ export default function MoreScreen() {
     <Screen scroll contentStyle={{ flexGrow: 1, paddingBottom: spacing.lg }}>
       <View style={{ marginTop: spacing.lg, marginBottom: spacing.md }}>
         <AppText size="xxl" weight="bold" heading>
-          {t({ nb: 'Mer', en: 'More', ar: 'المزيد', ur: 'مزید' })}
+          {t('more.more')}
         </AppText>
       </View>
 
@@ -81,7 +81,7 @@ export default function MoreScreen() {
         {!duasEnabled && tasbihEnabled && (
           <FeatureCard
             icon={<TasbihIcon size={24} color={theme.colors.primary} />}
-            title={t({ nb: 'Tasbih', en: 'Tasbih', ar: 'المسبحة', ur: 'تسبیح' })}
+            title={t('more.tasbih')}
             onPress={() => router.push('/tasbih')}
           />
         )}
@@ -90,7 +90,7 @@ export default function MoreScreen() {
       <View style={{ flexGrow: 1, minHeight: spacing.xl }} />
       <Card padding="sm" rounded="xl">
         <ListRow
-          title={t({ nb: 'Gi tilbakemelding', en: 'Send feedback', ar: 'أرسل ملاحظاتك', ur: 'رائے دیں' })}
+          title={t('more.sendFeedback')}
           leading={<Ionicons name="chatbubble-ellipses-outline" size={20} color={theme.colors.primary} />}
           trailing={support.unread > 0 ? <Badge label={String(support.unread)} /> : undefined}
           chevron
@@ -99,7 +99,7 @@ export default function MoreScreen() {
         />
         <Divider />
         <ListRow
-          title={t({ nb: 'Hva er nytt', en: "What's new", ar: 'ما الجديد', ur: 'نیا کیا ہے' })}
+          title={t('more.whatSNew')}
           leading={<Ionicons name="sparkles-outline" size={20} color={theme.colors.primary} />}
           chevron
           onPress={() => router.push('/whats-new')}

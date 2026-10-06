@@ -26,11 +26,11 @@ import { t } from '@/lib/i18n';
 
 const ROW = { paddingHorizontal: spacing.md } as const;
 
-const FIX_LABEL = t({ nb: 'Fiks', en: 'Fix', ar: 'إصلاح', ur: 'ٹھیک کریں' });
-const ALLOWED = t({ nb: 'Tillatt', en: 'Allowed', ar: 'مسموح', ur: 'اجازت ہے' });
-const NOT_ALLOWED = t({ nb: 'Ikke tillatt', en: 'Not allowed', ar: 'غير مسموح', ur: 'اجازت نہیں' });
-const ON = t({ nb: 'På', en: 'On', ar: 'مفعّل', ur: 'آن' });
-const OFF = t({ nb: 'Av', en: 'Off', ar: 'متوقف', ur: 'آف' });
+const FIX_LABEL = t('settings.fix');
+const ALLOWED = t('settings.allowed');
+const NOT_ALLOWED = t('settings.notAllowed');
+const ON = t('settings.on');
+const OFF = t('settings.off');
 
 function openSettings(kind: SystemSettingsKind) {
   if (!openSystemSettings(kind)) Linking.openSettings().catch(() => {});
@@ -61,7 +61,7 @@ export default function NotificationCheckScreen() {
   if (!notificationsSupported) {
     return (
       <Screen edges={[]}>
-        <EmptyState message={t({ nb: 'Ikke tilgjengelig i Expo Go på Android', en: 'Not available in Expo Go on Android', ar: 'غير متاح في Expo Go على أندرويد', ur: 'اینڈرائیڈ پر Expo Go میں دستیاب نہیں' })} icon="notifications-off-outline" />
+        <EmptyState message={t('settings.notAvailableInExpo')} icon="notifications-off-outline" />
       </Screen>
     );
   }
@@ -77,7 +77,7 @@ export default function NotificationCheckScreen() {
   if (!status.enabled) {
     return (
       <Screen edges={[]}>
-        <EmptyState message={t({ nb: 'Varsler er slått av', en: 'Notifications are turned off', ar: 'الإشعارات متوقفة', ur: 'اطلاعات بند ہیں' })} icon="notifications-off-outline" />
+        <EmptyState message={t('settings.notificationsAreTurnedOff')} icon="notifications-off-outline" />
       </Screen>
     );
   }
@@ -113,15 +113,15 @@ export default function NotificationCheckScreen() {
 
   return (
     <Screen scroll edges={[]}>
-      <SectionHeader title={t({ nb: 'Status', en: 'Status', ar: 'الحالة', ur: 'صورتحال' })} style={{ marginTop: spacing.lg }} />
+      <SectionHeader title={t('settings.status')} style={{ marginTop: spacing.lg }} />
       <Card padding="sm" rounded="xl">
         <ListRow
-          title={t({ nb: 'Varsler', en: 'Notifications', ar: 'الإشعارات', ur: 'اطلاعات' })}
+          title={t('settings.notifications')}
           subtitle={
             !status.permissionGranted
               ? NOT_ALLOWED
               : status.channelBlocked
-                ? t({ nb: 'Slått av for bønnevarsler', en: 'Turned off for prayer notifications', ar: 'متوقفة لإشعارات الصلاة', ur: 'نماز کی اطلاعات کے لیے بند' })
+                ? t('settings.turnedOffForPrayer')
                 : ALLOWED
           }
           leading={icon(permissionIssue)}
@@ -132,7 +132,7 @@ export default function NotificationCheckScreen() {
           <>
             <Divider />
             <ListRow
-              title={t({ nb: 'Lyd', en: 'Sound', ar: 'الصوت', ur: 'آواز' })}
+              title={t('settings.sound')}
               subtitle={status.soundAllowed ? ON : OFF}
               leading={icon(find('sound'))}
               trailing={fixButton(find('sound'), FIX_LABEL, () => openSettings('notifications'))}
@@ -144,7 +144,7 @@ export default function NotificationCheckScreen() {
           <>
             <Divider />
             <ListRow
-              title={t({ nb: 'Alarmer og påminnelser', en: 'Alarms and reminders', ar: 'المنبهات والتذكيرات', ur: 'الارم اور یاد دہانیاں' })}
+              title={t('settings.alarmsAndReminders')}
               subtitle={status.exactAlarmsAllowed ? ALLOWED : NOT_ALLOWED}
               leading={icon(find('exactAlarm'))}
               trailing={fixButton(find('exactAlarm'), FIX_LABEL, () => openSettings('exactAlarm'))}
@@ -156,41 +156,36 @@ export default function NotificationCheckScreen() {
           <>
             <Divider />
             <ListRow
-              title={t({ nb: 'Batterisparing', en: 'Battery saver', ar: 'توفير البطارية', ur: 'بیٹری سیور' })}
+              title={t('settings.batterySaver')}
               subtitle={status.batteryOptimized ? ON : OFF}
               leading={icon(find('battery'))}
-              trailing={fixButton(find('battery'), t({ nb: 'Slå av', en: 'Turn off', ar: 'إيقاف', ur: 'بند کریں' }), () => openSettings('battery'))}
+              trailing={fixButton(find('battery'), t('settings.turnOff'), () => openSettings('battery'))}
               style={ROW}
             />
           </>
         )}
         <Divider />
         <ListRow
-          title={t({ nb: 'Planlagte varsler', en: 'Scheduled notifications', ar: 'الإشعارات المجدولة', ur: 'طے شدہ اطلاعات' })}
+          title={t('settings.scheduledNotifications')}
           subtitle={
             next
-              ? t({
-                  nb: `${status.scheduledAdhans} · neste ${next.title}, ${formatGregorianShort(dayOf(next.isoDate))}`,
-                  en: `${status.scheduledAdhans} · next ${next.title}, ${formatGregorianShort(dayOf(next.isoDate))}`,
-                  ar: `${status.scheduledAdhans} · التالي ${next.title}، ${formatGregorianShort(dayOf(next.isoDate))}`,
-                  ur: `${status.scheduledAdhans} · اگلی ${next.title}، ${formatGregorianShort(dayOf(next.isoDate))}`,
-                })
+              ? t('settings.next', { scheduledAdhans: status.scheduledAdhans, title: next.title, value: formatGregorianShort(dayOf(next.isoDate)) })
               : `${status.scheduledAdhans}`
           }
           leading={icon(queueIssue)}
           trailing={
             queueIssue?.key === 'noPrayers'
-              ? fixButton(queueIssue, t({ nb: 'Velg', en: 'Choose', ar: 'اختر', ur: 'منتخب کریں' }), () => router.push('/notification-prayers'))
-              : fixButton(queueIssue, t({ nb: 'Meld fra', en: 'Report', ar: 'إبلاغ', ur: 'اطلاع دیں' }), () => router.push('/feedback'))
+              ? fixButton(queueIssue, t('settings.choose'), () => router.push('/notification-prayers'))
+              : fixButton(queueIssue, t('settings.report'), () => router.push('/feedback'))
           }
           style={ROW}
         />
       </Card>
 
-      <SectionHeader title={t({ nb: 'Siste varsler', en: 'Recent notifications', ar: 'أحدث الإشعارات', ur: 'حالیہ اطلاعات' })} style={{ marginTop: spacing.lg }} />
+      <SectionHeader title={t('settings.recentNotifications')} style={{ marginTop: spacing.lg }} />
       <Card padding="sm" rounded="xl">
         {delivered.length === 0 ? (
-          <ListRow title={t({ nb: 'Ingen i varslingssenteret', en: 'None in Notification Center', ar: 'لا شيء في مركز الإشعارات', ur: 'اطلاعاتی مرکز میں کوئی نہیں' })} style={ROW} />
+          <ListRow title={t('settings.noneInNotificationCenter')} style={ROW} />
         ) : (
           delivered.map((item, index) => {
             const at = new Date(item.deliveredAt);
@@ -199,12 +194,7 @@ export default function NotificationCheckScreen() {
                 {index > 0 && <Divider />}
                 <ListRow
                   title={prayerLabel(item.prayer)}
-                  subtitle={t({
-                    nb: `${formatGregorianShort(at)} kl. ${formatLocalClock(at)}`,
-                    en: `${formatGregorianShort(at)} at ${formatLocalClock(at)}`,
-                    ar: `${formatGregorianShort(at)} الساعة ${formatLocalClock(at)}`,
-                    ur: `${formatGregorianShort(at)}، ${formatLocalClock(at)} بجے`,
-                  })}
+                  subtitle={t('settings.at', { value: formatGregorianShort(at), value2: formatLocalClock(at) })}
                   leading={
                     <Ionicons name="notifications-outline" size={20} color={theme.colors.primary} />
                   }

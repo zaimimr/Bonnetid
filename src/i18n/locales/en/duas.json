@@ -1,0 +1,154 @@
+{
+  "couldNotFindThis": "Could not find this dua",
+  "dua": "Dua",
+  "couldNotFindThis2": "Could not find this category",
+  "countWithTasbih": "Count with tasbih",
+  "repeatedTimes": "Repeated {{repeat}} times",
+  "pronunciation": "Pronunciation: {{transliteration}}",
+  "source": "Source: {{source}}",
+  "now": "Now",
+  "tasbih": "Tasbih",
+  "afterAdhan": {
+    "title": "After the adhan",
+    "description": "Answering the call and the dua after it"
+  },
+  "wuduMosque": {
+    "title": "Wudu and mosque",
+    "description": "After wudu, entering and leaving the mosque"
+  },
+  "afterSalah": {
+    "title": "After the prayer",
+    "description": "Dhikr and duas after every prayer"
+  },
+  "ramadan": {
+    "title": "Ramadan",
+    "description": "Iftar, the fast and Laylat al-Qadr"
+  },
+  "eid": {
+    "title": "Eid",
+    "description": "Takbir and greeting"
+  },
+  "hajj": {
+    "title": "Hajj and Dhul Hijjah",
+    "description": "Talbiyah, Arafah, takbir and qurbani"
+  },
+  "answerMuezzin": {
+    "title": "When the muezzin calls",
+    "meaning": "There is no might and no power except with Allah.",
+    "note": "Repeat what the muezzin says. When he says «hayya ala as-salah» and «hayya ala al-falah», say this instead."
+  },
+  "testimonyAfterAdhan": {
+    "title": "Testimony after the adhan",
+    "meaning": "I bear witness that none has the right to be worshipped except Allah alone, without partner, and that Muhammad is His servant and Messenger. I am pleased with Allah as Lord, with Muhammad as Messenger and with Islam as religion."
+  },
+  "adhanDua": {
+    "title": "Dua after the adhan",
+    "meaning": "O Allah, Lord of this perfect call and of the prayer to be established, grant Muhammad al-wasilah and excellence, and raise him to the praised station You have promised him."
+  },
+  "afterWudu": {
+    "title": "After wudu",
+    "meaning": "I bear witness that none has the right to be worshipped except Allah alone, without partner, and I bear witness that Muhammad is His servant and Messenger."
+  },
+  "enteringMosque": {
+    "title": "Entering the mosque",
+    "meaning": "O Allah, open for me the gates of Your mercy."
+  },
+  "leavingMosque": {
+    "title": "Leaving the mosque",
+    "meaning": "O Allah, I ask You of Your bounty."
+  },
+  "istighfar": {
+    "title": "Seeking forgiveness",
+    "meaning": "I seek the forgiveness of Allah."
+  },
+  "antaAsSalam": {
+    "title": "Allahumma anta as-salam",
+    "meaning": "O Allah, You are Peace and from You comes peace. Blessed are You, O Possessor of majesty and honour."
+  },
+  "laIlahaIllallahAfter": {
+    "title": "La ilaha illallah",
+    "meaning": "None has the right to be worshipped except Allah alone, without partner. His is the dominion and His is the praise, and He is over all things competent. O Allah, none can withhold what You give, and none can give what You withhold, and the wealth of the wealthy cannot avail him against You."
+  },
+  "tasbih2": {
+    "title": "Subhanallah, Alhamdulillah, Allahu akbar",
+    "meaning": "Glory be to Allah.\nAll praise is for Allah.\nAllah is the Greatest.",
+    "note": "Say each of them 33 times."
+  },
+  "tasbihCompletion": {
+    "title": "Completing the hundred",
+    "meaning": "None has the right to be worshipped except Allah alone, without partner. His is the dominion and His is the praise, and He is over all things competent.",
+    "note": "Said once after the three rounds of 33, making a hundred in total."
+  },
+  "ayatAlKursi": {
+    "title": "Ayat al-Kursi",
+    "meaning": "Allah, there is no deity except Him, the Ever-Living, the Sustainer of all existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is before them and what will be after them, and they encompass nothing of His knowledge except what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great.",
+    "source": "Quran 2:255. After the prayer: an-Nasa'i, as-Sunan al-Kubra 9848"
+  },
+  "muawwidhat": {
+    "title": "The last three surahs",
+    "meaning": "Al-Ikhlas: Say, He is Allah, the One. Allah, the Eternal Refuge. He neither begets nor is born. Nor is there to Him any equivalent.\n\nAl-Falaq: Say, I seek refuge in the Lord of daybreak, from the evil of that which He created, and from the evil of darkness when it settles, and from the evil of the blowers in knots, and from the evil of an envier when he envies.\n\nAn-Nas: Say, I seek refuge in the Lord of mankind, the Sovereign of mankind, the God of mankind, from the evil of the retreating whisperer, who whispers into the breasts of mankind, from among the jinn and mankind.",
+    "note": "Recited once after every prayer.",
+    "source": "Quran 112-114. After the prayer: Sunan Abi Dawud 1523, Jami' at-Tirmidhi 2903"
+  },
+  "helpMeRemember": {
+    "title": "Help me remember You",
+    "meaning": "O Allah, help me to remember You, to thank You and to worship You in the best manner."
+  },
+  "iftar": {
+    "title": "Dua at iftar",
+    "meaning": "The thirst has gone, the veins are moistened, and the reward is confirmed, if Allah wills.",
+    "note": "Said when you break the fast."
+  },
+  "laylatAlQadr": {
+    "title": "Dua for Laylat al-Qadr",
+    "meaning": "O Allah, You are Pardoning and You love to pardon, so pardon me.",
+    "note": "The Prophet taught Aisha to say this dua."
+  },
+  "iAmFasting": {
+    "title": "When someone provokes you",
+    "meaning": "I am fasting.",
+    "note": "Said if someone argues with you or insults you while you are fasting."
+  },
+  "iftarAsGuest": {
+    "title": "Breaking the fast with others",
+    "meaning": "May the fasting break their fast with you, may the righteous eat your food, and may the angels pray for you."
+  },
+  "talbiyah": {
+    "title": "Talbiyah",
+    "meaning": "Here I am, O Allah, here I am. Here I am, You have no partner, here I am. Truly all praise and favour are Yours, and the dominion. You have no partner.",
+    "note": "Said by pilgrims from entering ihram until they stone on the day of Eid."
+  },
+  "arafah": {
+    "title": "The best dua on the day of Arafah",
+    "meaning": "None has the right to be worshipped except Allah alone, without partner. To Him belong the dominion and all praise, and He is over all things competent.",
+    "note": "The Prophet said the best dua is the dua on the day of Arafah, and that this is the best that he and the prophets before him have said."
+  },
+  "takbirDhulHijjah": {
+    "title": "Takbir in Dhul Hijjah",
+    "meaning": "Allah is the Greatest, Allah is the Greatest, none has the right to be worshipped except Allah. Allah is the Greatest, Allah is the Greatest, and all praise is for Allah.",
+    "note": "Said often during the first ten days, and after the prayers from the day of Arafah through 13 Dhul Hijjah.",
+    "source": "Musannaf Ibn Abi Shaybah, from Abdullah ibn Masud"
+  },
+  "betweenTheCorners": {
+    "title": "Between the Yemeni Corner and the Black Stone",
+    "meaning": "Our Lord, give us good in this world and good in the Hereafter, and protect us from the punishment of the Fire.",
+    "note": "Said during tawaf, on the stretch between these two corners of the Kaaba.",
+    "source": "Sunan Abi Dawud 1892. Quran 2:201"
+  },
+  "qurbani": {
+    "title": "When slaughtering the qurbani",
+    "meaning": "In the name of Allah, and Allah is the Greatest."
+  },
+  "takbirEid": {
+    "title": "Takbir",
+    "meaning": "Allah is the Greatest, Allah is the Greatest, none has the right to be worshipped except Allah. Allah is the Greatest, Allah is the Greatest, and all praise is for Allah.",
+    "note": "Said from the eve of Eid al-Fitr until the Eid prayer, and after the prayers from the day of Arafah through 13 Dhul Hijjah.",
+    "source": "Musannaf Ibn Abi Shaybah, from Abdullah ibn Masud"
+  },
+  "eidGreeting": {
+    "title": "Eid greeting",
+    "meaning": "May Allah accept from us and from you.",
+    "note": "The Companions greeted each other like this when they met on Eid.",
+    "source": "Fath al-Bari, from Jubayr ibn Nufayr"
+  }
+}

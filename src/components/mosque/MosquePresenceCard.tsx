@@ -15,12 +15,7 @@ import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 
 const trackedMosques = new Set<string>();
-const DONATE = t({
-  nb: 'Doner med Vipps',
-  en: 'Donate with Vipps',
-  ar: 'تبرّع عبر Vipps',
-  ur: 'Vipps کے ذریعے عطیہ کریں',
-});
+const DONATE = t('mosque.donateWithVipps2');
 
 export function MosquePresenceCard() {
   const theme = useTheme();
@@ -49,7 +44,7 @@ export function MosquePresenceCard() {
         <MosqueLogo uri={mosque.logo} size="sm" />
         <View style={{ flex: 1 }}>
           <AppText size="xs" weight="medium" tone="primary">
-            {t({ nb: 'Du er i moskeen', en: 'You are at the mosque', ar: 'أنت في المسجد', ur: 'آپ مسجد میں ہیں' })}
+            {t('mosque.youAreAtThe')}
           </AppText>
           <AppText size="md" weight="semibold">
             {mosque.name}

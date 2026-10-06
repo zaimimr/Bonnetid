@@ -7,7 +7,7 @@ import { spacing } from '@/theme/tokens';
 
 export function MosqueAnnouncement({
   text,
-  title = t({ nb: 'Kunngjøring', en: 'Announcement', ar: 'إعلان', ur: 'اعلان' }),
+  title = t('mosque.announcement'),
   compact = false,
   chevron = false,
 }: {

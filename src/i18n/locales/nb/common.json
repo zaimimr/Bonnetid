@@ -1,0 +1,22 @@
+{
+  "close": "Lukk",
+  "somethingWentWrongTry": "Noe gikk galt. Prøv igjen.",
+  "tryAgain": "Prøv igjen",
+  "prayerTimesForHave": "Bønnetidene for {{period}} er ikke publisert ennå",
+  "small": "Liten",
+  "normal": "Vanlig",
+  "large": "Stor",
+  "duration": {
+    "units": [
+      "t",
+      "m",
+      "s"
+    ],
+    "hoursShort_other": "{{count}}t",
+    "minutesShort_other": "{{count}}m",
+    "hours_other": "{{count}} t",
+    "minutes_other": "{{count}} min",
+    "days_other": "{{count}} dager",
+    "joiner": " "
+  }
+}

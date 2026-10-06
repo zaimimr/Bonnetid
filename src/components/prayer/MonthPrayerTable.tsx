@@ -19,7 +19,7 @@ import {
 
 const COLUMNS = [
   PRAYER_LABELS.fajr,
-  t({ nb: 'Sol', en: 'Sun', ar: 'الشروق', ur: 'طلوع' }),
+  t('prayer.sun'),
   PRAYER_LABELS.duhr,
   PRAYER_LABELS.asr,
   PRAYER_LABELS.maghrib,
@@ -28,12 +28,7 @@ const COLUMNS = [
 const DATE_COLUMN_WIDTH = 40;
 const TIME_TEXT_WIDTH = 32;
 const MAX_TABLE_FONT_SCALE = 1.3;
-const WEEKDAY_LETTERS = t({
-  nb: ['S', 'M', 'T', 'O', 'T', 'F', 'L'],
-  en: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
-  ar: ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'],
-  ur: ['', '', '', '', '', '', ''],
-});
+const WEEKDAY_LETTERS = t('prayer.weekdayLetters', { returnObjects: true });
 const FRIDAY = 5;
 const MARKER_SIZE = 5;
 
@@ -98,7 +93,7 @@ export function MonthPrayerTable({
           tone="textMuted"
           maxFontSizeMultiplier={tableScale}
           style={{ width: dateColumnWidth }}>
-          {t({ nb: 'Dato', en: 'Date', ar: 'التاريخ', ur: 'تاریخ' })}
+          {t('prayer.date')}
         </AppText>
         {COLUMNS.map((column) => (
           <AppText

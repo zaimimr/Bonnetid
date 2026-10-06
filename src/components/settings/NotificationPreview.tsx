@@ -28,17 +28,12 @@ export function NotificationPreview({ enabled }: { enabled: boolean }) {
               {`${next.label} ${next.time}`}
             </AppText>
             <AppText size="xs" tone="textMuted">
-              {t({ nb: 'nå', en: 'now', ar: 'الآن', ur: 'ابھی' })}
+              {t('settings.now')}
             </AppText>
           </View>
           <PostHogMaskView>
             <AppText size="sm" tone="textSecondary">
-              {t({
-                nb: `Det er tid for ${next.label} i ${location.name}.`,
-                en: `It is time for ${next.label} in ${location.name}.`,
-                ar: `حان وقت ${next.label} في ${location.name}.`,
-                ur: `${location.name} میں ${next.label} کا وقت ہو گیا ہے۔`,
-              })}
+              {t('settings.itIsTimeFor', { label: next.label, name: location.name })}
             </AppText>
           </PostHogMaskView>
         </View>

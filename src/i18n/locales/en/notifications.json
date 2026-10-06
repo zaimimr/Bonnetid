@@ -1,0 +1,31 @@
+{
+  "prayerNotificationsAreNot": "Prayer notifications are not working",
+  "fasting": "Fasting",
+  "notificationIssueLabels": {
+    "permission": "Notifications are not allowed",
+    "channel": "Prayer notifications are turned off on the phone",
+    "exactAlarm": "Alarms and reminders are not allowed",
+    "emptyQueue": "No notifications are scheduled",
+    "noPrayers": "No prayers are selected",
+    "sound": "Sound is turned off",
+    "battery": "Battery saver is on"
+  },
+  "default": {
+    "label": "Default",
+    "description": "System notification sound"
+  },
+  "adhanKort": {
+    "label": "Adhan (short)",
+    "description": "Takbir, about 4 seconds"
+  },
+  "adhan": {
+    "label": "Adhan"
+  },
+  "fullAdhanAbout2": "Full adhan, about 2.5 minutes",
+  "takbirAndShahadaAbout": "Takbir and shahada, about 29 seconds",
+  "prayed": "Prayed",
+  "skip": "Skip",
+  "reminders": "Reminders",
+  "itIsTimeFor": "It is time for {{label}} in {{locationName}}.",
+  "lastsUntil": "{{start}}\nLasts until {{endClock}} ({{duration}})."
+}

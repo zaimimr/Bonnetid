@@ -10,12 +10,7 @@ import { parseHijriDate } from '@/lib/hijri';
 import { isoDateKey, osloDateKey } from '@/lib/time';
 import type { CalendarPrimary } from '@/store/settings';
 
-const WEEKDAY_LABELS = t({
-  nb: ['man', 'tir', 'ons', 'tor', 'fre', 'lør', 'søn'],
-  en: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-  ar: ['اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت', 'أحد'],
-  ur: ['پیر', 'منگل', 'بدھ', 'جمعرات', 'جمعہ', 'ہفتہ', 'اتوار'],
-});
+const WEEKDAY_LABELS = t('calendar.weekdayLabels', { returnObjects: true });
 const CELL_HEIGHT = 56;
 const DAY_HEIGHT = 48;
 const DAY_WIDTH = 40;
@@ -125,12 +120,7 @@ export function MonthGrid({
           const isToday = cell.iso === todayIso;
           const isSpecial = Boolean(cell.hijri?.special_date_name);
           const label = isSpecial
-            ? t({
-                nb: `${cell.primary}. ${cell.hijri?.special_date_name}`,
-                en: `${cell.primary}, ${cell.hijri?.special_date_name}`,
-                ar: `${cell.primary}، ${cell.hijri?.special_date_name}`,
-                ur: `${cell.primary}، ${cell.hijri?.special_date_name}`,
-              })
+            ? t('calendar.combined', { primary: cell.primary, special_date_name: cell.hijri?.special_date_name })
             : String(cell.primary);
 
           return (

@@ -1,0 +1,15 @@
+{
+  "searchForAPlace": "Search for a place, municipality or county",
+  "clearSearch": "Clear search",
+  "myLocation": "My location",
+  "allPlaces": "All places",
+  "prayerTimesFor": "Prayer times for {{name}}",
+  "showMosquesAcrossThe": "Show mosques across the country",
+  "places": "{{length}} places",
+  "places2": "{{totalMatches}} places",
+  "placesWithRegisteredMosques": "{{totalMatches}} places with registered mosques",
+  "noPlacesMatch": "No places match “{{value}}”",
+  "otherPlaces": "Other places",
+  "n1Mosque": "1 mosque",
+  "mosques": "{{count}} mosques"
+}

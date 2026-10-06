@@ -1,0 +1,31 @@
+{
+  "close": "إغلاق",
+  "somethingWentWrongTry": "حدث خطأ ما. حاول مرة أخرى.",
+  "tryAgain": "حاول مرة أخرى",
+  "prayerTimesForHave": "لم تُنشر مواقيت الصلاة لـ {{period}} بعد",
+  "small": "صغير",
+  "normal": "عادي",
+  "large": "كبير",
+  "duration": {
+    "hoursShort_other": "{{count}}س",
+    "minutesShort_other": "{{count}}د",
+    "hours_one": "ساعة",
+    "hours_two": "ساعتان",
+    "hours_few": "{{count}} ساعات",
+    "hours_other": "{{count}} ساعة",
+    "minutes_one": "دقيقة",
+    "minutes_two": "دقيقتان",
+    "minutes_few": "{{count}} دقائق",
+    "minutes_other": "{{count}} دقيقة",
+    "days_one": "يوم",
+    "days_two": "يومين",
+    "days_few": "{{count}} أيام",
+    "days_other": "{{count}} يومًا",
+    "joiner": " و",
+    "units": [
+      "س",
+      "د",
+      "ث"
+    ]
+  }
+}

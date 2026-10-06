@@ -1,0 +1,7 @@
+{
+  "travelMode": "Reisemodus",
+  "localTimes": "Lokale tider",
+  "timesAreShownIn": "Tidene vises i lokal tid for {{name}} ({{localOffset}}). Telefonen din står på {{deviceOffset}}",
+  "timesAreForIn": "Tidene gjelder {{name}} i norsk tid, vist i din lokale tid ({{deviceOffset}})",
+  "yourLocation": "Din posisjon"
+}

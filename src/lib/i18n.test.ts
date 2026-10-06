@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isRTL, resolveLanguage, setLanguage, t } from './i18n.ts';
+import { isRTL, resolveLanguage, setLanguage, t, tCount } from './i18n.ts';
 
 test('first supported phone language wins', () => {
   assert.equal(resolveLanguage(['sv', 'ur-PK', 'en']), 'ur');
@@ -14,7 +14,10 @@ test('unsupported phone languages fall back to English', () => {
 
 test('t picks the active language and RTL follows it', () => {
   setLanguage('ar');
-  assert.equal(t({ nb: 'Hei', en: 'Hi', ar: 'مرحبا', ur: 'سلام' }), 'مرحبا');
+  assert.equal(t('common.duration.joiner'), ' و');
+  assert.equal(tCount('common.duration.hours', 2), 'ساعتان');
+  assert.equal(tCount('common.duration.hours', 5), '5 ساعات');
+  assert.equal(tCount('common.duration.hours', 12), '12 ساعة');
   assert.equal(isRTL(), true);
   setLanguage('nb');
   assert.equal(isRTL(), false);

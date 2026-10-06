@@ -60,7 +60,7 @@ async function ensureAndroidChannel(
 ): Promise<string | undefined> {
   if (Platform.OS !== 'android') return undefined;
   await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-    name: t({ nb: 'Faste', en: 'Fasting', ar: 'الصيام', ur: 'روزہ' }),
+    name: t('notifications.fasting'),
     importance: Notifications.AndroidImportance.HIGH,
   });
   return CHANNEL_ID;

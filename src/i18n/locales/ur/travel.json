@@ -1,0 +1,7 @@
+{
+  "travelMode": "سفر موڈ",
+  "localTimes": "مقامی اوقات",
+  "timesAreShownIn": "اوقات {{name}} کے مقامی وقت میں دکھائے گئے ہیں ({{localOffset}})۔ آپ کا فون {{deviceOffset}} پر ہے",
+  "timesAreForIn": "اوقات {{name}} کے لیے ناروے کے وقت میں ہیں، آپ کے مقامی وقت میں دکھائے گئے ({{deviceOffset}})",
+  "yourLocation": "آپ کا مقام"
+}

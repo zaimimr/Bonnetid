@@ -1,0 +1,8 @@
+{
+  "today": "اليوم",
+  "noPrayerTimesFor": "لا توجد مواقيت صلاة لهذا اليوم",
+  "markedAsPrayed": "{{label}}، مُعلَّمة كمُصلّاة",
+  "notMarked": "{{label}}، غير مُعلَّمة",
+  "previousDay": "اليوم السابق",
+  "nextDay": "اليوم التالي"
+}

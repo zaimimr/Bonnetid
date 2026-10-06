@@ -1,0 +1,7 @@
+{
+  "travelMode": "Travel mode",
+  "localTimes": "Local times",
+  "timesAreShownIn": "Times are shown in local time for {{name}} ({{localOffset}}). Your phone is set to {{deviceOffset}}",
+  "timesAreForIn": "Times are for {{name}} in Norwegian time, shown in your local time ({{deviceOffset}})",
+  "yourLocation": "Your location"
+}

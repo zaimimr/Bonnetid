@@ -19,7 +19,7 @@ export default function NotificationPrayersScreen() {
 
   return (
     <Screen scroll edges={[]}>
-      <SectionHeader title={t({ nb: 'Varsle for', en: 'Notify for', ar: 'التنبيه لـ', ur: 'اطلاع برائے' })} style={{ marginTop: spacing.lg }} />
+      <SectionHeader title={t('settings.notifyFor')} style={{ marginTop: spacing.lg }} />
       <Card padding="sm" rounded="xl">
         {NOTIFIABLE_PRAYERS.map((prayer, index) => (
           <View key={prayer}>
@@ -44,10 +44,10 @@ export default function NotificationPrayersScreen() {
         ))}
       </Card>
 
-      <SectionHeader title={t({ nb: 'Lyd', en: 'Sound', ar: 'الصوت', ur: 'آواز' })} style={{ marginTop: spacing.lg }} />
+      <SectionHeader title={t('settings.sound')} style={{ marginTop: spacing.lg }} />
       <Card padding="sm" rounded="xl">
         <ListRow
-          title={t({ nb: 'Varsellyd', en: 'Notification sound', ar: 'صوت الإشعار', ur: 'اطلاع کی آواز' })}
+          title={t('settings.notificationSound')}
           subtitle={getNotificationSound(notificationSound).label}
           leading={<Ionicons name="musical-notes-outline" size={20} color={theme.colors.primary} />}
           chevron

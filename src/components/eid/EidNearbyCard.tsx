@@ -13,12 +13,7 @@ export function EidNearbyCard({ mosques }: { mosques: Mosque[] }) {
   return (
     <View>
       <SectionHeader
-        title={t({
-          nb: 'Eid-bønn i nærheten',
-          en: 'Eid prayer nearby',
-          ar: 'صلاة العيد بالقرب منك',
-          ur: 'قریب میں عید کی نماز',
-        })}
+        title={t('season.eidPrayerNearby')}
       />
       <Card rounded="xl" padding="sm">
         {mosques.map((mosque, index) => (

@@ -1,0 +1,15 @@
+{
+  "searchForAPlace": "ابحث عن مكان أو بلدية أو مقاطعة",
+  "clearSearch": "مسح البحث",
+  "myLocation": "موقعي",
+  "allPlaces": "كل الأماكن",
+  "prayerTimesFor": "مواقيت الصلاة في {{name}}",
+  "showMosquesAcrossThe": "عرض المساجد في كل البلاد",
+  "places": "الأماكن: {{length}}",
+  "places2": "الأماكن: {{totalMatches}}",
+  "placesWithRegisteredMosques": "أماكن فيها مساجد مسجلة: {{totalMatches}}",
+  "noPlacesMatch": "لا توجد أماكن تطابق «{{value}}»",
+  "otherPlaces": "أماكن أخرى",
+  "n1Mosque": "مسجد واحد",
+  "mosques": "{{count}} مساجد"
+}

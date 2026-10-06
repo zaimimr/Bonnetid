@@ -1,0 +1,24 @@
+{
+  "close": "بند کریں",
+  "somethingWentWrongTry": "کچھ غلط ہو گیا۔ دوبارہ کوشش کریں۔",
+  "tryAgain": "دوبارہ کوشش کریں",
+  "prayerTimesForHave": "{{period}} کے نماز کے اوقات ابھی شائع نہیں ہوئے",
+  "small": "چھوٹا",
+  "normal": "عام",
+  "large": "بڑا",
+  "duration": {
+    "hoursShort_one": "{{count}} گھنٹہ",
+    "hoursShort_other": "{{count}} گھنٹے",
+    "minutesShort_other": "{{count}} منٹ",
+    "hours_one": "{{count}} گھنٹہ",
+    "hours_other": "{{count}} گھنٹے",
+    "minutes_other": "{{count}} منٹ",
+    "days_other": "{{count}} دن",
+    "joiner": " ",
+    "units": [
+      "گ",
+      "م",
+      "س"
+    ]
+  }
+}

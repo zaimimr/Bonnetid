@@ -89,9 +89,9 @@ export function SurveyHost() {
       {finished ? (
         <View style={{ gap: spacing.lg }}>
           <AppText size="lg" weight="semibold">
-            {t({ nb: 'Takk for svaret!', en: 'Thanks for your answer!', ar: 'شكرًا على إجابتك!', ur: 'جواب کا شکریہ!' })}
+            {t('feedback.thanksForYourAnswer')}
           </AppText>
-          <Button label={t({ nb: 'Lukk', en: 'Close', ar: 'إغلاق', ur: 'بند کریں' })} fullWidth onPress={close} />
+          <Button label={t('feedback.close')} fullWidth onPress={close} />
         </View>
       ) : (
         <View style={{ gap: spacing.xl }}>
@@ -104,8 +104,8 @@ export function SurveyHost() {
             label={
               question.buttonText ??
               (isLast
-                ? t({ nb: 'Send', en: 'Send', ar: 'إرسال', ur: 'بھیجیں' })
-                : t({ nb: 'Neste', en: 'Next', ar: 'التالي', ur: 'اگلا' }))
+                ? t('feedback.send')
+                : t('feedback.next'))
             }
             fullWidth
             disabled={!isAnswered(question, answer)}

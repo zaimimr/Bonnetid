@@ -45,13 +45,8 @@ const STEP_ORDER: StepId[] = [
 const LINE_ART = require('../../../assets/images/splash-icon.png');
 const LINE_ART_RATIO = 1525 / 1537;
 
-const CONTINUE = t({ nb: 'Fortsett', en: 'Continue', ar: 'متابعة', ur: 'جاری رکھیں' });
-const NOTIFY_TITLE = t({
-  nb: 'Varsle ved bønnetid',
-  en: 'Notify at prayer time',
-  ar: 'التنبيه عند وقت الصلاة',
-  ur: 'نماز کے وقت اطلاع',
-});
+const CONTINUE = t('onboarding.continue');
+const NOTIFY_TITLE = t('onboarding.notifyAtPrayerTime');
 
 const enter = (delay: number) =>
   FadeInDown.duration(250).delay(delay).reduceMotion(ReduceMotion.System);
@@ -230,23 +225,13 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
 
       <Animated.View entering={enter(80)} style={{ gap: spacing.sm }}>
         <AppText size="lg" weight="semibold" color={theme.colors.primary}>
-          {t({ nb: 'Assalamu alaikum', en: 'Assalamu alaikum', ar: 'السلام عليكم', ur: 'السلام علیکم' })}
+          {t('onboarding.assalamuAlaikum')}
         </AppText>
         <AppText size="display" weight="bold" heading>
-          {t({
-            nb: 'Velkommen til Bønnetid',
-            en: 'Welcome to Bønnetid',
-            ar: 'مرحبًا بك في Bønnetid',
-            ur: 'Bønnetid میں خوش آمدید',
-          })}
+          {t('onboarding.welcomeToBNnetid')}
         </AppText>
         <AppText size="md" tone="textSecondary" style={{ marginTop: spacing.xs }}>
-          {t({
-            nb: 'Bønnetidene for kommunen din, varsel når det er tid, og jamat-tidene fra moskeen din. Oppsettet tar et halvt minutt.',
-            en: 'Prayer times for your municipality, a notification when it is time, and the jamaat times from your mosque. Setup takes half a minute.',
-            ar: 'مواقيت الصلاة لبلديتك، وإشعار عند حلول الوقت، وأوقات الجماعة في مسجدك. يستغرق الإعداد نصف دقيقة.',
-            ur: 'آپ کی بلدیہ کے نماز کے اوقات، وقت ہونے پر اطلاع، اور آپ کی مسجد کے جماعت کے اوقات۔ سیٹ اپ میں آدھا منٹ لگتا ہے۔',
-          })}
+          {t('onboarding.prayerTimesForYour')}
         </AppText>
       </Animated.View>
 
@@ -254,7 +239,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
         entering={enter(160)}
         style={{ gap: spacing.lg, paddingTop: spacing.xxl, paddingBottom: spacing.lg }}>
         <Button
-          label={t({ nb: 'Kom i gang', en: 'Get started', ar: 'ابدأ', ur: 'شروع کریں' })}
+          label={t('onboarding.getStarted')}
           onPress={onNext}
           size="lg"
           fullWidth
@@ -277,12 +262,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
             accessible={false}
           />
           <AppText size="sm" tone="textSecondary">
-            {t({
-              nb: 'Bønnetider fra Islamsk Råd Norge',
-              en: 'Prayer times from the Islamic Council of Norway',
-              ar: 'مواقيت الصلاة من المجلس الإسلامي النرويجي',
-              ur: 'نماز کے اوقات اسلامک کونسل ناروے کی جانب سے',
-            })}
+            {t('onboarding.prayerTimesFromThe')}
           </AppText>
         </View>
       </Animated.View>
@@ -358,45 +338,25 @@ function LocationStep({ onNext }: { onNext: () => void }) {
   return (
     <StepShell
       icon="location-outline"
-      title={t({ nb: 'Hvor er du?', en: 'Where are you?', ar: 'أين أنت؟', ur: 'آپ کہاں ہیں؟' })}
-      body={t({
-        nb: 'For å vise riktige bønnetider trenger appen å vite hvor du er. I Norge får du tidene fra Islamsk Råd Norge. I utlandet regner appen ut tidene for stedet du er på, med metoden som er vanlig i landet.',
-        en: 'To show the right prayer times, the app needs to know where you are. In Norway you get the times from the Islamic Council of Norway. Abroad, the app calculates the times for where you are, using the method common in that country.',
-        ar: 'لعرض مواقيت الصلاة الصحيحة يحتاج التطبيق إلى معرفة موقعك. في النرويج تحصل على المواقيت من المجلس الإسلامي النرويجي. وخارج النرويج يحسب التطبيق المواقيت لمكانك بالطريقة المعتمدة في ذلك البلد.',
-        ur: 'درست نماز کے اوقات دکھانے کے لیے ایپ کو آپ کا مقام جاننا ضروری ہے۔ ناروے میں اوقات اسلامک کونسل ناروے سے ملتے ہیں۔ بیرونِ ملک ایپ اس ملک میں رائج طریقے سے آپ کے مقام کے اوقات کا حساب لگاتی ہے۔',
-      })}
+      title={t('onboarding.whereAreYou')}
+      body={t('onboarding.toShowTheRight')}
       primaryLabel={
         denied
-          ? t({ nb: 'Åpne Innstillinger', en: 'Open Settings', ar: 'فتح الإعدادات', ur: 'ترتیبات کھولیں' })
-          : t({
-              nb: 'Finn posisjonen min',
-              en: 'Find my location',
-              ar: 'حدّد موقعي',
-              ur: 'میرا مقام تلاش کریں',
-            })
+          ? t('onboarding.openSettings')
+          : t('onboarding.findMyLocation')
       }
       onPrimary={denied ? () => Linking.openSettings() : detect}
       primaryLoading={busy || !locations}
       secondaryLabel={
         denied
-          ? t({
-              nb: `Fortsett med ${DEFAULT_LOCATION.name}`,
-              en: `Continue with ${DEFAULT_LOCATION.name}`,
-              ar: `المتابعة مع ${DEFAULT_LOCATION.name}`,
-              ur: `${DEFAULT_LOCATION.name} کے ساتھ جاری رکھیں`,
-            })
+          ? t('onboarding.continueWith', { name: DEFAULT_LOCATION.name })
           : undefined
       }
       onSecondary={denied ? onNext : undefined}>
       {denied && (
         <StatusLine
           tone="textMuted"
-          text={t({
-            nb: `Fant ingen posisjon. Gi Bønnetid tilgang til posisjon i Innstillinger, eller fortsett med ${DEFAULT_LOCATION.name} for nå.`,
-            en: `No location found. Give Bønnetid location access in Settings, or continue with ${DEFAULT_LOCATION.name} for now.`,
-            ar: `لم يُعثر على موقع. اسمح لـ Bønnetid بالوصول إلى الموقع من الإعدادات، أو تابع مع ${DEFAULT_LOCATION.name} الآن.`,
-            ur: `کوئی مقام نہیں ملا۔ ترتیبات میں Bønnetid کو مقام تک رسائی دیں، یا فی الحال ${DEFAULT_LOCATION.name} کے ساتھ جاری رکھیں۔`,
-          })}
+          text={t('onboarding.noLocationFoundGive', { name: DEFAULT_LOCATION.name })}
         />
       )}
     </StepShell>
@@ -416,31 +376,21 @@ function MosqueStep({ onNext }: { onNext: () => void }) {
   return (
     <StepShell
       icon="business-outline"
-      title={t({ nb: 'Velg moskeen din', en: 'Choose your mosque', ar: 'اختر مسجدك', ur: 'اپنی مسجد منتخب کریں' })}
-      body={t({
-        nb: 'Velg din moské og få jamat-tider og fredagsbønn rett i appen.',
-        en: 'Choose your mosque and get jamaat times and Jumuah right in the app.',
-        ar: 'اختر مسجدك واحصل على أوقات الجماعة وصلاة الجمعة داخل التطبيق.',
-        ur: 'اپنی مسجد منتخب کریں اور جماعت کے اوقات اور نمازِ جمعہ براہِ راست ایپ میں پائیں۔',
-      })}
-      primaryLabel={mosque ? CONTINUE : t({ nb: 'Velg moské', en: 'Choose mosque', ar: 'اختر مسجدًا', ur: 'مسجد منتخب کریں' })}
+      title={t('onboarding.chooseYourMosque')}
+      body={t('onboarding.chooseYourMosqueAnd')}
+      primaryLabel={mosque ? CONTINUE : t('onboarding.chooseMosque')}
       onPrimary={mosque ? onNext : () => router.push('/mosque-picker')}
       secondaryLabel={
         mosque
-          ? t({ nb: 'Bytt moské', en: 'Change mosque', ar: 'تغيير المسجد', ur: 'مسجد تبدیل کریں' })
-          : t({ nb: 'Hopp over', en: 'Skip', ar: 'تخطٍّ', ur: 'چھوڑ دیں' })
+          ? t('onboarding.changeMosque')
+          : t('onboarding.skip')
       }
       onSecondary={mosque ? () => router.push('/mosque-picker') : onNext}>
       {mosque && <StatusLine tone="success" text={mosque.name} />}
       {!mosque && (
         <StatusLine
           tone="textMuted"
-          text={t({
-            nb: 'Du kan velge moské senere under Innstillinger.',
-            en: 'You can choose a mosque later in Settings.',
-            ar: 'يمكنك اختيار مسجد لاحقًا من الإعدادات.',
-            ur: 'آپ بعد میں ترتیبات میں مسجد منتخب کر سکتے ہیں۔',
-          })}
+          text={t('onboarding.youCanChooseA')}
         />
       )}
     </StepShell>
@@ -462,13 +412,8 @@ function AsrStep({ onNext }: { onNext: () => void }) {
   return (
     <StepShell
       icon="partly-sunny-outline"
-      title={t({ nb: 'Velg asr-metode', en: 'Choose Asr method', ar: 'اختر طريقة حساب العصر', ur: 'عصر کا طریقہ منتخب کریں' })}
-      body={t({
-        nb: 'Asr-tiden avhenger av metoden du følger. Er du usikker, velg IRN standard.',
-        en: 'The Asr time depends on the method you follow. If you are unsure, choose IRN standard.',
-        ar: 'يعتمد وقت العصر على الطريقة التي تتبعها. إن لم تكن متأكدًا فاختر معيار المجلس الإسلامي النرويجي.',
-        ur: 'عصر کا وقت آپ کے اختیار کردہ طریقے پر منحصر ہے۔ اگر یقین نہ ہو تو IRN معیاری منتخب کریں۔',
-      })}
+      title={t('onboarding.chooseAsrMethod')}
+      body={t('onboarding.theAsrTimeDepends')}
       primaryLabel={CONTINUE}
       onPrimary={choose}>
       <Card padding="sm" rounded="xl">
@@ -517,12 +462,7 @@ function NotificationStep({ onNext }: { onNext: () => void }) {
       <StepShell
         icon="notifications-outline"
         title={NOTIFY_TITLE}
-        body={t({
-          nb: 'Varsler krever en installert versjon av appen. Du kan slå dem på under Innstillinger når du har den.',
-          en: 'Notifications require an installed version of the app. You can turn them on in Settings once you have it.',
-          ar: 'تتطلب الإشعارات نسخة مثبتة من التطبيق. يمكنك تفعيلها من الإعدادات عندما تتوفر لديك.',
-          ur: 'اطلاعات کے لیے ایپ کا انسٹال شدہ ورژن ضروری ہے۔ وہ مل جائے تو آپ ترتیبات میں انہیں آن کر سکتے ہیں۔',
-        })}
+        body={t('onboarding.notificationsRequireAnInstalled')}
         primaryLabel={CONTINUE}
         onPrimary={onNext}
       />
@@ -533,43 +473,28 @@ function NotificationStep({ onNext }: { onNext: () => void }) {
     <StepShell
       icon="notifications-outline"
       title={NOTIFY_TITLE}
-      body={t({
-        nb: 'Få et varsel når hver bønn begynner. Adhan-lyd og hvilke bønner som skal varsle velger du under Innstillinger.',
-        en: 'Get a notification when each prayer begins. Choose the adhan sound and which prayers notify you in Settings.',
-        ar: 'احصل على إشعار عند دخول وقت كل صلاة. اختر صوت الأذان والصلوات التي تريد الإشعار بها من الإعدادات.',
-        ur: 'ہر نماز کا وقت شروع ہونے پر اطلاع پائیں۔ اذان کی آواز اور کن نمازوں کی اطلاع ملے، یہ ترتیبات میں منتخب کریں۔',
-      })}
+      body={t('onboarding.getANotificationWhen')}
       primaryLabel={
         notificationsEnabled
           ? CONTINUE
-          : t({ nb: 'Slå på varsler', en: 'Turn on notifications', ar: 'تفعيل الإشعارات', ur: 'اطلاعات آن کریں' })
+          : t('onboarding.turnOnNotifications')
       }
       onPrimary={notificationsEnabled ? onNext : enable}
       primaryLoading={busy}
       secondaryLabel={
-        notificationsEnabled ? undefined : t({ nb: 'Ikke nå', en: 'Not now', ar: 'ليس الآن', ur: 'ابھی نہیں' })
+        notificationsEnabled ? undefined : t('onboarding.notNow')
       }
       onSecondary={notificationsEnabled ? undefined : onNext}>
       {notificationsEnabled && (
         <StatusLine
           tone="success"
-          text={t({
-            nb: 'Varsler er på for alle fem bønner',
-            en: 'Notifications are on for all five prayers',
-            ar: 'الإشعارات مفعّلة للصلوات الخمس',
-            ur: 'پانچوں نمازوں کی اطلاعات آن ہیں',
-          })}
+          text={t('onboarding.notificationsAreOnFor')}
         />
       )}
       {!notificationsEnabled && denied && (
         <StatusLine
           tone="textMuted"
-          text={t({
-            nb: 'Telefonen sa nei til varsler. Du kan gi tilgang i telefonens innstillinger senere.',
-            en: 'Your phone declined notifications. You can allow them in the phone settings later.',
-            ar: 'رفض الهاتف الإشعارات. يمكنك السماح بها لاحقًا من إعدادات الهاتف.',
-            ur: 'فون نے اطلاعات کی اجازت نہیں دی۔ آپ بعد میں فون کی ترتیبات میں اجازت دے سکتے ہیں۔',
-          })}
+          text={t('onboarding.yourPhoneDeclinedNotifications')}
         />
       )}
     </StepShell>
@@ -582,18 +507,8 @@ function TrackerStep({ onNext }: { onNext: () => void }) {
 
   const body =
     Platform.OS === 'ios'
-      ? t({
-          nb: 'Marker bønnene du har bedt. Du får en nedtelling på låseskjermen der du kan svare uten å åpne appen.',
-          en: 'Mark the prayers you have prayed. You get a countdown on the lock screen where you can answer without opening the app.',
-          ar: 'سجّل الصلوات التي أدّيتها. يظهر لك عدّ تنازلي على شاشة القفل يمكنك الرد منه دون فتح التطبيق.',
-          ur: 'ادا کی گئی نمازوں کا اندراج کریں۔ لاک اسکرین پر الٹی گنتی دکھائی دے گی جہاں سے آپ ایپ کھولے بغیر جواب دے سکتے ہیں۔',
-        })
-      : t({
-          nb: 'Marker bønnene du har bedt. Du får et varsel på låseskjermen der du kan svare uten å åpne appen.',
-          en: 'Mark the prayers you have prayed. You get a notification on the lock screen where you can answer without opening the app.',
-          ar: 'سجّل الصلوات التي أدّيتها. يظهر لك إشعار على شاشة القفل يمكنك الرد منه دون فتح التطبيق.',
-          ur: 'ادا کی گئی نمازوں کا اندراج کریں۔ لاک اسکرین پر اطلاع آئے گی جہاں سے آپ ایپ کھولے بغیر جواب دے سکتے ہیں۔',
-        });
+      ? t('onboarding.markThePrayersYou')
+      : t('onboarding.markThePrayersYou2');
 
   const enable = () => {
     setTrackerEnabled(true);
@@ -604,37 +519,22 @@ function TrackerStep({ onNext }: { onNext: () => void }) {
   return (
     <StepShell
       icon="checkmark-done-outline"
-      title={t({
-        nb: 'Hold oversikt over bønnene',
-        en: 'Keep track of your prayers',
-        ar: 'تابع صلواتك',
-        ur: 'اپنی نمازوں کا حساب رکھیں',
-      })}
+      title={t('onboarding.keepTrackOfYour')}
       body={body}
       primaryLabel={
         trackerEnabled
           ? CONTINUE
-          : t({
-              nb: 'Slå på bønnesporing',
-              en: 'Turn on prayer tracking',
-              ar: 'تفعيل متابعة الصلوات',
-              ur: 'نماز کا ریکارڈ آن کریں',
-            })
+          : t('onboarding.turnOnPrayerTracking')
       }
       onPrimary={trackerEnabled ? onNext : enable}
       secondaryLabel={
-        trackerEnabled ? undefined : t({ nb: 'Nei takk', en: 'No thanks', ar: 'لا، شكرًا', ur: 'جی نہیں، شکریہ' })
+        trackerEnabled ? undefined : t('onboarding.noThanks')
       }
       onSecondary={trackerEnabled ? undefined : onNext}>
       {trackerEnabled && (
         <StatusLine
           tone="success"
-          text={t({
-            nb: 'Bønnesporing er på',
-            en: 'Prayer tracking is on',
-            ar: 'متابعة الصلوات مفعّلة',
-            ur: 'نماز کا ریکارڈ آن ہے',
-          })}
+          text={t('onboarding.prayerTrackingIsOn')}
         />
       )}
     </StepShell>
@@ -654,18 +554,8 @@ function ReadyStep({ onFinish }: { onFinish: () => void }) {
   const remaining = countdownTarget ? formatDurationShort(countdownTarget.getTime() - now.getTime()) : '';
 
   const body = mosque
-    ? t({
-        nb: `Bønnetidene for ${location.name} er klare, med jamat-tidene fra ${mosque.name}.`,
-        en: `Prayer times for ${location.name} are ready, with the jamaat times from ${mosque.name}.`,
-        ar: `مواقيت الصلاة لـ ${location.name} جاهزة، مع أوقات الجماعة في ${mosque.name}.`,
-        ur: `${location.name} کے نماز کے اوقات تیار ہیں، ${mosque.name} کے جماعت کے اوقات کے ساتھ۔`,
-      })
-    : t({
-        nb: `Bønnetidene for ${location.name} er klare.`,
-        en: `Prayer times for ${location.name} are ready.`,
-        ar: `مواقيت الصلاة لـ ${location.name} جاهزة.`,
-        ur: `${location.name} کے نماز کے اوقات تیار ہیں۔`,
-      });
+    ? t('onboarding.prayerTimesForAre', { name: location.name, name2: mosque.name })
+    : t('onboarding.prayerTimesForAre2', { name: location.name });
 
   return (
     <View style={{ flex: 1 }}>
@@ -676,18 +566,8 @@ function ReadyStep({ onFinish }: { onFinish: () => void }) {
             accessible
             accessibilityLabel={
               current
-                ? t({
-                    nb: `Nåværende bønn er ${shown.label} fra klokken ${shown.time}`,
-                    en: `Current prayer is ${shown.label} from ${shown.time}`,
-                    ar: `الصلاة الحالية ${shown.label} منذ الساعة ${shown.time}`,
-                    ur: `موجودہ نماز ${shown.label} ہے، ${shown.time} بجے سے`,
-                  })
-                : t({
-                    nb: `Neste bønn er ${shown.label} klokken ${shown.time}`,
-                    en: `Next prayer is ${shown.label} at ${shown.time}`,
-                    ar: `الصلاة التالية ${shown.label} الساعة ${shown.time}`,
-                    ur: `اگلی نماز ${shown.label} ہے، ${shown.time} بجے`,
-                  })
+                ? t('onboarding.currentPrayerIsFrom', { label: shown.label, time: shown.time })
+                : t('onboarding.nextPrayerIsAt', { label: shown.label, time: shown.time })
             }
             style={{ alignItems: 'center', gap: spacing.xs }}>
             <View
@@ -704,33 +584,18 @@ function ReadyStep({ onFinish }: { onFinish: () => void }) {
             </View>
             <AppText size="sm" weight="medium" tone="textSecondary">
               {current
-                ? t({ nb: 'Nåværende bønn', en: 'Current prayer', ar: 'الصلاة الحالية', ur: 'موجودہ نماز' })
+                ? t('onboarding.currentPrayer')
                 : nextPrayer?.isTomorrow
-                  ? t({
-                      nb: 'Første bønn i morgen',
-                      en: 'First prayer tomorrow',
-                      ar: 'أول صلاة غدًا',
-                      ur: 'کل کی پہلی نماز',
-                    })
-                  : t({ nb: 'Neste bønn', en: 'Next prayer', ar: 'الصلاة التالية', ur: 'اگلی نماز' })}
+                  ? t('onboarding.firstPrayerTomorrow')
+                  : t('onboarding.nextPrayer')}
             </AppText>
             <AppText size="display" weight="bold" heading>
               {shown.label}
             </AppText>
             <AppText size="lg" tone="textSecondary" tabular>
               {countdownLabel
-                ? t({
-                    nb: `kl. ${shown.time} · ${countdownLabel} om ${remaining}`,
-                    en: `${shown.time} · ${countdownLabel} in ${remaining}`,
-                    ar: `${shown.time} · ${countdownLabel} بعد ${remaining}`,
-                    ur: `${shown.time} · ${countdownLabel} ${remaining} میں`,
-                  })
-                : t({
-                    nb: `kl. ${shown.time} · om ${remaining}`,
-                    en: `${shown.time} · in ${remaining}`,
-                    ar: `${shown.time} · بعد ${remaining}`,
-                    ur: `${shown.time} · ${remaining} میں`,
-                  })}
+                ? t('onboarding.in', { time: shown.time, countdownLabel, remaining })
+                : t('onboarding.in2', { time: shown.time, remaining })}
             </AppText>
           </Animated.View>
         ) : (
@@ -740,7 +605,7 @@ function ReadyStep({ onFinish }: { onFinish: () => void }) {
 
       <Animated.View entering={enter(80)} style={{ gap: spacing.sm }}>
         <AppText size="display" weight="bold" heading>
-          {t({ nb: 'Klar for bruk', en: 'Ready to go', ar: 'كل شيء جاهز', ur: 'سب تیار ہے' })}
+          {t('onboarding.readyToGo')}
         </AppText>
         <PostHogMaskView>
           <AppText size="md" tone="textSecondary">
@@ -748,12 +613,7 @@ function ReadyStep({ onFinish }: { onFinish: () => void }) {
           </AppText>
         </PostHogMaskView>
         <AppText size="md" weight="medium" color={theme.colors.primary} style={{ marginTop: spacing.xs }}>
-          {t({
-            nb: 'Må Allah ta imot bønnene dine.',
-            en: 'May Allah accept your prayers.',
-            ar: 'تقبّل الله صلاتك.',
-            ur: 'اللہ آپ کی نمازیں قبول فرمائے۔',
-          })}
+          {t('onboarding.mayAllahAcceptYour')}
         </AppText>
       </Animated.View>
 
@@ -761,18 +621,13 @@ function ReadyStep({ onFinish }: { onFinish: () => void }) {
         entering={enter(160)}
         style={{ gap: spacing.md, paddingTop: spacing.xxl, paddingBottom: spacing.lg }}>
         <Button
-          label={t({ nb: 'Åpne Bønnetid', en: 'Open Bønnetid', ar: 'افتح Bønnetid', ur: 'Bønnetid کھولیں' })}
+          label={t('onboarding.openBNnetid')}
           onPress={onFinish}
           size="lg"
           fullWidth
         />
         <AppText size="sm" tone="textSecondary" align="center">
-          {t({
-            nb: 'Alt kan endres senere under Mer.',
-            en: 'You can change everything later under More.',
-            ar: 'يمكنك تغيير كل شيء لاحقًا من المزيد.',
-            ur: 'سب کچھ بعد میں مزید میں تبدیل کیا جا سکتا ہے۔',
-          })}
+          {t('onboarding.youCanChangeEverything')}
         </AppText>
       </Animated.View>
     </View>

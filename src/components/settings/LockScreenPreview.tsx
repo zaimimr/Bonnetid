@@ -44,13 +44,13 @@ export function LockScreenPreview({ enabled, tracker }: { enabled: boolean; trac
           </AppText>
         </View>
         <AppText size="lg" weight="semibold" tabular>
-          {t({ nb: `om ${remaining}`, en: `in ${remaining}`, ar: `بعد ${remaining}`, ur: `${remaining} میں` })}
+          {t('settings.in', { remaining })}
         </AppText>
       </View>
       {tracker !== null && (
         <View style={{ flexDirection: 'row', gap: spacing.sm, opacity: tracker ? 1 : opacity.disabled }}>
-          <Pill label={t({ nb: 'Bedt', en: 'Prayed', ar: 'صلّيت', ur: 'ادا کی' })} primary />
-          <Pill label={t({ nb: 'Hopp over', en: 'Skip', ar: 'تخطٍّ', ur: 'چھوڑ دیں' })} />
+          <Pill label={t('settings.prayed')} primary />
+          <Pill label={t('settings.skip')} />
         </View>
       )}
     </Card>

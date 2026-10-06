@@ -58,7 +58,7 @@ export function placesByIso(places: Place[]): Map<string, Place> {
 export function groupPlacesByFylke(places: Place[]): PlaceSection[] {
   const sections = new Map<string, Place[]>();
   for (const place of places) {
-    const key = place.fylke || t({ nb: 'Andre steder', en: 'Other places', ar: 'أماكن أخرى', ur: 'دیگر مقامات' });
+    const key = place.fylke || t('places.otherPlaces');
     const bucket = sections.get(key);
     if (bucket) bucket.push(place);
     else sections.set(key, [place]);
@@ -80,6 +80,6 @@ export function matchesPlace(place: Place, normalizedQuery: string): boolean {
 
 export function placeCountLabel(count: number): string {
   return count === 1
-    ? t({ nb: '1 moské', en: '1 mosque', ar: 'مسجد واحد', ur: '1 مسجد' })
-    : t({ nb: `${count} moskeer`, en: `${count} mosques`, ar: `${count} مساجد`, ur: `${count} مساجد` });
+    ? t('places.n1Mosque')
+    : t('places.mosques', { count });
 }

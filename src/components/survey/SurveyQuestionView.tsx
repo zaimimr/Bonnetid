@@ -39,7 +39,7 @@ export function SurveyQuestionView({ question, value, onChange }: SurveyQuestion
           multiline
           value={typeof value === 'string' ? value : ''}
           onChangeText={onChange}
-          placeholder={t({ nb: 'Skriv her', en: 'Write here', ar: 'اكتب هنا', ur: 'یہاں لکھیں' })}
+          placeholder={t('feedback.writeHere')}
           maxLength={2000}
         />
       )}

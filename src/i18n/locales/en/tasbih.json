@@ -1,0 +1,16 @@
+{
+  "complete": "Complete",
+  "saidOnce": "Said once",
+  "of": "of {{target}}",
+  "allRoundsComplete": "All rounds complete",
+  "roundOf": "Round {{value}} of {{total}}",
+  "afterPrayer": "After prayer",
+  "freeCount": "Free count",
+  "noGoal": "No goal",
+  "reset": "Reset",
+  "done": "Done",
+  "startOver": "Start over",
+  "countOf": "Count, {{count}} of {{target}}",
+  "count": "Count, {{count}}",
+  "tapAnywhereToCount": "Tap anywhere to count"
+}

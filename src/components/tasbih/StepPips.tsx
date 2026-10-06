@@ -54,18 +54,8 @@ export function StepPips({
     <View
       accessibilityLabel={
         complete
-          ? t({
-              nb: 'Alle runder fullført',
-              en: 'All rounds complete',
-              ar: 'اكتملت جميع الجولات',
-              ur: 'تمام چکر مکمل',
-            })
-          : t({
-              nb: `Runde ${step + 1} av ${total}`,
-              en: `Round ${step + 1} of ${total}`,
-              ar: `الجولة ${step + 1} من ${total}`,
-              ur: `${total} میں سے چکر ${step + 1}`,
-            })
+          ? t('tasbih.allRoundsComplete')
+          : t('tasbih.roundOf', { value: step + 1, total })
       }
       style={{ flexDirection: 'row', justifyContent: 'center', gap: spacing.sm }}>
       {Array.from({ length: total }, (_, index) => (

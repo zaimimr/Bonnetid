@@ -1,0 +1,27 @@
+{
+  "month": "مہینہ",
+  "prayerTimes": "نماز کے اوقات",
+  "showGregorianCalendar": "عیسوی کیلنڈر دکھائیں",
+  "showHijriCalendar": "ہجری کیلنڈر دکھائیں",
+  "specialDaysIn": "{{monthLabel}} کے خاص دن",
+  "noSpecialDaysThis": "اس مہینے کوئی خاص دن نہیں",
+  "localTimes": "{{name}} · مقامی اوقات",
+  "invalidDate": "غلط تاریخ",
+  "previousDay": "پچھلا دن",
+  "nextDay": "اگلا دن",
+  "theMosqueIsIn": "مسجد کسی دوسری میونسپلٹی میں ہے، اس لیے صرف جمعہ {{value4}} سے آتا ہے",
+  "weekdayLabels": [
+    "پیر",
+    "منگل",
+    "بدھ",
+    "جمعرات",
+    "جمعہ",
+    "ہفتہ",
+    "اتوار"
+  ],
+  "combined": "{{primary}}، {{special_date_name}}",
+  "goToThisMonth": "اس مہینے پر جائیں",
+  "today": "آج",
+  "previousMonth": "پچھلا مہینہ",
+  "nextMonth": "اگلا مہینہ"
+}

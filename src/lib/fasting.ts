@@ -34,15 +34,10 @@ export type FastingReminder = {
   fireAt: Date;
 };
 
-const SUHOOR_HINT = t({
-  nb: 'Husk suhoor hvis du vil faste.',
-  en: 'Remember suhoor if you plan to fast.',
-  ar: 'لا تنسَ السحور إن كنت تنوي الصيام.',
-  ur: 'اگر آپ روزہ رکھنا چاہتے ہیں تو سحری یاد رکھیں۔',
-});
+const SUHOOR_HINT = t('season.rememberSuhoorIfYou');
 
 function hijriDayOf(day: number, month: string): string {
-  return t({ nb: `Den ${day}. ${month}.`, en: `${day} ${month}.`, ar: `${day} ${month}.`, ur: `${day} ${month}۔` });
+  return t('season.combined', { day, month });
 }
 
 export function isFastingForbidden(hijri: ParsedHijri): boolean {
@@ -61,18 +56,8 @@ function occasionFor(
     return {
       isoDate: row.gregorian_date,
       kind: 'arafah',
-      title: t({
-        nb: 'I morgen er det Arafah',
-        en: 'Tomorrow is the Day of Arafah',
-        ar: 'غدًا يوم عرفة',
-        ur: 'کل یوم عرفہ ہے',
-      }),
-      body: t({
-        nb: 'Den 9. Dhul Hijjah etter kalenderen til IRN. Husk suhoor hvis du vil faste.',
-        en: `9 Dhul Hijjah according to the IRN calendar. ${SUHOOR_HINT}`,
-        ar: `9 ذو الحجة حسب تقويم المجلس الإسلامي النرويجي. ${SUHOOR_HINT}`,
-        ur: `اسلامک کونسل ناروے کے کیلنڈر کے مطابق 9 ذوالحجہ۔ ${SUHOOR_HINT}`,
-      }),
+      title: t('season.arafah2.title'),
+      body: t('season.arafah2.body', { SUHOOR_HINT }),
     };
   }
 
@@ -82,14 +67,9 @@ function occasionFor(
       kind: 'ashura',
       title:
         hijri.day === 10
-          ? t({ nb: 'I morgen er det Ashura', en: 'Tomorrow is Ashura', ar: 'غدًا يوم عاشوراء', ur: 'کل عاشورہ ہے' })
-          : t({
-              nb: 'I morgen er det dagen før Ashura',
-              en: 'Tomorrow is the day before Ashura',
-              ar: 'غدًا يوم تاسوعاء',
-              ur: 'کل عاشورہ سے پہلے کا دن ہے',
-            }),
-      body: `${hijriDayOf(hijri.day, t({ nb: 'Muharram', en: 'Muharram', ar: 'محرم', ur: 'محرم' }))} ${SUHOOR_HINT}`,
+          ? t('season.tomorrowIsAshura')
+          : t('season.tomorrowIsTheDay'),
+      body: `${hijriDayOf(hijri.day, t('season.muharram'))} ${SUHOOR_HINT}`,
     };
   }
 
@@ -97,12 +77,7 @@ function occasionFor(
     return {
       isoDate: row.gregorian_date,
       kind: 'whiteDays',
-      title: t({
-        nb: 'I morgen er det en hvit dag',
-        en: 'Tomorrow is one of the White Days',
-        ar: 'غدًا من الأيام البيض',
-        ur: 'کل ایام بیض میں سے ہے',
-      }),
+      title: t('season.whitedays.title'),
       body: `${hijriDayOf(hijri.day, row.hijri_month_text)} ${SUHOOR_HINT}`,
     };
   }
@@ -112,12 +87,7 @@ function occasionFor(
     return {
       isoDate: row.gregorian_date,
       kind: 'mondayThursday',
-      title: t({
-        nb: `I morgen er det ${weekdayName(weekday)}`,
-        en: `Tomorrow is ${weekdayName(weekday)}`,
-        ar: `غدًا يوم ${weekdayName(weekday)}`,
-        ur: `کل ${weekdayName(weekday)} ہے`,
-      }),
+      title: t('season.mondaythursday.title', { value: weekdayName(weekday) }),
       body: SUHOOR_HINT,
     };
   }
@@ -167,18 +137,8 @@ export function ramadanFastingReminders(
 ): FastingReminder[] {
   return days.map((day) => ({
     isoDate: day.isoDate,
-    title: t({
-      nb: `Suhoor slutter om ${SUHOOR_REMINDER_MINUTES} minutter`,
-      en: `Suhoor ends in ${SUHOOR_REMINDER_MINUTES} minutes`,
-      ar: `ينتهي السحور بعد ${SUHOOR_REMINDER_MINUTES} دقيقة`,
-      ur: `سحری ${SUHOOR_REMINDER_MINUTES} منٹ میں ختم ہو جائے گی`,
-    }),
-    body: t({
-      nb: `Fajr er ${day.fajrClock} i ${locationName}. Ramadan dag ${day.dayOfRamadan}.`,
-      en: `Fajr is at ${day.fajrClock} in ${locationName}. Ramadan day ${day.dayOfRamadan}.`,
-      ar: `الفجر الساعة ${day.fajrClock} في ${locationName}. اليوم ${day.dayOfRamadan} من رمضان.`,
-      ur: `${locationName} میں فجر ${day.fajrClock} پر ہے۔ رمضان، دن ${day.dayOfRamadan}۔`,
-    }),
+    title: t('season.suhoorEndsInMinutes', { SUHOOR_REMINDER_MINUTES }),
+    body: t('season.fajrIsAtIn', { fajrClock: day.fajrClock, locationName, dayOfRamadan: day.dayOfRamadan }),
     fireAt: suhoorReminderAt(day.fajrAt),
   }));
 }

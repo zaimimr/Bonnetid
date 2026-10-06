@@ -1,0 +1,8 @@
+{
+  "today": "I dag",
+  "noPrayerTimesFor": "Ingen bønnetider for denne dagen",
+  "markedAsPrayed": "{{label}}, markert som bedt",
+  "notMarked": "{{label}}, ikke markert",
+  "previousDay": "Forrige dag",
+  "nextDay": "Neste dag"
+}

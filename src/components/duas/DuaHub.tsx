@@ -63,7 +63,7 @@ export function FeaturedCategoryCard({ category }: { category: DuaCategory }) {
         <CategoryIcon category={category} />
         <View style={{ flex: 1, gap: spacing.xxs }}>
           <AppText size="sm" tone="textMuted">
-            {t({ nb: 'Nå', en: 'Now', ar: 'الآن', ur: 'ابھی' })}
+            {t('duas.now')}
           </AppText>
           <AppText size="lg" weight="semibold">
             {category.title}
@@ -82,7 +82,7 @@ export function TasbihRow({ from }: { from?: string }) {
   return (
     <Card padding="sm" rounded="xl">
       <ListRow
-        title={t({ nb: 'Tasbih', en: 'Tasbih', ar: 'المسبحة', ur: 'تسبیح' })}
+        title={t('duas.tasbih')}
         leading={
           <IconTile>
             <TasbihIcon size={22} color={theme.colors.primary} />

@@ -1,0 +1,8 @@
+{
+  "today": "Today",
+  "noPrayerTimesFor": "No prayer times for this day",
+  "markedAsPrayed": "{{label}}, marked as prayed",
+  "notMarked": "{{label}}, not marked",
+  "previousDay": "Previous day",
+  "nextDay": "Next day"
+}

@@ -1,0 +1,15 @@
+{
+  "searchForAPlace": "Søk etter sted, kommune eller fylke",
+  "clearSearch": "Tøm søk",
+  "myLocation": "Mitt sted",
+  "allPlaces": "Alle steder",
+  "prayerTimesFor": "Bønnetider for {{name}}",
+  "showMosquesAcrossThe": "Vis moskeer i hele landet",
+  "places": "{{length}} steder",
+  "places2": "{{totalMatches}} steder",
+  "placesWithRegisteredMosques": "{{totalMatches}} steder med registrerte moskeer",
+  "noPlacesMatch": "Ingen steder matcher «{{value}}»",
+  "otherPlaces": "Andre steder",
+  "n1Mosque": "1 moské",
+  "mosques": "{{count}} moskeer"
+}

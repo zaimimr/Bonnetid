@@ -18,14 +18,9 @@ export const widgetJamatSupported = Platform.OS === 'android' && prayerWidgetAva
 
 export const ROW = { paddingHorizontal: spacing.md } as const;
 
-export const ON = t({ nb: 'På', en: 'On', ar: 'مفعّل', ur: 'آن' });
-export const TRACKER_TITLE = t({
-  nb: 'Låseskjerm og bønnesporing',
-  en: 'Lock screen and prayer tracker',
-  ar: 'شاشة القفل ومتابعة الصلوات',
-  ur: 'لاک اسکرین اور نماز ٹریکر',
-});
-export const OFF = t({ nb: 'Av', en: 'Off', ar: 'متوقف', ur: 'آف' });
+export const ON = t('settings.on');
+export const TRACKER_TITLE = t('settings.lockScreenAndPrayer');
+export const OFF = t('settings.off');
 
 export function useLockScreenToggle() {
   const setLiveActivityEnabled = useSettings((state) => state.setLiveActivityEnabled);

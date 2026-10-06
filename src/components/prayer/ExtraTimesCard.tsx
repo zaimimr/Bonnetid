@@ -74,8 +74,8 @@ export function ExtraTimesCard({ times }: { times: ExtraTime[] }) {
         ]}>
         <AppText size="sm" weight="semibold" tone="onPrimarySoft">
           {expanded
-            ? t({ nb: 'Vis færre tider', en: 'Show fewer times', ar: 'عرض أوقات أقل', ur: 'کم اوقات دکھائیں' })
-            : t({ nb: 'Vis flere tider', en: 'Show more times', ar: 'عرض المزيد من الأوقات', ur: 'مزید اوقات دکھائیں' })}
+            ? t('prayer.showFewerTimes')
+            : t('prayer.showMoreTimes')}
         </AppText>
         <Ionicons
           name={expanded ? 'chevron-up' : 'chevron-down'}

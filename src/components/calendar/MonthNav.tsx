@@ -81,12 +81,7 @@ export function MonthNav({
             onPress={onToday}
             hitSlop={hitSlop}
             accessibilityRole="button"
-            accessibilityLabel={t({
-              nb: 'Gå til denne måneden',
-              en: 'Go to this month',
-              ar: 'الانتقال إلى هذا الشهر',
-              ur: 'اس مہینے پر جائیں',
-            })}
+            accessibilityLabel={t('calendar.goToThisMonth')}
             style={({ pressed }) => [
               {
                 height: CONTROL_SIZE,
@@ -98,18 +93,18 @@ export function MonthNav({
               pressed && { opacity: opacity.pressed },
             ]}>
             <AppText size="sm" weight="semibold" tone="onPrimarySoft">
-              {t({ nb: 'I dag', en: 'Today', ar: 'اليوم', ur: 'آج' })}
+              {t('calendar.today')}
             </AppText>
           </Pressable>
         )}
         <IconButton
           name={isRTL() ? 'chevron-forward' : 'chevron-back'}
-          accessibilityLabel={t({ nb: 'Forrige måned', en: 'Previous month', ar: 'الشهر السابق', ur: 'پچھلا مہینہ' })}
+          accessibilityLabel={t('calendar.previousMonth')}
           onPress={onPrev}
         />
         <IconButton
           name={isRTL() ? 'chevron-back' : 'chevron-forward'}
-          accessibilityLabel={t({ nb: 'Neste måned', en: 'Next month', ar: 'الشهر التالي', ur: 'اگلا مہینہ' })}
+          accessibilityLabel={t('calendar.nextMonth')}
           onPress={onNext}
         />
       </View>

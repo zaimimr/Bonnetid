@@ -28,12 +28,7 @@ export function NotificationCheckCard() {
         <Ionicons name="alert-circle" size={24} color={theme.colors.danger} />
         <View style={{ flex: 1 }}>
           <AppText weight="semibold">
-            {t({
-              nb: 'Bønnevarsler virker ikke',
-              en: 'Prayer notifications are not working',
-              ar: 'إشعارات الصلاة لا تعمل',
-              ur: 'نماز کی اطلاعات کام نہیں کر رہیں',
-            })}
+            {t('notifications.prayerNotificationsAreNot')}
           </AppText>
           <AppText size="sm" tone="textMuted">
             {NOTIFICATION_ISSUE_LABELS[broken.key]}

@@ -95,7 +95,7 @@ export default function PlacePickerScreen() {
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder={t({ nb: 'Søk etter sted, kommune eller fylke', en: 'Search for a place, municipality or county', ar: 'ابحث عن مكان أو بلدية أو مقاطعة', ur: 'مقام، میونسپلٹی یا کاؤنٹی تلاش کریں' })}
+              placeholder={t('places.searchForAPlace')}
               placeholderTextColor={theme.colors.textMuted}
               autoCorrect={false}
               maxFontSizeMultiplier={1.6}
@@ -108,7 +108,7 @@ export default function PlacePickerScreen() {
             />
           </PostHogMaskView>
           {query.length > 0 && (
-            <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel={t({ nb: 'Tøm søk', en: 'Clear search', ar: 'مسح البحث', ur: 'تلاش صاف کریں' })}>
+            <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel={t('places.clearSearch')}>
               <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
             </Pressable>
           )}
@@ -141,18 +141,13 @@ export default function PlacePickerScreen() {
               tone={placeIso == null ? 'onPrimarySoft' : 'textPrimary'}
               numberOfLines={2}>
               {forTimes
-                ? t({ nb: 'Mitt sted', en: 'My location', ar: 'موقعي', ur: 'میرا مقام' })
-                : t({ nb: 'Alle steder', en: 'All places', ar: 'كل الأماكن', ur: 'تمام مقامات' })}
+                ? t('places.myLocation')
+                : t('places.allPlaces')}
             </AppText>
             <AppText size="xs" tone={placeIso == null ? 'onPrimarySoft' : 'textMuted'}>
               {forTimes
-                ? t({
-                    nb: `Bønnetider for ${activeLocation.name}`,
-                    en: `Prayer times for ${activeLocation.name}`,
-                    ar: `مواقيت الصلاة في ${activeLocation.name}`,
-                    ur: `${activeLocation.name} کے نماز کے اوقات`,
-                  })
-                : t({ nb: 'Vis moskeer i hele landet', en: 'Show mosques across the country', ar: 'عرض المساجد في كل البلاد', ur: 'پورے ملک کی مساجد دکھائیں' })}
+                ? t('places.prayerTimesFor', { name: activeLocation.name })
+                : t('places.showMosquesAcrossThe')}
             </AppText>
           </View>
           {placeIso == null && (
@@ -220,12 +215,7 @@ export default function PlacePickerScreen() {
                     ) : (
                       <AppText size="sm" tone="textMuted" tabular>
                         {forTimes
-                          ? t({
-                              nb: `${section.places.length} steder`,
-                              en: `${section.places.length} places`,
-                              ar: `الأماكن: ${section.places.length}`,
-                              ur: `${section.places.length} مقامات`,
-                            })
+                          ? t('places.places', { length: section.places.length })
                           : placeCountLabel(
                               section.places.reduce((sum, place) => sum + place.mosqueCount, 0),
                             )}
@@ -311,29 +301,14 @@ export default function PlacePickerScreen() {
               totalMatches > 0 ? (
                 <AppText size="xs" tone="textMuted" align="center" style={{ marginTop: spacing.md }}>
                   {forTimes
-                    ? t({
-                        nb: `${totalMatches} steder`,
-                        en: `${totalMatches} places`,
-                        ar: `الأماكن: ${totalMatches}`,
-                        ur: `${totalMatches} مقامات`,
-                      })
-                    : t({
-                        nb: `${totalMatches} steder med registrerte moskeer`,
-                        en: `${totalMatches} places with registered mosques`,
-                        ar: `أماكن فيها مساجد مسجلة: ${totalMatches}`,
-                        ur: `رجسٹرڈ مساجد والے ${totalMatches} مقامات`,
-                      })}
+                    ? t('places.places2', { totalMatches })
+                    : t('places.placesWithRegisteredMosques', { totalMatches })}
                 </AppText>
               ) : null
             }
             ListEmptyComponent={
               <EmptyState
-                message={t({
-                  nb: `Ingen steder matcher «${query.trim()}»`,
-                  en: `No places match “${query.trim()}”`,
-                  ar: `لا توجد أماكن تطابق «${query.trim()}»`,
-                  ur: `«${query.trim()}» سے کوئی مقام نہیں ملا`,
-                })}
+                message={t('places.noPlacesMatch', { value: query.trim() })}
               />
             }
           />
