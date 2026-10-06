@@ -6,29 +6,53 @@ import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { formatDurationSpaced } from '@/lib/time';
 import { t } from '@/lib/i18n';
 import { useTheme } from '@/theme';
-import { opacity, spacing } from '@/theme/tokens';
+import { opacity, radius, spacing } from '@/theme/tokens';
 
-export function LockScreenPreview({ enabled }: { enabled: boolean }) {
+function Pill({ label, primary }: { label: string; primary?: boolean }) {
+  const theme = useTheme();
+  return (
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        paddingVertical: spacing.sm,
+        borderRadius: radius.full,
+        backgroundColor: primary ? theme.colors.primary : theme.colors.primarySoft,
+      }}>
+      <AppText size="sm" weight="semibold" color={primary ? theme.colors.onPrimary : theme.colors.onPrimarySoft}>
+        {label}
+      </AppText>
+    </View>
+  );
+}
+
+export function LockScreenPreview({ enabled, tracker }: { enabled: boolean; tracker: boolean | null }) {
   const theme = useTheme();
   const now = useNow(60_000);
-  const next = usePrayerDay(now).nextPrayer?.next;
-  if (!next) return null;
-  const remaining = formatDurationSpaced(next.date.getTime() - now.getTime());
+  const day = usePrayerDay(now).nextPrayer;
+  if (!day) return null;
+  const remaining = formatDurationSpaced(day.next.date.getTime() - now.getTime());
 
   return (
-    <Card rounded="xl" padding="md" elevated style={{ opacity: enabled ? 1 : opacity.disabled }}>
+    <Card rounded="xl" padding="md" elevated style={{ gap: spacing.md, opacity: enabled ? 1 : opacity.disabled }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-        <PrayerIcon name={next.name} size={28} color={theme.colors.primary} />
+        <PrayerIcon name={day.next.name} size={28} color={theme.colors.primary} />
         <View style={{ flex: 1, gap: spacing.xxs }}>
-          <AppText weight="semibold">{next.label}</AppText>
+          <AppText weight="semibold">{day.next.label}</AppText>
           <AppText size="sm" tone="textMuted" tabular>
-            {next.time}
+            {day.next.time}
           </AppText>
         </View>
         <AppText size="lg" weight="semibold" tabular>
           {t({ nb: `om ${remaining}`, en: `in ${remaining}`, ar: `بعد ${remaining}`, ur: `${remaining} میں` })}
         </AppText>
       </View>
+      {tracker !== null && (
+        <View style={{ flexDirection: 'row', gap: spacing.sm, opacity: tracker ? 1 : opacity.disabled }}>
+          <Pill label={t({ nb: 'Bedt', en: 'Prayed', ar: 'صلّيت', ur: 'ادا کی' })} primary />
+          <Pill label={t({ nb: 'Hopp over', en: 'Skip', ar: 'تخطٍّ', ur: 'چھوڑ دیں' })} />
+        </View>
+      )}
     </Card>
   );
 }

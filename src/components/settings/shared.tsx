@@ -20,10 +20,10 @@ export const ROW = { paddingHorizontal: spacing.md } as const;
 
 export const ON = t({ nb: 'På', en: 'On', ar: 'مفعّل', ur: 'آن' });
 export const TRACKER_TITLE = t({
-  nb: 'Bønnesporing og låseskjerm',
-  en: 'Prayer tracker and lock screen',
-  ar: 'متابعة الصلوات وشاشة القفل',
-  ur: 'نماز ٹریکر اور لاک اسکرین',
+  nb: 'Låseskjerm og bønnesporing',
+  en: 'Lock screen and prayer tracker',
+  ar: 'شاشة القفل ومتابعة الصلوات',
+  ur: 'لاک اسکرین اور نماز ٹریکر',
 });
 export const OFF = t({ nb: 'Av', en: 'Off', ar: 'متوقف', ur: 'آف' });
 

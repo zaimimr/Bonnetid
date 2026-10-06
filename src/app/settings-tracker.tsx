@@ -33,21 +33,14 @@ export default function TrackerSettingsScreen() {
 
   return (
     <SettingsPage>
-      {iosCountdown && <LockScreenPreview enabled={liveActivityEnabled} />}
-
-      {trackerAllowed && (
-        <Card padding="sm" rounded="xl">
-          <ListRow
-            title={t({ nb: 'Marker bønner', en: 'Mark prayers', ar: 'تعليم الصلوات', ur: 'نمازیں نشان زد کریں' })}
-            subtitle={t({ nb: 'Huk av bønnene du har bedt', en: 'Tick off the prayers you have prayed', ar: 'علّم الصلوات التي صلّيتها', ur: 'ادا کی گئی نمازوں پر نشان لگائیں' })}
-            leading={<Ionicons name="checkmark-done-outline" size={20} color={theme.colors.primary} />}
-            trailing={<Toggle value={trackerEnabled} onValueChange={setTrackerEnabled} />}
-            style={ROW}
-          />
-        </Card>
+      {(iosCountdown || (!ios && lockScreenSupported)) && (
+        <LockScreenPreview
+          enabled={liveActivityEnabled}
+          tracker={trackerAllowed ? trackerEnabled : null}
+        />
       )}
 
-      {(iosCountdown || androidLockCard || widgetJamat) && (
+      {(iosCountdown || widgetJamat) && (
         <Card padding="sm" rounded="xl">
           {iosCountdown && (
             <ListRow
@@ -58,16 +51,6 @@ export default function TrackerSettingsScreen() {
               style={ROW}
             />
           )}
-          {androidLockCard && (
-            <ListRow
-              title={t({ nb: 'Bønnekort på låseskjermen', en: 'Prayer card on the lock screen', ar: 'بطاقة الصلاة على شاشة القفل', ur: 'لاک اسکرین پر نماز کارڈ' })}
-              subtitle={t({ nb: 'Nedtelling med Bedt og Hopp over', en: 'Countdown with Prayed and Skip', ar: 'عدّ تنازلي مع صلّيت وتخطَّ', ur: 'الٹی گنتی، ادا کی اور چھوڑیں کے ساتھ' })}
-              leading={<Ionicons name="timer-outline" size={20} color={theme.colors.primary} />}
-              trailing={<Toggle value={liveActivityEnabled} onValueChange={toggleLockScreen} />}
-              style={ROW}
-            />
-          )}
-          {androidLockCard && widgetJamat && <Divider />}
           {widgetJamat && (
             <ListRow
               title={t({ nb: 'Vis jamaat-tider i widget', en: 'Show jamaat times in widget', ar: 'عرض أوقات الجماعة في الأداة', ur: 'ویجیٹ میں جماعت کے اوقات دکھائیں' })}
@@ -82,6 +65,30 @@ export default function TrackerSettingsScreen() {
               }
               style={ROW}
             />
+          )}
+        </Card>
+      )}
+
+      {trackerAllowed && (
+        <Card padding="sm" rounded="xl">
+          <ListRow
+            title={t({ nb: 'Marker bønner', en: 'Mark prayers', ar: 'تعليم الصلوات', ur: 'نمازیں نشان زد کریں' })}
+            subtitle={t({ nb: 'Huk av bønnene du har bedt', en: 'Tick off the prayers you have prayed', ar: 'علّم الصلوات التي صلّيتها', ur: 'ادا کی گئی نمازوں پر نشان لگائیں' })}
+            leading={<Ionicons name="checkmark-done-outline" size={20} color={theme.colors.primary} />}
+            trailing={<Toggle value={trackerEnabled} onValueChange={setTrackerEnabled} />}
+            style={ROW}
+          />
+          {androidLockCard && (
+            <>
+              <Divider />
+              <ListRow
+                title={t({ nb: 'Bønnekort på låseskjermen', en: 'Prayer card on the lock screen', ar: 'بطاقة الصلاة على شاشة القفل', ur: 'لاک اسکرین پر نماز کارڈ' })}
+                subtitle={t({ nb: 'Nedtelling med Bedt og Hopp over', en: 'Countdown with Prayed and Skip', ar: 'عدّ تنازلي مع صلّيت وتخطَّ', ur: 'الٹی گنتی، ادا کی اور چھوڑیں کے ساتھ' })}
+                leading={<Ionicons name="timer-outline" size={20} color={theme.colors.primary} />}
+                trailing={<Toggle value={liveActivityEnabled} onValueChange={toggleLockScreen} />}
+                style={ROW}
+              />
+            </>
           )}
         </Card>
       )}
