@@ -9,6 +9,7 @@ import {
   type NotificationSoundKey,
   type NotificationSoundOption,
 } from './notificationSounds';
+import { formatDurationSpaced, formatZonedClock, type PrayerTimeZone } from './time';
 import { track } from './telemetry';
 import type { DeliveredAdhan, ScheduledAdhan } from './notificationHealth';
 import { setNativeNotificationQueue } from '../../modules/prayer-widget';
@@ -212,6 +213,7 @@ export type PrayerNotificationPlan = {
   adhan: ScheduledPrayer[];
   reminders: PrayerReminder[];
   locationName: string;
+  zone: PrayerTimeZone;
   soundKey: NotificationSoundKey;
   markActions: boolean;
 };
@@ -222,6 +224,14 @@ function serialize<T>(task: () => Promise<T>): Promise<T> {
   const next = pending.then(task, task);
   pending = next.catch(() => {});
   return next;
+}
+
+function adhanBody(entry: PrayerEntry, locationName: string, zone: PrayerTimeZone): string {
+  const start = `Det er tid for ${entry.label} i ${locationName}.`;
+  if (!entry.end) return start;
+  const endClock = formatZonedClock(entry.end.date, zone);
+  const duration = formatDurationSpaced(entry.end.date.getTime() - entry.date.getTime());
+  return `${start}\nVarer til ${endClock} (${duration}).`;
 }
 
 export function syncPrayerNotifications(plan: PrayerNotificationPlan): Promise<number> {
@@ -247,7 +257,7 @@ async function runSync(plan: PrayerNotificationPlan): Promise<number> {
     planned.push({
       identifier,
       title: `${entry.label} ${entry.time}`,
-      body: `Det er tid for ${entry.label} i ${plan.locationName}.`,
+      body: adhanBody(entry, plan.locationName, plan.zone),
       date: entry.date,
       sound: sound.fileName ?? true,
       interruptionLevel: 'timeSensitive',

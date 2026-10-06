@@ -97,6 +97,7 @@ export function useNotificationScheduler() {
       adhan,
       reminders,
       locationName: location.name,
+      zone,
       soundKey: sound,
       markActions: trackerEnabled,
     }).catch(() => {});
