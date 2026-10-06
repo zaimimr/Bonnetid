@@ -20,5 +20,8 @@ xcodebuild \
   build | grep -E "error:|BUILD (SUCCEEDED|FAILED)"
 
 xcrun simctl install "$udid" ios/build/dd/Build/Products/Debug-iphonesimulator/Bnnetid.app
-xcrun simctl openurl "$udid" "exp+bonnetid://expo-development-client/?url=http%3A%2F%2Flocalhost%3A${RCT_METRO_PORT:-8081}"
+xcrun simctl spawn "$udid" defaults write no.irn.bonnetid EXDevMenuIsOnboardingFinished -bool YES
+xcrun simctl spawn "$udid" defaults write no.irn.bonnetid EXDevMenuShowsAtLaunch -bool NO
+xcrun simctl terminate "$udid" no.irn.bonnetid 2>/dev/null || true
+xcrun simctl launch "$udid" no.irn.bonnetid --initialUrl "http://localhost:${RCT_METRO_PORT:-8081}"
 open -a DeviceHub 2>/dev/null || true
