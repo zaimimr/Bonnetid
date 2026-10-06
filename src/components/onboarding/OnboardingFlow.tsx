@@ -274,14 +274,14 @@ async function detectOnboardingLocation(
   locations: ApiLocation[],
   setLocation: (location: SavedLocation) => void,
 ): Promise<boolean> {
-  const inNorway = await detectNearestLocation(locations);
+  const inNorway = await detectNearestLocation(locations, true);
   if (inNorway) {
     setLocation(inNorway);
     track('location_detected', { iso: inNorway.iso, source: 'onboarding' });
     return true;
   }
 
-  const coords = await requestCoords();
+  const coords = await requestCoords(true);
   if (!coords || isInsideNorwayBounds(coords.lat, coords.lon)) return false;
   const place = await resolvePlace(coords);
   const abroad = calculatedLocation(place.name, coords.lat, coords.lon, place);

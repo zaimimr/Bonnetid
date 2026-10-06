@@ -20,6 +20,7 @@ export function useUserCoords(): UserCoords {
       if (status !== 'granted') return;
       const position = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
+        mayShowUserSettingsDialog: false,
       });
       if (!cancelled) {
         setCoords({

@@ -27,6 +27,7 @@ export function usePreciseCoords(active: boolean): PreciseCoords {
     async function sampleOnce() {
       const position = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.BestForNavigation,
+        mayShowUserSettingsDialog: false,
       });
       if (cancelled) return;
 

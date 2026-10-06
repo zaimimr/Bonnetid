@@ -24,11 +24,13 @@ export function toSavedLocation(location: ApiLocation): SavedLocation {
 
 export async function detectNearestLocation(
   locations: ApiLocation[],
+  askForAccuracy = false,
 ): Promise<SavedLocation | null> {
   const { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== 'granted') return null;
   const position = await Location.getCurrentPositionAsync({
     accuracy: Location.Accuracy.Balanced,
+    mayShowUserSettingsDialog: askForAccuracy,
   });
   const { latitude, longitude } = position.coords;
   if (!isInsideNorway(latitude, longitude)) return null;

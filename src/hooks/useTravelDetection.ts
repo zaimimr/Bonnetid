@@ -55,6 +55,7 @@ async function readPosition(): Promise<PositionSnapshot> {
   }
   const position = await Location.getCurrentPositionAsync({
     accuracy: Location.Accuracy.Balanced,
+    mayShowUserSettingsDialog: false,
   });
   return {
     coords: { lat: position.coords.latitude, lon: position.coords.longitude },
@@ -144,12 +145,13 @@ export async function resolvePlace(coords: Coords): Promise<ResolvedPlace> {
   }
 }
 
-export async function requestCoords(): Promise<Coords | null> {
+export async function requestCoords(askForAccuracy = false): Promise<Coords | null> {
   try {
     const permission = await Location.requestForegroundPermissionsAsync();
     if (!permission.granted) return null;
     const position = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Balanced,
+      mayShowUserSettingsDialog: askForAccuracy,
     });
     const coords = { lat: position.coords.latitude, lon: position.coords.longitude };
     publish({
