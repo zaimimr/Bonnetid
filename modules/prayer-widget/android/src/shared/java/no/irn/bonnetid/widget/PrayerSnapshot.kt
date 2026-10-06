@@ -25,19 +25,17 @@ data class PrayerEntry(
   val jummahEnd: Long? = null,
 ) {
   fun printedAt(showJamat: Boolean): Long {
-    if (!showJamat && isJummah && jamat != null) return jamat
     return at
   }
 
   /**
-   * Friday reads as Jumuah until half an hour after the last congregation, then it is an
-   * ordinary Dhuhr again. Resolved per render so a widget flips on its own, offline.
+   * On Friday the Dhuhr jamat is the Jumuah until half an hour after the last congregation,
+   * then it is the ordinary jamat again. Resolved per render so a widget flips on its own, offline.
    */
   fun resolveJummah(at: Long): PrayerEntry {
     if (jummahAt == null) return this
     val isOpen = jummahEnd == null || at < jummahEnd
     return copy(
-      displayLabel = if (isOpen) "Jumuah" else label,
       isJummah = isOpen,
       jamat = if (isOpen) jummahAt else jamat,
     )

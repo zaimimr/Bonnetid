@@ -93,7 +93,7 @@ struct ComplicationView: View {
               .font(.caption)
               .lineLimit(1)
             if let jamat = next.jamat {
-              Text("Jamat \(PrayerFormat.time(jamat))")
+              Text("\(next.isJummah == true ? "Jumuah" : "Jamat") \(PrayerFormat.time(jamat))")
                 .font(.caption)
                 .monospacedDigit()
                 .foregroundStyle(.secondary)

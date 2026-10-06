@@ -108,7 +108,7 @@ private struct NextPrayerPage: View {
           .foregroundStyle(WatchColor.inkSecondary)
         Spacer(minLength: 0)
         if let jamat = next.jamat {
-          Text("Jamat \(PrayerFormat.time(jamat))")
+          Text("\(next.isJummah == true ? "Jumuah" : "Jamat") \(PrayerFormat.time(jamat))")
             .font(.footnote.weight(.semibold))
             .monospacedDigit()
             .foregroundStyle(WatchColor.onBrandPlate)

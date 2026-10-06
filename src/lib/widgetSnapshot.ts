@@ -85,10 +85,6 @@ export function jummahSlotForCell(day: SnapshotDayInput, prayerName: string): Ju
   return prayerName === 'duhr' ? (day.jummah ?? null) : null;
 }
 
-export function isJummahCell(day: SnapshotDayInput, prayerName: string, now?: Date): boolean {
-  return jummahSlotIsOpen(jummahSlotForCell(day, prayerName), now);
-}
-
 /**
  * The single payload every widget surface reads. Times are absolute instants so the widget
  * never has to know the app's date formats or the user's time zone rules.

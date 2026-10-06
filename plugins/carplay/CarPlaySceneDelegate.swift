@@ -167,7 +167,7 @@ enum CarPlayText {
   }
 
   static func jamat(_ prayer: PrayerEntry) -> String? {
-    prayer.jamat.map { "Jamat \(PrayerFormat.time($0))" }
+    prayer.jamat.map { "\(prayer.isJummah == true ? "Jumuah" : "Jamat") \(PrayerFormat.time($0))" }
   }
 
   static func nextJamat(_ prayer: PrayerEntry) -> String? {

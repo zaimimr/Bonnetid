@@ -17,18 +17,14 @@ struct PrayerEntry: Codable, Hashable {
   let jummahAt: Date?
   let jummahEnd: Date?
 
-  /// What a widget prints: "Jumuah" on Friday when the mosque has one.
   var printedLabel: String { displayLabel ?? label }
 
-  /// The single time to print when jamat times are hidden. On Friday the congregation time is
-  /// the one people need, so it wins over the adhan.
   func printedAt(showJamat: Bool) -> Date {
-    if !showJamat, isJummah == true, let jamat { return jamat }
     return at
   }
 
-  /// Friday reads as Jumuah until half an hour after the last congregation, then it is an
-  /// ordinary Dhuhr again. Resolved per render so a widget flips on its own, offline.
+  /// On Friday the Dhuhr jamat is the Jumuah until half an hour after the last congregation,
+  /// then it is the ordinary jamat again. Resolved per render so a widget flips on its own, offline.
   func jummahResolved(at date: Date) -> PrayerEntry {
     guard let jummahAt else { return self }
     let isOpen = jummahEnd.map { date < $0 } ?? true
@@ -38,7 +34,7 @@ struct PrayerEntry: Codable, Hashable {
       at: at,
       isPrayer: isPrayer,
       jamat: isOpen ? jummahAt : jamat,
-      displayLabel: isOpen ? "Jumuah" : label,
+      displayLabel: label,
       isJummah: isOpen,
       end: end,
       jummahAt: jummahAt,

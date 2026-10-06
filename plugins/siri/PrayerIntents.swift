@@ -122,7 +122,7 @@ struct NextPrayerSnippet: View {
             .prayerTime(.system(.title, design: .default).weight(.bold))
             .foregroundStyle(PrayerColor.ink)
           if let jamat = next.jamat {
-            Text("Jamat \(PrayerFormat.time(jamat))")
+            Text("\(next.isJummah == true ? "Jumuah" : "Jamat") \(PrayerFormat.time(jamat))")
               .prayerTime(.subheadline)
               .foregroundStyle(PrayerColor.brand)
           }

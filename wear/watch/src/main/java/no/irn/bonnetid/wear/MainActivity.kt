@@ -155,7 +155,7 @@ private fun NextPrayerCard(next: PrayerEntry, showJamat: Boolean, now: Long) {
     Text(PrayerFormat.countdown(next.at, now), style = MaterialTheme.typography.bodySmall, color = OnBrandMuted)
     val jamat = next.jamat
     if (jamat != null && jamat != printed) {
-      Text("Jamat ${PrayerFormat.time(jamat)}", style = MaterialTheme.typography.bodySmall, color = OnBrandMuted)
+      Text("${if (next.isJummah) "Jumuah" else "Jamat"} ${PrayerFormat.time(jamat)}", style = MaterialTheme.typography.bodySmall, color = OnBrandMuted)
     }
   }
 }
@@ -186,7 +186,7 @@ private fun PrayerRow(prayer: PrayerEntry, showJamat: Boolean, isNext: Boolean) 
     }
     if (jamat != null && jamat != printed) {
       Text(
-        "Jamat ${PrayerFormat.time(jamat)}",
+        "${if (prayer.isJummah) "Jumuah" else "Jamat"} ${PrayerFormat.time(jamat)}",
         style = MaterialTheme.typography.labelSmall,
         color = InkMuted,
         softWrap = false,

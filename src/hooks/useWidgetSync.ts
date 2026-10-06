@@ -14,7 +14,7 @@ import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { formatHijri } from '@/lib/hijri';
 import { resolveActivityWindow } from '@/lib/liveActivityWindow';
 import { jummahSlotFor } from '@/lib/jummah';
-import { isJummahCell, type SnapshotDayInput, type SnapshotMosqueInput } from '@/lib/widgetSnapshot';
+import { type SnapshotDayInput, type SnapshotMosqueInput } from '@/lib/widgetSnapshot';
 import {
   adhanTimesFromSchedule,
   buildDaySchedule,
@@ -235,23 +235,18 @@ function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now
         return;
       }
 
-      const labelFor = (isoDate: string, prayer: PrayerEntry) => {
-        const day = days.find((entry) => isoDateKey(entry.date) === isoDate);
-        return day && isJummahCell(day, prayer.name, now) ? 'Jumuah' : prayer.label;
-      };
-
       const { next } = window;
 
       const state = {
         locationName,
         isoDate: window.isoDate,
-        prayerLabel: labelFor(window.isoDate, window.prayer),
+        prayerLabel: window.prayer.label,
         prayerKind: window.prayer.name,
         prayerAt: window.prayer.date.getTime() / 1000,
         windowEnd: window.windowEnd.getTime() / 1000,
         showMarkButtons: trackerEnabled,
         nextIsoDate: next?.isoDate ?? '',
-        nextLabel: next ? labelFor(next.isoDate, next.prayer) : '',
+        nextLabel: next ? next.prayer.label : '',
         nextKind: next?.prayer.name ?? '',
         nextAt: next ? next.prayer.date.getTime() / 1000 : 0,
         nextWindowEnd: next ? next.windowEnd.getTime() / 1000 : 0,
