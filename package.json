@@ -80,6 +80,7 @@
     "duas:review": "node --no-warnings scripts/duas.mjs review",
     "web": "expo start --web",
     "lint": "expo lint",
+    "aso": "node scripts/aso-ranks.mjs",
     "leaflet:bundle": "node scripts/generate-leaflet-bundle.mjs"
   },
   "private": true
