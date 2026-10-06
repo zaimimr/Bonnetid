@@ -5,7 +5,6 @@ export function migrateSettings(
   return {
     ...state,
     activeDays: state.activeDays ?? [],
-    mosqueSelectedOn: state.mosqueSelectedOn ?? null,
     reviewRequestedAt: state.reviewRequestedAt ?? (state.reviewRequested ? Date.now() : null),
     reviewRequestedVersion: state.reviewRequestedVersion ?? null,
     analyticsEnabled: state.analyticsEnabled ?? true,

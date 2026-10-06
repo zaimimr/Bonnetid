@@ -5,7 +5,6 @@ import { migrateSettings } from './settingsMigration.ts';
 test('fills new fields for an upgrading user', () => {
   const out = migrateSettings({ onboardingDone: true, reviewRequested: false }, '1.8.0');
   assert.deepEqual(out.activeDays, []);
-  assert.equal(out.mosqueSelectedOn, null);
   assert.equal(out.reviewRequestedAt, null);
   assert.equal(out.analyticsEnabled, true);
   assert.equal(out.lastSeenWhatsNew, '1.8.0');

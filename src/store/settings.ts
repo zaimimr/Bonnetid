@@ -84,7 +84,6 @@ type SettingsState = {
   voluntaryFasts: Record<VoluntaryFastKind, boolean>;
   launchCount: number;
   activeDays: string[];
-  mosqueSelectedOn: string | null;
   reviewRequestedAt: number | null;
   reviewRequestedVersion: string | null;
   analyticsEnabled: boolean;
@@ -182,7 +181,6 @@ export const useSettings = create<SettingsState>()(
       voluntaryFasts: NO_VOLUNTARY_FASTS,
       launchCount: 0,
       activeDays: [],
-      mosqueSelectedOn: null,
       reviewRequestedAt: null,
       reviewRequestedVersion: null,
       analyticsEnabled: true,
@@ -237,14 +235,7 @@ export const useSettings = create<SettingsState>()(
             : { location, homeLocation: home, asrMethod: null, calculationMethod };
         }),
       setCalculationMethod: (calculationMethod) => set({ calculationMethod }),
-      setMosque: (mosque) =>
-        set((state) => ({
-          mosque,
-          mosqueSelectedOn:
-            mosque && mosque.orgNr !== state.mosque?.orgNr
-              ? localDayKey(new Date())
-              : state.mosqueSelectedOn,
-        })),
+      setMosque: (mosque) => set({ mosque }),
       setAsrMethod: (asrMethod) => set({ asrMethod }),
       setThemePreference: (themePreference) => set({ themePreference }),
       setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),

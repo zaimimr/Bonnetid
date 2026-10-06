@@ -1,21 +1,19 @@
-export type ReviewTrigger = 'prayers_logged' | 'active_days' | 'mosque_return';
+export type ReviewTrigger = 'day_completed' | 'active_days';
 
 export type ReviewHistory = {
   activeDays: string[];
-  mosqueSelectedOn: string | null;
   lastRequestedAt: number | null;
   lastRequestedVersion: string | null;
 };
 
 export type ReviewContext = {
-  today: string;
   now: number;
   appVersion: string;
   prayersLogged: number;
+  dayCompleted: boolean;
   suppressed: boolean;
 };
 
-export const PRAYERS_FOR_REVIEW = 5;
 export const DAYS_FOR_REVIEW = 7;
 export const REASK_AFTER_MS = 120 * 24 * 60 * 60 * 1000;
 const MAX_ACTIVE_DAYS = 30;
@@ -40,8 +38,7 @@ function mayAsk(history: ReviewHistory, context: ReviewContext): boolean {
 
 export function reviewTrigger(history: ReviewHistory, context: ReviewContext): ReviewTrigger | null {
   if (context.suppressed || !mayAsk(history, context)) return null;
-  if (context.prayersLogged >= PRAYERS_FOR_REVIEW) return 'prayers_logged';
-  if (history.activeDays.length >= DAYS_FOR_REVIEW) return 'active_days';
-  if (history.mosqueSelectedOn != null && history.mosqueSelectedOn < context.today) return 'mosque_return';
-  return null;
+  if (history.activeDays.length < DAYS_FOR_REVIEW) return null;
+  if (context.dayCompleted) return 'day_completed';
+  return context.prayersLogged === 0 ? 'active_days' : null;
 }

@@ -11,48 +11,52 @@ import {
 
 const fresh: ReviewHistory = {
   activeDays: [],
-  mosqueSelectedOn: null,
   lastRequestedAt: null,
   lastRequestedVersion: null,
 };
 
 const ctx: ReviewContext = {
-  today: '2026-10-10',
   now: Date.UTC(2026, 9, 10),
   appVersion: '1.9.0',
   prayersLogged: 0,
+  dayCompleted: false,
   suppressed: false,
 };
+
+const days = ['01', '02', '03', '04', '05', '06', '07'].map((d) => `2026-10-${d}`);
+const regular: ReviewHistory = { ...fresh, activeDays: days };
 
 test('nothing met returns null', () => {
   assert.equal(reviewTrigger(fresh, ctx), null);
 });
 
-test('five prayers logged triggers', () => {
-  assert.equal(reviewTrigger(fresh, { ...ctx, prayersLogged: 5 }), 'prayers_logged');
-  assert.equal(reviewTrigger(fresh, { ...ctx, prayersLogged: 4 }), null);
+test('fewer than seven active days never triggers', () => {
+  const early = { ...fresh, activeDays: days.slice(1) };
+  assert.equal(reviewTrigger(early, ctx), null);
+  assert.equal(reviewTrigger(early, { ...ctx, prayersLogged: 5, dayCompleted: true }), null);
 });
 
-test('seven active days triggers', () => {
-  const days = ['01', '02', '03', '04', '05', '06', '07'].map((d) => `2026-10-${d}`);
-  assert.equal(reviewTrigger({ ...fresh, activeDays: days }, ctx), 'active_days');
-  assert.equal(reviewTrigger({ ...fresh, activeDays: days.slice(1) }, ctx), null);
+test('a completed day triggers for a regular user', () => {
+  assert.equal(reviewTrigger(regular, { ...ctx, prayersLogged: 5, dayCompleted: true }), 'day_completed');
 });
 
-test('mosque return triggers only on a later day', () => {
-  assert.equal(reviewTrigger({ ...fresh, mosqueSelectedOn: '2026-10-09' }, ctx), 'mosque_return');
-  assert.equal(reviewTrigger({ ...fresh, mosqueSelectedOn: '2026-10-10' }, ctx), null);
+test('tracker users wait for a completed day', () => {
+  assert.equal(reviewTrigger(regular, { ...ctx, prayersLogged: 3 }), null);
+});
+
+test('users without the tracker are asked after seven active days', () => {
+  assert.equal(reviewTrigger(regular, ctx), 'active_days');
 });
 
 test('suppressed session never triggers', () => {
-  assert.equal(reviewTrigger(fresh, { ...ctx, prayersLogged: 9, suppressed: true }), null);
+  assert.equal(reviewTrigger(regular, { ...ctx, prayersLogged: 9, dayCompleted: true, suppressed: true }), null);
 });
 
 test('re-ask needs 120 days and a new version', () => {
-  const asked: ReviewHistory = { ...fresh, lastRequestedAt: ctx.now - REASK_AFTER_MS, lastRequestedVersion: '1.8.0' };
-  assert.equal(reviewTrigger(asked, { ...ctx, prayersLogged: 5 }), 'prayers_logged');
-  assert.equal(reviewTrigger({ ...asked, lastRequestedVersion: '1.9.0' }, { ...ctx, prayersLogged: 5 }), null);
-  assert.equal(reviewTrigger({ ...asked, lastRequestedAt: ctx.now - REASK_AFTER_MS + 1 }, { ...ctx, prayersLogged: 5 }), null);
+  const asked: ReviewHistory = { ...regular, lastRequestedAt: ctx.now - REASK_AFTER_MS, lastRequestedVersion: '1.8.0' };
+  assert.equal(reviewTrigger(asked, { ...ctx, prayersLogged: 5, dayCompleted: true }), 'day_completed');
+  assert.equal(reviewTrigger({ ...asked, lastRequestedVersion: '1.9.0' }, { ...ctx, prayersLogged: 5, dayCompleted: true }), null);
+  assert.equal(reviewTrigger({ ...asked, lastRequestedAt: ctx.now - REASK_AFTER_MS + 1 }, { ...ctx, prayersLogged: 5, dayCompleted: true }), null);
 });
 
 test('addActiveDay dedupes, sorts and caps at 30', () => {

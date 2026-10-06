@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import * as Haptics from 'expo-haptics';
+import { promptReviewIfDayCompleted } from '@/hooks/useReviewPrompt';
 import { cancelPrayerReminder } from '@/lib/notifications';
 import type { PrayerStatus } from '@/lib/prayerLog';
 import { usePrayerLog } from '@/store/prayerLog';
@@ -15,6 +16,7 @@ export function usePrayerMark(): MarkPrayer {
       cancelPrayerReminder(isoDate, prayer).catch(() => {});
       if (status === 'prayed') {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+        promptReviewIfDayCompleted(isoDate);
       } else {
         Haptics.selectionAsync().catch(() => {});
       }
