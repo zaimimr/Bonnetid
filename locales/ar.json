@@ -1,4 +1,6 @@
 {
-  "NSLocationWhenInUseUsageDescription": "يستخدم Bønnetid موقعك للعثور على المساجد القريبة وتحديد اتجاه القبلة.",
-  "NSCameraUsageDescription": "يستخدم Bønnetid الكاميرا لعرض اتجاه القبلة في وضع الواقع المعزز."
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "يستخدم Bønnetid موقعك للعثور على المساجد القريبة وتحديد اتجاه القبلة.",
+    "NSCameraUsageDescription": "يستخدم Bønnetid الكاميرا لعرض اتجاه القبلة في وضع الواقع المعزز."
+  }
 }

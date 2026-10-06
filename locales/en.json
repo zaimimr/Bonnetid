@@ -1,4 +1,6 @@
 {
-  "NSLocationWhenInUseUsageDescription": "Bønnetid uses your location to find nearby mosques and the direction of the Qibla.",
-  "NSCameraUsageDescription": "Bønnetid uses the camera to show the direction of the Qibla in AR view."
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "Bønnetid uses your location to find nearby mosques and the direction of the Qibla.",
+    "NSCameraUsageDescription": "Bønnetid uses the camera to show the direction of the Qibla in AR view."
+  }
 }
