@@ -9,7 +9,7 @@
   "cancel": "Cancel",
   "supportTheMosque": "Support the mosque",
   "donateWithVipps": "Donate with Vipps",
-  "opensVippsNumber": "Opens Vipps · number {{vipps_number}}",
+  "opensVippsNumber": "Copies {{vipps_number}} and opens Vipps",
   "opensVipps": "Opens Vipps",
   "prayerTimesToday": "Prayer times today",
   "hasNotAddedTimes": "{{name}} has not added times for the Eid prayer yet.",

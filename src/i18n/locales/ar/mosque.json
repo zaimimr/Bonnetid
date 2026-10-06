@@ -9,7 +9,7 @@
   "cancel": "إلغاء",
   "supportTheMosque": "ادعم المسجد",
   "donateWithVipps": "تبرّع عبر Vipps",
-  "opensVippsNumber": "يفتح Vipps · الرقم {{vipps_number}}",
+  "opensVippsNumber": "ينسخ ⁦{{vipps_number}}⁩ ويفتح Vipps",
   "opensVipps": "يفتح Vipps",
   "prayerTimesToday": "مواقيت الصلاة اليوم",
   "hasNotAddedTimes": "لم يُضِف {{name}} مواعيد صلاة العيد بعد.",

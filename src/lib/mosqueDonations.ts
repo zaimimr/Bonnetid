@@ -1,4 +1,5 @@
 import { Linking, Platform } from 'react-native';
+import { setStringAsync } from 'expo-clipboard';
 
 const VIPPS_APP_URL = 'vipps://';
 const VIPPS_STORE_URL =
@@ -15,7 +16,8 @@ export function vippsNumberFrom(...texts: (string | null | undefined)[]): string
   return null;
 }
 
-export function openVipps(): void {
+export async function openVipps(vippsNumber?: string | null): Promise<void> {
+  if (vippsNumber) await setStringAsync(vippsNumber).catch(() => false);
   Linking.openURL(VIPPS_APP_URL).catch(() => {
     Linking.openURL(VIPPS_STORE_URL).catch(() => {});
   });

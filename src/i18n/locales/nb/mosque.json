@@ -9,7 +9,7 @@
   "cancel": "Avbryt",
   "supportTheMosque": "Støtt moskeen",
   "donateWithVipps": "Doner med Vipps",
-  "opensVippsNumber": "Åpner Vipps · nummer {{vipps_number}}",
+  "opensVippsNumber": "Kopierer {{vipps_number}} og åpner Vipps",
   "opensVipps": "Åpner Vipps",
   "prayerTimesToday": "Bønnetider i dag",
   "hasNotAddedTimes": "{{name}} har ikke lagt inn tider for Eid-bønnen ennå.",

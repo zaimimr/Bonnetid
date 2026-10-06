@@ -9,7 +9,7 @@
   "cancel": "منسوخ کریں",
   "supportTheMosque": "مسجد کی مدد کریں",
   "donateWithVipps": "Vipps سے عطیہ دیں",
-  "opensVippsNumber": "Vipps کھلتا ہے · نمبر {{vipps_number}}",
+  "opensVippsNumber": "⁦{{vipps_number}}⁩ کاپی کر کے Vipps کھولتا ہے",
   "opensVipps": "Vipps کھلتا ہے",
   "prayerTimesToday": "آج کے نماز کے اوقات",
   "hasNotAddedTimes": "{{name}} نے ابھی عید کی نماز کے اوقات شامل نہیں کیے۔",

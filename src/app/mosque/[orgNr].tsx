@@ -234,7 +234,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
               trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
               onPress={() => {
                 track('mosque_donation_opened', { source: 'detail' });
-                openVipps();
+                openVipps(mosque.vipps_number);
               }}
               style={{ paddingHorizontal: spacing.md }}
             />
