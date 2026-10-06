@@ -42,7 +42,7 @@ bridge is a `requireOptionalNativeModule`, so every call no-ops there.
 ## Conventions
 
 - All styling reads semantic theme roles via `useTheme()` from `src/theme`. Never hardcode colors in components; add roles to `src/theme/theme.ts` and primitives to `src/theme/tokens.ts`.
-- UI text is Norwegian bokmål.
+- UI text is Norwegian bokmål first, plus en/ar/ur. Text lives in `src/i18n/locales/<lang>/<namespace>.json`; components call `t('namespace.key', params)` from `@/lib/i18n` (i18next, keys typed from the nb files). Add a key to all four languages. Counts use `tCount(key, n)` with `_one`/`_two`/`_few`/`_other` keys, since Hermes lacks `Intl.PluralRules`. New namespaces go in `src/i18n/resources.ts`.
 - Prayer name spelling, everywhere a human reads it: **Jumuah** (never "jummah", "Jummah" or "jumma") and **Dhuhr** (never "duhr" or "Duhr"). This covers UI strings, comments, commit messages, PR text and docs. The lowercase `duhr` and `jummah` identifiers stay as they are - they are Supabase column names and the app-facing types built on them, so renaming them would break the data layer.
 - API layer: Supabase client in `src/api/supabase.ts`, fetch + row-to-app-type mapping in `endpoints.ts`, react-query hooks in `queries.ts`. Screens only consume hooks. DB rows never leak past `endpoints.ts`.
 - Pure logic (time parsing, qibla bearing, hijri formatting, schedule building) lives in `src/lib` and takes explicit arguments, no hooks.
