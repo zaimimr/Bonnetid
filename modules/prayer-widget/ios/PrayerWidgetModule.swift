@@ -65,6 +65,21 @@ public class PrayerWidgetModule: Module {
       Self.hasDynamicIsland()
     }
 
+    AsyncFunction("windowGeometry") { () -> [String: Any] in
+      let scene = UIApplication.shared.connectedScenes
+        .compactMap { $0 as? UIWindowScene }
+        .first { $0.activationState == .foregroundActive } ?? UIApplication.shared.connectedScenes
+        .compactMap { $0 as? UIWindowScene }.first
+      var geometry: [String: Any] = ["rotation": Self.rotation(scene?.effectiveGeometry.interfaceOrientation)]
+      if #available(iOS 27.1, *),
+         let window = scene?.windows.first(where: \.isKeyWindow),
+         let fold = window.reservedRegions(kind: .division).first(where: \.isActive) {
+        let frame = fold.frame
+        geometry["fold"] = ["x": frame.minX, "y": frame.minY, "width": frame.width, "height": frame.height]
+      }
+      return geometry
+    }.runOnQueue(.main)
+
     Function("areLiveActivitiesEnabled") { () -> Bool in
       if #available(iOS 16.2, *) {
         return ActivityAuthorizationInfo().areActivitiesEnabled
@@ -110,6 +125,15 @@ public class PrayerWidgetModule: Module {
       }
       ActivityStore.current = nil
       PrayerBackgroundRefresh.schedule()
+    }
+  }
+
+  private static func rotation(_ orientation: UIInterfaceOrientation?) -> Double {
+    switch orientation {
+    case .landscapeRight: return 90
+    case .landscapeLeft: return -90
+    case .portraitUpsideDown: return 180
+    default: return 0
     }
   }
 

@@ -103,7 +103,80 @@ export default function HomeScreen() {
   }, [specialsThisYear.data, specialsNextYear.data, todayIso]);
 
   return (
-    <Screen scroll refreshing={refreshing} onRefresh={onRefresh}>
+    <Screen
+      scroll
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+      aside={
+        <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
+          {todaySchedule.length > 0 && (
+            <View>
+              <PostHogMaskView>
+                <SectionHeader
+                  title={t('home.todaySPrayerTimes')}
+                  subtitle={
+                    mosque && mosqueInLocation ? `${location.name} · ${mosque.name}` : location.name
+                  }
+                  trailing={calculated ? <Badge label={t('home.localTimes')} variant="neutral" /> : undefined}
+                  style={timezoneNote ? { marginBottom: spacing.xs } : undefined}
+                />
+              </PostHogMaskView>
+              {timezoneNote && (
+                <AppText size="xs" tone="textMuted" style={{ marginBottom: spacing.md }}>
+                  {timezoneNote}
+                </AppText>
+              )}
+              <PrayerTimesCard
+                schedule={todaySchedule}
+                highlightedName={
+                  nextPrayer?.current && todaySchedule.includes(nextPrayer.current)
+                    ? nextPrayer.current.name
+                    : undefined
+                }
+                mosqueName={mosque?.name}
+                mosqueNote={
+                  mosqueInLocation
+                    ? undefined
+                    : t('home.theMosqueIsIn', { name: mosque?.name ?? t('common.theMosque') })
+                }
+                jamatTimes={jamatTimes}
+                jummah={isoDateIsFriday(todayIso) ? jummahTimes : []}
+                onPressMosque={() => {
+                  if (!mosque) return;
+                  if (mosqueInLocation) {
+                    router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } });
+                  } else {
+                    router.push('/mosque-picker');
+                  }
+                }}
+                onSelectMosque={calculated ? undefined : () => router.push('/mosque-picker')}
+                statusDate={todayIso}
+                now={now}
+              />
+            </View>
+          )}
+
+          {upcomingEvents.length > 0 && (
+            <View>
+              <SectionHeader title={t('home.upcomingSpecialDays')} />
+              <View style={{ gap: spacing.md }}>
+                {upcomingEvents.map((event) => (
+                  <EventCard
+                    key={event.gregorian_date + event.special_date_name}
+                    event={event}
+                    onPress={() =>
+                      router.push({
+                        pathname: '/day/[date]',
+                        params: { date: event.gregorian_date },
+                      })
+                    }
+                  />
+                ))}
+              </View>
+            </View>
+          )}
+        </View>
+      }>
       <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
         <MosquePresenceCard />
 
@@ -161,72 +234,6 @@ export default function HomeScreen() {
           }
         />
 
-        {todaySchedule.length > 0 && (
-          <View>
-            <PostHogMaskView>
-              <SectionHeader
-                title={t('home.todaySPrayerTimes')}
-                subtitle={
-                  mosque && mosqueInLocation ? `${location.name} · ${mosque.name}` : location.name
-                }
-                trailing={calculated ? <Badge label={t('home.localTimes')} variant="neutral" /> : undefined}
-                style={timezoneNote ? { marginBottom: spacing.xs } : undefined}
-              />
-            </PostHogMaskView>
-            {timezoneNote && (
-              <AppText size="xs" tone="textMuted" style={{ marginBottom: spacing.md }}>
-                {timezoneNote}
-              </AppText>
-            )}
-            <PrayerTimesCard
-              schedule={todaySchedule}
-              highlightedName={
-                nextPrayer?.current && todaySchedule.includes(nextPrayer.current)
-                  ? nextPrayer.current.name
-                  : undefined
-              }
-              mosqueName={mosque?.name}
-              mosqueNote={
-                mosqueInLocation
-                  ? undefined
-                  : t('home.theMosqueIsIn', { value: mosque?.name ?? 'moskeen', value2: mosque?.name ?? 'the mosque', value3: mosque?.name ?? 'المسجد', value4: mosque?.name ?? 'مسجد' })
-              }
-              jamatTimes={jamatTimes}
-              jummah={isoDateIsFriday(todayIso) ? jummahTimes : []}
-              onPressMosque={() => {
-                if (!mosque) return;
-                if (mosqueInLocation) {
-                  router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } });
-                } else {
-                  router.push('/mosque-picker');
-                }
-              }}
-              onSelectMosque={calculated ? undefined : () => router.push('/mosque-picker')}
-              statusDate={todayIso}
-              now={now}
-            />
-          </View>
-        )}
-
-        {upcomingEvents.length > 0 && (
-          <View>
-            <SectionHeader title={t('home.upcomingSpecialDays')} />
-            <View style={{ gap: spacing.md }}>
-              {upcomingEvents.map((event) => (
-                <EventCard
-                  key={event.gregorian_date + event.special_date_name}
-                  event={event}
-                  onPress={() =>
-                    router.push({
-                      pathname: '/day/[date]',
-                      params: { date: event.gregorian_date },
-                    })
-                  }
-                />
-              ))}
-            </View>
-          </View>
-        )}
       </View>
     </Screen>
   );

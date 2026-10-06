@@ -27,6 +27,7 @@ import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useTimezoneNote } from '@/hooks/useTimezoneNote';
+import { useVerticalFold } from '@/hooks/useWindowGeometry';
 import { spacing } from '@/theme/tokens';
 import {
   monthName,
@@ -75,6 +76,7 @@ function sameHijriMonth(a: HijriMonthCursor | null, b: HijriMonthCursor | null):
 export default function CalendarScreen() {
   const router = useRouter();
   const { refreshing, onRefresh } = useRefresh();
+  const split = useVerticalFold() != null;
 
   // The tab stays mounted for days, so a frozen date would keep marking yesterday.
   const today = useNow(60_000);
@@ -196,8 +198,49 @@ export default function CalendarScreen() {
   const daysLoading = isHijri ? hijriMonth.isLoading || shownHijri == null : month.isLoading;
   const daysError = isHijri ? hijriMonth.isError : month.isError;
 
+  const datesView = (
+    <DatesView
+      year={cursor.year}
+      monthIndex={cursor.monthIndex}
+      calendar={calendar}
+      monthLabel={monthLabel}
+      days={days}
+      isLoading={daysLoading}
+      isError={daysError}
+      onRetry={isHijri ? hijriMonth.refetch : month.refetch}
+      todayIso={todayIso}
+      isCurrentMonth={isCurrentMonth}
+      events={events}
+      eventsLoading={isHijri ? daysLoading : specials.isLoading}
+      eventsError={isHijri ? daysError : specials.isError}
+      onEventsRetry={isHijri ? hijriMonth.refetch : specials.refetch}
+      onDayPress={openDay}
+    />
+  );
+
+  const timesView = timesRange ? (
+    <TimesView
+      first={timesRange.first}
+      last={timesRange.last}
+      dates={isHijri ? hijriDates : null}
+      calendar={calendar}
+      specialDates={specialDates}
+      todayDayKey={todayDayKey}
+      onDayPress={openDay}
+    />
+  ) : daysError ? (
+    <ErrorState onRetry={hijriMonth.refetch} />
+  ) : (
+    <Skeleton height={480} rounded="xl" />
+  );
+
   return (
-    <Screen scroll refreshing={refreshing} onRefresh={onRefresh}>
+    <Screen
+      scroll
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+      aside={split ? <View style={{ marginTop: spacing.lg }}>{timesView}</View> : undefined}
+    >
       <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
         <MonthNav
           title={title}
@@ -213,41 +256,9 @@ export default function CalendarScreen() {
           }
         />
 
-        <SegmentedControl value={view} options={VIEW_OPTIONS} onChange={setView} />
+        {!split && <SegmentedControl value={view} options={VIEW_OPTIONS} onChange={setView} />}
 
-        {view === 'dates' ? (
-          <DatesView
-            year={cursor.year}
-            monthIndex={cursor.monthIndex}
-            calendar={calendar}
-            monthLabel={monthLabel}
-            days={days}
-            isLoading={daysLoading}
-            isError={daysError}
-            onRetry={isHijri ? hijriMonth.refetch : month.refetch}
-            todayIso={todayIso}
-            isCurrentMonth={isCurrentMonth}
-            events={events}
-            eventsLoading={isHijri ? daysLoading : specials.isLoading}
-            eventsError={isHijri ? daysError : specials.isError}
-            onEventsRetry={isHijri ? hijriMonth.refetch : specials.refetch}
-            onDayPress={openDay}
-          />
-        ) : timesRange ? (
-          <TimesView
-            first={timesRange.first}
-            last={timesRange.last}
-            dates={isHijri ? hijriDates : null}
-            calendar={calendar}
-            specialDates={specialDates}
-            todayDayKey={todayDayKey}
-            onDayPress={openDay}
-          />
-        ) : daysError ? (
-          <ErrorState onRetry={hijriMonth.refetch} />
-        ) : (
-          <Skeleton height={480} rounded="xl" />
-        )}
+        {split || view === 'dates' ? datesView : timesView}
       </View>
     </Screen>
   );

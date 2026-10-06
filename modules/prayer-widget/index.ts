@@ -24,6 +24,7 @@ type PrayerWidgetNativeModule = {
   areLiveActivitiesEnabled: () => boolean;
   hasDynamicIsland?: () => boolean;
   isTestFlight?: () => boolean;
+  windowGeometry?: () => Promise<WindowGeometry>;
   startOrUpdateActivity: (state: PrayerActivityState) => Promise<void>;
   endActivity: () => Promise<void>;
   getPrayerLog: () => string | null;
@@ -33,6 +34,10 @@ type PrayerWidgetNativeModule = {
   isIgnoringBatteryOptimizations?: () => boolean;
   openSystemSettings?: (kind: SystemSettingsKind) => void;
 };
+
+export type FoldFrame = { x: number; y: number; width: number; height: number };
+
+export type WindowGeometry = { rotation: number; fold?: FoldFrame };
 
 export type SystemSettingsKind = 'notifications' | 'exactAlarm' | 'battery';
 
@@ -74,6 +79,14 @@ export function dynamicIslandAvailable() {
     return native?.hasDynamicIsland?.() ?? false;
   } catch {
     return false;
+  }
+}
+
+export async function windowGeometry(): Promise<WindowGeometry | null> {
+  try {
+    return (await native?.windowGeometry?.()) ?? null;
+  } catch {
+    return null;
   }
 }
 

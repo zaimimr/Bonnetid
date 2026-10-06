@@ -1,9 +1,11 @@
-import type { PropsWithChildren, Ref } from 'react';
+import type { PropsWithChildren, ReactNode, Ref } from 'react';
 import { ScrollView, StyleSheet, View, type ViewStyle, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useVerticalFold } from '@/hooks/useWindowGeometry';
 import { useResponsive } from '@/hooks/useResponsive';
 import { EidBanner } from '@/components/eid/EidBanner';
 import { TravelBanner } from '@/components/travel/TravelBanner';
+import { isRTL } from '@/lib/i18n';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 
@@ -17,6 +19,7 @@ export type ScreenProps = PropsWithChildren<{
   refreshing?: boolean;
   onRefresh?: () => void;
   scrollRef?: Ref<ScrollView>;
+  aside?: ReactNode;
 }>;
 
 export function Screen({
@@ -30,10 +33,12 @@ export function Screen({
   refreshing = false,
   onRefresh,
   scrollRef,
+  aside,
 }: ScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const { contentMaxWidth } = useResponsive();
+  const { width, contentMaxWidth } = useResponsive();
+  const fold = useVerticalFold();
   const cap = maxWidth === null ? undefined : (maxWidth ?? contentMaxWidth);
 
   const shell: ViewStyle = {
@@ -47,10 +52,7 @@ export function Screen({
     paddingBottom: edges.includes('bottom') ? insets.bottom : 0,
   };
 
-  const padding: ViewStyle = {
-    paddingLeft: (padded ? spacing.lg : 0) + insets.left,
-    paddingRight: (padded ? spacing.lg : 0) + insets.right,
-  };
+  const side = padded ? spacing.lg : 0;
 
   const inner: ViewStyle = {
     width: '100%',
@@ -59,14 +61,20 @@ export function Screen({
     flexGrow: 1,
   };
 
-  const body = scroll ? (
-    <ScrollView
-        ref={scrollRef}
+  const rtl = isRTL();
+  const column = (content: ReactNode, left: number, right: number, primary: boolean) => {
+    const padding: ViewStyle = {
+      paddingStart: side + (rtl ? right : left),
+      paddingEnd: side + (rtl ? left : right),
+    };
+    return scroll ? (
+      <ScrollView
+        ref={primary ? scrollRef : undefined}
         style={[base, style]}
         contentContainerStyle={[padding, styles.scrollContent, contentStyle]}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          onRefresh ? (
+          primary && onRefresh ? (
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
@@ -74,12 +82,34 @@ export function Screen({
             />
           ) : undefined
         }>
-      <View style={inner}>{children}</View>
-    </ScrollView>
-  ) : (
-    <View style={[base, padding, style, contentStyle]}>
-      <View style={[inner, { flex: 1 }]}>{children}</View>
+        <View style={inner}>{content}</View>
+      </ScrollView>
+    ) : (
+      <View style={[base, padding, style, contentStyle]}>
+        <View style={[inner, { flex: 1 }]}>{content}</View>
+      </View>
+    );
+  };
+
+  const body = fold ? (
+    <View style={styles.panes}>
+      <View style={{ width: rtl ? width - fold.end : fold.start }}>
+        {column(children, rtl ? 0 : insets.left, rtl ? insets.right : 0, true)}
+      </View>
+      <View style={{ width: rtl ? fold.start : width - fold.end, marginStart: fold.end - fold.start }}>
+        {aside != null && column(aside, rtl ? insets.left : 0, rtl ? 0 : insets.right, false)}
+      </View>
     </View>
+  ) : (
+    column(
+      <>
+        {children}
+        {aside}
+      </>,
+      insets.left,
+      insets.right,
+      true,
+    )
   );
 
   return (
@@ -94,5 +124,9 @@ export function Screen({
 const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: spacing.xxxl,
+  },
+  panes: {
+    flex: 1,
+    flexDirection: 'row',
   },
 });

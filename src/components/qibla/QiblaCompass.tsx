@@ -76,11 +76,11 @@ export function QiblaCompass({
   accuracyM = null,
 }: QiblaCompassProps) {
   const theme = useTheme();
-  const { width, height } = useResponsive();
+  const { paneWidth, height } = useResponsive();
   const roseRotation = useSharedValue(0);
 
   const compassSize = Math.round(
-    Math.max(MIN_COMPASS_SIZE, Math.min(MAX_COMPASS_SIZE, width - spacing.xxl * 2, height * 0.42)),
+    Math.max(MIN_COMPASS_SIZE, Math.min(MAX_COMPASS_SIZE, paneWidth - spacing.xxl * 2, height * 0.42)),
   );
 
   const trustworthy = isBearingTrustworthy(uncertaintyDegrees);
@@ -210,7 +210,7 @@ export function QiblaCompass({
         </AppText>
         {!trustworthy && accuracyM != null && (
           <AppText size="sm" tone="notice" align="center">
-            {t('qibla.yourLocationIsUncertain', { value: formatAccuracy(accuracyM), value2: Math.round(uncertaintyDegrees) })}
+            {t('qibla.yourLocationIsUncertain', { accuracy: formatAccuracy(accuracyM), degrees: Math.round(uncertaintyDegrees) })}
           </AppText>
         )}
         {isAligned && (

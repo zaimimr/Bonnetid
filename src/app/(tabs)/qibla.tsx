@@ -11,6 +11,7 @@ import { useCompassHeading } from '@/hooks/useCompassHeading';
 import { usePreciseCoords } from '@/hooks/usePreciseCoords';
 import { useFeature } from '@/hooks/useFeature';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useScreenRotation } from '@/hooks/useWindowGeometry';
 import {
   bearingUncertaintyDegrees,
   distanceKm,
@@ -20,6 +21,7 @@ import {
   KAABA,
   qiblaBearing,
 } from '@/lib/geo';
+import { normalizeHeading } from '@/lib/compassHeading';
 import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
@@ -42,6 +44,16 @@ export default function QiblaScreen() {
         ? t('qibla.theCompassIsInaccurate')
         : null;
   const { isLandscape } = useResponsive();
+  const rotation = useScreenRotation();
+  const screenHeading =
+    heading == null
+      ? null
+      : !isLandscape
+        ? heading
+        : Platform.OS === 'ios' && rotation != null && rotation !== 0
+          ? normalizeHeading(heading + rotation)
+          : null;
+  const headingUnusable = isLandscape && screenHeading == null;
   const calculated = useIsCalculatedMode();
   const [selectedView, setView] = useState<QiblaView>('compass');
   const arEnabled = useFeature('qibla-ar');
@@ -60,8 +72,86 @@ export default function QiblaScreen() {
   const insideHaram = coords.source === 'gps' && isInsideHaram(kaabaDistance);
 
   return (
-    <Screen>
-      <View style={{ marginTop: spacing.lg, gap: spacing.lg, flex: 1 }}>
+    <Screen
+      aside={
+        <View style={{ marginTop: spacing.lg, gap: spacing.lg, flex: 1 }}>
+          {permissionDenied && view === 'compass' ? (
+            <EmptyState
+              message={t('qibla.allowLocationAccessTo')}
+              icon="compass-outline"
+            />
+          ) : null}
+
+          {view === 'compass' && !permissionDenied && (
+            <ScrollView
+              contentContainerStyle={{
+                flexGrow: 1,
+                justifyContent: 'center',
+                paddingBottom: spacing.lg,
+              }}
+              showsVerticalScrollIndicator={false}>
+              {insideHaram ? (
+                <QiblaHaramNotice distanceKm={kaabaDistance} />
+              ) : headingUnusable ? (
+                <RotateNotice bearing={bearing} />
+              ) : (
+                <>
+                  <QiblaCompass
+                    heading={screenHeading ?? 0}
+                    qiblaBearing={bearing}
+                    uncertaintyDegrees={uncertainty}
+                    accuracyM={coords.accuracyM}
+                  />
+                  {calibrationNote && (
+                    <AppText
+                      size="sm"
+                      tone="notice"
+                      align="center"
+                      style={{ marginTop: spacing.lg }}>
+                      {calibrationNote}
+                    </AppText>
+                  )}
+                  {coords.source === 'settings' && (
+                    <AppText
+                      size="xs"
+                      tone="textMuted"
+                      align="center"
+                      style={{ marginTop: spacing.lg }}>
+                      {calculated
+                        ? t('qibla.basedOnTheLocation')
+                        : t('qibla.basedOnTheSelected')}
+                    </AppText>
+                  )}
+                </>
+              )}
+            </ScrollView>
+          )}
+
+          {view === 'map' && (
+            <PostHogMaskView style={{ flex: 1 }}>
+              <QiblaMap
+                lat={coords.lat}
+                lon={coords.lon}
+                heading={screenHeading}
+                accuracyM={coords.accuracyM}
+                distanceToKaabaKm={kaabaDistance}
+              />
+            </PostHogMaskView>
+          )}
+
+          {view === '3d' &&
+            (isLandscape ? (
+              <View style={{ flex: 1, justifyContent: 'center' }}>
+                <RotateNotice bearing={bearing} />
+              </View>
+            ) : insideHaram ? (
+              <QiblaHaramNotice distanceKm={kaabaDistance} />
+            ) : (
+              <QiblaAr qiblaBearing={bearing} uncertaintyDegrees={uncertainty} />
+            ))}
+        </View>
+      }>
+      <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
         <View
           style={{
             flexDirection: 'row',
@@ -95,80 +185,6 @@ export default function QiblaScreen() {
           }}
         />
 
-        {permissionDenied && view === 'compass' ? (
-          <EmptyState
-            message={t('qibla.allowLocationAccessTo')}
-            icon="compass-outline"
-          />
-        ) : null}
-
-        {view === 'compass' && !permissionDenied && (
-          <ScrollView
-            contentContainerStyle={{
-              flexGrow: 1,
-              justifyContent: 'center',
-              paddingBottom: spacing.lg,
-            }}
-            showsVerticalScrollIndicator={false}>
-            {insideHaram ? (
-              <QiblaHaramNotice distanceKm={kaabaDistance} />
-            ) : isLandscape ? (
-              <RotateNotice bearing={bearing} />
-            ) : (
-              <>
-                <QiblaCompass
-                  heading={heading ?? 0}
-                  qiblaBearing={bearing}
-                  uncertaintyDegrees={uncertainty}
-                  accuracyM={coords.accuracyM}
-                />
-                {calibrationNote && (
-                  <AppText
-                    size="sm"
-                    tone="notice"
-                    align="center"
-                    style={{ marginTop: spacing.lg }}>
-                    {calibrationNote}
-                  </AppText>
-                )}
-                {coords.source === 'settings' && (
-                  <AppText
-                    size="xs"
-                    tone="textMuted"
-                    align="center"
-                    style={{ marginTop: spacing.lg }}>
-                    {calculated
-                      ? t('qibla.basedOnTheLocation')
-                      : t('qibla.basedOnTheSelected')}
-                  </AppText>
-                )}
-              </>
-            )}
-          </ScrollView>
-        )}
-
-        {view === 'map' && (
-          <PostHogMaskView style={{ flex: 1 }}>
-            <QiblaMap
-              lat={coords.lat}
-              lon={coords.lon}
-              heading={isLandscape ? null : heading}
-              accuracyM={coords.accuracyM}
-              distanceToKaabaKm={kaabaDistance}
-            />
-          </PostHogMaskView>
-        )}
-
-        {view === '3d' &&
-          (isLandscape ? (
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-              <RotateNotice bearing={bearing} />
-            </View>
-          ) : insideHaram ? (
-            <QiblaHaramNotice distanceKm={kaabaDistance} />
-          ) : (
-            <QiblaAr qiblaBearing={bearing} uncertaintyDegrees={uncertainty} />
-          ))}
       </View>
     </Screen>
   );
