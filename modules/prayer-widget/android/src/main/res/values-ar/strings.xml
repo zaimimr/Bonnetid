@@ -1,0 +1,14 @@
+<resources>
+  <string name="prayer_widget_label">الصلاة التالية</string>
+  <string name="prayer_widget_description">موعد الصلاة التالية مع العد التنازلي.</string>
+  <string name="prayer_day_widget_label">مواقيت الصلاة اليوم</string>
+  <string name="prayer_day_widget_description">الصلوات الخمس اليوم مع تمييز الصلاة الحالية.</string>
+  <string name="prayer_widget_empty_title">افتح Bønnetid</string>
+  <string name="prayer_widget_empty_body">ستظهر المواقيت هنا بعد أن يجلبها التطبيق لموقعك.</string>
+  <string name="prayer_widget_prayed">صلّيت</string>
+  <string name="prayer_status_channel_name">حالة الصلاة</string>
+  <string name="prayer_status_channel_description">إشعار على شاشة القفل عند دخول وقت الصلاة، مع خياري صلّيت وتخطي.</string>
+  <string name="prayer_timeline_widget_label">الخط الزمني</string>
+  <string name="prayer_timeline_widget_description">اليوم كخط زمني مع الوقت المتبقي للصلاة التالية.</string>
+  <string name="prayer_timeline_bar_description">الخط الزمني لصلوات اليوم</string>
+</resources>

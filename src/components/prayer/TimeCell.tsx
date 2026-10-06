@@ -1,4 +1,5 @@
 import { View } from 'react-native';
+import { isRTL } from '@/lib/i18n';
 import { AppText, type TextTone } from '@/components/ui';
 import { spacing, type FontSizeToken, type FontWeightToken } from '@/theme/tokens';
 
@@ -43,7 +44,7 @@ export function TimeCell({
       size={size}
       weight={weight}
       tone={tone}
-      align="right"
+      align={isRTL() ? 'left' : 'right'}
       tabular
       style={width ? { width } : undefined}>
       {value}

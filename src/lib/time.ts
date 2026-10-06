@@ -1,3 +1,4 @@
+import { t } from './i18n.ts';
 import { zoneOffsetMinutes } from './timezone.ts';
 
 const MINUTE_MS = 60_000;
@@ -198,26 +199,65 @@ export function formatCountdownUnits(milliseconds: number): string {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-  if (hours > 0) return `${hours}t ${minutes}m ${pad(seconds)}s`;
-  if (minutes > 0) return `${minutes}m ${pad(seconds)}s`;
-  return `${seconds}s`;
+  const [h, m, s] = t({ nb: ['t', 'm', 's'], en: ['h', 'm', 's'], ar: ['س', 'د', 'ث'], ur: ['گ', 'م', 'س'] });
+  if (hours > 0) return `${hours}${h} ${minutes}${m} ${pad(seconds)}${s}`;
+  if (minutes > 0) return `${minutes}${m} ${pad(seconds)}${s}`;
+  return `${seconds}${s}`;
 }
 
 export function formatDurationShort(milliseconds: number): string {
   const totalMinutes = Math.max(0, Math.round(milliseconds / MINUTE_MS));
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
-  if (hours > 0) return `${hours}t ${minutes}m`;
-  return `${minutes}m`;
+  return t({
+    nb: hours > 0 ? `${hours}t ${minutes}m` : `${minutes}m`,
+    en: hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`,
+    ar: hours > 0 ? `${hours}س ${minutes}د` : `${minutes}د`,
+    ur: hours > 0 ? `${urduHours(hours)} ${minutes} منٹ` : `${minutes} منٹ`,
+  });
 }
 
 export function formatDurationSpaced(milliseconds: number): string {
   const totalMinutes = Math.max(0, Math.round(milliseconds / MINUTE_MS));
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
-  if (hours === 0) return `${minutes} min`;
-  if (minutes === 0) return `${hours} t`;
-  return `${hours} t ${minutes} min`;
+  const hourText = t({ nb: `${hours} t`, en: `${hours} h`, ar: arabicCount(hours, ARABIC_HOURS), ur: urduHours(hours) });
+  const minuteText = t({
+    nb: `${minutes} min`,
+    en: `${minutes} min`,
+    ar: arabicCount(minutes, ARABIC_MINUTES),
+    ur: `${minutes} منٹ`,
+  });
+  const joiner = t({ nb: ' ', en: ' ', ar: ' و', ur: ' ' });
+  if (hours === 0) return minuteText;
+  if (minutes === 0) return hourText;
+  return `${hourText}${joiner}${minuteText}`;
+}
+
+type ArabicForms = readonly [one: string, two: string, few: string, many: string];
+
+const ARABIC_HOURS: ArabicForms = ['ساعة', 'ساعتان', 'ساعات', 'ساعة'];
+const ARABIC_MINUTES: ArabicForms = ['دقيقة', 'دقيقتان', 'دقائق', 'دقيقة'];
+const ARABIC_DAYS: ArabicForms = ['يوم', 'يومين', 'أيام', 'يومًا'];
+
+function arabicCount(count: number, [one, two, few, many]: ArabicForms): string {
+  if (count === 1) return one;
+  if (count === 2) return two;
+  if (count >= 3 && count <= 10) return `${count} ${few}`;
+  return `${count} ${many}`;
+}
+
+function urduHours(hours: number): string {
+  return `${hours} ${hours === 1 ? 'گھنٹہ' : 'گھنٹے'}`;
+}
+
+export function formatDayCount(days: number): string {
+  return t({
+    nb: `${days} dager`,
+    en: `${days} days`,
+    ar: arabicCount(days, ARABIC_DAYS),
+    ur: `${days} دن`,
+  });
 }
 
 export function formatClock(time: string | null): string {

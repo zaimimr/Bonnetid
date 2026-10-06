@@ -5,9 +5,10 @@ import { useLocations } from '@/api/queries';
 import { deviceOffsetMinutes, osloOffsetMinutes } from '@/lib/time';
 import { evaluateTravel, type Coords, type TravelSignal } from '@/lib/travelMode';
 import type { PlaceCountry } from '@/store/settings';
+import { t } from '@/lib/i18n';
 
 const MIN_REFRESH_INTERVAL_MS = 60_000;
-const FALLBACK_PLACE_NAME = 'Din posisjon';
+const FALLBACK_PLACE_NAME = t({ nb: 'Din posisjon', en: 'Your location', ar: 'موقعك', ur: 'آپ کا مقام' });
 
 type PositionSnapshot = {
   coords: Coords | null;

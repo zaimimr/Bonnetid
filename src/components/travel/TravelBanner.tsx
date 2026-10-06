@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { t } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
@@ -27,11 +28,11 @@ export function TravelBanner() {
       <View style={{ flex: 1 }}>
         <PostHogMaskView>
           <AppText size="sm" weight="semibold" style={{ color: theme.colors.onTravelSurface }}>
-            {`Reisemodus · ${location.name}`}
+            {`${t({ nb: 'Reisemodus', en: 'Travel mode', ar: 'وضع السفر', ur: 'سفر موڈ' })} · ${location.name}`}
           </AppText>
         </PostHogMaskView>
         <AppText size="xs" style={{ color: theme.colors.travelSurfaceMuted }}>
-          Lokale tider
+          {t({ nb: 'Lokale tider', en: 'Local times', ar: 'الأوقات المحلية', ur: 'مقامی اوقات' })}
         </AppText>
       </View>
     </View>

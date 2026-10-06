@@ -1,5 +1,6 @@
 import type { PrayerDay } from '@/api/types';
 import type { AsrMethodPreference } from '@/store/settings';
+import { t } from './i18n.ts';
 import { jummahSlotFor, jummahSlotIsOpen } from './jummah.ts';
 import {
   addMinutesToTime,
@@ -27,14 +28,12 @@ export type PrayerEntry = {
   end: PrayerWindowEnd | null;
 };
 
-export const PRAYER_LABELS: Record<PrayerName, string> = {
-  fajr: 'Fajr',
-  fajr_endtime: 'Soloppgang',
-  duhr: 'Dhuhr',
-  asr: 'Asr',
-  maghrib: 'Maghrib',
-  isha: 'Isha',
-};
+export const PRAYER_LABELS: Record<PrayerName, string> = t({
+  nb: { fajr: 'Fajr', fajr_endtime: 'Soloppgang', duhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' },
+  en: { fajr: 'Fajr', fajr_endtime: 'Sunrise', duhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' },
+  ar: { fajr: 'الفجر', fajr_endtime: 'الشروق', duhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' },
+  ur: { fajr: 'فجر', fajr_endtime: 'طلوع آفتاب', duhr: 'ظہر', asr: 'عصر', maghrib: 'مغرب', isha: 'عشاء' },
+});
 
 export function asrTimeFor(day: PrayerDay, method: AsrMethodPreference): string | null {
   const preferred =

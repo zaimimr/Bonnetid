@@ -39,6 +39,7 @@ import { isoDateIsFriday, parseDayKey } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
 import { useActiveLocation, useActiveMosque, useUnreadAnnouncement } from '@/store/settings';
 import { PostHogMaskView } from 'posthog-react-native';
+import { t } from '@/lib/i18n';
 
 const UPCOMING_EVENT_COUNT = 3;
 
@@ -139,7 +140,12 @@ export default function HomeScreen() {
               router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } })
             }>
             <MosqueAnnouncement
-              title={`Kunngjøring fra ${mosque.name}`}
+              title={t({
+                nb: `Kunngjøring fra ${mosque.name}`,
+                en: `Announcement from ${mosque.name}`,
+                ar: `إعلان من ${mosque.name}`,
+                ur: `${mosque.name} کی طرف سے اعلان`,
+              })}
               text={myAnnouncement}
               compact
               chevron
@@ -164,11 +170,11 @@ export default function HomeScreen() {
           <View>
             <PostHogMaskView>
               <SectionHeader
-                title="Dagens bønnetider"
+                title={t({ nb: 'Dagens bønnetider', en: "Today's prayer times", ar: 'مواقيت صلاة اليوم', ur: 'آج کے نماز کے اوقات' })}
                 subtitle={
                   mosque && mosqueInLocation ? `${location.name} · ${mosque.name}` : location.name
                 }
-                trailing={calculated ? <Badge label="Lokale tider" variant="neutral" /> : undefined}
+                trailing={calculated ? <Badge label={t({ nb: 'Lokale tider', en: 'Local times', ar: 'أوقات محلية', ur: 'مقامی اوقات' })} variant="neutral" /> : undefined}
                 style={timezoneNote ? { marginBottom: spacing.xs } : undefined}
               />
             </PostHogMaskView>
@@ -188,7 +194,12 @@ export default function HomeScreen() {
               mosqueNote={
                 mosqueInLocation
                   ? undefined
-                  : `Moskeen er i en annen kommune, så bare Jumuah kommer fra ${mosque?.name ?? 'moskeen'}`
+                  : t({
+                      nb: `Moskeen er i en annen kommune, så bare Jumuah kommer fra ${mosque?.name ?? 'moskeen'}`,
+                      en: `The mosque is in another municipality, so only Jumuah comes from ${mosque?.name ?? 'the mosque'}`,
+                      ar: `المسجد في بلدية أخرى، لذا تأتي صلاة الجمعة فقط من ${mosque?.name ?? 'المسجد'}`,
+                      ur: `مسجد کسی دوسری میونسپلٹی میں ہے، اس لیے صرف جمعہ ${mosque?.name ?? 'مسجد'} سے آتا ہے`,
+                    })
               }
               jamatTimes={jamatTimes}
               jummah={isoDateIsFriday(todayIso) ? jummahTimes : []}
@@ -209,7 +220,7 @@ export default function HomeScreen() {
 
         {upcomingEvents.length > 0 && (
           <View>
-            <SectionHeader title="Kommende merkedager" />
+            <SectionHeader title={t({ nb: 'Kommende merkedager', en: 'Upcoming special days', ar: 'المناسبات القادمة', ur: 'آنے والے خاص دن' })} />
             <View style={{ gap: spacing.md }}>
               {upcomingEvents.map((event) => (
                 <EventCard

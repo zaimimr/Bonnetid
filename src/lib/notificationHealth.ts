@@ -1,3 +1,5 @@
+import { t } from './i18n.ts';
+
 export type NotificationHealthStatus = {
   enabled: boolean;
   permissionGranted: boolean;
@@ -35,15 +37,44 @@ export type DeliveredAdhan = {
   deliveredAt: number;
 };
 
-export const NOTIFICATION_ISSUE_LABELS: Record<NotificationIssueKey, string> = {
-  permission: 'Varsler er ikke tillatt',
-  channel: 'Bønnevarsler er slått av i telefonen',
-  exactAlarm: 'Alarmer og påminnelser er ikke tillatt',
-  emptyQueue: 'Ingen varsler er planlagt',
-  noPrayers: 'Ingen bønner er valgt',
-  sound: 'Lyd er slått av',
-  battery: 'Batterisparing er på',
-};
+export const NOTIFICATION_ISSUE_LABELS: Record<NotificationIssueKey, string> = t({
+  nb: {
+    permission: 'Varsler er ikke tillatt',
+    channel: 'Bønnevarsler er slått av i telefonen',
+    exactAlarm: 'Alarmer og påminnelser er ikke tillatt',
+    emptyQueue: 'Ingen varsler er planlagt',
+    noPrayers: 'Ingen bønner er valgt',
+    sound: 'Lyd er slått av',
+    battery: 'Batterisparing er på',
+  },
+  en: {
+    permission: 'Notifications are not allowed',
+    channel: 'Prayer notifications are turned off on the phone',
+    exactAlarm: 'Alarms and reminders are not allowed',
+    emptyQueue: 'No notifications are scheduled',
+    noPrayers: 'No prayers are selected',
+    sound: 'Sound is turned off',
+    battery: 'Battery saver is on',
+  },
+  ar: {
+    permission: 'الإشعارات غير مسموح بها',
+    channel: 'إشعارات الصلاة معطلة في الهاتف',
+    exactAlarm: 'المنبهات والتذكيرات غير مسموح بها',
+    emptyQueue: 'لا توجد إشعارات مجدولة',
+    noPrayers: 'لم يتم اختيار أي صلاة',
+    sound: 'الصوت متوقف',
+    battery: 'توفير البطارية مفعّل',
+  },
+  ur: {
+    permission: 'اطلاعات کی اجازت نہیں ہے',
+    channel: 'فون میں نماز کی اطلاعات بند ہیں',
+    exactAlarm: 'الارم اور یاد دہانیوں کی اجازت نہیں ہے',
+    emptyQueue: 'کوئی اطلاع شیڈول نہیں ہے',
+    noPrayers: 'کوئی نماز منتخب نہیں کی گئی',
+    sound: 'آواز بند ہے',
+    battery: 'بیٹری سیور آن ہے',
+  },
+});
 
 export function notificationIssues(status: NotificationHealthStatus): NotificationIssue[] {
   if (!status.enabled) return [];

@@ -152,6 +152,7 @@ struct PrayerWidgetView: View {
       }
     }
     .widgetURL(URL(string: "bonnetid://"))
+    .widgetLanguage(WidgetStrings.current)
   }
 }
 
@@ -166,7 +167,7 @@ private struct SmallPrayerView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
-      Text(moment.stateLabel)
+      Text(WidgetStrings.current.stateLabel(isNow: moment.isNow))
         .font(.caption)
         .foregroundStyle(PrayerColor.inkMuted)
 
@@ -203,7 +204,7 @@ private struct SmallPrayerView: View {
   }
 
   private var countdownLine: String {
-    let countdown = PrayerFormat.countdown(to: moment.next.at, from: now)
+    let countdown = WidgetStrings.current.countdown(to: moment.next.at, from: now)
     if moment.isNow {
       return "\(moment.next.printedLabel) \(countdown)"
     }
@@ -258,7 +259,7 @@ private struct MediumPrayerView: View {
           .lineLimit(1)
           .minimumScaleFactor(0.8)
         if entry.showJamat, entry.hasJamatTimes {
-          Text("· jamat")
+          Text("· \(WidgetStrings.current.jamat)")
             .font(.caption2)
             .foregroundStyle(PrayerColor.inkMuted)
         }
@@ -270,10 +271,12 @@ private struct MediumPrayerView: View {
   }
 
   private var footerLine: String {
+    let strings = WidgetStrings.current
+    let countdown = strings.countdown(to: moment.next.at, from: entry.date)
     if moment.isNow {
-      return "\(moment.headline.label) nå · \(moment.next.label) \(PrayerFormat.countdown(to: moment.next.at, from: entry.date))"
+      return "\(strings.nowLine(moment.headline.label)) · \(moment.next.label) \(countdown)"
     }
-    return "\(moment.next.label) \(PrayerFormat.countdown(to: moment.next.at, from: entry.date))"
+    return "\(moment.next.label) \(countdown)"
   }
 }
 
@@ -359,8 +362,8 @@ private struct RectangularPrayerView: View {
 
       Text(
         moment.isNow
-          ? "\(moment.next.label) \(PrayerFormat.countdown(to: moment.next.at, from: now))"
-          : PrayerFormat.countdown(to: moment.next.at, from: now)
+          ? "\(moment.next.label) \(WidgetStrings.current.countdown(to: moment.next.at, from: now))"
+          : WidgetStrings.current.countdown(to: moment.next.at, from: now)
       )
       .font(.caption)
       .lineLimit(1)
@@ -402,10 +405,11 @@ private struct InlinePrayerView: View {
   let status: String?
 
   private var text: String {
+    let strings = WidgetStrings.current
     if moment.isNow {
-      return "\(moment.headline.printedLabel) nå · \(moment.next.label) \(PrayerFormat.countdown(to: moment.next.at, from: now))"
+      return "\(strings.nowLine(moment.headline.printedLabel)) · \(moment.next.label) \(strings.countdown(to: moment.next.at, from: now))"
     }
-    return "\(moment.headline.printedLabel) \(PrayerFormat.countdown(to: moment.headline.at, from: now))"
+    return "\(moment.headline.printedLabel) \(strings.countdown(to: moment.headline.at, from: now))"
   }
 
   var body: some View {
@@ -421,19 +425,20 @@ private struct InlinePrayerView: View {
 
 private struct MissingSnapshotView: View {
   let family: WidgetFamily
+  private var strings: WidgetStrings { WidgetStrings.current }
 
   var body: some View {
     switch family {
     case .accessoryInline:
-      Label("Åpne Bønnetid", systemImage: "moon")
+      Label(strings.openApp, systemImage: "moon")
         .containerBackground(.clear, for: .widget)
     case .accessoryCircular:
       Image(systemName: "moon")
         .containerBackground(.clear, for: .widget)
     case .accessoryRectangular:
       VStack(alignment: .leading) {
-        Text("Bønnetid").font(.headline).widgetAccentable()
-        Text("Åpne appen for tider").font(.caption)
+        Text(strings.appName).font(.headline).widgetAccentable()
+        Text(strings.openAppForTimes).font(.caption)
       }
       .frame(maxWidth: .infinity, alignment: .leading)
       .containerBackground(.clear, for: .widget)
@@ -442,10 +447,10 @@ private struct MissingSnapshotView: View {
         Image(systemName: "moon.stars")
           .font(.title3)
           .foregroundStyle(PrayerColor.brand)
-        Text("Åpne Bønnetid")
+        Text(strings.openApp)
           .font(.headline)
           .foregroundStyle(PrayerColor.ink)
-        Text("Tidene vises her så snart appen har hentet dem for stedet ditt.")
+        Text(strings.timesAppearHere)
           .font(.caption)
           .foregroundStyle(PrayerColor.inkSecondary)
       }
@@ -464,8 +469,8 @@ struct PrayerWidget: Widget {
     ) { entry in
       PrayerWidgetView(entry: entry)
     }
-    .configurationDisplayName("Bønnetider")
-    .description("Neste bønn og dagens tider for stedet ditt.")
+    .configurationDisplayName(WidgetStrings.current.prayerWidgetName)
+    .description(WidgetStrings.current.prayerWidgetDescription)
     .supportedFamilies([
       .systemSmall,
       .systemMedium,

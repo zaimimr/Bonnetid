@@ -1,6 +1,7 @@
 import { Pressable, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
+import { t } from '@/lib/i18n';
 import { AppText, Badge } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
@@ -20,7 +21,7 @@ export function MosqueSelectAction({
     return (
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
         <Ionicons name="checkmark-circle" size={15} color={theme.colors.primary} />
-        <Badge label="Min moské" variant="primary" />
+        <Badge label={t({ nb: 'Min moské', en: 'My mosque', ar: 'مسجدي', ur: 'میری مسجد' })} variant="primary" />
       </View>
     );
   }
@@ -35,7 +36,12 @@ export function MosqueSelectAction({
       onPress={select}
       hitSlop={spacing.sm}
       accessibilityRole="button"
-      accessibilityLabel={`Velg ${mosqueName} som min moské`}
+      accessibilityLabel={t({
+        nb: `Velg ${mosqueName} som min moské`,
+        en: `Choose ${mosqueName} as my mosque`,
+        ar: `اختيار ${mosqueName} مسجدًا لي`,
+        ur: `${mosqueName} کو اپنی مسجد منتخب کریں`,
+      })}
       style={({ pressed }) => [
         {
           flexDirection: 'row',
@@ -52,7 +58,12 @@ export function MosqueSelectAction({
       ]}>
       <Ionicons name="add-circle-outline" size={15} color={theme.colors.onPrimarySoft} />
       <AppText size="sm" weight="semibold" tone="onPrimarySoft" style={{ flexShrink: 1 }}>
-        Velg som min moské
+        {t({
+          nb: 'Velg som min moské',
+          en: 'Choose as my mosque',
+          ar: 'اختيار كمسجدي',
+          ur: 'اپنی مسجد منتخب کریں',
+        })}
       </AppText>
     </Pressable>
   );

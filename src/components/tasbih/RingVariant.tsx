@@ -11,6 +11,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { t } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
 import { BEADS_PER_ROUND, SEQUENCE, isClosing } from '@/lib/tasbih';
 import { useTheme } from '@/theme';
@@ -128,7 +129,7 @@ function CompleteCheck({ size }: { size: number }) {
 
   return (
     <Animated.View
-      accessibilityLabel="Fullført"
+      accessibilityLabel={t({ nb: 'Fullført', en: 'Complete', ar: 'اكتمل', ur: 'مکمل' })}
       style={[
         {
           position: 'absolute',
@@ -193,7 +194,11 @@ export function RingVariant({ session }: { session: TasbihSession }) {
     <View style={{ flex: 1, alignItems: 'center', gap: spacing.md }}>
       <PhraseBlock
         phrase={phrase}
-        note={complete || closing ? 'Sies én gang' : undefined}
+        note={
+          complete || closing
+            ? t({ nb: 'Sies én gang', en: 'Said once', ar: 'تُقال مرة واحدة', ur: 'ایک بار پڑھیں' })
+            : undefined
+        }
         compact={complete || closing}
       />
       <View
@@ -226,7 +231,7 @@ export function RingVariant({ session }: { session: TasbihSession }) {
               <PulseCount count={state.count} />
               {target ? (
                 <AppText size="sm" tone="textMuted" tabular>
-                  av {target}
+                  {t({ nb: `av ${target}`, en: `of ${target}`, ar: `من ${target}`, ur: `${target} میں سے` })}
                 </AppText>
               ) : null}
             </>

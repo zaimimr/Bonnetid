@@ -75,6 +75,7 @@ struct PrayerSnapshot: Codable, Hashable {
   let days: [PrayerDaySnapshot]
   var origin: SnapshotPoint?
   var mosques: [SnapshotMosque]?
+  var lang: String?
 
   var usesDeviceTimeZone: Bool { mode == "calculated" }
 

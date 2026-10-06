@@ -4,6 +4,7 @@ import { AppTabBar } from '@/components/navigation/AppTabBar';
 import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 import { useOnboardingDone, useSettingsHydrated } from '@/store/settings';
 import { useSupportThread } from '@/hooks/useSupportThread';
+import { t } from '@/lib/i18n';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -33,7 +34,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Oversikt',
+          title: t({ nb: 'Oversikt', en: 'Today', ar: 'اليوم', ur: 'آج' }),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="home-outline" activeName="home" focused={focused} color={color as string} />
           ),
@@ -42,7 +43,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="calendar"
         options={{
-          title: 'Kalender',
+          title: t({ nb: 'Kalender', en: 'Calendar', ar: 'التقويم', ur: 'کیلنڈر' }),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="calendar-outline" activeName="calendar" focused={focused} color={color as string} />
           ),
@@ -51,7 +52,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="qibla"
         options={{
-          title: 'Qibla',
+          title: t({ nb: 'Qibla', en: 'Qibla', ar: 'القبلة', ur: 'قبلہ' }),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="compass-outline" activeName="compass" focused={focused} color={color as string} />
           ),
@@ -60,7 +61,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="more"
         options={{
-          title: 'Mer',
+          title: t({ nb: 'Mer', en: 'More', ar: 'المزيد', ur: 'مزید' }),
           tabBarBadge: unread > 0 ? '' : undefined,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="apps-outline" activeName="apps" focused={focused} color={color as string} />

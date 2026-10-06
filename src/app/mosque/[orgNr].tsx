@@ -32,14 +32,39 @@ import { JUMMAH_MISSING_FOR_MOSQUE } from '@/lib/jummahCopy';
 import { osloDateKey, osloDayKey, osloDayStart, osloTimeToLocalClock } from '@/lib/time';
 import { useNow } from '@/hooks/useNow';
 import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from '@/components/prayer/TimeCell';
+import { isRTL, t } from '@/lib/i18n';
 
 const ASR_METHOD_LABELS: Record<Mosque['asr_method'], string | null> = {
-  IRN: 'Asr beregnes med IRN standard',
-  SHADOW_1X: 'Asr beregnes med 1x skygge',
-  SHADOW_2X: 'Asr beregnes med 2x skygge (Hanafi)',
-  WUSTA: 'Asr beregnes med Wusta',
+  IRN: t({
+    nb: 'Asr beregnes med IRN standard',
+    en: 'Asr is calculated with the IRN standard',
+    ar: 'يُحسب العصر وفق معيار المجلس الإسلامي النرويجي',
+    ur: 'عصر کا حساب IRN معیار سے کیا جاتا ہے',
+  }),
+  SHADOW_1X: t({
+    nb: 'Asr beregnes med 1x skygge',
+    en: 'Asr is calculated with 1x shadow',
+    ar: 'يُحسب العصر بظل مثل واحد',
+    ur: 'عصر کا حساب ایک مثل سائے سے کیا جاتا ہے',
+  }),
+  SHADOW_2X: t({
+    nb: 'Asr beregnes med 2x skygge (Hanafi)',
+    en: 'Asr is calculated with 2x shadow (Hanafi)',
+    ar: 'يُحسب العصر بظل مثلين (الحنفي)',
+    ur: 'عصر کا حساب دو مثل سائے سے کیا جاتا ہے (حنفی)',
+  }),
+  WUSTA: t({
+    nb: 'Asr beregnes med Wusta',
+    en: 'Asr is calculated with Wusta',
+    ar: 'يُحسب العصر بطريقة الوسطى',
+    ur: 'عصر کا حساب وسطیٰ طریقے سے کیا جاتا ہے',
+  }),
   NONE: null,
 };
+
+const ADHAN = t({ nb: 'Adhan', en: 'Adhan', ar: 'الأذان', ur: 'اذان' });
+const JAMAAT = t({ nb: 'Jamaat', en: 'Jamaat', ar: 'الجماعة', ur: 'جماعت' });
+const JUMUAH = t({ nb: 'Jumuah', en: 'Jumuah', ar: 'الجمعة', ur: 'جمعہ' });
 
 export default function MosqueDetailScreen() {
   const { orgNr } = useLocalSearchParams<{ orgNr: string }>();
@@ -149,7 +174,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
     ActionSheetIOS.showActionSheetWithOptions(
       {
         title: mosque.name,
-        options: [...installed.map((app) => app.name), 'Avbryt'],
+        options: [...installed.map((app) => app.name), t({ nb: 'Avbryt', en: 'Cancel', ar: 'إلغاء', ur: 'منسوخ کریں' })],
         cancelButtonIndex: installed.length,
       },
       (index) => {
@@ -216,11 +241,20 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
 
       {!mosque.map_only && donationEnabled && (
         <View>
-          <SectionHeader title="Støtt moskeen" />
+          <SectionHeader title={t({ nb: 'Støtt moskeen', en: 'Support the mosque', ar: 'ادعم المسجد', ur: 'مسجد کی مدد کریں' })} />
           <Card padding="sm" rounded="xl">
             <ListRow
-              title="Doner med Vipps"
-              subtitle={mosque.vipps_number ? `Åpner Vipps · nummer ${mosque.vipps_number}` : 'Åpner Vipps'}
+              title={t({ nb: 'Doner med Vipps', en: 'Donate with Vipps', ar: 'تبرّع عبر Vipps', ur: 'Vipps سے عطیہ دیں' })}
+              subtitle={
+                mosque.vipps_number
+                  ? t({
+                      nb: `Åpner Vipps · nummer ${mosque.vipps_number}`,
+                      en: `Opens Vipps · number ${mosque.vipps_number}`,
+                      ar: `يفتح Vipps · الرقم ${mosque.vipps_number}`,
+                      ur: `Vipps کھلتا ہے · نمبر ${mosque.vipps_number}`,
+                    })
+                  : t({ nb: 'Åpner Vipps', en: 'Opens Vipps', ar: 'يفتح Vipps', ur: 'Vipps کھلتا ہے' })
+              }
               leading={<Ionicons name="heart-outline" size={20} color={theme.colors.primary} />}
               trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
               onPress={() => {
@@ -236,7 +270,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
       {jamatRows.length > 0 && (
         <View>
           <SectionHeader
-            title="Bønnetider i dag"
+            title={t({ nb: 'Bønnetider i dag', en: 'Prayer times today', ar: 'مواقيت الصلاة اليوم', ur: 'آج کے نماز کے اوقات' })}
             subtitle={jamatSubtitle(jamat)}
           />
           <Card padding="sm" rounded="xl">
@@ -255,17 +289,17 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                   size="xs"
                   weight="medium"
                   tone="textMuted"
-                  align="right"
+                  align={isRTL() ? 'left' : 'right'}
                   style={{ width: columnWidth }}>
-                  Adhan
+                  {ADHAN}
                 </AppText>
                 <AppText
                   size="xs"
                   weight="medium"
                   tone="textMuted"
-                  align="right"
+                  align={isRTL() ? 'left' : 'right'}
                   style={{ width: columnWidth }}>
-                  Jamaat
+                  {JAMAAT}
                 </AppText>
               </View>
             )}
@@ -274,14 +308,14 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                 <>
                   <TimeCell
                     value={row.adhan ?? '–'}
-                    label={hasJamatTimes ? 'Adhan' : ''}
+                    label={hasJamatTimes ? ADHAN : ''}
                     stacked={stacked}
                     width={columnWidth}
                   />
                   {hasJamatTimes && (
                     <TimeCell
                       value={row.jamat ?? '–'}
-                      label="Jamaat"
+                      label={JAMAAT}
                       stacked={stacked}
                       width={columnWidth}
                       weight="semibold"
@@ -319,7 +353,12 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
           {eidTimes.length === 0 ? (
             <Card padding="lg" rounded="xl">
               <AppText size="sm" tone="textSecondary">
-                {`${mosque.name} har ikke lagt inn tider for Eid-bønnen ennå.`}
+                {t({
+                  nb: `${mosque.name} har ikke lagt inn tider for Eid-bønnen ennå.`,
+                  en: `${mosque.name} has not added times for the Eid prayer yet.`,
+                  ar: `لم يُضِف ${mosque.name} مواعيد صلاة العيد بعد.`,
+                  ur: `${mosque.name} نے ابھی عید کی نماز کے اوقات شامل نہیں کیے۔`,
+                })}
               </AppText>
             </Card>
           ) : (
@@ -353,7 +392,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
 
       {mosque.jummah.length === 0 && (
         <View>
-          <SectionHeader title="Jumuah" />
+          <SectionHeader title={JUMUAH} />
           <Card rounded="xl">
             <AppText size="sm" tone="textSecondary">
               {JUMMAH_MISSING_FOR_MOSQUE}
@@ -364,12 +403,16 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
 
       {mosque.jummah.length > 0 && (
         <View>
-          <SectionHeader title="Jumuah" />
+          <SectionHeader title={JUMUAH} />
           <Card padding="sm" rounded="xl">
             {mosque.jummah.map((entry, index) => (
               <ListRow
                 key={entry.id}
-                title={mosque.jummah.length > 1 ? `Jumuah ${index + 1}` : 'Fredagsbønn'}
+                title={
+                  mosque.jummah.length > 1
+                    ? `${JUMUAH} ${index + 1}`
+                    : t({ nb: 'Fredagsbønn', en: 'Friday prayer', ar: 'صلاة الجمعة', ur: 'نمازِ جمعہ' })
+                }
                 trailing={
                   <AppText weight="semibold" tabular>
                     {osloTimeToLocalClock(today, entry.jummah) ?? entry.jummah}
@@ -388,7 +431,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
 
       {(mosque.contact_name || mosque.contact_phone || mosque.contact_email || mosque.homepage) && (
         <View>
-          <SectionHeader title="Kontakt" />
+          <SectionHeader title={t({ nb: 'Kontakt', en: 'Contact', ar: 'التواصل', ur: 'رابطہ' })} />
           <Card padding="sm" rounded="xl">
             {mosque.contact_name && (
               <ListRow
@@ -431,11 +474,26 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
 function jamatSubtitle(jamat: MosqueJamat | null | undefined): string | undefined {
   const lines: string[] = [];
   if (jamat?.start_date && jamat.end_date) {
-    lines.push(`Jamaat gjelder ${jamat.start_date} til ${jamat.end_date}`);
+    lines.push(
+      t({
+        nb: `Jamaat gjelder ${jamat.start_date} til ${jamat.end_date}`,
+        en: `Jamaat times apply ${jamat.start_date} to ${jamat.end_date}`,
+        ar: `أوقات الجماعة سارية من ${jamat.start_date} إلى ${jamat.end_date}`,
+        ur: `جماعت کے اوقات ${jamat.start_date} سے ${jamat.end_date} تک`,
+      }),
+    );
   }
   const updated = jamat?.updated_at ? new Date(jamat.updated_at) : null;
   if (updated && !Number.isNaN(updated.getTime())) {
-    lines.push(`Oppdatert ${formatGregorianShort(updated)} ${updated.getFullYear()}`);
+    const updatedLabel = `${formatGregorianShort(updated)} ${updated.getFullYear()}`;
+    lines.push(
+      t({
+        nb: `Oppdatert ${updatedLabel}`,
+        en: `Updated ${updatedLabel}`,
+        ar: `آخر تحديث ${updatedLabel}`,
+        ur: `تازہ کاری ${updatedLabel}`,
+      }),
+    );
   }
   return lines.length > 0 ? lines.join('\n') : undefined;
 }

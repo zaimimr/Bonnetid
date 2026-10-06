@@ -22,8 +22,15 @@ import { formatLocalClock } from '@/lib/time';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { openSystemSettings, type SystemSettingsKind } from '../../modules/prayer-widget';
+import { t } from '@/lib/i18n';
 
 const ROW = { paddingHorizontal: spacing.md } as const;
+
+const FIX_LABEL = t({ nb: 'Fiks', en: 'Fix', ar: 'إصلاح', ur: 'ٹھیک کریں' });
+const ALLOWED = t({ nb: 'Tillatt', en: 'Allowed', ar: 'مسموح', ur: 'اجازت ہے' });
+const NOT_ALLOWED = t({ nb: 'Ikke tillatt', en: 'Not allowed', ar: 'غير مسموح', ur: 'اجازت نہیں' });
+const ON = t({ nb: 'På', en: 'On', ar: 'مفعّل', ur: 'آن' });
+const OFF = t({ nb: 'Av', en: 'Off', ar: 'متوقف', ur: 'آف' });
 
 function openSettings(kind: SystemSettingsKind) {
   if (!openSystemSettings(kind)) Linking.openSettings().catch(() => {});
@@ -54,7 +61,7 @@ export default function NotificationCheckScreen() {
   if (!notificationsSupported) {
     return (
       <Screen edges={[]}>
-        <EmptyState message="Ikke tilgjengelig i Expo Go på Android" icon="notifications-off-outline" />
+        <EmptyState message={t({ nb: 'Ikke tilgjengelig i Expo Go på Android', en: 'Not available in Expo Go on Android', ar: 'غير متاح في Expo Go على أندرويد', ur: 'اینڈرائیڈ پر Expo Go میں دستیاب نہیں' })} icon="notifications-off-outline" />
       </Screen>
     );
   }
@@ -70,7 +77,7 @@ export default function NotificationCheckScreen() {
   if (!status.enabled) {
     return (
       <Screen edges={[]}>
-        <EmptyState message="Varsler er slått av" icon="notifications-off-outline" />
+        <EmptyState message={t({ nb: 'Varsler er slått av', en: 'Notifications are turned off', ar: 'الإشعارات متوقفة', ur: 'اطلاعات بند ہیں' })} icon="notifications-off-outline" />
       </Screen>
     );
   }
@@ -106,29 +113,29 @@ export default function NotificationCheckScreen() {
 
   return (
     <Screen scroll edges={[]}>
-      <SectionHeader title="Status" style={{ marginTop: spacing.lg }} />
+      <SectionHeader title={t({ nb: 'Status', en: 'Status', ar: 'الحالة', ur: 'صورتحال' })} style={{ marginTop: spacing.lg }} />
       <Card padding="sm" rounded="xl">
         <ListRow
-          title="Varsler"
+          title={t({ nb: 'Varsler', en: 'Notifications', ar: 'الإشعارات', ur: 'اطلاعات' })}
           subtitle={
             !status.permissionGranted
-              ? 'Ikke tillatt'
+              ? NOT_ALLOWED
               : status.channelBlocked
-                ? 'Slått av for bønnevarsler'
-                : 'Tillatt'
+                ? t({ nb: 'Slått av for bønnevarsler', en: 'Turned off for prayer notifications', ar: 'متوقفة لإشعارات الصلاة', ur: 'نماز کی اطلاعات کے لیے بند' })
+                : ALLOWED
           }
           leading={icon(permissionIssue)}
-          trailing={fixButton(permissionIssue, 'Fiks', fixPermission)}
+          trailing={fixButton(permissionIssue, FIX_LABEL, fixPermission)}
           style={ROW}
         />
         {status.soundAllowed != null && (
           <>
             <Divider />
             <ListRow
-              title="Lyd"
-              subtitle={status.soundAllowed ? 'På' : 'Av'}
+              title={t({ nb: 'Lyd', en: 'Sound', ar: 'الصوت', ur: 'آواز' })}
+              subtitle={status.soundAllowed ? ON : OFF}
               leading={icon(find('sound'))}
-              trailing={fixButton(find('sound'), 'Fiks', () => openSettings('notifications'))}
+              trailing={fixButton(find('sound'), FIX_LABEL, () => openSettings('notifications'))}
               style={ROW}
             />
           </>
@@ -137,10 +144,10 @@ export default function NotificationCheckScreen() {
           <>
             <Divider />
             <ListRow
-              title="Alarmer og påminnelser"
-              subtitle={status.exactAlarmsAllowed ? 'Tillatt' : 'Ikke tillatt'}
+              title={t({ nb: 'Alarmer og påminnelser', en: 'Alarms and reminders', ar: 'المنبهات والتذكيرات', ur: 'الارم اور یاد دہانیاں' })}
+              subtitle={status.exactAlarmsAllowed ? ALLOWED : NOT_ALLOWED}
               leading={icon(find('exactAlarm'))}
-              trailing={fixButton(find('exactAlarm'), 'Fiks', () => openSettings('exactAlarm'))}
+              trailing={fixButton(find('exactAlarm'), FIX_LABEL, () => openSettings('exactAlarm'))}
               style={ROW}
             />
           </>
@@ -149,36 +156,41 @@ export default function NotificationCheckScreen() {
           <>
             <Divider />
             <ListRow
-              title="Batterisparing"
-              subtitle={status.batteryOptimized ? 'På' : 'Av'}
+              title={t({ nb: 'Batterisparing', en: 'Battery saver', ar: 'توفير البطارية', ur: 'بیٹری سیور' })}
+              subtitle={status.batteryOptimized ? ON : OFF}
               leading={icon(find('battery'))}
-              trailing={fixButton(find('battery'), 'Slå av', () => openSettings('battery'))}
+              trailing={fixButton(find('battery'), t({ nb: 'Slå av', en: 'Turn off', ar: 'إيقاف', ur: 'بند کریں' }), () => openSettings('battery'))}
               style={ROW}
             />
           </>
         )}
         <Divider />
         <ListRow
-          title="Planlagte varsler"
+          title={t({ nb: 'Planlagte varsler', en: 'Scheduled notifications', ar: 'الإشعارات المجدولة', ur: 'طے شدہ اطلاعات' })}
           subtitle={
             next
-              ? `${status.scheduledAdhans} · neste ${next.title}, ${formatGregorianShort(dayOf(next.isoDate))}`
+              ? t({
+                  nb: `${status.scheduledAdhans} · neste ${next.title}, ${formatGregorianShort(dayOf(next.isoDate))}`,
+                  en: `${status.scheduledAdhans} · next ${next.title}, ${formatGregorianShort(dayOf(next.isoDate))}`,
+                  ar: `${status.scheduledAdhans} · التالي ${next.title}، ${formatGregorianShort(dayOf(next.isoDate))}`,
+                  ur: `${status.scheduledAdhans} · اگلی ${next.title}، ${formatGregorianShort(dayOf(next.isoDate))}`,
+                })
               : `${status.scheduledAdhans}`
           }
           leading={icon(queueIssue)}
           trailing={
             queueIssue?.key === 'noPrayers'
-              ? fixButton(queueIssue, 'Velg', () => router.push('/notification-prayers'))
-              : fixButton(queueIssue, 'Meld fra', () => router.push('/feedback'))
+              ? fixButton(queueIssue, t({ nb: 'Velg', en: 'Choose', ar: 'اختر', ur: 'منتخب کریں' }), () => router.push('/notification-prayers'))
+              : fixButton(queueIssue, t({ nb: 'Meld fra', en: 'Report', ar: 'إبلاغ', ur: 'اطلاع دیں' }), () => router.push('/feedback'))
           }
           style={ROW}
         />
       </Card>
 
-      <SectionHeader title="Siste varsler" style={{ marginTop: spacing.lg }} />
+      <SectionHeader title={t({ nb: 'Siste varsler', en: 'Recent notifications', ar: 'أحدث الإشعارات', ur: 'حالیہ اطلاعات' })} style={{ marginTop: spacing.lg }} />
       <Card padding="sm" rounded="xl">
         {delivered.length === 0 ? (
-          <ListRow title="Ingen i varslingssenteret" style={ROW} />
+          <ListRow title={t({ nb: 'Ingen i varslingssenteret', en: 'None in Notification Center', ar: 'لا شيء في مركز الإشعارات', ur: 'اطلاعاتی مرکز میں کوئی نہیں' })} style={ROW} />
         ) : (
           delivered.map((item, index) => {
             const at = new Date(item.deliveredAt);
@@ -187,7 +199,12 @@ export default function NotificationCheckScreen() {
                 {index > 0 && <Divider />}
                 <ListRow
                   title={prayerLabel(item.prayer)}
-                  subtitle={`${formatGregorianShort(at)} kl. ${formatLocalClock(at)}`}
+                  subtitle={t({
+                    nb: `${formatGregorianShort(at)} kl. ${formatLocalClock(at)}`,
+                    en: `${formatGregorianShort(at)} at ${formatLocalClock(at)}`,
+                    ar: `${formatGregorianShort(at)} الساعة ${formatLocalClock(at)}`,
+                    ur: `${formatGregorianShort(at)}، ${formatLocalClock(at)} بجے`,
+                  })}
                   leading={
                     <Ionicons name="notifications-outline" size={20} color={theme.colors.primary} />
                   }

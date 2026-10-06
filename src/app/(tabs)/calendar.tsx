@@ -40,12 +40,13 @@ import { track } from '@/lib/telemetry';
 import { isoDateKey, parseDayKey } from '@/lib/time';
 import { usePlaceFilter } from '@/store/placeFilter';
 import { useActiveLocation, useSettings, type CalendarPrimary } from '@/store/settings';
+import { language, t } from '@/lib/i18n';
 
 type MonthView = 'dates' | 'times';
 
 const VIEW_OPTIONS: { value: MonthView; label: string }[] = [
-  { value: 'dates', label: 'Måned' },
-  { value: 'times', label: 'Bønnetider' },
+  { value: 'dates', label: t({ nb: 'Måned', en: 'Month', ar: 'الشهر', ur: 'مہینہ' }) },
+  { value: 'times', label: t({ nb: 'Bønnetider', en: 'Prayer times', ar: 'مواقيت الصلاة', ur: 'نماز کے اوقات' }) },
 ];
 
 function gregorianLabel(iso: string): { month: string; year: number } {
@@ -165,7 +166,11 @@ export default function CalendarScreen() {
       : ' '
     : `${monthName(cursor.monthIndex)} ${cursor.year}`;
   const subtitle = isHijri ? gregorianRange(hijriMonth.data) : hijriRange;
-  const monthLabel = isHijri ? hijriName : monthName(cursor.monthIndex).toLowerCase();
+  const monthLabel = isHijri
+    ? hijriName
+    : language() === 'nb'
+      ? monthName(cursor.monthIndex).toLowerCase()
+      : monthName(cursor.monthIndex);
 
   const hijriDates = useMemo(
     () => (hijriMonth.data ? new Set(hijriMonth.data.map((day) => day.gregorian_date)) : null),
@@ -201,7 +206,11 @@ export default function CalendarScreen() {
           onNext={() => shiftMonth(1)}
           onToday={isCurrentMonth ? undefined : goToToday}
           onSwap={swapCalendar}
-          swapLabel={isHijri ? 'Vis gregoriansk kalender' : 'Vis hijri-kalender'}
+          swapLabel={
+            isHijri
+              ? t({ nb: 'Vis gregoriansk kalender', en: 'Show Gregorian calendar', ar: 'عرض التقويم الميلادي', ur: 'عیسوی کیلنڈر دکھائیں' })
+              : t({ nb: 'Vis hijri-kalender', en: 'Show Hijri calendar', ar: 'عرض التقويم الهجري', ur: 'ہجری کیلنڈر دکھائیں' })
+          }
         />
 
         <SegmentedControl value={view} options={VIEW_OPTIONS} onChange={setView} />
@@ -298,13 +307,18 @@ function DatesView({
 
       <View>
         <SectionHeader
-          title={`Merkedager i ${monthLabel}`}
+          title={t({
+            nb: `Merkedager i ${monthLabel}`,
+            en: `Special days in ${monthLabel}`,
+            ar: `مناسبات شهر ${monthLabel}`,
+            ur: `${monthLabel} کے خاص دن`,
+          })}
           style={{ marginTop: 0 }}
         />
         {eventsLoading && <Skeleton height={180} rounded="xl" />}
         {eventsError && <ErrorState onRetry={onEventsRetry} />}
         {!eventsLoading && !eventsError && events.length === 0 && (
-          <EmptyState message="Ingen merkedager denne måneden" icon="calendar-clear-outline" />
+          <EmptyState message={t({ nb: 'Ingen merkedager denne måneden', en: 'No special days this month', ar: 'لا توجد مناسبات هذا الشهر', ur: 'اس مہینے کوئی خاص دن نہیں' })} icon="calendar-clear-outline" />
         )}
         <View style={{ gap: spacing.md }}>
           {events.map((event) => (
@@ -378,7 +392,12 @@ function TimesView({
             disabled={placesLoading}
             emptyLabel={
               activeLocation.mode === 'calculated'
-                ? `${activeLocation.name} · lokale tider`
+                ? t({
+                    nb: `${activeLocation.name} · lokale tider`,
+                    en: `${activeLocation.name} · local times`,
+                    ar: `${activeLocation.name} · أوقات محلية`,
+                    ur: `${activeLocation.name} · مقامی اوقات`,
+                  })
                 : activeLocation.name
             }
             onPress={() => router.push({ pathname: '/place-picker', params: { scope: 'times' } })}

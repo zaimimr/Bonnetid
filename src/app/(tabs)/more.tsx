@@ -10,6 +10,7 @@ import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
 import { useFeature } from '@/hooks/useFeature';
 import { useSupportThread } from '@/hooks/useSupportThread';
 import { FeedbackSheet } from '@/components/feedback/FeedbackSheet';
+import { t } from '@/lib/i18n';
 
 const ROW = { paddingHorizontal: spacing.md } as const;
 
@@ -22,25 +23,25 @@ type Feature = {
 const TRACKER_FEATURE: Feature = {
   href: '/tracker',
   icon: 'checkmark-done-outline',
-  title: 'Bønnesporing',
+  title: t({ nb: 'Bønnesporing', en: 'Prayer tracker', ar: 'متابعة الصلوات', ur: 'نماز ٹریکر' }),
 };
 
 const MOSQUE_FEATURE: Feature = {
   href: '/mosques',
   icon: 'business-outline',
-  title: 'Moskeer',
+  title: t({ nb: 'Moskeer', en: 'Mosques', ar: 'المساجد', ur: 'مساجد' }),
 };
 
 const DUAS_FEATURE: Feature = {
   href: '/duas',
   icon: 'book-outline',
-  title: 'Dua og dhikr',
+  title: t({ nb: 'Dua og dhikr', en: 'Dua and dhikr', ar: 'الأدعية والأذكار', ur: 'دعا اور ذکر' }),
 };
 
 const SETTINGS_FEATURE: Feature = {
   href: '/settings',
   icon: 'settings-outline',
-  title: 'Innstillinger',
+  title: t({ nb: 'Innstillinger', en: 'Settings', ar: 'الإعدادات', ur: 'ترتیبات' }),
 };
 
 export default function MoreScreen() {
@@ -64,7 +65,7 @@ export default function MoreScreen() {
     <Screen scroll contentStyle={{ flexGrow: 1, paddingBottom: spacing.lg }}>
       <View style={{ marginTop: spacing.lg, marginBottom: spacing.md }}>
         <AppText size="xxl" weight="bold" heading>
-          Mer
+          {t({ nb: 'Mer', en: 'More', ar: 'المزيد', ur: 'مزید' })}
         </AppText>
       </View>
 
@@ -80,7 +81,7 @@ export default function MoreScreen() {
         {!duasEnabled && tasbihEnabled && (
           <FeatureCard
             icon={<TasbihIcon size={24} color={theme.colors.primary} />}
-            title="Tasbih"
+            title={t({ nb: 'Tasbih', en: 'Tasbih', ar: 'المسبحة', ur: 'تسبیح' })}
             onPress={() => router.push('/tasbih')}
           />
         )}
@@ -89,7 +90,7 @@ export default function MoreScreen() {
       <View style={{ flexGrow: 1, minHeight: spacing.xl }} />
       <Card padding="sm" rounded="xl">
         <ListRow
-          title="Gi tilbakemelding"
+          title={t({ nb: 'Gi tilbakemelding', en: 'Send feedback', ar: 'أرسل ملاحظاتك', ur: 'رائے دیں' })}
           leading={<Ionicons name="chatbubble-ellipses-outline" size={20} color={theme.colors.primary} />}
           trailing={support.unread > 0 ? <Badge label={String(support.unread)} /> : undefined}
           chevron
@@ -98,7 +99,7 @@ export default function MoreScreen() {
         />
         <Divider />
         <ListRow
-          title="Hva er nytt"
+          title={t({ nb: 'Hva er nytt', en: "What's new", ar: 'ما الجديد', ur: 'نیا کیا ہے' })}
           leading={<Ionicons name="sparkles-outline" size={20} color={theme.colors.primary} />}
           chevron
           onPress={() => router.push('/whats-new')}

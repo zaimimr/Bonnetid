@@ -4,6 +4,7 @@ import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInDown, FadeOut, ReduceMotion } from 'react-native-reanimated';
+import { t } from '@/lib/i18n';
 import { AppText, Button, SegmentedControl } from '@/components/ui';
 import { COMPLETION, type TasbihGoal, type TasbihMode } from '@/lib/tasbih';
 import { useTheme } from '@/theme';
@@ -12,14 +13,17 @@ import { useTasbihReturn } from '@/store/tasbihReturn';
 import type { TasbihSession } from './useTasbih';
 
 const MODES: { value: TasbihMode; label: string }[] = [
-  { value: 'sequence', label: 'Etter bønnen' },
-  { value: 'free', label: 'Fri telling' },
+  {
+    value: 'sequence',
+    label: t({ nb: 'Etter bønnen', en: 'After prayer', ar: 'بعد الصلاة', ur: 'نماز کے بعد' }),
+  },
+  { value: 'free', label: t({ nb: 'Fri telling', en: 'Free count', ar: 'عدّ حر', ur: 'آزاد گنتی' }) },
 ];
 
 const GOALS: { value: string; label: string }[] = [
   { value: '33', label: '33' },
   { value: '100', label: '100' },
-  { value: 'none', label: 'Uten mål' },
+  { value: 'none', label: t({ nb: 'Uten mål', en: 'No goal', ar: 'بلا هدف', ur: 'بغیر ہدف' }) },
 ];
 
 function goalFrom(value: string): TasbihGoal {
@@ -39,7 +43,7 @@ function ResetButton({ onPress }: { onPress: () => void }) {
       onPress={onPress}
       hitSlop={hitSlop}
       accessibilityRole="button"
-      accessibilityLabel="Nullstill"
+      accessibilityLabel={t({ nb: 'Nullstill', en: 'Reset', ar: 'إعادة الضبط', ur: 'دوبارہ شروع کریں' })}
       style={({ pressed }) => ({ padding: 6, opacity: pressed ? opacity.pressed : 1 })}>
       <Ionicons name="refresh" size={24} color={theme.colors.primary} />
     </Pressable>
@@ -54,7 +58,7 @@ function FinishAction({ session, fromDuas }: { session: TasbihSession; fromDuas:
   if (fromDuas && state.mode === 'sequence') {
     return (
       <Button
-        label="Ferdig"
+        label={t({ nb: 'Ferdig', en: 'Done', ar: 'تم', ur: 'مکمل' })}
         onPress={() => {
           setScrollPast(COMPLETION?.id ?? null);
           router.back();
@@ -65,7 +69,7 @@ function FinishAction({ session, fromDuas }: { session: TasbihSession; fromDuas:
   }
   return (
     <Button
-      label="Begynn på nytt"
+      label={t({ nb: 'Begynn på nytt', en: 'Start over', ar: 'البدء من جديد', ur: 'نئے سرے سے شروع کریں' })}
       variant="secondary"
       onPress={reset}
       style={{ alignSelf: 'center', minWidth: 200 }}
@@ -83,7 +87,19 @@ export function TasbihShell({ session, fromDuas = false, children }: TasbihShell
   const insets = useSafeAreaInsets();
   const { state, target, tap, reset, setMode, setGoal } = session;
   const untouched = state.count === 0 && state.step === 0;
-  const label = target ? `Tell, ${state.count} av ${target}` : `Tell, ${state.count}`;
+  const label = target
+    ? t({
+        nb: `Tell, ${state.count} av ${target}`,
+        en: `Count, ${state.count} of ${target}`,
+        ar: `عُدّ، ${state.count} من ${target}`,
+        ur: `گنیں، ${target} میں سے ${state.count}`,
+      })
+    : t({
+        nb: `Tell, ${state.count}`,
+        en: `Count, ${state.count}`,
+        ar: `عُدّ، ${state.count}`,
+        ur: `گنیں، ${state.count}`,
+      });
 
   return (
     <>
@@ -124,7 +140,12 @@ export function TasbihShell({ session, fromDuas = false, children }: TasbihShell
           ) : untouched ? (
             <Animated.View entering={fade} exiting={fadeOut}>
               <AppText size="sm" tone="textMuted" align="center">
-                Trykk hvor som helst for å telle
+                {t({
+                  nb: 'Trykk hvor som helst for å telle',
+                  en: 'Tap anywhere to count',
+                  ar: 'اضغط في أي مكان للعدّ',
+                  ur: 'گننے کے لیے کہیں بھی دبائیں',
+                })}
               </AppText>
             </Animated.View>
           ) : null}

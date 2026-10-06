@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText, Card } from '@/components/ui';
+import { isRTL } from '@/lib/i18n';
+import { AppText, Card, mirrored } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
 import type { HijriDay } from '@/api/types';
@@ -31,7 +32,7 @@ export function EventCard({ event, onPress }: EventCardProps) {
             {date.getDate()}
           </AppText>
           <AppText size="xs" tone="onPrimarySoft" numberOfLines={1}>
-            {monthName(date.getMonth()).slice(0, 3)}
+            {isRTL() ? monthName(date.getMonth()) : monthName(date.getMonth()).slice(0, 3)}
           </AppText>
         </View>
         <View style={{ flex: 1, gap: spacing.xxs }}>
@@ -42,7 +43,7 @@ export function EventCard({ event, onPress }: EventCardProps) {
             {formatHijri(event.hijri_date, event.hijri_month_text)}
           </AppText>
         </View>
-        {onPress && <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />}
+        {onPress && <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} style={mirrored} />}
       </View>
     </Card>
   );

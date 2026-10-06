@@ -2,7 +2,8 @@ import { Fragment } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText, Card, Divider } from '@/components/ui';
+import { t } from '@/lib/i18n';
+import { AppText, Card, Divider, mirrored } from '@/components/ui';
 import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
 import { useFeature } from '@/hooks/useFeature';
 import type { FeatureFlag } from '@/lib/featureFlags';
@@ -61,7 +62,7 @@ function WhatsNewRow({ item, onPress }: { item: WhatsNewItem; onPress?: () => vo
           name="chevron-forward"
           size={18}
           color={theme.colors.textMuted}
-          style={{ alignSelf: 'center' }}
+          style={[{ alignSelf: 'center' }, mirrored]}
         />
       ) : null}
     </Pressable>
@@ -87,7 +88,12 @@ export function WhatsNewList({ entries, onNavigate }: WhatsNewListProps) {
         return (
           <View key={entry.version} style={{ gap: spacing.md }}>
             <AppText size="lg" weight="bold" heading>
-              Versjon {entry.version}
+              {t({
+                nb: `Versjon ${entry.version}`,
+                en: `Version ${entry.version}`,
+                ar: `الإصدار ${entry.version}`,
+                ur: `ورژن ${entry.version}`,
+              })}
             </AppText>
             <Card padding="xs" rounded="xl">
               {items.map((item, index) => (

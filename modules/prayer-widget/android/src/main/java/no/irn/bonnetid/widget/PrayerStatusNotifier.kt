@@ -165,6 +165,7 @@ object PrayerStatusNotifier {
     ensureChannel(context, manager)
 
     val label = prayer.displayLabel
+    val strings = WidgetStrings.of(snapshot)
     val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       Notification.Builder(context, CHANNEL_ID)
     } else {
@@ -178,8 +179,8 @@ object PrayerStatusNotifier {
       .setSmallIcon(R.drawable.prayer_widget_status_icon)
       .setContentTitle("$label · ${PrayerFormat.time(prayer.at)}")
       .setContentText(
-        if (endsAt != null) "Går ut ${PrayerFormat.time(endsAt)} · har du bedt $label?"
-        else "Har du bedt $label?",
+        if (endsAt != null) strings.endsAtPrayedQuestion(PrayerFormat.time(endsAt), label)
+        else strings.prayedQuestion(label),
       )
       .setWhen(prayer.at)
       .setShowWhen(true)
@@ -191,10 +192,10 @@ object PrayerStatusNotifier {
       .setContentIntent(openAppIntent(context))
       .addExtras(Bundle().apply { putBoolean(EXTRA_REQUEST_PROMOTED_ONGOING, true) })
       .addAction(
-        action(context, R.drawable.prayer_widget_check, "Bedt", date, kind, PrayerLogStore.STATUS_PRAYED),
+        action(context, R.drawable.prayer_widget_check, strings.prayed, date, kind, PrayerLogStore.STATUS_PRAYED),
       )
       .addAction(
-        action(context, R.drawable.prayer_widget_skip, "Hopp over", date, kind, PrayerLogStore.STATUS_SKIPPED),
+        action(context, R.drawable.prayer_widget_skip, strings.skip, date, kind, PrayerLogStore.STATUS_SKIPPED),
       )
 
     if (endsAt != null) {

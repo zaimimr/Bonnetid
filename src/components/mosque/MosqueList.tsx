@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { t } from '@/lib/i18n';
 import { useMosques } from '@/api/queries';
 import type { Mosque } from '@/api/types';
 import { MosqueCard } from '@/components/mosque/MosqueCard';
@@ -40,10 +41,24 @@ type MosqueWithDistance = {
   distance: number | null;
 };
 
-const CALCULATED_MESSAGE: Record<MosqueListMode, string> = {
-  browse: 'Moskeoversikten gjelder Norge. Bytt til norsk tid i Innstillinger for å se den.',
-  pick: 'Moskeer er norske. Bytt til norsk tid i Innstillinger for å velge en moské.',
-};
+const CALCULATED_MESSAGE: Record<MosqueListMode, string> = t({
+  nb: {
+    browse: 'Moskeoversikten gjelder Norge. Bytt til norsk tid i Innstillinger for å se den.',
+    pick: 'Moskeer er norske. Bytt til norsk tid i Innstillinger for å velge en moské.',
+  },
+  en: {
+    browse: 'The mosque list covers Norway. Switch to Norwegian time in Settings to see it.',
+    pick: 'The mosques are in Norway. Switch to Norwegian time in Settings to choose a mosque.',
+  },
+  ar: {
+    browse: 'قائمة المساجد خاصة بالنرويج. انتقل إلى التوقيت النرويجي في الإعدادات لعرضها.',
+    pick: 'المساجد في النرويج. انتقل إلى التوقيت النرويجي في الإعدادات لاختيار مسجد.',
+  },
+  ur: {
+    browse: 'مساجد کی فہرست ناروے کے لیے ہے۔ اسے دیکھنے کے لیے ترتیبات میں نارویجن وقت پر جائیں۔',
+    pick: 'مساجد ناروے میں ہیں۔ مسجد منتخب کرنے کے لیے ترتیبات میں نارویجن وقت پر جائیں۔',
+  },
+});
 
 export function MosqueList({ mode }: { mode: MosqueListMode }) {
   const picking = mode === 'pick';
@@ -170,13 +185,34 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
 
   const mapCenter = place ? { lat: place.lat, lon: place.lon } : { lat: coords.lat, lon: coords.lon };
 
+  const search = query.trim();
   const emptyMessage = place
-    ? query.trim()
-      ? `Ingen moskeer i ${place.name} matcher «${query.trim()}»`
-      : `Vi har ingen registrerte moskeer i ${place.name}`
-    : query.trim()
-      ? `Ingen moskeer matcher «${query.trim()}»`
-      : 'Ingen moskeer funnet i nærheten';
+    ? search
+      ? t({
+          nb: `Ingen moskeer i ${place.name} matcher «${search}»`,
+          en: `No mosques in ${place.name} match “${search}”`,
+          ar: `لا توجد مساجد في ${place.name} تطابق «${search}»`,
+          ur: `${place.name} میں کوئی مسجد «${search}» سے مطابقت نہیں رکھتی`,
+        })
+      : t({
+          nb: `Vi har ingen registrerte moskeer i ${place.name}`,
+          en: `We have no registered mosques in ${place.name}`,
+          ar: `لا توجد لدينا مساجد مسجّلة في ${place.name}`,
+          ur: `${place.name} میں ہمارے پاس کوئی رجسٹرڈ مسجد نہیں`,
+        })
+    : search
+      ? t({
+          nb: `Ingen moskeer matcher «${search}»`,
+          en: `No mosques match “${search}”`,
+          ar: `لا توجد مساجد تطابق «${search}»`,
+          ur: `کوئی مسجد «${search}» سے مطابقت نہیں رکھتی`,
+        })
+      : t({
+          nb: 'Ingen moskeer funnet i nærheten',
+          en: 'No mosques found nearby',
+          ar: 'لم يُعثر على مساجد قريبة',
+          ur: 'قریب میں کوئی مسجد نہیں ملی',
+        });
 
   if (calculated) {
     return (
@@ -205,7 +241,12 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
               <TextInput
                 value={query}
                 onChangeText={setQuery}
-                placeholder="Søk etter moské eller sted"
+                placeholder={t({
+                  nb: 'Søk etter moské eller sted',
+                  en: 'Search for a mosque or place',
+                  ar: 'ابحث عن مسجد أو مكان',
+                  ur: 'مسجد یا مقام تلاش کریں',
+                })}
                 placeholderTextColor={theme.colors.textMuted}
                 autoCorrect={false}
                 maxFontSizeMultiplier={1.6}
@@ -218,7 +259,12 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
               />
             </PostHogMaskView>
             {query.length > 0 && (
-              <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel="Tøm søk">
+              <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel={t({
+                  nb: 'Tøm søk',
+                  en: 'Clear search',
+                  ar: 'مسح البحث',
+                  ur: 'تلاش صاف کریں',
+                })}>
                 <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
               </Pressable>
             )}
@@ -249,13 +295,13 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
               rowGap: spacing.sm,
             }}>
             <SortChip
-              label="Nærmest meg"
+              label={t({ nb: 'Nærmest meg', en: 'Nearest me', ar: 'الأقرب إليّ', ur: 'میرے قریب ترین' })}
               icon="navigate-outline"
               active={sort === 'distance'}
               onPress={() => setSort('distance')}
             />
             <SortChip
-              label="Navn A–Å"
+              label={t({ nb: 'Navn A–Å', en: 'Name A–Z', ar: 'الاسم أ–ي', ur: 'نام ا–ی' })}
               icon="text-outline"
               active={sort === 'name'}
               onPress={() => setSort('name')}
@@ -335,7 +381,16 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
             key={placeIso ?? 'all'}
             pins={pins}
             center={mapCenter}
-            actionLabel={picking ? 'Velg denne moskeen' : 'Vis moské'}
+            actionLabel={
+              picking
+                ? t({
+                    nb: 'Velg denne moskeen',
+                    en: 'Choose this mosque',
+                    ar: 'اختيار هذا المسجد',
+                    ur: 'یہ مسجد منتخب کریں',
+                  })
+                : t({ nb: 'Vis moské', en: 'View mosque', ar: 'عرض المسجد', ur: 'مسجد دیکھیں' })
+            }
             myOrgNr={selectedOrgNr}
             fitToPins={place != null}
             onSelect={onSelectPin}

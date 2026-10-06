@@ -8,6 +8,7 @@ import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { NOTIFIABLE_PRAYERS, useSettings } from '@/store/settings';
+import { t } from '@/lib/i18n';
 
 export default function NotificationPrayersScreen() {
   const theme = useTheme();
@@ -18,7 +19,7 @@ export default function NotificationPrayersScreen() {
 
   return (
     <Screen scroll edges={[]}>
-      <SectionHeader title="Varsle for" style={{ marginTop: spacing.lg }} />
+      <SectionHeader title={t({ nb: 'Varsle for', en: 'Notify for', ar: 'التنبيه لـ', ur: 'اطلاع برائے' })} style={{ marginTop: spacing.lg }} />
       <Card padding="sm" rounded="xl">
         {NOTIFIABLE_PRAYERS.map((prayer, index) => (
           <View key={prayer}>
@@ -43,10 +44,10 @@ export default function NotificationPrayersScreen() {
         ))}
       </Card>
 
-      <SectionHeader title="Lyd" style={{ marginTop: spacing.lg }} />
+      <SectionHeader title={t({ nb: 'Lyd', en: 'Sound', ar: 'الصوت', ur: 'آواز' })} style={{ marginTop: spacing.lg }} />
       <Card padding="sm" rounded="xl">
         <ListRow
-          title="Varsellyd"
+          title={t({ nb: 'Varsellyd', en: 'Notification sound', ar: 'صوت الإشعار', ur: 'اطلاع کی آواز' })}
           subtitle={getNotificationSound(notificationSound).label}
           leading={<Ionicons name="musical-notes-outline" size={20} color={theme.colors.primary} />}
           chevron

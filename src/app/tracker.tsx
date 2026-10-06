@@ -21,6 +21,7 @@ import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import { usePrayerLog } from '@/store/prayerLog';
 import { useActiveLocation } from '@/store/settings';
 import { FeatureGate } from '@/components/FeatureGate';
+import { isRTL, t } from '@/lib/i18n';
 
 const MINUTE_MS = 60 * 1000;
 
@@ -71,7 +72,7 @@ function TrackerScreen() {
     [selectedDate, todayIso, todaySchedule, log, at],
   );
 
-  const dayLabel = isToday ? 'I dag' : formatGregorianLong(selectedDate);
+  const dayLabel = isToday ? t({ nb: 'I dag', en: 'Today', ar: 'اليوم', ur: 'آج' }) : formatGregorianLong(selectedDate);
   const loading = isLoading || (!isToday && month.isLoading);
   const failed = isError || (!isToday && month.isError);
 
@@ -119,7 +120,7 @@ function TrackerScreen() {
           {loading && <Skeleton height={240} rounded="xl" />}
           {!loading && failed && <ErrorState onRetry={refetch} />}
           {!loading && !failed && schedule.length === 0 && (
-            <EmptyState message="Ingen bønnetider for denne dagen" icon="time-outline" />
+            <EmptyState message={t({ nb: 'Ingen bønnetider for denne dagen', en: 'No prayer times for this day', ar: 'لا توجد مواقيت صلاة لهذا اليوم', ur: 'اس دن کے لیے نماز کے اوقات نہیں' })} icon="time-outline" />
           )}
 
           {!loading && !failed && schedule.length > 0 && (
@@ -142,8 +143,18 @@ function TrackerScreen() {
                       accessibilityLabel={
                         started
                           ? status === 'prayed'
-                            ? `${entry.label}, markert som bedt`
-                            : `${entry.label}, ikke markert`
+                            ? t({
+                                nb: `${entry.label}, markert som bedt`,
+                                en: `${entry.label}, marked as prayed`,
+                                ar: `${entry.label}، مُعلَّمة كمُصلّاة`,
+                                ur: `${entry.label}، ادا شدہ کے طور پر نشان زد`,
+                              })
+                            : t({
+                                nb: `${entry.label}, ikke markert`,
+                                en: `${entry.label}, not marked`,
+                                ar: `${entry.label}، غير مُعلَّمة`,
+                                ur: `${entry.label}، نشان زد نہیں`,
+                              })
                           : undefined
                       }
                       accessibilityState={started ? { expanded: open } : undefined}
@@ -169,7 +180,7 @@ function TrackerScreen() {
                         size={isStacked ? 'sm' : 'md'}
                         tone={started ? 'textSecondary' : 'textMuted'}
                         tabular
-                        style={{ marginLeft: 'auto' }}>
+                        style={{ marginStart: 'auto' }}>
                         {entry.time}
                       </AppText>
                     </Pressable>
@@ -211,7 +222,7 @@ function DayArrow({
       disabled={disabled}
       hitSlop={hitSlop}
       accessibilityRole="button"
-      accessibilityLabel={direction === 'back' ? 'Forrige dag' : 'Neste dag'}
+      accessibilityLabel={direction === 'back' ? t({ nb: 'Forrige dag', en: 'Previous day', ar: 'اليوم السابق', ur: 'پچھلا دن' }) : t({ nb: 'Neste dag', en: 'Next day', ar: 'اليوم التالي', ur: 'اگلا دن' })}
       accessibilityState={{ disabled }}
       style={({ pressed }) => [
         {
@@ -226,7 +237,7 @@ function DayArrow({
         pressed && !disabled && { opacity: opacity.pressed },
       ]}>
       <Ionicons
-        name={direction === 'back' ? 'chevron-back' : 'chevron-forward'}
+        name={(direction === 'back') !== isRTL() ? 'chevron-back' : 'chevron-forward'}
         size={20}
         color={theme.colors.textSecondary}
       />

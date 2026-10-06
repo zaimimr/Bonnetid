@@ -33,6 +33,8 @@ object DayViews {
       WidgetSize.TALL -> R.layout.prayer_day_tall
     }
     val views = RemoteViews(context.packageName, layout)
+    val strings = WidgetStrings.of(snapshot)
+    views.setInt(R.id.root, "setLayoutDirection", strings.layoutDirection)
     val showJamat = snapshot.showJamat && snapshot.hasJamatTimes
 
     if (size != WidgetSize.COMPACT) {
@@ -40,8 +42,8 @@ object DayViews {
       views.setTextViewText(R.id.hijri, moment.hijriText)
     }
     when (size) {
-      WidgetSize.MEDIUM -> fillFooter(views, moment, showJamat, now)
-      WidgetSize.TALL -> fillHero(views, moment, showJamat, now)
+      WidgetSize.MEDIUM -> fillFooter(views, strings, moment, showJamat, now)
+      WidgetSize.TALL -> fillHero(views, strings, moment, showJamat, now)
       WidgetSize.COMPACT -> Unit
     }
 
@@ -115,13 +117,15 @@ object DayViews {
 
   private fun fillFooter(
     views: RemoteViews,
+    strings: WidgetStrings,
     moment: PrayerMoment,
     showJamat: Boolean,
     now: Long,
   ) {
     views.setImageViewResource(R.id.footer_icon, PrayerIcons.drawable(moment.next.kind))
     views.setTextViewText(R.id.footer_label, moment.next.displayLabel)
-    WidgetChrome.countdown(views, R.id.countdown, moment.next.at, now, "om %s")
+    WidgetChrome.countdown(views, R.id.countdown, moment.next.at, now, strings.countdownFormat)
+    views.setTextViewText(R.id.footer_jamat, "· ${strings.jamat}")
     views.setViewVisibility(
       R.id.footer_jamat,
       if (showJamat) View.VISIBLE else View.GONE,
@@ -130,6 +134,7 @@ object DayViews {
 
   private fun fillHero(
     views: RemoteViews,
+    strings: WidgetStrings,
     moment: PrayerMoment,
     showJamat: Boolean,
     now: Long,
@@ -137,7 +142,7 @@ object DayViews {
     views.setImageViewResource(R.id.headline_icon, PrayerIcons.drawable(moment.headline.kind))
     views.setTextViewText(
       R.id.headline_label,
-      "${moment.stateLabel} · ${moment.headline.displayLabel}",
+      "${strings.stateLabel(moment)} · ${moment.headline.displayLabel}",
     )
     views.setTextViewText(
       R.id.headline_time,
@@ -146,7 +151,7 @@ object DayViews {
     WidgetChrome.countdown(views, R.id.countdown, moment.next.at, now, "%s")
     views.setTextViewText(
       R.id.countdown_label,
-      "til ${moment.next.displayLabel} ${PrayerFormat.time(moment.next.at)}",
+      strings.until(moment.next.displayLabel, PrayerFormat.time(moment.next.at)),
     )
   }
 }

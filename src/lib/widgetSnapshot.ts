@@ -1,3 +1,4 @@
+import { language, type Language } from './i18n.ts';
 import type { JummahSlot } from './jummah';
 import { jummahSlotIsOpen } from './jummah';
 import type { PrayerEntry } from './prayerSchedule';
@@ -70,6 +71,7 @@ export type Snapshot = {
   mosqueName: string | null;
   showJamat: boolean;
   lockScreenEnabled: boolean;
+  lang: Language;
   days: SnapshotDay[];
 };
 
@@ -102,6 +104,7 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
     mosqueName: input.mosqueName ?? null,
     showJamat: input.showJamat ?? false,
     lockScreenEnabled: input.lockScreenEnabled ?? false,
+    lang: language(),
     days: input.days.map((day) => ({
       date: isoDateKey(day.date),
       hijriText: day.hijriText,

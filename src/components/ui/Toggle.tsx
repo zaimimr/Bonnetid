@@ -5,6 +5,7 @@ import Animated, {
   useDerivedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { isRTL } from '@/lib/i18n';
 import { useTheme } from '@/theme';
 import { opacity } from '@/theme/tokens';
 
@@ -31,8 +32,9 @@ export function Toggle({ value, onValueChange, disabled = false, accessibilityLa
     backgroundColor: interpolateColor(progress.value, [0, 1], [offTrack, onTrack]),
   }));
 
+  const travel = isRTL() ? -TRAVEL : TRAVEL;
   const thumbStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: progress.value * TRAVEL }],
+    transform: [{ translateX: progress.value * travel }],
   }));
 
   return (

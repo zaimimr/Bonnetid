@@ -1,6 +1,7 @@
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from './AppText';
+import { mirrored } from './rtl';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, spacing } from '@/theme/tokens';
 
@@ -30,7 +31,7 @@ export function InlineLink({ label, icon, onPress }: InlineLinkProps) {
         <AppText size="sm" weight="semibold" tone="primary" style={{ flexShrink: 1 }}>
           {label}
         </AppText>
-        <Ionicons name="chevron-forward" size={14} color={theme.colors.primary} />
+        <Ionicons name="chevron-forward" size={14} color={theme.colors.primary} style={mirrored} />
       </View>
     </Pressable>
   );

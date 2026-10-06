@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { View, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from './AppText';
+import { mirrored } from './rtl';
 import { Badge } from './Badge';
 import { Card } from './Card';
 import { useTheme } from '@/theme';
@@ -36,7 +37,7 @@ export function FeatureCard({ icon, title, onPress, badge, style }: FeatureCardP
           {title}
         </AppText>
         {badge ? <Badge label={badge} /> : null}
-        <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
+        <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} style={mirrored} />
       </View>
     </Card>
   );

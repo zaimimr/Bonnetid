@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from './AppText';
+import { mirrored } from './rtl';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, spacing } from '@/theme/tokens';
 
@@ -28,7 +29,7 @@ export function ListRow({
 
   const content = (
     <>
-      {leading && <View style={{ marginRight: spacing.md }}>{leading}</View>}
+      {leading && <View style={{ marginEnd: spacing.md }}>{leading}</View>}
       <View style={{ flex: 1, gap: spacing.xxs }}>
         <AppText weight="medium" numberOfLines={2}>
           {title}
@@ -40,7 +41,7 @@ export function ListRow({
         ) : null}
       </View>
       {trailing && (
-        <View style={{ marginLeft: spacing.md, flexShrink: 1, alignItems: 'flex-end' }}>
+        <View style={{ marginStart: spacing.md, flexShrink: 1, alignItems: 'flex-end' }}>
           {trailing}
         </View>
       )}
@@ -49,7 +50,7 @@ export function ListRow({
           name="chevron-forward"
           size={18}
           color={theme.colors.textMuted}
-          style={{ marginLeft: spacing.sm }}
+          style={[{ marginStart: spacing.sm }, mirrored]}
         />
       )}
     </>

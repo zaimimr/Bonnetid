@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
+import { t } from '@/lib/i18n';
 import { AppText, Button, Sheet } from '@/components/ui';
 import { SurveyQuestionView } from './SurveyQuestionView';
 import { featureResultEnabled } from '@/lib/featureFlags';
@@ -88,9 +89,9 @@ export function SurveyHost() {
       {finished ? (
         <View style={{ gap: spacing.lg }}>
           <AppText size="lg" weight="semibold">
-            Takk for svaret!
+            {t({ nb: 'Takk for svaret!', en: 'Thanks for your answer!', ar: 'شكرًا على إجابتك!', ur: 'جواب کا شکریہ!' })}
           </AppText>
-          <Button label="Lukk" fullWidth onPress={close} />
+          <Button label={t({ nb: 'Lukk', en: 'Close', ar: 'إغلاق', ur: 'بند کریں' })} fullWidth onPress={close} />
         </View>
       ) : (
         <View style={{ gap: spacing.xl }}>
@@ -100,7 +101,12 @@ export function SurveyHost() {
             onChange={(value) => setAnswers((current) => ({ ...current, [index]: value }))}
           />
           <Button
-            label={question.buttonText ?? (isLast ? 'Send' : 'Neste')}
+            label={
+              question.buttonText ??
+              (isLast
+                ? t({ nb: 'Send', en: 'Send', ar: 'إرسال', ur: 'بھیجیں' })
+                : t({ nb: 'Neste', en: 'Next', ar: 'التالي', ur: 'اگلا' }))
+            }
             fullWidth
             disabled={!isAnswered(question, answer)}
             onPress={advance}

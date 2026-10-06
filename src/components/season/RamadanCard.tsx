@@ -1,4 +1,5 @@
 import { View } from 'react-native';
+import { t } from '@/lib/i18n';
 import { AppText, Card } from '@/components/ui';
 import { DuaLink } from '@/components/duas/DuaLink';
 import { SeasonCountdownCard } from '@/components/season/SeasonCountdownCard';
@@ -87,7 +88,14 @@ function FastingDayCard({
           rowGap: spacing.xxs,
         }}>
         <AppText weight="semibold">
-          {dayOfRamadan != null ? `Ramadan dag ${dayOfRamadan}` : 'Ramadan'}
+          {dayOfRamadan != null
+            ? t({
+                nb: `Ramadan dag ${dayOfRamadan}`,
+                en: `Ramadan day ${dayOfRamadan}`,
+                ar: `اليوم ${dayOfRamadan} من رمضان`,
+                ur: `رمضان کا ${dayOfRamadan} واں دن`,
+              })
+            : t({ nb: 'Ramadan', en: 'Ramadan', ar: 'رمضان', ur: 'رمضان' })}
         </AppText>
         {hijriYear != null && (
           <AppText size="sm" tone="textMuted" tabular>
@@ -105,9 +113,13 @@ function FastingDayCard({
             alignItems: isStacked ? 'flex-start' : 'flex-end',
             gap: isStacked ? spacing.sm : spacing.lg,
           }}>
-          <FastingBoundary label="Suhoor slutter" time={fajr.time} stacked={isStacked} />
           <FastingBoundary
-            label="Iftar"
+            label={t({ nb: 'Suhoor slutter', en: 'Suhoor ends', ar: 'نهاية السحور', ur: 'سحری کا اختتام' })}
+            time={fajr.time}
+            stacked={isStacked}
+          />
+          <FastingBoundary
+            label={t({ nb: 'Iftar', en: 'Iftar', ar: 'الإفطار', ur: 'افطار' })}
             time={maghrib.time}
             stacked={isStacked}
             alignEnd={!isStacked}
@@ -118,7 +130,12 @@ function FastingDayCard({
       {progress != null && (
         <View
           accessibilityRole="progressbar"
-          accessibilityLabel="Fasten fra Fajr til Maghrib"
+          accessibilityLabel={t({
+            nb: 'Fasten fra Fajr til Maghrib',
+            en: 'The fast from Fajr to Maghrib',
+            ar: 'الصيام من الفجر إلى المغرب',
+            ur: 'فجر سے مغرب تک روزہ',
+          })}
           accessibilityValue={{ min: 0, max: 100, now: Math.round(progress * 100) }}
           style={{
             marginTop: spacing.md,
@@ -145,11 +162,16 @@ function FastingDayCard({
           tone="textSecondary"
           tabular
           style={{ marginTop: spacing.sm }}>
-          {`${countdown.label} om ${formatDurationShort(countdown.target.getTime() - now.getTime())}`}
+          {t({
+            nb: `${countdown.label} om ${formatDurationShort(countdown.target.getTime() - now.getTime())}`,
+            en: `${countdown.label} in ${formatDurationShort(countdown.target.getTime() - now.getTime())}`,
+            ar: `${countdown.label} بعد ${formatDurationShort(countdown.target.getTime() - now.getTime())}`,
+            ur: `${countdown.label} ${formatDurationShort(countdown.target.getTime() - now.getTime())} میں`,
+          })}
         </AppText>
       )}
 
-      <DuaLink duaId={DUA_LINKS.iftar} label="Dua ved iftar" />
+      <DuaLink duaId={DUA_LINKS.iftar} label={t({ nb: 'Dua ved iftar', en: 'Dua at iftar', ar: 'دعاء الإفطار', ur: 'افطار کی دعا' })} />
     </Card>
   );
 }

@@ -50,7 +50,10 @@ private struct ActivityPhase {
     showMarkButtons = state.showMarkButtons ?? true
   }
 
-  var statusLine: String { windowOver ? "\(label)-tiden er over" : "Går ut om" }
+  var statusLine: String {
+    let strings = WidgetStrings.current
+    return windowOver ? strings.windowOver(label) : strings.endsIn
+  }
   var upcomingLine: String? {
     guard let upcoming else { return nil }
     return "\(upcoming.label) \(PrayerFormat.time(upcoming.prayerAt))"
@@ -90,21 +93,24 @@ struct PrayerLiveActivity: Widget {
         locationName: context.attributes.locationName,
         phase: ActivityPhase(state: context.state, isStale: context.isStale)
       )
+      .widgetLanguage(WidgetStrings.current)
       .activityBackgroundTint(PrayerColor.surface)
       .activitySystemActionForegroundColor(PrayerColor.brand)
     } dynamicIsland: { context in
       let phase = ActivityPhase(state: context.state, isStale: context.isStale)
+      let strings = WidgetStrings.current
 
       return DynamicIsland {
         DynamicIslandExpandedRegion(.leading) {
           VStack(alignment: .leading, spacing: 1) {
-            Text(phase.windowOver ? "Ubesvart" : "Nå")
+            Text(phase.windowOver ? strings.unmarked : strings.now)
               .font(.caption2)
               .foregroundStyle(PrayerColor.inkMuted)
             Text(phase.label)
               .font(.headline)
               .foregroundStyle(PrayerColor.brand)
           }
+          .widgetLanguage(strings)
         }
 
         DynamicIslandExpandedRegion(.trailing) {
@@ -117,6 +123,7 @@ struct PrayerLiveActivity: Widget {
               .foregroundStyle(PrayerColor.inkMuted)
               .lineLimit(1)
           }
+          .widgetLanguage(strings)
         }
 
         DynamicIslandExpandedRegion(.bottom) {
@@ -132,7 +139,7 @@ struct PrayerLiveActivity: Widget {
                   .foregroundStyle(PrayerColor.inkSecondary)
                   .frame(maxWidth: 76, alignment: .trailing)
               } else if let upcoming = phase.upcomingLine {
-                Text("Neste: \(upcoming)")
+                Text(WidgetStrings.current.nextLine(upcoming))
                   .font(.caption)
                   .foregroundStyle(PrayerColor.inkSecondary)
                   .lineLimit(1)
@@ -143,6 +150,7 @@ struct PrayerLiveActivity: Widget {
               MarkButtons(phase: phase)
             }
           }
+          .widgetLanguage(strings)
         }
       } compactLeading: {
         Image(systemName: PrayerFormat.symbol(for: phase.kind))
@@ -152,6 +160,7 @@ struct PrayerLiveActivity: Widget {
           .prayerTime(.caption2)
           .foregroundStyle(PrayerColor.brand)
           .frame(maxWidth: 54)
+          .widgetLanguage(strings)
       } minimal: {
         Image(systemName: PrayerFormat.symbol(for: phase.kind))
           .foregroundStyle(PrayerColor.brand)
@@ -207,7 +216,7 @@ private struct SmallActivityView: View {
             .foregroundStyle(PrayerColor.inkSecondary)
         }
       } else if let upcoming = phase.upcomingLine {
-        Text("Neste: \(upcoming)")
+        Text(WidgetStrings.current.nextLine(upcoming))
           .font(.caption)
           .foregroundStyle(PrayerColor.inkSecondary)
           .lineLimit(1)
@@ -245,7 +254,7 @@ private struct MarkButtons: View {
       Button(
         intent: MarkPrayerIntent(isoDate: phase.isoDate, prayer: phase.kind, status: "prayed")
       ) {
-        Label("Bedt", systemImage: "checkmark")
+        Label(WidgetStrings.current.prayed, systemImage: "checkmark")
           .font(.subheadline.weight(.semibold))
           .frame(maxWidth: .infinity)
       }
@@ -255,7 +264,7 @@ private struct MarkButtons: View {
       Button(
         intent: MarkPrayerIntent(isoDate: phase.isoDate, prayer: phase.kind, status: "skipped")
       ) {
-        Text("Hopp over")
+        Text(WidgetStrings.current.skip)
           .font(.subheadline)
           .frame(maxWidth: .infinity)
       }
@@ -298,7 +307,7 @@ private struct LockScreenActivityView: View {
         )
         .tint(PrayerColor.brand)
       } else if let upcoming = phase.upcomingLine {
-        Text("Neste: \(upcoming)")
+        Text(WidgetStrings.current.nextLine(upcoming))
           .font(.subheadline)
           .foregroundStyle(PrayerColor.inkSecondary)
           .lineLimit(1)

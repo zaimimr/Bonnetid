@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
+import { t } from '@/lib/i18n';
 import { Button, Sheet } from '@/components/ui';
 import { WhatsNewList } from './WhatsNewList';
 import { openStoreReview } from '@/lib/review';
@@ -32,11 +33,16 @@ export function WhatsNewHost() {
   };
 
   return (
-    <Sheet visible={interruption === 'whats_new' && !dismissed} onClose={close} title="Hva er nytt">
+    <Sheet visible={interruption === 'whats_new' && !dismissed} onClose={close} title={t({ nb: 'Hva er nytt', en: "What's new", ar: 'ما الجديد', ur: 'نیا کیا ہے' })}>
       <WhatsNewList entries={pending} onNavigate={close} />
       <View style={{ marginTop: spacing.xl, gap: spacing.sm }}>
         <Button
-          label="Gi Bønnetid en vurdering"
+          label={t({
+            nb: 'Gi Bønnetid en vurdering',
+            en: 'Rate Bønnetid',
+            ar: 'قيّم Bønnetid',
+            ur: 'Bønnetid کی درجہ بندی کریں',
+          })}
           variant="secondary"
           fullWidth
           onPress={() => {
@@ -44,7 +50,7 @@ export function WhatsNewHost() {
             openStoreReview();
           }}
         />
-        <Button label="Fortsett" fullWidth onPress={close} />
+        <Button label={t({ nb: 'Fortsett', en: 'Continue', ar: 'متابعة', ur: 'جاری رکھیں' })} fullWidth onPress={close} />
       </View>
     </Sheet>
   );

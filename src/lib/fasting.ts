@@ -1,5 +1,6 @@
 import type { HijriDay } from '@/api/types';
-import { parseHijriDate, type ParsedHijri } from './hijri';
+import { parseHijriDate, weekdayName, type ParsedHijri } from './hijri';
+import { t } from './i18n.ts';
 import { ARAFAH_DAY, DHUL_HIJJAH_SEASON, RAMADAN_SEASON } from './hijriSeason';
 import { SUHOOR_REMINDER_MINUTES } from './ramadan';
 import { addIsoDays, isoWeekday, osloWallClockToDate } from './time';
@@ -33,10 +34,16 @@ export type FastingReminder = {
   fireAt: Date;
 };
 
-const WEEKDAY_NAMES: Record<number, string> = {
-  [MONDAY]: 'mandag',
-  [THURSDAY]: 'torsdag',
-};
+const SUHOOR_HINT = t({
+  nb: 'Husk suhoor hvis du vil faste.',
+  en: 'Remember suhoor if you plan to fast.',
+  ar: 'لا تنسَ السحور إن كنت تنوي الصيام.',
+  ur: 'اگر آپ روزہ رکھنا چاہتے ہیں تو سحری یاد رکھیں۔',
+});
+
+function hijriDayOf(day: number, month: string): string {
+  return t({ nb: `Den ${day}. ${month}.`, en: `${day} ${month}.`, ar: `${day} ${month}.`, ur: `${day} ${month}۔` });
+}
 
 export function isFastingForbidden(hijri: ParsedHijri): boolean {
   if (hijri.month === SHAWWAL && hijri.day === 1) return true;
@@ -54,8 +61,18 @@ function occasionFor(
     return {
       isoDate: row.gregorian_date,
       kind: 'arafah',
-      title: 'I morgen er det Arafah',
-      body: 'Den 9. Dhul Hijjah etter kalenderen til IRN. Husk suhoor hvis du vil faste.',
+      title: t({
+        nb: 'I morgen er det Arafah',
+        en: 'Tomorrow is the Day of Arafah',
+        ar: 'غدًا يوم عرفة',
+        ur: 'کل یوم عرفہ ہے',
+      }),
+      body: t({
+        nb: 'Den 9. Dhul Hijjah etter kalenderen til IRN. Husk suhoor hvis du vil faste.',
+        en: `9 Dhul Hijjah according to the IRN calendar. ${SUHOOR_HINT}`,
+        ar: `9 ذو الحجة حسب تقويم المجلس الإسلامي النرويجي. ${SUHOOR_HINT}`,
+        ur: `اسلامک کونسل ناروے کے کیلنڈر کے مطابق 9 ذوالحجہ۔ ${SUHOOR_HINT}`,
+      }),
     };
   }
 
@@ -64,8 +81,15 @@ function occasionFor(
       isoDate: row.gregorian_date,
       kind: 'ashura',
       title:
-        hijri.day === 10 ? 'I morgen er det Ashura' : 'I morgen er det dagen før Ashura',
-      body: `Den ${hijri.day}. Muharram. Husk suhoor hvis du vil faste.`,
+        hijri.day === 10
+          ? t({ nb: 'I morgen er det Ashura', en: 'Tomorrow is Ashura', ar: 'غدًا يوم عاشوراء', ur: 'کل عاشورہ ہے' })
+          : t({
+              nb: 'I morgen er det dagen før Ashura',
+              en: 'Tomorrow is the day before Ashura',
+              ar: 'غدًا يوم تاسوعاء',
+              ur: 'کل عاشورہ سے پہلے کا دن ہے',
+            }),
+      body: `${hijriDayOf(hijri.day, t({ nb: 'Muharram', en: 'Muharram', ar: 'محرم', ur: 'محرم' }))} ${SUHOOR_HINT}`,
     };
   }
 
@@ -73,8 +97,13 @@ function occasionFor(
     return {
       isoDate: row.gregorian_date,
       kind: 'whiteDays',
-      title: 'I morgen er det en hvit dag',
-      body: `Den ${hijri.day}. ${row.hijri_month_text}. Husk suhoor hvis du vil faste.`,
+      title: t({
+        nb: 'I morgen er det en hvit dag',
+        en: 'Tomorrow is one of the White Days',
+        ar: 'غدًا من الأيام البيض',
+        ur: 'کل ایام بیض میں سے ہے',
+      }),
+      body: `${hijriDayOf(hijri.day, row.hijri_month_text)} ${SUHOOR_HINT}`,
     };
   }
 
@@ -83,8 +112,13 @@ function occasionFor(
     return {
       isoDate: row.gregorian_date,
       kind: 'mondayThursday',
-      title: `I morgen er det ${WEEKDAY_NAMES[weekday]}`,
-      body: 'Husk suhoor hvis du vil faste.',
+      title: t({
+        nb: `I morgen er det ${weekdayName(weekday)}`,
+        en: `Tomorrow is ${weekdayName(weekday)}`,
+        ar: `غدًا يوم ${weekdayName(weekday)}`,
+        ur: `کل ${weekdayName(weekday)} ہے`,
+      }),
+      body: SUHOOR_HINT,
     };
   }
 
@@ -133,8 +167,18 @@ export function ramadanFastingReminders(
 ): FastingReminder[] {
   return days.map((day) => ({
     isoDate: day.isoDate,
-    title: `Suhoor slutter om ${SUHOOR_REMINDER_MINUTES} minutter`,
-    body: `Fajr er ${day.fajrClock} i ${locationName}. Ramadan dag ${day.dayOfRamadan}.`,
+    title: t({
+      nb: `Suhoor slutter om ${SUHOOR_REMINDER_MINUTES} minutter`,
+      en: `Suhoor ends in ${SUHOOR_REMINDER_MINUTES} minutes`,
+      ar: `ينتهي السحور بعد ${SUHOOR_REMINDER_MINUTES} دقيقة`,
+      ur: `سحری ${SUHOOR_REMINDER_MINUTES} منٹ میں ختم ہو جائے گی`,
+    }),
+    body: t({
+      nb: `Fajr er ${day.fajrClock} i ${locationName}. Ramadan dag ${day.dayOfRamadan}.`,
+      en: `Fajr is at ${day.fajrClock} in ${locationName}. Ramadan day ${day.dayOfRamadan}.`,
+      ar: `الفجر الساعة ${day.fajrClock} في ${locationName}. اليوم ${day.dayOfRamadan} من رمضان.`,
+      ur: `${locationName} میں فجر ${day.fajrClock} پر ہے۔ رمضان، دن ${day.dayOfRamadan}۔`,
+    }),
     fireAt: suhoorReminderAt(day.fajrAt),
   }));
 }

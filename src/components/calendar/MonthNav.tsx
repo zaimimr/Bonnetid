@@ -1,5 +1,6 @@
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { t, isRTL } from '@/lib/i18n';
 import { AppText, IconButton } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
@@ -80,7 +81,12 @@ export function MonthNav({
             onPress={onToday}
             hitSlop={hitSlop}
             accessibilityRole="button"
-            accessibilityLabel="Gå til denne måneden"
+            accessibilityLabel={t({
+              nb: 'Gå til denne måneden',
+              en: 'Go to this month',
+              ar: 'الانتقال إلى هذا الشهر',
+              ur: 'اس مہینے پر جائیں',
+            })}
             style={({ pressed }) => [
               {
                 height: CONTROL_SIZE,
@@ -92,12 +98,20 @@ export function MonthNav({
               pressed && { opacity: opacity.pressed },
             ]}>
             <AppText size="sm" weight="semibold" tone="onPrimarySoft">
-              I dag
+              {t({ nb: 'I dag', en: 'Today', ar: 'اليوم', ur: 'آج' })}
             </AppText>
           </Pressable>
         )}
-        <IconButton name="chevron-back" accessibilityLabel="Forrige måned" onPress={onPrev} />
-        <IconButton name="chevron-forward" accessibilityLabel="Neste måned" onPress={onNext} />
+        <IconButton
+          name={isRTL() ? 'chevron-forward' : 'chevron-back'}
+          accessibilityLabel={t({ nb: 'Forrige måned', en: 'Previous month', ar: 'الشهر السابق', ur: 'پچھلا مہینہ' })}
+          onPress={onPrev}
+        />
+        <IconButton
+          name={isRTL() ? 'chevron-back' : 'chevron-forward'}
+          accessibilityLabel={t({ nb: 'Neste måned', en: 'Next month', ar: 'الشهر التالي', ur: 'اگلا مہینہ' })}
+          onPress={onNext}
+        />
       </View>
     </View>
   );

@@ -1,5 +1,6 @@
 import { statusOf, type PrayerLog } from './prayerLog';
 import type { PrayerEntry, PrayerName } from './prayerSchedule';
+import { t } from './i18n.ts';
 
 export const REMINDER_LEAD_MINUTES = 30;
 export const SHORT_WINDOW_MINUTES = 45;
@@ -69,9 +70,19 @@ export function buildPrayerReminders(
 }
 
 export function reminderTitle(label: string): string {
-  return `Har du bedt ${label}?`;
+  return t({
+    nb: `Har du bedt ${label}?`,
+    en: `Have you prayed ${label}?`,
+    ar: `هل صلّيت ${label}؟`,
+    ur: `کیا آپ نے ${label} ادا کی؟`,
+  });
 }
 
 export function reminderBody(reminder: PrayerReminder): string {
-  return `${reminder.label} går ut kl. ${reminder.endClock} (${reminder.endLabel})`;
+  return t({
+    nb: `${reminder.label} går ut kl. ${reminder.endClock} (${reminder.endLabel})`,
+    en: `${reminder.label} ends at ${reminder.endClock} (${reminder.endLabel})`,
+    ar: `ينتهي وقت ${reminder.label} الساعة ${reminder.endClock} (${reminder.endLabel})`,
+    ur: `${reminder.label} کا وقت ${reminder.endClock} پر ختم ہوتا ہے (${reminder.endLabel})`,
+  });
 }

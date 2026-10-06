@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import type { FastingReminder } from './fasting';
 import { hasNotificationPermission, notificationsSupported } from './notifications';
+import { t } from './i18n.ts';
 
 export const FASTING_IDENTIFIER_PREFIX = 'fasting|';
 export const LEGACY_RAMADAN_IDENTIFIER_PREFIX = 'ramadan|';
@@ -59,7 +60,7 @@ async function ensureAndroidChannel(
 ): Promise<string | undefined> {
   if (Platform.OS !== 'android') return undefined;
   await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-    name: 'Faste',
+    name: t({ nb: 'Faste', en: 'Fasting', ar: 'الصيام', ur: 'روزہ' }),
     importance: Notifications.AndroidImportance.HIGH,
   });
   return CHANNEL_ID;

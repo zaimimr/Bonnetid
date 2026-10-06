@@ -7,6 +7,12 @@
     "icon": "./assets/images/icon.png",
     "scheme": "bonnetid",
     "userInterfaceStyle": "automatic",
+    "locales": {
+      "nb": "./locales/nb.json",
+      "en": "./locales/en.json",
+      "ar": "./locales/ar.json",
+      "ur": "./locales/ur.json"
+    },
     "ios": {
       "supportsTablet": true,
       "icon": {
@@ -115,7 +121,13 @@
       "./plugins/withCarPlay",
       "expo-image",
       "expo-status-bar",
-      "expo-localization",
+      [
+        "expo-localization",
+        {
+          "supportsRTL": true,
+          "supportedLocales": ["nb", "en", "ar", "ur"]
+        }
+      ],
       [
         "posthog-react-native/expo",
         {

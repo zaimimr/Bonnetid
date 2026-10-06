@@ -1,4 +1,5 @@
 import type { ApiLocation } from '@/api/types';
+import { t } from './i18n.ts';
 
 export type Place = {
   iso: string;
@@ -57,7 +58,7 @@ export function placesByIso(places: Place[]): Map<string, Place> {
 export function groupPlacesByFylke(places: Place[]): PlaceSection[] {
   const sections = new Map<string, Place[]>();
   for (const place of places) {
-    const key = place.fylke || 'Andre steder';
+    const key = place.fylke || t({ nb: 'Andre steder', en: 'Other places', ar: 'أماكن أخرى', ur: 'دیگر مقامات' });
     const bucket = sections.get(key);
     if (bucket) bucket.push(place);
     else sections.set(key, [place]);

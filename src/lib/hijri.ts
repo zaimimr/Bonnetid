@@ -1,3 +1,5 @@
+import { language, t, type Translations } from './i18n.ts';
+
 export type ParsedHijri = {
   year: number;
   month: number;
@@ -22,56 +24,60 @@ export function eidPeriodOf(hijri: ParsedHijri): EidPeriod | null {
 }
 
 export function eidPrayerTitle(period: EidPeriod): string {
-  return period === 'adha' ? 'Eid al-Adha-bønn' : 'Eid al-Fitr-bønn';
+  return period === 'adha'
+    ? t({ nb: 'Eid al-Adha-bønn', en: 'Eid al-Adha prayer', ar: 'صلاة عيد الأضحى', ur: 'عید الاضحی کی نماز' })
+    : t({ nb: 'Eid al-Fitr-bønn', en: 'Eid al-Fitr prayer', ar: 'صلاة عيد الفطر', ur: 'عید الفطر کی نماز' });
 }
 
 export function eidBadgeLabel(period: EidPeriod): string {
-  return period === 'adha' ? 'Eid al-Adha' : 'Eid';
+  return period === 'adha'
+    ? t({ nb: 'Eid al-Adha', en: 'Eid al-Adha', ar: 'عيد الأضحى', ur: 'عید الاضحی' })
+    : t({ nb: 'Eid', en: 'Eid', ar: 'العيد', ur: 'عید' });
 }
 
 export function formatHijri(hijriDate: string, monthText: string): string {
   const parsed = parseHijriDate(hijriDate);
   if (!parsed) return hijriDate;
-  return `${parsed.day}. ${monthText} ${parsed.year}`;
+  return language() === 'nb' ? `${parsed.day}. ${monthText} ${parsed.year}` : `${parsed.day} ${monthText} ${parsed.year}`;
 }
 
-const NORWEGIAN_MONTHS = [
-  'januar',
-  'februar',
-  'mars',
-  'april',
-  'mai',
-  'juni',
-  'juli',
-  'august',
-  'september',
-  'oktober',
-  'november',
-  'desember',
-] as const;
+const MONTHS: Translations<readonly string[]> = {
+  nb: ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'],
+  en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  ar: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+  ur: ['جنوری', 'فروری', 'مارچ', 'اپریل', 'مئی', 'جون', 'جولائی', 'اگست', 'ستمبر', 'اکتوبر', 'نومبر', 'دسمبر'],
+};
 
-const NORWEGIAN_WEEKDAYS = [
-  'søndag',
-  'mandag',
-  'tirsdag',
-  'onsdag',
-  'torsdag',
-  'fredag',
-  'lørdag',
-] as const;
+const WEEKDAYS: Translations<readonly string[]> = {
+  nb: ['søndag', 'mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag'],
+  en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  ar: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
+  ur: ['اتوار', 'پیر', 'منگل', 'بدھ', 'جمعرات', 'جمعہ', 'ہفتہ'],
+};
+
+export function weekdayName(dayIndex: number): string {
+  return t(WEEKDAYS)[dayIndex] ?? '';
+}
+
+function gregorianMonth(monthIndex: number): string {
+  return t(MONTHS)[monthIndex] ?? '';
+}
+
+function dayAndMonth(date: Date): string {
+  const month = gregorianMonth(date.getMonth());
+  return language() === 'nb' ? `${date.getDate()}. ${month}` : `${date.getDate()} ${month}`;
+}
 
 export function formatGregorianLong(date: Date): string {
-  const weekday = NORWEGIAN_WEEKDAYS[date.getDay()];
-  const month = NORWEGIAN_MONTHS[date.getMonth()];
-  return `${capitalize(weekday)} ${date.getDate()}. ${month} ${date.getFullYear()}`;
+  return `${capitalize(weekdayName(date.getDay()))} ${dayAndMonth(date)} ${date.getFullYear()}`;
 }
 
 export function formatGregorianShort(date: Date): string {
-  return `${date.getDate()}. ${NORWEGIAN_MONTHS[date.getMonth()]}`;
+  return dayAndMonth(date);
 }
 
 export function monthName(monthIndex: number): string {
-  return capitalize(NORWEGIAN_MONTHS[monthIndex] ?? '');
+  return capitalize(gregorianMonth(monthIndex));
 }
 
 function capitalize(value: string): string {
@@ -99,5 +105,5 @@ export function shiftHijriMonth(cursor: HijriMonthCursor, delta: number): HijriM
 }
 
 export function monthYearLabel(date: Date): string {
-  return `${NORWEGIAN_MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+  return `${gregorianMonth(date.getMonth())} ${date.getFullYear()}`;
 }

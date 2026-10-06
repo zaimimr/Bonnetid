@@ -1,4 +1,5 @@
 import { HIJRI_META, type HijriMeta } from '@/lib/hijriMeta';
+import { language } from '@/lib/i18n';
 import { vippsNumberFrom } from '@/lib/mosqueDonations';
 import { supabase } from './supabase';
 import type { ApiLocation, HijriDay, Mosque, MosqueJamat, MosqueJummah, PrayerDay } from './types';
@@ -50,14 +51,15 @@ type HijriDateRow = {
 };
 
 function toHijriDay(row: HijriDateRow, meta: HijriMeta): HijriDay {
+  const metaEvent =
+    meta.yearlyEvents.get(`${row.hijri_date_month}-${row.hijri_date_day}`) ??
+    (row.hijri_date_day === 1 ? (meta.monthStartNames.get(row.hijri_date_month) ?? null) : null);
   return {
     gregorian_date: row.gregorian_date,
     hijri_month_text: meta.monthNames.get(row.hijri_date_month) ?? '',
     hijri_date: `${row.hijri_date_year}-${row.hijri_date_month}-${row.hijri_date_day}`,
     special_date_name:
-      row.special_date_no ??
-      meta.yearlyEvents.get(`${row.hijri_date_month}-${row.hijri_date_day}`) ??
-      (row.hijri_date_day === 1 ? (meta.monthStartNames.get(row.hijri_date_month) ?? null) : null),
+      language() === 'nb' ? (row.special_date_no ?? metaEvent) : (metaEvent ?? row.special_date_no),
   };
 }
 

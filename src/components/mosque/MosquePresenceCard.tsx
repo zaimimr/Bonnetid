@@ -2,9 +2,10 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { t } from '@/lib/i18n';
 import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosqueLogo } from '@/components/mosque/MosqueLogo';
-import { AppText, Button, Card } from '@/components/ui';
+import { AppText, Button, Card, mirrored } from '@/components/ui';
 import { useFeature } from '@/hooks/useFeature';
 import { useMosquePresence } from '@/hooks/useMosquePresence';
 import { openVipps } from '@/lib/mosqueDonations';
@@ -14,6 +15,12 @@ import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 
 const trackedMosques = new Set<string>();
+const DONATE = t({
+  nb: 'Doner med Vipps',
+  en: 'Donate with Vipps',
+  ar: 'تبرّع عبر Vipps',
+  ur: 'Vipps کے ذریعے عطیہ کریں',
+});
 
 export function MosquePresenceCard() {
   const theme = useTheme();
@@ -42,18 +49,22 @@ export function MosquePresenceCard() {
         <MosqueLogo uri={mosque.logo} size="sm" />
         <View style={{ flex: 1 }}>
           <AppText size="xs" weight="medium" tone="primary">
-            Du er i moskeen
+            {t({ nb: 'Du er i moskeen', en: 'You are at the mosque', ar: 'أنت في المسجد', ur: 'آپ مسجد میں ہیں' })}
           </AppText>
           <AppText size="md" weight="semibold">
             {mosque.name}
           </AppText>
         </View>
-        <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
+        <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} style={mirrored} />
       </View>
       {announcement && <MosqueAnnouncement text={announcement} compact />}
       {donationEnabled && (
         <Button
-          label={mosque.vipps_number ? `Doner med Vipps · ${mosque.vipps_number}` : 'Doner med Vipps'}
+          label={
+            mosque.vipps_number
+              ? `${DONATE} · ${mosque.vipps_number}`
+              : DONATE
+          }
           variant="secondary"
           size="sm"
           fullWidth

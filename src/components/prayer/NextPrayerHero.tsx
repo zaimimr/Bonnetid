@@ -1,10 +1,20 @@
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText, Card } from '@/components/ui';
+import { t } from '@/lib/i18n';
+import { AppText, Card, mirrored } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, spacing } from '@/theme/tokens';
 import type { NextPrayerResult } from '@/lib/prayerSchedule';
 import { formatCountdown } from '@/lib/time';
+
+function inCountdown(countdown: string): string {
+  return t({
+    nb: `om ${countdown}`,
+    en: `in ${countdown}`,
+    ar: `بعد ${countdown}`,
+    ur: `${countdown} میں`,
+  });
+}
 
 export type EidHeroPrayer = {
   title: string;
@@ -64,7 +74,7 @@ export function NextPrayerHero({
             {hijriText}
           </AppText>
         </View>
-        {onPressDate && <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} />}
+        {onPressDate && <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} style={mirrored} />}
       </Pressable>
     </Card>
   );
@@ -79,7 +89,11 @@ function NextPrayerBlock({ nextPrayer, now }: { nextPrayer: NextPrayerResult; no
   return (
     <View style={{ gap: spacing.xxs }}>
       <AppText size="sm" weight="medium" tone="textMuted">
-        {current ? 'Nåværende bønn' : nextPrayer.isTomorrow ? 'Neste bønn i morgen' : 'Neste bønn'}
+        {current
+          ? t({ nb: 'Nåværende bønn', en: 'Current prayer', ar: 'الصلاة الحالية', ur: 'موجودہ نماز' })
+          : nextPrayer.isTomorrow
+            ? t({ nb: 'Neste bønn i morgen', en: 'Next prayer tomorrow', ar: 'الصلاة التالية غدًا', ur: 'اگلی نماز کل' })
+            : t({ nb: 'Neste bønn', en: 'Next prayer', ar: 'الصلاة التالية', ur: 'اگلی نماز' })}
       </AppText>
       <View
         style={{
@@ -103,8 +117,13 @@ function NextPrayerBlock({ nextPrayer, now }: { nextPrayer: NextPrayerResult; no
       </View>
       <AppText size="sm" weight="medium" tone="textSecondary" tabular>
         {countdownLabel
-          ? `${countdownLabel} om ${formatCountdown(remaining)}`
-          : `om ${formatCountdown(remaining)}`}
+          ? t({
+              nb: `${countdownLabel} om ${formatCountdown(remaining)}`,
+              en: `${countdownLabel} in ${formatCountdown(remaining)}`,
+              ar: `${countdownLabel} بعد ${formatCountdown(remaining)}`,
+              ur: `${countdownLabel} ${formatCountdown(remaining)} میں`,
+            })
+          : inCountdown(formatCountdown(remaining))}
       </AppText>
     </View>
   );
@@ -123,7 +142,9 @@ function EidPrayerBlock({ prayer, now }: { prayer: EidHeroPrayer; now: Date }) {
         {prayer.times.join(' · ')}
       </AppText>
       <AppText size="sm" weight="medium" tone="textSecondary" tabular>
-        {prayer.next ? `om ${formatCountdown(prayer.next.getTime() - now.getTime())}` : 'Pågår'}
+        {prayer.next
+          ? inCountdown(formatCountdown(prayer.next.getTime() - now.getTime()))
+          : t({ nb: 'Pågår', en: 'In progress', ar: 'جارية الآن', ur: 'جاری ہے' })}
       </AppText>
     </View>
   );

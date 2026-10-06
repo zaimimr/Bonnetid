@@ -1,4 +1,5 @@
 import { Pressable, View } from 'react-native';
+import { t } from '@/lib/i18n';
 import { AppText, Card } from '@/components/ui';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -9,7 +10,12 @@ import { parseHijriDate } from '@/lib/hijri';
 import { isoDateKey, osloDateKey } from '@/lib/time';
 import type { CalendarPrimary } from '@/store/settings';
 
-const WEEKDAY_LABELS = ['man', 'tir', 'ons', 'tor', 'fre', 'lør', 'søn'];
+const WEEKDAY_LABELS = t({
+  nb: ['man', 'tir', 'ons', 'tor', 'fre', 'lør', 'søn'],
+  en: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  ar: ['اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت', 'أحد'],
+  ur: ['پیر', 'منگل', 'بدھ', 'جمعرات', 'جمعہ', 'ہفتہ', 'اتوار'],
+});
 const CELL_HEIGHT = 56;
 const DAY_HEIGHT = 48;
 const DAY_WIDTH = 40;
@@ -119,7 +125,12 @@ export function MonthGrid({
           const isToday = cell.iso === todayIso;
           const isSpecial = Boolean(cell.hijri?.special_date_name);
           const label = isSpecial
-            ? `${cell.primary}. ${cell.hijri?.special_date_name}`
+            ? t({
+                nb: `${cell.primary}. ${cell.hijri?.special_date_name}`,
+                en: `${cell.primary}, ${cell.hijri?.special_date_name}`,
+                ar: `${cell.primary}، ${cell.hijri?.special_date_name}`,
+                ur: `${cell.primary}، ${cell.hijri?.special_date_name}`,
+              })
             : String(cell.primary);
 
           return (

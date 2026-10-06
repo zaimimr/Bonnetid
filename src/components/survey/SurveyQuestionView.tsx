@@ -1,5 +1,6 @@
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { t } from '@/lib/i18n';
 import { AppText, TextField } from '@/components/ui';
 import type { FlowQuestion, SurveyAnswer } from '@/lib/surveyFlow';
 import { useTheme } from '@/theme';
@@ -38,7 +39,7 @@ export function SurveyQuestionView({ question, value, onChange }: SurveyQuestion
           multiline
           value={typeof value === 'string' ? value : ''}
           onChangeText={onChange}
-          placeholder="Skriv her"
+          placeholder={t({ nb: 'Skriv her', en: 'Write here', ar: 'اكتب هنا', ur: 'یہاں لکھیں' })}
           maxLength={2000}
         />
       )}

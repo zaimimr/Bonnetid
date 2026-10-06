@@ -2,6 +2,7 @@ import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from '
 import { View } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
+import { t } from '@/lib/i18n';
 import { AppText, Button } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
@@ -32,7 +33,12 @@ export const LeafletMap = forwardRef<LeafletMapHandle, LeafletMapProps>(function
     html,
     onReady,
     onMessage,
-    fallbackMessage = 'Kartet ble avsluttet av systemet, sannsynligvis fordi enheten gikk tom for minne.',
+    fallbackMessage = t({
+      nb: 'Kartet ble avsluttet av systemet, sannsynligvis fordi enheten gikk tom for minne.',
+      en: 'The system closed the map, probably because the device ran out of memory.',
+      ar: 'أغلق النظام الخريطة، على الأرجح بسبب نفاد ذاكرة الجهاز.',
+      ur: 'سسٹم نے نقشہ بند کر دیا، غالباً اس لیے کہ آلے کی میموری ختم ہو گئی۔',
+    }),
   },
   ref,
 ) {
@@ -87,7 +93,11 @@ export const LeafletMap = forwardRef<LeafletMapHandle, LeafletMapProps>(function
         <AppText tone="textSecondary" align="center">
           {fallbackMessage}
         </AppText>
-        <Button label="Prøv igjen" variant="secondary" onPress={handleRetry} />
+        <Button
+          label={t({ nb: 'Prøv igjen', en: 'Try again', ar: 'حاول مرة أخرى', ur: 'دوبارہ کوشش کریں' })}
+          variant="secondary"
+          onPress={handleRetry}
+        />
       </View>
     );
   }

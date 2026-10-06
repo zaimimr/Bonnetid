@@ -12,6 +12,7 @@ import { fontSize, opacity, radius, spacing } from '@/theme/tokens';
 import { usePlaceFilter } from '@/store/placeFilter';
 import { useActiveLocation } from '@/store/settings';
 import { PostHogMaskView } from 'posthog-react-native';
+import { t } from '@/lib/i18n';
 
 export default function PlacePickerScreen() {
   const router = useRouter();
@@ -94,7 +95,7 @@ export default function PlacePickerScreen() {
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Søk etter sted, kommune eller fylke"
+              placeholder={t({ nb: 'Søk etter sted, kommune eller fylke', en: 'Search for a place, municipality or county', ar: 'ابحث عن مكان أو بلدية أو مقاطعة', ur: 'مقام، میونسپلٹی یا کاؤنٹی تلاش کریں' })}
               placeholderTextColor={theme.colors.textMuted}
               autoCorrect={false}
               maxFontSizeMultiplier={1.6}
@@ -107,7 +108,7 @@ export default function PlacePickerScreen() {
             />
           </PostHogMaskView>
           {query.length > 0 && (
-            <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel="Tøm søk">
+            <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel={t({ nb: 'Tøm søk', en: 'Clear search', ar: 'مسح البحث', ur: 'تلاش صاف کریں' })}>
               <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
             </Pressable>
           )}
@@ -139,10 +140,19 @@ export default function PlacePickerScreen() {
               weight="semibold"
               tone={placeIso == null ? 'onPrimarySoft' : 'textPrimary'}
               numberOfLines={2}>
-              {forTimes ? 'Mitt sted' : 'Alle steder'}
+              {forTimes
+                ? t({ nb: 'Mitt sted', en: 'My location', ar: 'موقعي', ur: 'میرا مقام' })
+                : t({ nb: 'Alle steder', en: 'All places', ar: 'كل الأماكن', ur: 'تمام مقامات' })}
             </AppText>
             <AppText size="xs" tone={placeIso == null ? 'onPrimarySoft' : 'textMuted'}>
-              {forTimes ? `Bønnetider for ${activeLocation.name}` : 'Vis moskeer i hele landet'}
+              {forTimes
+                ? t({
+                    nb: `Bønnetider for ${activeLocation.name}`,
+                    en: `Prayer times for ${activeLocation.name}`,
+                    ar: `مواقيت الصلاة في ${activeLocation.name}`,
+                    ur: `${activeLocation.name} کے نماز کے اوقات`,
+                  })
+                : t({ nb: 'Vis moskeer i hele landet', en: 'Show mosques across the country', ar: 'عرض المساجد في كل البلاد', ur: 'پورے ملک کی مساجد دکھائیں' })}
             </AppText>
           </View>
           {placeIso == null && (
@@ -210,7 +220,12 @@ export default function PlacePickerScreen() {
                     ) : (
                       <AppText size="sm" tone="textMuted" tabular>
                         {forTimes
-                          ? `${section.places.length} steder`
+                          ? t({
+                              nb: `${section.places.length} steder`,
+                              en: `${section.places.length} places`,
+                              ar: `الأماكن: ${section.places.length}`,
+                              ur: `${section.places.length} مقامات`,
+                            })
                           : placeCountLabel(
                               section.places.reduce((sum, place) => sum + place.mosqueCount, 0),
                             )}
@@ -241,7 +256,7 @@ export default function PlacePickerScreen() {
                     borderBottomWidth: isLast ? 1 : 0,
                     borderBottomLeftRadius: isLast ? radius.lg : 0,
                     borderBottomRightRadius: isLast ? radius.lg : 0,
-                    paddingLeft: spacing.lg,
+                    paddingStart: spacing.lg,
                   }}>
                   <Pressable
                     onPress={() => choose(item)}
@@ -254,7 +269,7 @@ export default function PlacePickerScreen() {
                         gap: spacing.md,
                         minHeight: 52,
                         paddingVertical: spacing.md,
-                        paddingRight: spacing.lg,
+                        paddingEnd: spacing.lg,
                         borderTopWidth: index > 0 ? 1 : 0,
                         borderTopColor: theme.colors.border,
                       },
@@ -295,12 +310,31 @@ export default function PlacePickerScreen() {
             ListFooterComponent={
               totalMatches > 0 ? (
                 <AppText size="xs" tone="textMuted" align="center" style={{ marginTop: spacing.md }}>
-                  {forTimes ? `${totalMatches} steder` : `${totalMatches} steder med registrerte moskeer`}
+                  {forTimes
+                    ? t({
+                        nb: `${totalMatches} steder`,
+                        en: `${totalMatches} places`,
+                        ar: `الأماكن: ${totalMatches}`,
+                        ur: `${totalMatches} مقامات`,
+                      })
+                    : t({
+                        nb: `${totalMatches} steder med registrerte moskeer`,
+                        en: `${totalMatches} places with registered mosques`,
+                        ar: `أماكن فيها مساجد مسجلة: ${totalMatches}`,
+                        ur: `رجسٹرڈ مساجد والے ${totalMatches} مقامات`,
+                      })}
                 </AppText>
               ) : null
             }
             ListEmptyComponent={
-              <EmptyState message={`Ingen steder matcher «${query.trim()}»`} />
+              <EmptyState
+                message={t({
+                  nb: `Ingen steder matcher «${query.trim()}»`,
+                  en: `No places match “${query.trim()}”`,
+                  ar: `لا توجد أماكن تطابق «${query.trim()}»`,
+                  ur: `«${query.trim()}» سے کوئی مقام نہیں ملا`,
+                })}
+              />
             }
           />
         )}

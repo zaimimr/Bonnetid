@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import { DuaCard } from '@/components/duas/DuaCard';
 import { AppText, Card, Divider, ListRow, Screen, SegmentedControl, Toggle } from '@/components/ui';
 import { duaById } from '@/lib/duas';
+import { language, t } from '@/lib/i18n';
 import { useSettings } from '@/store/settings';
 import {
   arabicFonts,
@@ -25,6 +26,9 @@ const SIZES = (Object.keys(arabicSizes) as ArabicSizeKey[]).map((key) => ({
 
 const ROW = { paddingHorizontal: spacing.md } as const;
 
+const PRONUNCIATION = t({ nb: 'Uttale', en: 'Pronunciation', ar: 'النطق', ur: 'تلفظ' });
+const TRANSLATION = t({ nb: 'Norsk oversettelse', en: 'English translation', ar: 'الترجمة', ur: 'اردو ترجمہ' });
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <View style={{ gap: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.sm }}>
@@ -45,6 +49,8 @@ export default function DuaSettingsScreen() {
   const setShowTransliteration = useSettings((state) => state.setDuaShowTransliteration);
   const showMeaning = useSettings((state) => state.duaShowMeaning);
   const setShowMeaning = useSettings((state) => state.setDuaShowMeaning);
+  const showPronunciationSetting = language() !== 'ar' && language() !== 'ur';
+  const showMeaningSetting = language() !== 'ar';
 
   return (
     <Screen scroll edges={[]}>
@@ -52,36 +58,44 @@ export default function DuaSettingsScreen() {
         {EXAMPLE ? <DuaCard dua={EXAMPLE} /> : null}
 
         <Card padding="sm" rounded="xl">
-          <Field label="Arabisk skrift">
+          <Field label={t({ nb: 'Arabisk skrift', en: 'Arabic script', ar: 'الخط العربي', ur: 'عربی رسم الخط' })}>
             <SegmentedControl value={font} options={FONTS} onChange={setFont} />
           </Field>
-          <Field label="Tekststørrelse">
+          <Field label={t({ nb: 'Tekststørrelse', en: 'Text size', ar: 'حجم النص', ur: 'متن کا سائز' })}>
             <SegmentedControl value={size} options={SIZES} onChange={setSize} />
           </Field>
-          <Divider />
-          <ListRow
-            title="Uttale"
-            trailing={
-              <Toggle
-                value={showTransliteration}
-                onValueChange={setShowTransliteration}
-                accessibilityLabel="Uttale"
+          {showPronunciationSetting && (
+            <>
+              <Divider />
+              <ListRow
+                title={PRONUNCIATION}
+                trailing={
+                  <Toggle
+                    value={showTransliteration}
+                    onValueChange={setShowTransliteration}
+                    accessibilityLabel={PRONUNCIATION}
+                  />
+                }
+                style={ROW}
               />
-            }
-            style={ROW}
-          />
-          <Divider />
-          <ListRow
-            title="Norsk oversettelse"
-            trailing={
-              <Toggle
-                value={showMeaning}
-                onValueChange={setShowMeaning}
-                accessibilityLabel="Norsk oversettelse"
+            </>
+          )}
+          {showMeaningSetting && (
+            <>
+              <Divider />
+              <ListRow
+                title={TRANSLATION}
+                trailing={
+                  <Toggle
+                    value={showMeaning}
+                    onValueChange={setShowMeaning}
+                    accessibilityLabel={TRANSLATION}
+                  />
+                }
+                style={ROW}
               />
-            }
-            style={ROW}
-          />
+            </>
+          )}
         </Card>
       </View>
     </Screen>

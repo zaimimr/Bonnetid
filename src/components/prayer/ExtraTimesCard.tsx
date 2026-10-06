@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { t } from '@/lib/i18n';
 import { AppText, Card } from '@/components/ui';
 import type { ExtraTime, ExtraTimeName } from '@/lib/extraTimes';
 import { useTheme } from '@/theme';
@@ -72,7 +73,9 @@ export function ExtraTimesCard({ times }: { times: ExtraTime[] }) {
           pressed && { opacity: opacity.pressed },
         ]}>
         <AppText size="sm" weight="semibold" tone="onPrimarySoft">
-          {expanded ? 'Vis færre tider' : 'Vis flere tider'}
+          {expanded
+            ? t({ nb: 'Vis færre tider', en: 'Show fewer times', ar: 'عرض أوقات أقل', ur: 'کم اوقات دکھائیں' })
+            : t({ nb: 'Vis flere tider', en: 'Show more times', ar: 'عرض المزيد من الأوقات', ur: 'مزید اوقات دکھائیں' })}
         </AppText>
         <Ionicons
           name={expanded ? 'chevron-up' : 'chevron-down'}

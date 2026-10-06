@@ -1,5 +1,7 @@
 import type { HijriDay } from '@/api/types';
 import { RAMADAN_SEASON, seasonDayNumbers, seasonStatusFrom } from './hijriSeason';
+import { t } from './i18n.ts';
+import { formatDayCount } from './time';
 
 export const RAMADAN_MONTH = RAMADAN_SEASON.month;
 export const RAMADAN_COUNTDOWN_DAYS = RAMADAN_SEASON.countdownDays;
@@ -56,15 +58,29 @@ export function ramadanCountdown(
   maghrib: Date | null,
   tomorrowFajr: Date | null,
 ): RamadanCountdown | null {
-  if (fajr && now.getTime() < fajr.getTime()) return { label: 'Suhoor slutter', target: fajr };
-  if (maghrib && now.getTime() < maghrib.getTime()) return { label: 'Iftar', target: maghrib };
+  const suhoorEnds = t({ nb: 'Suhoor slutter', en: 'Suhoor ends', ar: 'ينتهي السحور', ur: 'سحری ختم' });
+  const iftar = t({ nb: 'Iftar', en: 'Iftar', ar: 'الإفطار', ur: 'افطار' });
+  if (fajr && now.getTime() < fajr.getTime()) return { label: suhoorEnds, target: fajr };
+  if (maghrib && now.getTime() < maghrib.getTime()) return { label: iftar, target: maghrib };
   if (tomorrowFajr && now.getTime() < tomorrowFajr.getTime()) {
-    return { label: 'Suhoor slutter', target: tomorrowFajr };
+    return { label: suhoorEnds, target: tomorrowFajr };
   }
   return null;
 }
 
 export function ramadanCountdownText(days: number): string {
-  if (days <= 1) return 'Ramadan begynner i morgen';
-  return `Ramadan begynner om ${days} dager`;
+  if (days <= 1) {
+    return t({
+      nb: 'Ramadan begynner i morgen',
+      en: 'Ramadan begins tomorrow',
+      ar: 'يبدأ رمضان غدًا',
+      ur: 'رمضان کل شروع ہو گا',
+    });
+  }
+  return t({
+    nb: `Ramadan begynner om ${days} dager`,
+    en: `Ramadan begins in ${formatDayCount(days)}`,
+    ar: `يبدأ رمضان بعد ${formatDayCount(days)}`,
+    ur: `رمضان ${formatDayCount(days)} میں شروع ہو گا`,
+  });
 }

@@ -7,6 +7,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import { isRTL } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { duration, spacing } from '@/theme/tokens';
@@ -36,7 +37,12 @@ function SlidingPill({
   const style = useAnimatedStyle(
     () => ({
       transform: [
-        { translateX: withTiming(index * itemWidth + (itemWidth - PILL_WIDTH) / 2, SLIDE) },
+        {
+          translateX: withTiming(
+            (isRTL() ? -1 : 1) * (index * itemWidth + (itemWidth - PILL_WIDTH) / 2),
+            SLIDE,
+          ),
+        },
       ],
     }),
     [index, itemWidth],
@@ -49,7 +55,7 @@ function SlidingPill({
         {
           position: 'absolute',
           top: spacing.md,
-          left: 0,
+          start: 0,
           width: PILL_WIDTH,
           height: PILL_HEIGHT,
           borderRadius: PILL_HEIGHT / 2,
@@ -132,7 +138,7 @@ export function AppTabBar({ state, descriptors, navigation, insets }: AppTabBarP
                       style={{
                         position: 'absolute',
                         top: 4,
-                        right: 16,
+                        end: 16,
                         width: 8,
                         height: 8,
                         borderRadius: 4,

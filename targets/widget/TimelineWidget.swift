@@ -65,6 +65,7 @@ struct TimelineWidgetView: View {
       }
     }
     .widgetURL(URL(string: "bonnetid://"))
+    .widgetLanguage(WidgetStrings.current)
   }
 }
 
@@ -74,11 +75,12 @@ private struct DayTimelineCard: View {
   let now: Date
 
   private var marker: TimelineMark? { timeline.mark(at: moment.next.at) }
+  private var strings: WidgetStrings { WidgetStrings.current }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 10) {
       HStack(alignment: .top, spacing: 8) {
-        Text(moment.isNow ? "Nåværende bønn" : "Neste bønn")
+        Text(moment.isNow ? strings.currentPrayer : strings.nextPrayer)
           .font(.caption)
           .foregroundStyle(PrayerColor.inkMuted)
           .lineLimit(1)
@@ -86,7 +88,7 @@ private struct DayTimelineCard: View {
 
         Spacer(minLength: 4)
 
-        Text("Tid igjen til neste salah")
+        Text(strings.timeUntilNext)
           .font(.caption)
           .foregroundStyle(PrayerColor.inkMuted)
           .lineLimit(1)
@@ -254,15 +256,17 @@ private struct TimelineAxisLabel: Identifiable {
 }
 
 private struct TimelineMissingView: View {
+  private var strings: WidgetStrings { WidgetStrings.current }
+
   var body: some View {
     VStack(alignment: .leading, spacing: 6) {
       Image(systemName: "clock")
         .font(.title3)
         .foregroundStyle(PrayerColor.brand)
-      Text("Åpne Bønnetid")
+      Text(strings.openApp)
         .font(.headline)
         .foregroundStyle(PrayerColor.ink)
-      Text("Tidslinjen vises her så snart appen har hentet tidene for stedet ditt.")
+      Text(strings.timelineAppearsHere)
         .font(.caption)
         .foregroundStyle(PrayerColor.inkSecondary)
     }
@@ -276,8 +280,8 @@ struct PrayerTimelineWidget: Widget {
     StaticConfiguration(kind: "BonnetidTimelineWidget", provider: DayTimelineProvider()) { entry in
       TimelineWidgetView(entry: entry)
     }
-    .configurationDisplayName("Tidslinje")
-    .description("Døgnet fra 00:00 til 24:00 med bønnene og tiden igjen til den neste.")
+    .configurationDisplayName(WidgetStrings.current.timelineWidgetName)
+    .description(WidgetStrings.current.timelineWidgetDescription)
     .supportedFamilies([.systemMedium])
   }
 }

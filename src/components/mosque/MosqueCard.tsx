@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText, Badge, Card } from '@/components/ui';
+import { t } from '@/lib/i18n';
+import { AppText, Badge, Card, mirrored } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import type { Mosque } from '@/api/types';
@@ -59,12 +60,20 @@ export function MosqueCard({
               rowGap: spacing.xs,
               marginTop: spacing.xxs,
             }}>
-            {selected && <Badge label="Min moské" variant="primary" />}
+            {selected && <Badge label={t({ nb: 'Min moské', en: 'My mosque', ar: 'مسجدي', ur: 'میری مسجد' })} variant="primary" />}
             {distanceKm != null && <Badge label={formatDistance(distanceKm)} variant="neutral" />}
             {eidPeriod && eidTimes.length > 0 && (
               <Badge label={`${eidBadgeLabel(eidPeriod)} ${eidTimes.join(' · ')}`} variant="primary" />
             )}
-            {jummahLabel ? <Badge label={`Jumuah ${jummahLabel}`} variant="primary" /> : null}
+            {jummahLabel ? <Badge
+                label={t({
+                  nb: `Jumuah ${jummahLabel}`,
+                  en: `Jumuah ${jummahLabel}`,
+                  ar: `الجمعة ${jummahLabel}`,
+                  ur: `جمعہ ${jummahLabel}`,
+                })}
+                variant="primary"
+              /> : null}
           </View>
           {missingJummah ? (
             <AppText size="xs" tone="textMuted" style={{ marginTop: spacing.xxs }}>
@@ -74,7 +83,7 @@ export function MosqueCard({
         </View>
 
         {accessory === 'chevron' && (
-          <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
+          <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} style={mirrored} />
         )}
         {accessory === 'check' && (
           <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />

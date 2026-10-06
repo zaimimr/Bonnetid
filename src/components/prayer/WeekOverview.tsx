@@ -1,11 +1,17 @@
 import { Pressable, View } from 'react-native';
+import { t } from '@/lib/i18n';
 import { AppText, Card } from '@/components/ui';
 import type { WeekCell, WeekColumn } from '@/lib/prayerLog';
+import { weekdayName } from '@/lib/hijri';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 
-const WEEKDAY_LABELS = ['M', 'T', 'O', 'T', 'F', 'L', 'S'];
-const WEEKDAY_NAMES = ['mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag', 'søndag'];
+const WEEKDAY_LABELS = t({
+  nb: ['M', 'T', 'O', 'T', 'F', 'L', 'S'],
+  en: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+  ar: ['ن', 'ث', 'ر', 'خ', 'ج', 'س', 'ح'],
+  ur: ['پیر', 'منگل', 'بدھ', 'جمعرات', 'جمعہ', 'ہفتہ', 'اتوار'],
+});
 const DOT_SIZE = 9;
 
 export type WeekOverviewProps = {
@@ -21,7 +27,7 @@ export function WeekOverview({ columns, selectedIso, onSelect }: WeekOverviewPro
     <Card padding="sm" rounded="xl">
       <View style={{ paddingHorizontal: spacing.md, paddingTop: spacing.sm }}>
         <AppText size="sm" tone="textMuted">
-          Denne uken
+          {t({ nb: 'Denne uken', en: 'This week', ar: 'هذا الأسبوع', ur: 'یہ ہفتہ' })}
         </AppText>
       </View>
       <View
@@ -39,7 +45,7 @@ export function WeekOverview({ columns, selectedIso, onSelect }: WeekOverviewPro
               onPress={() => onSelect(column.isoDate)}
               disabled={column.isFuture}
               accessibilityRole="button"
-              accessibilityLabel={`${WEEKDAY_NAMES[index]}, ${describe(column)}`}
+              accessibilityLabel={`${weekdayName((index + 1) % 7)}${t({ nb: ', ', en: ', ', ar: '، ', ur: '، ' })}${describe(column)}`}
               accessibilityState={{ selected }}
               style={({ pressed }) => [
                 {
@@ -73,11 +79,18 @@ export function WeekOverview({ columns, selectedIso, onSelect }: WeekOverviewPro
 }
 
 function describe(column: WeekColumn): string {
-  if (column.isFuture) return 'ikke begynt';
+  if (column.isFuture)
+    return t({ nb: 'ikke begynt', en: 'not started', ar: 'لم يبدأ بعد', ur: 'ابھی شروع نہیں ہوا' });
   const prayed = column.cells.filter((cell) => cell.status === 'prayed').length;
   const started = column.cells.filter((cell) => cell.started).length;
-  if (started === 0) return 'ingen bønner ennå';
-  return `${prayed} av ${started} bedt`;
+  if (started === 0)
+    return t({ nb: 'ingen bønner ennå', en: 'no prayers yet', ar: 'لا صلوات بعد', ur: 'ابھی کوئی نماز نہیں' });
+  return t({
+    nb: `${prayed} av ${started} bedt`,
+    en: `${prayed} of ${started} prayed`,
+    ar: `أُدّيت ${prayed} من ${started}`,
+    ur: `${started} میں سے ${prayed} ادا کیں`,
+  });
 }
 
 function Dot({ cell }: { cell: WeekCell }) {

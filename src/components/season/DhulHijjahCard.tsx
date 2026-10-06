@@ -1,4 +1,5 @@
 import { View } from 'react-native';
+import { t } from '@/lib/i18n';
 import { AppText, Badge, Card } from '@/components/ui';
 import { DuaLink } from '@/components/duas/DuaLink';
 import { SeasonCountdownCard } from '@/components/season/SeasonCountdownCard';
@@ -23,8 +24,9 @@ export type DhulHijjahCardProps = {
 };
 
 function badgeLabel(day: number | null): string | null {
-  if (day === ARAFAH_DAY) return 'Arafah';
-  if (day === EID_AL_ADHA_DAY) return 'Eid al-Adha';
+  if (day === ARAFAH_DAY) return t({ nb: 'Arafah', en: 'Arafah', ar: 'يوم عرفة', ur: 'یومِ عرفہ' });
+  if (day === EID_AL_ADHA_DAY)
+    return t({ nb: 'Eid al-Adha', en: 'Eid al-Adha', ar: 'عيد الأضحى', ur: 'عید الاضحیٰ' });
   return null;
 }
 
@@ -69,7 +71,12 @@ export function DhulHijjahCard({ status }: DhulHijjahCardProps) {
 
       <View
         accessibilityRole="progressbar"
-        accessibilityLabel="De ti første dagene i Dhul Hijjah"
+        accessibilityLabel={t({
+          nb: 'De ti første dagene i Dhul Hijjah',
+          en: 'The first ten days of Dhul Hijjah',
+          ar: 'العشر الأوائل من ذي الحجة',
+          ur: 'ذوالحجہ کے پہلے دس دن',
+        })}
         accessibilityValue={{ min: 1, max: DHUL_HIJJAH_SEASON.lastDay, now: day ?? 1 }}
         style={{
           marginTop: spacing.md,
@@ -102,7 +109,12 @@ export function DhulHijjahCard({ status }: DhulHijjahCardProps) {
         {MOON_SIGHTING_NOTE}
       </AppText>
 
-      <DuaLink category={DUA_LINKS.hajj} label="Duaer for Hajj og Dhul-Hijjah" />
+      <DuaLink category={DUA_LINKS.hajj} label={t({
+          nb: 'Duaer for Hajj og Dhul-Hijjah',
+          en: 'Duas for Hajj and Dhul Hijjah',
+          ar: 'أدعية الحج وذي الحجة',
+          ur: 'حج اور ذوالحجہ کی دعائیں',
+        })} />
     </Card>
   );
 }

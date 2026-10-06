@@ -1,12 +1,13 @@
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText } from '@/components/ui';
+import { t } from '@/lib/i18n';
+import { AppText, mirrored } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 
 export function MosqueAnnouncement({
   text,
-  title = 'Kunngjøring',
+  title = t({ nb: 'Kunngjøring', en: 'Announcement', ar: 'إعلان', ur: 'اعلان' }),
   compact = false,
   chevron = false,
 }: {
@@ -30,7 +31,7 @@ export function MosqueAnnouncement({
           {text}
         </AppText>
       </View>
-      {chevron && <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />}
+      {chevron && <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} style={mirrored} />}
     </View>
   );
 }

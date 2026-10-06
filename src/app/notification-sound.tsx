@@ -8,6 +8,7 @@ import { NOTIFICATION_SOUNDS, type NotificationSoundOption } from '@/lib/notific
 import { track } from '@/lib/telemetry';
 import { useSettings } from '@/store/settings';
 import { playSoundPreview, stopSoundPreview } from '../../modules/sound-preview';
+import { t } from '@/lib/i18n';
 
 export default function NotificationSoundScreen() {
   const theme = useTheme();
@@ -49,7 +50,12 @@ export default function NotificationSoundScreen() {
         size="xs"
         tone="textMuted"
         style={{ marginTop: spacing.sm, paddingHorizontal: spacing.md }}>
-        Lyden spilles av når du velger den. Adhan innspilt av Ahmed Al-Haddad.
+        {t({
+          nb: 'Lyden spilles av når du velger den. Adhan innspilt av Ahmed Al-Haddad.',
+          en: 'The sound plays when you select it. Adhan recorded by Ahmed Al-Haddad.',
+          ar: 'يُشغَّل الصوت عند اختياره. الأذان بصوت أحمد الحداد.',
+          ur: 'آواز منتخب کرنے پر چلتی ہے۔ اذان احمد الحداد کی آواز میں۔',
+        })}
       </AppText>
     </Screen>
   );

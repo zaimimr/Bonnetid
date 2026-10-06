@@ -45,13 +45,15 @@ object NextViews {
       WidgetSize.TALL -> R.layout.prayer_next_tall
     }
     val views = RemoteViews(context.packageName, layout)
+    val strings = WidgetStrings.of(snapshot)
+    views.setInt(R.id.root, "setLayoutDirection", strings.layoutDirection)
     val showJamat = snapshot.showJamat && snapshot.hasJamatTimes
     val headline = moment.headline
 
     views.setImageViewResource(R.id.headline_icon, PrayerIcons.drawable(headline.kind))
     views.setTextViewText(
       R.id.headline_label,
-      "${moment.stateLabel} · ${headline.displayLabel}",
+      "${strings.stateLabel(moment)} · ${headline.displayLabel}",
     )
     views.setTextViewText(R.id.headline_time, PrayerFormat.time(headline.printedAt(showJamat)))
 
@@ -75,7 +77,7 @@ object NextViews {
       }
       WidgetChrome.progress(views, R.id.progress, moment, now)
     }
-    WidgetChrome.countdown(views, R.id.countdown, moment.next.at, now, "om %s")
+    WidgetChrome.countdown(views, R.id.countdown, moment.next.at, now, strings.countdownFormat)
 
     if (size == WidgetSize.TALL) {
       fillUpcoming(views, snapshot, moment, showJamat, now)

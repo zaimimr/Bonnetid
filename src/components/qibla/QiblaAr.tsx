@@ -13,6 +13,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Circle, Line, Polygon, Polyline } from 'react-native-svg';
+import { t } from '@/lib/i18n';
 import { AppText, Button, EmptyState } from '@/components/ui';
 import { useArPose } from '@/hooks/useArPose';
 import { buildArScene, type ArScene, type Viewport } from '@/lib/arProjection';
@@ -68,12 +69,22 @@ export function QiblaAr({ qiblaBearing, uncertaintyDegrees = 0 }: QiblaArProps) 
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: spacing.lg }}>
         <EmptyState
-          message="Gi appen tilgang til kameraet for å se retningen mot Qibla i AR"
+          message={t({
+            nb: 'Gi appen tilgang til kameraet for å se retningen mot Qibla i AR',
+            en: 'Allow camera access to see the Qibla direction in AR',
+            ar: 'اسمح للتطبيق باستخدام الكاميرا لرؤية اتجاه القبلة بالواقع المعزز',
+            ur: 'AR میں قبلہ کی سمت دیکھنے کے لیے ایپ کو کیمرے تک رسائی دیں',
+          })}
           icon="camera-outline"
         />
         {cameraPermission.canAskAgain && (
           <Button
-            label="Gi kameratilgang"
+            label={t({
+              nb: 'Gi kameratilgang',
+              en: 'Allow camera access',
+              ar: 'السماح باستخدام الكاميرا',
+              ur: 'کیمرے تک رسائی دیں',
+            })}
             onPress={() => requestCameraPermission()}
             style={{ alignSelf: 'center' }}
           />
@@ -85,7 +96,12 @@ export function QiblaAr({ qiblaBearing, uncertaintyDegrees = 0 }: QiblaArProps) 
   if (permissionDenied) {
     return (
       <EmptyState
-        message="Gi appen tilgang til posisjon for å bruke kompasset"
+        message={t({
+          nb: 'Gi appen tilgang til posisjon for å bruke kompasset',
+          en: 'Allow location access to use the compass',
+          ar: 'اسمح للتطبيق بالوصول إلى موقعك لاستخدام البوصلة',
+          ur: 'قطب نما استعمال کرنے کے لیے ایپ کو مقام تک رسائی دیں',
+        })}
         icon="compass-outline"
       />
     );
@@ -94,7 +110,12 @@ export function QiblaAr({ qiblaBearing, uncertaintyDegrees = 0 }: QiblaArProps) 
   if (motionUnavailable) {
     return (
       <EmptyState
-        message="Enheten mangler bevegelsessensorene som trengs for AR-visning"
+        message={t({
+          nb: 'Enheten mangler bevegelsessensorene som trengs for AR-visning',
+          en: 'This device lacks the motion sensors needed for AR view',
+          ar: 'يفتقر الجهاز إلى مستشعرات الحركة اللازمة لعرض الواقع المعزز',
+          ur: 'اس آلے میں AR منظر کے لیے درکار حرکت کے سینسر موجود نہیں',
+        })}
         icon="hardware-chip-outline"
       />
     );
@@ -135,7 +156,12 @@ export function QiblaAr({ qiblaBearing, uncertaintyDegrees = 0 }: QiblaArProps) 
               borderRadius: radius.full,
             }}>
             <AppText size="sm" color={AR_INK}>
-              Venter på kompass og sensorer …
+              {t({
+                nb: 'Venter på kompass og sensorer …',
+                en: 'Waiting for compass and sensors …',
+                ar: 'في انتظار البوصلة والمستشعرات …',
+                ur: 'قطب نما اور سینسرز کا انتظار …',
+              })}
             </AppText>
           </View>
         </View>
@@ -165,19 +191,39 @@ function ArOverlay({
 
   const rotationHint =
     scene.pitchHint === 'raise'
-      ? 'Løft telefonen mot horisonten'
+      ? t({
+          nb: 'Løft telefonen mot horisonten',
+          en: 'Raise the phone towards the horizon',
+          ar: 'ارفع الهاتف نحو الأفق',
+          ur: 'فون کو افق کی طرف اٹھائیں',
+        })
       : scene.pitchHint === 'lower'
-        ? 'Senk telefonen mot horisonten'
+        ? t({
+            nb: 'Senk telefonen mot horisonten',
+            en: 'Lower the phone towards the horizon',
+            ar: 'اخفض الهاتف نحو الأفق',
+            ur: 'فون کو افق کی طرف نیچے کریں',
+          })
         : Math.abs(scene.deltaDeg) <= 5
           ? null
           : scene.deltaDeg > 0
-            ? `Roter ${Math.round(Math.abs(scene.deltaDeg))}° mot høyre`
-            : `Roter ${Math.round(Math.abs(scene.deltaDeg))}° mot venstre`;
+            ? t({
+                nb: `Roter ${Math.round(Math.abs(scene.deltaDeg))}° mot høyre`,
+                en: `Turn ${Math.round(Math.abs(scene.deltaDeg))}° to the right`,
+                ar: `استدر ${Math.round(Math.abs(scene.deltaDeg))}° إلى اليمين`,
+                ur: `${Math.round(Math.abs(scene.deltaDeg))}° دائیں مڑیں`,
+              })
+            : t({
+                nb: `Roter ${Math.round(Math.abs(scene.deltaDeg))}° mot venstre`,
+                en: `Turn ${Math.round(Math.abs(scene.deltaDeg))}° to the left`,
+                ar: `استدر ${Math.round(Math.abs(scene.deltaDeg))}° إلى اليسار`,
+                ur: `${Math.round(Math.abs(scene.deltaDeg))}° بائیں مڑیں`,
+              });
 
   const compassPoor = headingAccuracy != null && headingAccuracy >= 0 && headingAccuracy <= 1;
 
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+    <View style={[StyleSheet.absoluteFill, { direction: 'ltr' }]} pointerEvents="none">
       <Svg width={viewport.width} height={viewport.height}>
         {scene.groundPath.length >= 2 && (
           <Polyline
@@ -257,7 +303,7 @@ function ArOverlay({
             alignItems: 'center',
           }}>
           <AppText size="xs" weight="semibold" color={AR_INK} style={AR_TEXT_SHADOW}>
-            Bønneteppe
+            {t({ nb: 'Bønneteppe', en: 'Prayer mat', ar: 'سجادة الصلاة', ur: 'جائے نماز' })}
           </AppText>
         </View>
       )}
@@ -292,9 +338,20 @@ function ArOverlay({
             style={{ flexShrink: 1 }}>
             {aligned
               ? trustworthy
-                ? 'Du peker mot Qibla'
-                : 'Du peker innenfor det usikre området'
-              : (rotationHint ?? 'Nesten der …')}
+                ? t({
+                    nb: 'Du peker mot Qibla',
+                    en: 'You are facing the Qibla',
+                    ar: 'أنت متجه نحو القبلة',
+                    ur: 'آپ کا رخ قبلہ کی طرف ہے',
+                  })
+                : t({
+                    nb: 'Du peker innenfor det usikre området',
+                    en: 'You are pointing within the uncertain range',
+                    ar: 'أنت متجه ضمن النطاق غير المؤكد',
+                    ur: 'آپ کا رخ غیر یقینی دائرے کے اندر ہے',
+                  })
+              : (rotationHint ??
+                t({ nb: 'Nesten der …', en: 'Almost there …', ar: 'اقتربت …', ur: 'بس تھوڑا سا اور …' }))}
           </AppText>
         </View>
 
@@ -307,7 +364,12 @@ function ArOverlay({
               borderRadius: radius.full,
             }}>
             <AppText size="xs" color={AR_INK}>
-              Usikker posisjon – retningen kan være ±{Math.round(uncertaintyDegrees)}° feil
+              {t({
+                nb: `Usikker posisjon – retningen kan være ±${Math.round(uncertaintyDegrees)}° feil`,
+                en: `Uncertain location – the direction may be off by ±${Math.round(uncertaintyDegrees)}°`,
+                ar: `موقع غير دقيق – قد يخطئ الاتجاه بمقدار ±${Math.round(uncertaintyDegrees)}°`,
+                ur: `غیر یقینی مقام – سمت میں ±${Math.round(uncertaintyDegrees)}° کی غلطی ہو سکتی ہے`,
+              })}
             </AppText>
           </View>
         )}
@@ -321,7 +383,12 @@ function ArOverlay({
               borderRadius: radius.full,
             }}>
             <AppText size="xs" color={AR_INK}>
-              Unøyaktig kompass – beveg telefonen i et åttetall
+              {t({
+                nb: 'Unøyaktig kompass – beveg telefonen i et åttetall',
+                en: 'Inaccurate compass – move the phone in a figure eight',
+                ar: 'البوصلة غير دقيقة – حرّك الهاتف على شكل الرقم 8',
+                ur: 'قطب نما درست نہیں – فون کو 8 کی شکل میں گھمائیں',
+              })}
             </AppText>
           </View>
         )}
@@ -385,7 +452,12 @@ function RotateHint() {
           paddingVertical: spacing.sm,
         }}>
         <AppText size="xs" weight="semibold" color={AR_INK} align="center" style={AR_TEXT_SHADOW}>
-          Hold telefonen loddrett og snu deg til du peker mot pilen
+          {t({
+            nb: 'Hold telefonen loddrett og snu deg til du peker mot pilen',
+            en: 'Hold the phone upright and turn until you face the arrow',
+            ar: 'أمسك الهاتف عموديًا واستدر حتى تتجه نحو السهم',
+            ur: 'فون کو سیدھا کھڑا رکھیں اور تیر کی طرف رخ ہونے تک مڑیں',
+          })}
         </AppText>
       </View>
     </View>
@@ -431,10 +503,20 @@ function IntroCoach() {
       </View>
       <View style={{ alignItems: 'center', gap: spacing.sm }}>
         <AppText size="xl" weight="bold" color={AR_INK} align="center" style={AR_TEXT_SHADOW}>
-          Snu deg rundt for å finne Qibla
+          {t({
+            nb: 'Snu deg rundt for å finne Qibla',
+            en: 'Turn around to find the Qibla',
+            ar: 'استدر لتجد القبلة',
+            ur: 'قبلہ تلاش کرنے کے لیے گھومیں',
+          })}
         </AppText>
         <AppText size="sm" color={AR_INK} align="center" style={AR_TEXT_SHADOW}>
-          Hold telefonen loddrett og pek kameraet framover mens du snur deg
+          {t({
+            nb: 'Hold telefonen loddrett og pek kameraet framover mens du snur deg',
+            en: 'Hold the phone upright and point the camera ahead as you turn',
+            ar: 'أمسك الهاتف عموديًا ووجّه الكاميرا إلى الأمام أثناء استدارتك',
+            ur: 'فون کو سیدھا رکھیں اور گھومتے وقت کیمرا سامنے کی طرف رکھیں',
+          })}
         </AppText>
       </View>
     </Animated.View>
@@ -488,7 +570,12 @@ function TiltHint() {
           paddingVertical: spacing.sm,
         }}>
         <AppText size="xs" weight="semibold" color={AR_INK} align="center" style={AR_TEXT_SHADOW}>
-          Reis telefonen opp – hold den loddrett
+          {t({
+            nb: 'Reis telefonen opp – hold den loddrett',
+            en: 'Raise the phone – hold it upright',
+            ar: 'ارفع الهاتف – وأمسكه عموديًا',
+            ur: 'فون اوپر اٹھائیں – اسے سیدھا رکھیں',
+          })}
         </AppText>
       </View>
     </View>

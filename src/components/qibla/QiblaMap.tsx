@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { t } from '@/lib/i18n';
 import { LeafletMap, type LeafletMapHandle } from '@/components/map/LeafletMap';
 import {
   Circle,
@@ -92,8 +93,18 @@ export function QiblaMap({
         <Ionicons name="information-circle-outline" size={18} color={theme.colors.primary} />
         <AppText size="sm" tone="textSecondary" style={{ flex: 1 }}>
           {heading == null
-            ? 'Den grønne linjen peker mot Kaba.'
-            : 'Den grønne linjen peker mot Kaba. Snu deg til den blå kjeglen dekker linjen.'}
+            ? t({
+                nb: 'Den grønne linjen peker mot Kaba.',
+                en: 'The green line points to the Kaaba.',
+                ar: 'يشير الخط الأخضر إلى الكعبة.',
+                ur: 'سبز لکیر کعبہ کی طرف اشارہ کرتی ہے۔',
+              })
+            : t({
+                nb: 'Den grønne linjen peker mot Kaba. Snu deg til den blå kjeglen dekker linjen.',
+                en: 'The green line points to the Kaaba. Turn until the blue cone covers the line.',
+                ar: 'يشير الخط الأخضر إلى الكعبة. استدر حتى يغطي المخروط الأزرق الخط.',
+                ur: 'سبز لکیر کعبہ کی طرف اشارہ کرتی ہے۔ اتنا مڑیں کہ نیلی مخروطی شکل لکیر کو ڈھانپ لے۔',
+              })}
         </AppText>
       </View>
     </View>
@@ -158,13 +169,20 @@ function NativeQiblaMap({
       )}
       <Marker
         coordinate={{ latitude: KAABA.lat, longitude: KAABA.lon }}
-        title="Kaba"
-        description="Mekka, Saudi-Arabia"
+        title={t({ nb: 'Kaba', en: 'Kaaba', ar: 'الكعبة', ur: 'کعبہ' })}
+        description={t({
+          nb: 'Mekka, Saudi-Arabia',
+          en: 'Makkah, Saudi Arabia',
+          ar: 'مكة المكرمة، السعودية',
+          ur: 'مکہ مکرمہ، سعودی عرب',
+        })}
         pinColor={theme.colors.primary}
       />
     </MapView>
   );
 }
+
+const KAABA_POPUP = t({ nb: 'Kaba, Mekka', en: 'Kaaba, Makkah', ar: 'الكعبة، مكة المكرمة', ur: 'کعبہ، مکہ مکرمہ' });
 
 function OsmQiblaMap({
   lat,
@@ -238,7 +256,7 @@ function OsmQiblaMap({
 
   L.marker([${KAABA.lat}, ${KAABA.lon}], {
     icon: L.divIcon({ className: '', html: '<div class="kaaba-icon"></div>', iconSize: [16, 16], iconAnchor: [8, 8] })
-  }).addTo(map).bindPopup('Kaba, Mekka');`,
+  }).addTo(map).bindPopup(${JSON.stringify(KAABA_POPUP)});`,
       }),
     [
       initial,
@@ -290,7 +308,12 @@ function OsmQiblaMap({
         pushUser();
         pushCone();
       }}
-      fallbackMessage="Kartet ble avsluttet av systemet. Kompassvisningen virker fortsatt."
+      fallbackMessage={t({
+        nb: 'Kartet ble avsluttet av systemet. Kompassvisningen virker fortsatt.',
+        en: 'The system closed the map. The compass view still works.',
+        ar: 'أغلق النظام الخريطة. لا يزال عرض البوصلة يعمل.',
+        ur: 'سسٹم نے نقشہ بند کر دیا۔ قطب نما کا منظر اب بھی کام کرتا ہے۔',
+      })}
     />
   );
 }

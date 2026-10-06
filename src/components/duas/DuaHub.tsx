@@ -1,11 +1,12 @@
 import { Fragment, type ReactNode } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { t } from '@/lib/i18n';
 import { useMosque } from '@/api/queries';
 import { Ionicons } from '@expo/vector-icons';
 import { ArabicText } from '@/components/duas/ArabicText';
 import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
-import { AppText, Card, Divider, ListRow } from '@/components/ui';
+import { AppText, Card, Divider, ListRow, mirrored } from '@/components/ui';
 import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEidMode } from '@/hooks/useEidMode';
 import { useFeature } from '@/hooks/useFeature';
@@ -81,13 +82,13 @@ export function FeaturedCategoryCard({ category }: { category: DuaCategory }) {
         <CategoryIcon category={category} />
         <View style={{ flex: 1, gap: spacing.xxs }}>
           <AppText size="sm" tone="textMuted">
-            Nå
+            {t({ nb: 'Nå', en: 'Now', ar: 'الآن', ur: 'ابھی' })}
           </AppText>
           <AppText size="lg" weight="semibold">
             {category.title}
           </AppText>
         </View>
-        <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
+        <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} style={mirrored} />
       </View>
       {preview && <ArabicText>{preview.arabic}</ArabicText>}
     </Card>
@@ -100,7 +101,7 @@ export function TasbihRow({ from }: { from?: string }) {
   return (
     <Card padding="sm" rounded="xl">
       <ListRow
-        title="Tasbih"
+        title={t({ nb: 'Tasbih', en: 'Tasbih', ar: 'المسبحة', ur: 'تسبیح' })}
         leading={
           <Tile>
             <TasbihIcon size={22} color={theme.colors.primary} />

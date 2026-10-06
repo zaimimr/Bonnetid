@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ElementRef } from 'react';
 import { View } from 'react-native';
+import { t } from '@/lib/i18n';
 import { LeafletMap, type LeafletMapHandle } from '@/components/map/LeafletMap';
 import { MapView, Marker, NATIVE_MAPS_AVAILABLE } from '@/components/map/nativeMaps';
 import { AppText, Badge, Button, Card, IconButton } from '@/components/ui';
@@ -37,11 +38,12 @@ const PIN_SIZE = 16;
 const PIN_SIZE_ACTIVE = 24;
 const CLEAR_MESSAGE = 'clear';
 const FIT_PADDING = { top: 64, right: 48, bottom: 200, left: 48 };
+const VIEW_MOSQUE = t({ nb: 'Vis moské', en: 'View mosque', ar: 'عرض المسجد', ur: 'مسجد دیکھیں' });
 
 function NativeMosqueMap({
   pins,
   center,
-  actionLabel = 'Vis moské',
+  actionLabel = VIEW_MOSQUE,
   myOrgNr,
   fitToPins,
   onSelect,
@@ -163,14 +165,14 @@ function MosquePinCard({
           ) : null}
           {(pin.distanceKm != null || mine) && (
             <View style={{ flexDirection: 'row', gap: spacing.xs, marginTop: spacing.xs }}>
-              {mine && <Badge label="Din moské" variant="accent" />}
+              {mine && <Badge label={t({ nb: 'Din moské', en: 'Your mosque', ar: 'مسجدك', ur: 'آپ کی مسجد' })} variant="accent" />}
               {pin.distanceKm != null && (
                 <Badge label={formatDistance(pin.distanceKm)} variant="neutral" />
               )}
             </View>
           )}
         </View>
-        <IconButton name="close" accessibilityLabel="Lukk" onPress={onClose} />
+        <IconButton name="close" accessibilityLabel={t({ nb: 'Lukk', en: 'Close', ar: 'إغلاق', ur: 'بند کریں' })} onPress={onClose} />
       </View>
       <Button label={actionLabel} onPress={onSelect} fullWidth style={{ marginTop: spacing.md }} />
     </Card>
@@ -180,7 +182,7 @@ function MosquePinCard({
 function OsmMosqueMap({
   pins,
   center,
-  actionLabel = 'Vis moské',
+  actionLabel = VIEW_MOSQUE,
   myOrgNr,
   fitToPins,
   onSelect,
@@ -277,7 +279,12 @@ function OsmMosqueMap({
         html={html}
         onReady={pushPins}
         onMessage={(message) => setActiveOrgNr(message === CLEAR_MESSAGE ? null : message)}
-        fallbackMessage="Kartet ble avsluttet av systemet. Bruk listevisningen hvis det skjer igjen."
+        fallbackMessage={t({
+          nb: 'Kartet ble avsluttet av systemet. Bruk listevisningen hvis det skjer igjen.',
+          en: 'The system closed the map. Use the list view if it happens again.',
+          ar: 'أغلق النظام الخريطة. استخدم عرض القائمة إذا تكرر ذلك.',
+          ur: 'سسٹم نے نقشہ بند کر دیا۔ اگر دوبارہ ایسا ہو تو فہرست استعمال کریں۔',
+        })}
       />
       {active && (
         <MosquePinCard

@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
+import { t } from '@/lib/i18n';
 import { AppText, Card } from '@/components/ui';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import type { PrayerDay } from '@/api/types';
 import type { AsrMethodPreference, CalendarPrimary } from '@/store/settings';
-import { asrTimeFor } from '@/lib/prayerSchedule';
+import { asrTimeFor, PRAYER_LABELS } from '@/lib/prayerSchedule';
 import {
   formatZonedClock,
   isoDateKey,
@@ -16,11 +17,23 @@ import {
   type PrayerTimeZone,
 } from '@/lib/time';
 
-const COLUMNS = ['Fajr', 'Sol', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+const COLUMNS = [
+  PRAYER_LABELS.fajr,
+  t({ nb: 'Sol', en: 'Sun', ar: 'الشروق', ur: 'طلوع' }),
+  PRAYER_LABELS.duhr,
+  PRAYER_LABELS.asr,
+  PRAYER_LABELS.maghrib,
+  PRAYER_LABELS.isha,
+];
 const DATE_COLUMN_WIDTH = 40;
 const TIME_TEXT_WIDTH = 32;
 const MAX_TABLE_FONT_SCALE = 1.3;
-const WEEKDAY_LETTERS = ['S', 'M', 'T', 'O', 'T', 'F', 'L'];
+const WEEKDAY_LETTERS = t({
+  nb: ['S', 'M', 'T', 'O', 'T', 'F', 'L'],
+  en: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+  ar: ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'],
+  ur: ['', '', '', '', '', '', ''],
+});
 const FRIDAY = 5;
 const MARKER_SIZE = 5;
 
@@ -85,7 +98,7 @@ export function MonthPrayerTable({
           tone="textMuted"
           maxFontSizeMultiplier={tableScale}
           style={{ width: dateColumnWidth }}>
-          Dato
+          {t({ nb: 'Dato', en: 'Date', ar: 'التاريخ', ur: 'تاریخ' })}
         </AppText>
         {COLUMNS.map((column) => (
           <AppText

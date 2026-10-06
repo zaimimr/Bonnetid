@@ -32,6 +32,7 @@ import { useRefresh } from '@/hooks/useRefresh';
 import { useTimezoneNote } from '@/hooks/useTimezoneNote';
 import { useActiveLocation, useActiveMosque } from '@/store/settings';
 import { PostHogMaskView } from 'posthog-react-native';
+import { isRTL, t } from '@/lib/i18n';
 
 const FRIDAY = 5;
 const HEADER_HEIGHT = 44;
@@ -104,7 +105,7 @@ export default function DayScreen() {
   if (!valid) {
     return (
       <Screen edges={[]}>
-        <EmptyState message="Ugyldig dato" icon="calendar-clear-outline" />
+        <EmptyState message={t({ nb: 'Ugyldig dato', en: 'Invalid date', ar: 'تاريخ غير صالح', ur: 'غلط تاریخ' })} icon="calendar-clear-outline" />
       </Screen>
     );
   }
@@ -133,8 +134,8 @@ export default function DayScreen() {
           gap: spacing.md,
         }}>
         <IconButton
-          name="chevron-back"
-          accessibilityLabel="Forrige dag"
+          name={isRTL() ? 'chevron-forward' : 'chevron-back'}
+          accessibilityLabel={t({ nb: 'Forrige dag', en: 'Previous day', ar: 'اليوم السابق', ur: 'پچھلا دن' })}
           onPress={() => goToDay(-1)}
         />
         <View
@@ -166,8 +167,8 @@ export default function DayScreen() {
           )}
         </View>
         <IconButton
-          name="chevron-forward"
-          accessibilityLabel="Neste dag"
+          name={isRTL() ? 'chevron-back' : 'chevron-forward'}
+          accessibilityLabel={t({ nb: 'Neste dag', en: 'Next day', ar: 'اليوم التالي', ur: 'اگلا دن' })}
           onPress={() => goToDay(1)}
         />
       </View>
@@ -191,7 +192,12 @@ export default function DayScreen() {
             mosqueNote={
               mosqueInLocation
                 ? undefined
-                : `Moskeen er i en annen kommune, så bare Jumuah kommer fra ${mosque?.name ?? 'moskeen'}`
+                : t({
+                    nb: `Moskeen er i en annen kommune, så bare Jumuah kommer fra ${mosque?.name ?? 'moskeen'}`,
+                    en: `The mosque is in another municipality, so only Jumuah comes from ${mosque?.name ?? 'the mosque'}`,
+                    ar: `المسجد في بلدية أخرى، لذا تأتي صلاة الجمعة فقط من ${mosque?.name ?? 'المسجد'}`,
+                    ur: `مسجد کسی دوسری میونسپلٹی میں ہے، اس لیے صرف جمعہ ${mosque?.name ?? 'مسجد'} سے آتا ہے`,
+                  })
             }
             jamatTimes={jamatTimes}
             jummah={isFriday ? jummahTimes : []}

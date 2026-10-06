@@ -30,8 +30,10 @@ import { useWidgetSync } from '@/hooks/useWidgetSync';
 import { useNow } from '@/hooks/useNow';
 import { usePrayerLogSync } from '@/hooks/usePrayerLogSync';
 import { useSettings, useSettingsHydrated } from '@/store/settings';
+import { language, t } from '@/lib/i18n';
 
 const DAY = 24 * 60 * 60 * 1000;
+const BACK = t({ nb: 'Tilbake', en: 'Back', ar: 'رجوع', ur: 'واپس' });
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -56,7 +58,7 @@ const persister = createAsyncStoragePersister({
 const persistOptions = {
   persister,
   maxAge: 60 * DAY,
-  buster: 'v9',
+  buster: `v9-${language()}`,
   dehydrateOptions: {
     shouldDehydrateQuery: (query: Parameters<typeof defaultShouldDehydrateQuery>[0]) =>
       defaultShouldDehydrateQuery(query) && !String(query.queryKey[0]).startsWith('support-'),
@@ -131,120 +133,120 @@ function RootNavigator() {
           name="mosques"
           options={{
             headerShown: true,
-            title: 'Moskeer',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Moskeer', en: 'Mosques', ar: 'المساجد', ur: 'مساجد' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="place-picker"
           options={{
             headerShown: true,
-            title: 'Velg sted',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Velg sted', en: 'Choose location', ar: 'اختر الموقع', ur: 'مقام منتخب کریں' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="tracker"
           options={{
             headerShown: true,
-            title: 'Bønnesporing',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Bønnesporing', en: 'Prayer tracker', ar: 'متابعة الصلوات', ur: 'نماز ٹریکر' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="settings"
           options={{
             headerShown: true,
-            title: 'Innstillinger',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Innstillinger', en: 'Settings', ar: 'الإعدادات', ur: 'ترتیبات' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="tasbih"
           options={{
             headerShown: true,
-            title: 'Tasbih',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Tasbih', en: 'Tasbih', ar: 'المسبحة', ur: 'تسبیح' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="duas/index"
           options={{
             headerShown: true,
-            title: 'Dua og dhikr',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Dua og dhikr', en: 'Dua and dhikr', ar: 'الأدعية والأذكار', ur: 'دعا اور ذکر' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="duas/[id]"
           options={{
             headerShown: true,
-            title: 'Dua',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Dua', en: 'Dua', ar: 'دعاء', ur: 'دعا' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="irn"
           options={{
             headerShown: true,
-            title: 'Islamsk Råd Norge',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Islamsk Råd Norge', en: 'Islamic Council of Norway', ar: 'المجلس الإسلامي النرويجي', ur: 'اسلامک کونسل ناروے' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="notification-sound"
           options={{
             headerShown: true,
-            title: 'Varsellyd',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Varsellyd', en: 'Notification sound', ar: 'صوت الإشعار', ur: 'اطلاع کی آواز' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="notification-prayers"
           options={{
             headerShown: true,
-            title: 'Bønnevarsler',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Bønnevarsler', en: 'Prayer notifications', ar: 'إشعارات الصلاة', ur: 'نماز کی اطلاعات' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="notification-check"
           options={{
             headerShown: true,
-            title: 'Varselsjekk',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Varselsjekk', en: 'Notification check', ar: 'فحص الإشعارات', ur: 'اطلاعات کی جانچ' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="fasting-reminders"
           options={{
             headerShown: true,
-            title: 'Faste og merkedager',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Faste og merkedager', en: 'Fasting and special days', ar: 'الصيام والمناسبات', ur: 'روزے اور خاص دن' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="calculation-method"
           options={{
             headerShown: true,
-            title: 'Beregningsmetode',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Beregningsmetode', en: 'Calculation method', ar: 'طريقة الحساب', ur: 'حساب کا طریقہ' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="asr-method"
           options={{
             headerShown: true,
-            title: 'Asr-metode',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Asr-metode', en: 'Asr method', ar: 'طريقة العصر', ur: 'عصر کا طریقہ' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="dua-settings"
           options={{
             headerShown: true,
-            title: 'Duainnstillinger',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Duainnstillinger', en: 'Dua settings', ar: 'إعدادات الأدعية', ur: 'دعا کی ترتیبات' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
@@ -252,7 +254,7 @@ function RootNavigator() {
           options={{
             presentation: 'modal',
             headerShown: true,
-            title: 'Velg moské',
+            title: t({ nb: 'Velg moské', en: 'Choose mosque', ar: 'اختر المسجد', ur: 'مسجد منتخب کریں' }),
           }}
         />
         <Stack.Screen
@@ -260,7 +262,7 @@ function RootNavigator() {
           options={{
             headerShown: true,
             title: '',
-            headerBackTitle: 'Tilbake',
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
@@ -268,23 +270,23 @@ function RootNavigator() {
           options={{
             headerShown: true,
             title: '',
-            headerBackTitle: 'Tilbake',
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="whats-new"
           options={{
             headerShown: true,
-            title: 'Hva er nytt',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Hva er nytt', en: "What's new", ar: 'ما الجديد', ur: 'نیا کیا ہے' }),
+            headerBackTitle: BACK,
           }}
         />
         <Stack.Screen
           name="feedback"
           options={{
             headerShown: true,
-            title: 'Tilbakemelding',
-            headerBackTitle: 'Tilbake',
+            title: t({ nb: 'Tilbakemelding', en: 'Feedback', ar: 'الملاحظات', ur: 'رائے' }),
+            headerBackTitle: BACK,
           }}
         />
       </Stack>

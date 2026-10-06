@@ -35,6 +35,7 @@ object TimelineBarRenderer {
     widthPx: Int,
     heightPx: Int,
     compact: Boolean = false,
+    rtl: Boolean = false,
   ): Bitmap? {
     if (widthPx <= 0 || heightPx <= 0) return null
 
@@ -64,16 +65,18 @@ object TimelineBarRenderer {
     val axisCentre = barBottom + 4f * density + axisBand / 2f
     val radius = barHeight / 2f
     val progress = timeline.fraction(now).toFloat()
+    val side = { x: Float -> if (rtl) width - x else x }
 
     paint.color = track
     canvas.drawRoundRect(RectF(0f, barTop, width, barBottom), radius, radius, paint)
 
     val filled = (width * progress).coerceAtLeast(barHeight)
     paint.color = brand
-    canvas.drawRoundRect(RectF(0f, barTop, filled, barBottom), radius, radius, paint)
+    val fillRect = if (rtl) RectF(width - filled, barTop, width, barBottom) else RectF(0f, barTop, filled, barBottom)
+    canvas.drawRoundRect(fillRect, radius, radius, paint)
 
     for (mark in timeline.marks) {
-      val x = clamp(width * mark.fraction.toFloat(), width, density)
+      val x = side(clamp(width * mark.fraction.toFloat(), width, density))
       paint.color = if (mark.fraction <= progress) surface else trackMarker
       paint.alpha = 140
       canvas.drawRect(x - density / 2f, barTop, x + density / 2f, barBottom, paint)
@@ -82,7 +85,7 @@ object TimelineBarRenderer {
 
     if (markerAt != null) {
       timeline.mark(markerAt)?.let { mark ->
-        val x = clamp(width * mark.fraction.toFloat(), width, 2f * density)
+        val x = side(clamp(width * mark.fraction.toFloat(), width, 2f * density))
         paint.color = trackMarker
         canvas.drawRoundRect(
           RectF(x - density, barTop - markerOverhang, x + density, barBottom + markerOverhang),
@@ -94,7 +97,7 @@ object TimelineBarRenderer {
     }
 
     val knobRadius = barHeight / 2f + 2f * density
-    val knobX = clamp(width * progress, width, knobRadius * 2f)
+    val knobX = side(clamp(width * progress, width, knobRadius * 2f))
     paint.color = surface
     canvas.drawCircle(knobX, barCentre, knobRadius + knobRing, paint)
     paint.color = brand
@@ -111,7 +114,7 @@ object TimelineBarRenderer {
       val drawable: Drawable = context.getDrawable(PrayerIcons.drawable(mark.kind))
         ?.mutate() ?: continue
       drawable.setTint(if (mark.at == markerAt) brand else inkMuted)
-      val x = clamp(width * mark.fraction.toFloat(), width, glyphSlot)
+      val x = side(clamp(width * mark.fraction.toFloat(), width, glyphSlot))
       val half = glyphSize / 2f
       drawable.setBounds(
         (x - half).toInt(),
@@ -127,7 +130,7 @@ object TimelineBarRenderer {
     textPaint.textSize = 10f * density
     textPaint.textAlign = Paint.Align.CENTER
     for ((fraction, label) in axisLabels) {
-      val x = clamp(width * fraction.toFloat(), width, 30f * density)
+      val x = side(clamp(width * fraction.toFloat(), width, 30f * density))
       canvas.drawText(label, x, axisCentre + textPaint.textSize / 3f, textPaint)
     }
 

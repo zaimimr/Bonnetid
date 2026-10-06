@@ -5,6 +5,7 @@ import { AppText } from './AppText';
 import { IconButton } from './IconButton';
 import { useTheme } from '@/theme';
 import { radius, spacing } from '@/theme/tokens';
+import { t } from '@/lib/i18n';
 
 export type SheetProps = {
   visible: boolean;
@@ -23,7 +24,7 @@ export function Sheet({ visible, onClose, title, children }: SheetProps) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1, justifyContent: 'flex-end' }}>
         <Pressable
-          accessibilityLabel="Lukk"
+          accessibilityLabel={t({ nb: 'Lukk', en: 'Close', ar: 'إغلاق', ur: 'بند کریں' })}
           onPress={onClose}
           style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: theme.colors.overlay }}
         />
@@ -41,7 +42,7 @@ export function Sheet({ visible, onClose, title, children }: SheetProps) {
             <AppText size="xl" weight="bold" heading style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0 }}>
               {title}
             </AppText>
-            <IconButton name="close" accessibilityLabel="Lukk" onPress={onClose} />
+            <IconButton name="close" accessibilityLabel={t({ nb: 'Lukk', en: 'Close', ar: 'إغلاق', ur: 'بند کریں' })} onPress={onClose} />
           </View>
           <ScrollView bounces={false} keyboardShouldPersistTaps="handled">
             {children}

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { AppText, Badge, Card } from '@/components/ui';
+import { isRTL, t } from '@/lib/i18n';
+import { AppText, Badge, Card, mirrored } from '@/components/ui';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useResponsive } from '@/hooks/useResponsive';
 import { usePrayerMark } from '@/hooks/usePrayerMark';
@@ -18,6 +19,10 @@ import { PrayerActionButton, PrayerStatusMark } from './PrayerStatusControl';
 import { TimeCell, TimeCellRow, TIME_COLUMN_WIDTH } from './TimeCell';
 
 export type { JamatTimes };
+
+const ADHAN = t({ nb: 'Adhan', en: 'Adhan', ar: 'الأذان', ur: 'اذان' });
+const JAMAAT = t({ nb: 'Jamaat', en: 'Jamaat', ar: 'الجماعة', ur: 'جماعت' });
+const JUMUAH = t({ nb: 'Jumuah', en: 'Jumuah', ar: 'الجمعة', ur: 'جمعہ' });
 
 export type PrayerTimesCardProps = {
   schedule: PrayerEntry[];
@@ -74,17 +79,17 @@ export function PrayerTimesCard({
             size="xs"
             weight="medium"
             tone="textMuted"
-            align="right"
+            align={isRTL() ? 'left' : 'right'}
             style={{ width: columnWidth }}>
-            Adhan
+            {ADHAN}
           </AppText>
           <AppText
             size="xs"
             weight="medium"
             tone="textMuted"
-            align="right"
+            align={isRTL() ? 'left' : 'right'}
             style={{ width: columnWidth }}>
-            Jamaat
+            {JAMAAT}
           </AppText>
         </View>
       )}
@@ -103,7 +108,7 @@ export function PrayerTimesCard({
           <>
             <TimeCell
               value={entry.time}
-              label={hasJamat ? 'Adhan' : ''}
+              label={hasJamat ? ADHAN : ''}
               stacked={stacked}
               width={hasJamat ? columnWidth : undefined}
               weight={isHighlighted ? 'bold' : 'medium'}
@@ -112,7 +117,7 @@ export function PrayerTimesCard({
             {hasJamat && (
               <TimeCell
                 value={jamatTime ?? '–'}
-                label="Jamaat"
+                label={JAMAAT}
                 stacked={stacked}
                 width={columnWidth}
                 weight={isHighlighted ? 'semibold' : 'regular'}
@@ -138,11 +143,30 @@ export function PrayerTimesCard({
               accessibilityLabel={
                 markable
                   ? status === 'prayed'
-                    ? `${entry.label}, markert som bedt`
-                    : `${entry.label}, ikke markert`
+                    ? t({
+                        nb: `${entry.label}, markert som bedt`,
+                        en: `${entry.label}, marked as prayed`,
+                        ar: `${entry.label}، مُعلَّمة كمؤدّاة`,
+                        ur: `${entry.label}، ادا شدہ کے طور پر نشان زد`,
+                      })
+                    : t({
+                        nb: `${entry.label}, ikke markert`,
+                        en: `${entry.label}, not marked`,
+                        ar: `${entry.label}، غير مُعلَّمة`,
+                        ur: `${entry.label}، نشان زد نہیں`,
+                      })
                   : undefined
               }
-              accessibilityHint={markable ? 'Viser knappen for å markere bønnen' : undefined}
+              accessibilityHint={
+                markable
+                  ? t({
+                      nb: 'Viser knappen for å markere bønnen',
+                      en: 'Shows the button to mark the prayer',
+                      ar: 'يُظهر زر تعليم الصلاة',
+                      ur: 'نماز کو نشان زد کرنے کا بٹن دکھاتا ہے',
+                    })
+                  : undefined
+              }
               accessibilityState={markable ? { expanded: actionOpen } : undefined}
               style={({ pressed }) => [
                 {
@@ -176,7 +200,7 @@ export function PrayerTimesCard({
                       {entry.label}
                     </AppText>
                   )}
-                  {isHighlighted && <Badge label="Nå" variant="primary" />}
+                  {isHighlighted && <Badge label={t({ nb: 'Nå', en: 'Now', ar: 'الآن', ur: 'ابھی' })} variant="primary" />}
                   {markable && status === 'prayed' && <PrayerStatusMark label={entry.label} />}
                 </View>
                 {stacked && <TimeCellRow>{times}</TimeCellRow>}
@@ -223,9 +247,9 @@ export function PrayerTimesCard({
               }}>
               <Ionicons name="people-outline" size={18} color={theme.colors.primary} />
               <AppText weight="medium" style={{ flexShrink: 1 }}>
-                {jummah.length > 1 ? `Jumuah ${index + 1}` : 'Jumuah'}
+                {jummah.length > 1 ? `${JUMUAH} ${index + 1}` : JUMUAH}
               </AppText>
-              <AppText weight="semibold" tone="primary" tabular style={{ marginLeft: 'auto' }}>
+              <AppText weight="semibold" tone="primary" tabular style={{ marginStart: 'auto' }}>
                 {(statusDate && osloTimeToLocalClock(statusDate, entry.jummah)) ?? entry.jummah}
               </AppText>
             </View>
@@ -250,9 +274,15 @@ export function PrayerTimesCard({
           ]}>
           <Ionicons name="business-outline" size={15} color={theme.colors.textMuted} />
           <AppText size="xs" tone="textMuted" style={{ flex: 1 }} numberOfLines={2}>
-            {mosqueNote ?? `Jamaat-tider fra ${mosqueName}`}
+            {mosqueNote ??
+              t({
+                nb: `Jamaat-tider fra ${mosqueName}`,
+                en: `Jamaat times from ${mosqueName}`,
+                ar: `أوقات الجماعة من ${mosqueName}`,
+                ur: `${mosqueName} سے جماعت کے اوقات`,
+              })}
           </AppText>
-          <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} />
+          <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} style={mirrored} />
         </Pressable>
       )}
 
@@ -273,9 +303,14 @@ export function PrayerTimesCard({
           ]}>
           <Ionicons name="business-outline" size={18} color={theme.colors.primary} />
           <AppText size="sm" weight="medium" tone="primary" style={{ flex: 1 }}>
-            Velg din moské for å se jamaat- og jumuah-tider
+            {t({
+              nb: 'Velg din moské for å se jamaat- og jumuah-tider',
+              en: 'Choose your mosque to see Jamaat and Jumuah times',
+              ar: 'اختر مسجدك لعرض أوقات الجماعة والجمعة',
+              ur: 'جماعت اور جمعہ کے اوقات دیکھنے کے لیے اپنی مسجد منتخب کریں',
+            })}
           </AppText>
-          <Ionicons name="chevron-forward" size={16} color={theme.colors.primary} />
+          <Ionicons name="chevron-forward" size={16} color={theme.colors.primary} style={mirrored} />
         </Pressable>
       )}
     </Card>

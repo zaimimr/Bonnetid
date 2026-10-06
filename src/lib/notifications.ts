@@ -11,6 +11,7 @@ import {
 } from './notificationSounds';
 import { formatDurationSpaced, formatZonedClock, type PrayerTimeZone } from './time';
 import { track } from './telemetry';
+import { t } from './i18n.ts';
 import type { DeliveredAdhan, ScheduledAdhan } from './notificationHealth';
 import { setNativeNotificationQueue } from '../../modules/prayer-widget';
 
@@ -104,12 +105,12 @@ async function ensurePrayerCategory(Notifications: NotificationsModule) {
   await Notifications.setNotificationCategoryAsync(PRAYER_CATEGORY, [
     {
       identifier: MARK_PRAYED_ACTION,
-      buttonTitle: 'Bedt',
+      buttonTitle: t({ nb: 'Bedt', en: 'Prayed', ar: 'صلّيت', ur: 'ادا کی' }),
       options: { opensAppToForeground: false },
     },
     {
       identifier: MARK_SKIPPED_ACTION,
-      buttonTitle: 'Hopp over',
+      buttonTitle: t({ nb: 'Hopp over', en: 'Skip', ar: 'تخطٍّ', ur: 'چھوڑ دیں' }),
       options: { opensAppToForeground: false },
     },
   ]);
@@ -171,7 +172,7 @@ async function ensureReminderChannel(
 ): Promise<string | undefined> {
   if (Platform.OS !== 'android') return undefined;
   await Notifications.setNotificationChannelAsync(REMINDER_CHANNEL_ID, {
-    name: 'Påminnelser',
+    name: t({ nb: 'Påminnelser', en: 'Reminders', ar: 'التذكيرات', ur: 'یاد دہانیاں' }),
     importance: Notifications.AndroidImportance.DEFAULT,
   });
   return REMINDER_CHANNEL_ID;
@@ -227,11 +228,21 @@ function serialize<T>(task: () => Promise<T>): Promise<T> {
 }
 
 function adhanBody(entry: PrayerEntry, locationName: string, zone: PrayerTimeZone): string {
-  const start = `Det er tid for ${entry.label} i ${locationName}.`;
+  const start = t({
+    nb: `Det er tid for ${entry.label} i ${locationName}.`,
+    en: `It is time for ${entry.label} in ${locationName}.`,
+    ar: `حان وقت ${entry.label} في ${locationName}.`,
+    ur: `${locationName} میں ${entry.label} کا وقت ہو گیا ہے۔`,
+  });
   if (!entry.end) return start;
   const endClock = formatZonedClock(entry.end.date, zone);
   const duration = formatDurationSpaced(entry.end.date.getTime() - entry.date.getTime());
-  return `${start}\nVarer til ${endClock} (${duration}).`;
+  return t({
+    nb: `${start}\nVarer til ${endClock} (${duration}).`,
+    en: `${start}\nLasts until ${endClock} (${duration}).`,
+    ar: `${start}\nيستمر حتى ${endClock} (${duration}).`,
+    ur: `${start}\n${endClock} تک (${duration})۔`,
+  });
 }
 
 export function syncPrayerNotifications(plan: PrayerNotificationPlan): Promise<number> {

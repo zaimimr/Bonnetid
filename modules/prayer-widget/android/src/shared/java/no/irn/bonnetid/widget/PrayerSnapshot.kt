@@ -74,6 +74,7 @@ data class PrayerSnapshot(
   val origin: SnapshotCoords? = null,
   val mosques: List<SnapshotMosque> = emptyList(),
   val mode: String? = null,
+  val lang: String = "nb",
 ) {
   val usesDeviceTimeZone: Boolean
     get() = mode == "calculated"
@@ -200,6 +201,7 @@ data class PrayerSnapshot(
           origin = origin,
           mosques = mosques,
           mode = optStringOrNull(root, "mode"),
+          lang = optStringOrNull(root, "lang") ?: "nb",
         ).also { dayKeyZone = if (it.usesDeviceTimeZone) TimeZone.getDefault() else osloZone }
       } catch (error: Exception) {
         null

@@ -7,6 +7,7 @@ import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { opacity, spacing } from '@/theme/tokens';
 import { useActiveMosque, useSettings } from '@/store/settings';
+import { t } from '@/lib/i18n';
 
 export default function AsrMethodScreen() {
   const theme = useTheme();
@@ -50,7 +51,12 @@ export default function AsrMethodScreen() {
           size="xs"
           tone="textMuted"
           style={{ marginTop: spacing.sm, paddingHorizontal: spacing.md }}>
-          {`${mosque.name} bestemmer asr-metoden`}
+          {t({
+            nb: `${mosque.name} bestemmer asr-metoden`,
+            en: `${mosque.name} sets the Asr method`,
+            ar: `${mosque.name} يحدد طريقة حساب العصر`,
+            ur: `${mosque.name} عصر کا طریقہ طے کرتی ہے`,
+          })}
         </AppText>
       )}
     </Screen>

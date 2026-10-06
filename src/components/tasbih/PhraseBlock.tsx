@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 import Animated, { FadeIn, FadeOut, ReduceMotion } from 'react-native-reanimated';
+import { isRTL, language } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
 import { ArabicText } from '@/components/duas/ArabicText';
 import type { TasbihPhrase } from '@/lib/tasbih';
@@ -20,8 +21,9 @@ export function PhraseBlock({
   compact?: boolean;
   minHeight?: number;
 }) {
-  const showTransliteration = useSettings((state) => state.duaShowTransliteration);
-  const showMeaning = useSettings((state) => state.duaShowMeaning);
+  const showTransliteration =
+    useSettings((state) => state.duaShowTransliteration) && !isRTL();
+  const showMeaning = useSettings((state) => state.duaShowMeaning) && language() !== 'ar';
   return (
     <View style={{ minHeight, justifyContent: 'center' }}>
       {phrase ? (

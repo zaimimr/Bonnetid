@@ -1,5 +1,6 @@
 import type { PrayerDay } from '@/api/types';
 import { formatZonedClock, wallClockToDate, type PrayerTimeZone } from './time';
+import { t } from './i18n.ts';
 
 export type ExtraTimeName = 'duha' | 'midnight' | 'tahajjud';
 
@@ -41,8 +42,13 @@ export function buildExtraTimes(
   if (sunrise) {
     entries.push({
       name: 'duha',
-      label: 'Duha',
-      note: `Fra ${DUHA_AFTER_SUNRISE_MINUTES} min etter soloppgang til like før middag`,
+      label: t({ nb: 'Duha', en: 'Duha', ar: 'الضحى', ur: 'چاشت' }),
+      note: t({
+        nb: `Fra ${DUHA_AFTER_SUNRISE_MINUTES} min etter soloppgang til like før middag`,
+        en: `From ${DUHA_AFTER_SUNRISE_MINUTES} min after sunrise until just before midday`,
+        ar: `من بعد الشروق بـ${DUHA_AFTER_SUNRISE_MINUTES} دقيقة إلى قبيل الزوال`,
+        ur: `طلوع آفتاب کے ${DUHA_AFTER_SUNRISE_MINUTES} منٹ بعد سے زوال سے کچھ پہلے تک`,
+      }),
       date: new Date(sunrise.getTime() + DUHA_AFTER_SUNRISE_MINUTES * MINUTE_MS),
     });
   }
@@ -50,8 +56,13 @@ export function buildExtraTimes(
   if (noon) {
     entries.push({
       name: 'midnight',
-      label: 'Midnatt',
-      note: '12 timer etter middag',
+      label: t({ nb: 'Midnatt', en: 'Midnight', ar: 'منتصف الليل', ur: 'آدھی رات' }),
+      note: t({
+        nb: '12 timer etter middag',
+        en: '12 hours after midday',
+        ar: 'بعد الزوال بـ12 ساعة',
+        ur: 'زوال کے 12 گھنٹے بعد',
+      }),
       date: new Date(noon.getTime() + HALF_DAY_MS),
     });
   }
@@ -60,8 +71,13 @@ export function buildExtraTimes(
     const night = nextFajr.getTime() - maghrib.getTime();
     entries.push({
       name: 'tahajjud',
-      label: 'Tahajjud',
-      note: 'Siste tredjedel av natten, frem til Fajr',
+      label: t({ nb: 'Tahajjud', en: 'Tahajjud', ar: 'التهجد', ur: 'تہجد' }),
+      note: t({
+        nb: 'Siste tredjedel av natten, frem til Fajr',
+        en: 'Last third of the night, until Fajr',
+        ar: 'الثلث الأخير من الليل حتى الفجر',
+        ur: 'رات کا آخری تہائی حصہ، فجر تک',
+      }),
       date: new Date(maghrib.getTime() + Math.round((night * 2) / 3)),
     });
   }

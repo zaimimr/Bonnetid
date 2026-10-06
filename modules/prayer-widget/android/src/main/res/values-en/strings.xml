@@ -1,0 +1,14 @@
+<resources>
+  <string name="prayer_widget_label">Next prayer</string>
+  <string name="prayer_widget_description">The time of the next prayer, with a countdown.</string>
+  <string name="prayer_day_widget_label">Today\'s prayer times</string>
+  <string name="prayer_day_widget_description">All five prayers today, with the current one highlighted.</string>
+  <string name="prayer_widget_empty_title">Open Bønnetid</string>
+  <string name="prayer_widget_empty_body">The times appear here once the app has fetched them for your location.</string>
+  <string name="prayer_widget_prayed">Prayed</string>
+  <string name="prayer_status_channel_name">Prayer status</string>
+  <string name="prayer_status_channel_description">Lock screen notification when a prayer time starts, with Prayed and Skip.</string>
+  <string name="prayer_timeline_widget_label">Timeline</string>
+  <string name="prayer_timeline_widget_description">The day as a timeline, with the time left until the next prayer.</string>
+  <string name="prayer_timeline_bar_description">Timeline of today\'s prayers</string>
+</resources>

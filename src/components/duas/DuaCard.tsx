@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
+import { t, isRTL, language } from '@/lib/i18n';
 import { AppText, Badge, Card, Divider } from '@/components/ui';
 import type { Dua } from '@/lib/duas';
 import { useTheme } from '@/theme';
@@ -14,8 +15,9 @@ export type DuaCardProps = {
 
 export function DuaCard({ dua, footer }: DuaCardProps) {
   const theme = useTheme();
-  const showTransliteration = useSettings((state) => state.duaShowTransliteration);
-  const showMeaning = useSettings((state) => state.duaShowMeaning);
+  const showTransliteration =
+    useSettings((state) => state.duaShowTransliteration) && !isRTL();
+  const showMeaning = useSettings((state) => state.duaShowMeaning) && language() !== 'ar';
 
   return (
     <Card rounded="xl" padding="lg" style={{ gap: spacing.md }}>
@@ -30,7 +32,12 @@ export function DuaCard({ dua, footer }: DuaCardProps) {
           {dua.title}
         </AppText>
         {dua.repeat ? (
-          <View accessible accessibilityLabel={`Gjentas ${dua.repeat} ganger`}>
+          <View accessible accessibilityLabel={t({
+              nb: `Gjentas ${dua.repeat} ganger`,
+              en: `Repeated ${dua.repeat} times`,
+              ar: `عدد التكرار: ${dua.repeat}`,
+              ur: `${dua.repeat} بار دہرائیں`,
+            })}>
             <Badge label={`${dua.repeat}×`} variant="primary" />
           </View>
         ) : null}
@@ -47,7 +54,12 @@ export function DuaCard({ dua, footer }: DuaCardProps) {
       </View>
 
       {showTransliteration && (
-        <AppText tone="textSecondary" accessibilityLabel={`Uttale: ${dua.transliteration}`}>
+        <AppText tone="textSecondary" accessibilityLabel={t({
+            nb: `Uttale: ${dua.transliteration}`,
+            en: `Pronunciation: ${dua.transliteration}`,
+            ar: `النطق: ${dua.transliteration}`,
+            ur: `تلفظ: ${dua.transliteration}`,
+          })}>
           {dua.transliteration}
         </AppText>
       )}
@@ -59,7 +71,12 @@ export function DuaCard({ dua, footer }: DuaCardProps) {
         </>
       )}
       <AppText size="xs" tone="textMuted">
-        {`Kilde: ${dua.source}`}
+        {t({
+          nb: `Kilde: ${dua.source}`,
+          en: `Source: ${dua.source}`,
+          ar: `المصدر: ${dua.source}`,
+          ur: `حوالہ: ${dua.source}`,
+        })}
       </AppText>
       {footer}
     </Card>
