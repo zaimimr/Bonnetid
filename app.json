@@ -115,6 +115,8 @@
       "./plugins/withCarFormFactors",
       "./plugins/withWearOs",
       "./plugins/withTrimmedPermissions",
+      "./plugins/withUnlockedOrientation",
+      "./plugins/withR8Optimization",
       "./plugins/withPodDeploymentTarget",
       "./plugins/withSceneLifecycle",
       "./plugins/withSiriShortcuts",
