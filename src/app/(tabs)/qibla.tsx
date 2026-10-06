@@ -24,6 +24,7 @@ import { track } from '@/lib/telemetry';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import { useIsCalculatedMode } from '@/store/settings';
+import { PostHogMaskView } from 'posthog-react-native';
 
 type QiblaView = 'compass' | 'map' | '3d';
 
@@ -146,13 +147,15 @@ export default function QiblaScreen() {
         )}
 
         {view === 'map' && (
-          <QiblaMap
-            lat={coords.lat}
-            lon={coords.lon}
-            heading={isLandscape ? null : heading}
-            accuracyM={coords.accuracyM}
-            distanceToKaabaKm={kaabaDistance}
-          />
+          <PostHogMaskView style={{ flex: 1 }}>
+            <QiblaMap
+              lat={coords.lat}
+              lon={coords.lon}
+              heading={isLandscape ? null : heading}
+              accuracyM={coords.accuracyM}
+              distanceToKaabaKm={kaabaDistance}
+            />
+          </PostHogMaskView>
         )}
 
         {view === '3d' &&

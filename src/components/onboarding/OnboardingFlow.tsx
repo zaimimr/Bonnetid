@@ -27,6 +27,7 @@ import {
   useSettings,
   type SavedLocation,
 } from '@/store/settings';
+import { PostHogMaskView } from 'posthog-react-native';
 
 type StepId = 'welcome' | 'location' | 'mosque' | 'asr' | 'notifications' | 'tracker' | 'ready';
 
@@ -557,9 +558,11 @@ function ReadyStep({ onFinish }: { onFinish: () => void }) {
         <AppText size="display" weight="bold" heading>
           Klar for bruk
         </AppText>
-        <AppText size="md" tone="textSecondary">
-          {body}
-        </AppText>
+        <PostHogMaskView>
+          <AppText size="md" tone="textSecondary">
+            {body}
+          </AppText>
+        </PostHogMaskView>
         <AppText size="md" weight="medium" color={theme.colors.primary} style={{ marginTop: spacing.xs }}>
           Må Allah ta imot bønnene dine.
         </AppText>

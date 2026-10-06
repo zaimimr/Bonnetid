@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useHijriMonth, useMosque, useMosqueJamatPeriods } from '@/api/queries';
 import { ExtraTimesCard } from '@/components/prayer/ExtraTimesCard';
@@ -31,6 +31,7 @@ import { usePrayerMonth, zoneFor } from '@/hooks/usePrayerMonth';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useTimezoneNote } from '@/hooks/useTimezoneNote';
 import { useActiveLocation, useActiveMosque } from '@/store/settings';
+import { PostHogMaskView } from 'posthog-react-native';
 
 const FRIDAY = 5;
 const HEADER_HEIGHT = 44;
@@ -110,7 +111,18 @@ export default function DayScreen() {
 
   return (
     <Screen scroll edges={[]} refreshing={refreshing} onRefresh={onRefresh}>
-      <Stack.Screen options={{ title: location.name }} />
+      <Stack.Screen
+        options={{
+          title: location.name,
+          headerTitle: () => (
+            <PostHogMaskView>
+              <AppText weight="semibold" style={{ fontSize: Platform.OS === 'ios' ? 17 : 20 }}>
+                {location.name}
+              </AppText>
+            </PostHogMaskView>
+          ),
+        }}
+      />
 
       <View
         style={{

@@ -4,6 +4,7 @@ import { AppText } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { useActiveLocation, useIsCalculatedMode } from '@/store/settings';
+import { PostHogMaskView } from 'posthog-react-native';
 
 export function TravelBanner() {
   const theme = useTheme();
@@ -24,9 +25,11 @@ export function TravelBanner() {
       }}>
       <Ionicons name="airplane-outline" size={18} color={theme.colors.onTravelSurface} />
       <View style={{ flex: 1 }}>
-        <AppText size="sm" weight="semibold" style={{ color: theme.colors.onTravelSurface }}>
-          {`Reisemodus · ${location.name}`}
-        </AppText>
+        <PostHogMaskView>
+          <AppText size="sm" weight="semibold" style={{ color: theme.colors.onTravelSurface }}>
+            {`Reisemodus · ${location.name}`}
+          </AppText>
+        </PostHogMaskView>
         <AppText size="xs" style={{ color: theme.colors.travelSurfaceMuted }}>
           Lokale tider
         </AppText>

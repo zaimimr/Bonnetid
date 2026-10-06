@@ -12,7 +12,12 @@ export const posthog = new PostHog(analyticsActive ? POSTHOG_KEY : 'phc_disabled
   host: POSTHOG_HOST,
   disabled: !analyticsActive,
   captureAppLifecycleEvents: true,
-  enableSessionReplay: false,
+  enableSessionReplay: analyticsActive && !isRunningInExpoGo(),
+  sessionReplayConfig: {
+    maskAllTextInputs: false,
+    maskAllImages: false,
+    captureLog: false,
+  },
   errorTracking: {
     autocapture: {
       uncaughtExceptions: true,

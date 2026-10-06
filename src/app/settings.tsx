@@ -36,6 +36,7 @@ import {
   useActiveMosque,
   useSettings,
 } from '@/store/settings';
+import { PostHogMaskView } from 'posthog-react-native';
 
 const lockScreenSupported =
   prayerWidgetAvailable && (Platform.OS === 'android' || liveActivitiesEnabled());
@@ -121,16 +122,18 @@ export default function SettingsScreen() {
     <Screen scroll edges={[]}>
       <SectionHeader title="Bønnetider" />
       <Card padding="sm" rounded="xl">
-        <ListRow
-          title="Sted"
-          subtitle={
-            calculated
-              ? `${location.name} · lokale tider, følger posisjonen din`
-              : `${location.name} · følger posisjonen din`
-          }
-          leading={<Ionicons name="location-outline" size={20} color={theme.colors.primary} />}
-          style={ROW}
-        />
+        <PostHogMaskView>
+          <ListRow
+            title="Sted"
+            subtitle={
+              calculated
+                ? `${location.name} · lokale tider, følger posisjonen din`
+                : `${location.name} · følger posisjonen din`
+            }
+            leading={<Ionicons name="location-outline" size={20} color={theme.colors.primary} />}
+            style={ROW}
+          />
+        </PostHogMaskView>
         {!calculated && (
           <>
             <Divider />

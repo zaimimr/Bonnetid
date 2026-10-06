@@ -11,6 +11,7 @@ import { useTheme } from '@/theme';
 import { fontSize, opacity, radius, spacing } from '@/theme/tokens';
 import { usePlaceFilter } from '@/store/placeFilter';
 import { useActiveLocation } from '@/store/settings';
+import { PostHogMaskView } from 'posthog-react-native';
 
 export default function PlacePickerScreen() {
   const router = useRouter();
@@ -89,20 +90,22 @@ export default function PlacePickerScreen() {
             paddingHorizontal: spacing.md,
           }}>
           <Ionicons name="search" size={18} color={theme.colors.textMuted} />
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Søk etter sted, kommune eller fylke"
-            placeholderTextColor={theme.colors.textMuted}
-            autoCorrect={false}
-            maxFontSizeMultiplier={1.6}
-            style={{
-              flex: 1,
-              paddingVertical: spacing.md,
-              fontSize: fontSize.md,
-              color: theme.colors.textPrimary,
-            }}
-          />
+          <PostHogMaskView style={{ flex: 1 }}>
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Søk etter sted, kommune eller fylke"
+              placeholderTextColor={theme.colors.textMuted}
+              autoCorrect={false}
+              maxFontSizeMultiplier={1.6}
+              style={{
+                flex: 1,
+                paddingVertical: spacing.md,
+                fontSize: fontSize.md,
+                color: theme.colors.textPrimary,
+              }}
+            />
+          </PostHogMaskView>
           {query.length > 0 && (
             <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel="Tøm søk">
               <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />

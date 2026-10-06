@@ -38,6 +38,7 @@ import { track } from '@/lib/telemetry';
 import { isoDateIsFriday, parseDayKey } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
 import { useActiveLocation, useActiveMosque, useUnreadAnnouncement } from '@/store/settings';
+import { PostHogMaskView } from 'posthog-react-native';
 
 const UPCOMING_EVENT_COUNT = 3;
 
@@ -161,14 +162,16 @@ export default function HomeScreen() {
 
         {todaySchedule.length > 0 && (
           <View>
-            <SectionHeader
-              title="Dagens bønnetider"
-              subtitle={
-                mosque && mosqueInLocation ? `${location.name} · ${mosque.name}` : location.name
-              }
-              trailing={calculated ? <Badge label="Lokale tider" variant="neutral" /> : undefined}
-              style={timezoneNote ? { marginBottom: spacing.xs } : undefined}
-            />
+            <PostHogMaskView>
+              <SectionHeader
+                title="Dagens bønnetider"
+                subtitle={
+                  mosque && mosqueInLocation ? `${location.name} · ${mosque.name}` : location.name
+                }
+                trailing={calculated ? <Badge label="Lokale tider" variant="neutral" /> : undefined}
+                style={timezoneNote ? { marginBottom: spacing.xs } : undefined}
+              />
+            </PostHogMaskView>
             {timezoneNote && (
               <AppText size="xs" tone="textMuted" style={{ marginBottom: spacing.md }}>
                 {timezoneNote}
