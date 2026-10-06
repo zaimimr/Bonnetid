@@ -57,6 +57,10 @@ public class PrayerWidgetModule: Module {
       PrayerBackgroundRefresh.setQueue(json)
     }
 
+    Function("isTestFlight") { () -> Bool in
+      Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+    }
+
     Function("hasDynamicIsland") { () -> Bool in
       Self.hasDynamicIsland()
     }

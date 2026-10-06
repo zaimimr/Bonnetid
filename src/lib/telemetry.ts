@@ -1,6 +1,7 @@
 import Constants from 'expo-constants';
 import { isRunningInExpoGo } from 'expo';
 import PostHog from 'posthog-react-native';
+import { isTestFlight } from '../../modules/prayer-widget';
 import { useSession } from '@/store/session';
 
 const POSTHOG_KEY = process.env.EXPO_PUBLIC_POSTHOG_KEY ?? '';
@@ -28,7 +29,12 @@ export const posthog = new PostHog(analyticsActive ? POSTHOG_KEY : 'phc_disabled
   },
 });
 
-void posthog.register({ app_name: 'bonnetid' });
+function distribution(): 'local' | 'testflight' | 'production' {
+  if (__DEV__) return 'local';
+  return isTestFlight() ? 'testflight' : 'production';
+}
+
+void posthog.register({ app_name: 'bonnetid', distribution: distribution() });
 
 export type TrackProps = Record<string, string | number | boolean>;
 
