@@ -9,7 +9,7 @@
   "duasForHajjAnd": "أدعية الحج وذي الحجة",
   "timeOffForEid": "إجازة عيد الأضحى",
   "timeOffForEid2": "إجازة عيد الفطر",
-  "eidIsOnLet": "العيد في {{eidDate}}. أبلغ صاحب العمل {{value3}}.",
+  "eidIsOnLet": "العيد في {{eidDate}}. أبلغ صاحب العمل {{deadline}}.",
   "hide": "إخفاء",
   "duaFor": "دعاء {{title}}",
   "ramadanDay": "اليوم {{dayOfRamadan}} من رمضان",
@@ -57,5 +57,7 @@
   "dhulHijjahBeginsIn": "يبدأ ذو الحجة بعد {{value}}",
   "suhoorEnds2": "ينتهي السحور",
   "ramadanBeginsTomorrow": "يبدأ رمضان غدًا",
-  "ramadanBeginsIn": "يبدأ رمضان بعد {{value}}"
+  "ramadanBeginsIn": "يبدأ رمضان بعد {{value}}",
+  "today": "اليوم",
+  "byDate": "قبل {{date}}"
 }

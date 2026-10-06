@@ -192,7 +192,7 @@ export default function DayScreen() {
             mosqueNote={
               mosqueInLocation
                 ? undefined
-                : t('calendar.theMosqueIsIn', { value: mosque?.name ?? 'moskeen', value2: mosque?.name ?? 'the mosque', value3: mosque?.name ?? 'المسجد', value4: mosque?.name ?? 'مسجد' })
+                : t('calendar.theMosqueIsIn', { name: mosque?.name ?? t('common.theMosque') })
             }
             jamatTimes={jamatTimes}
             jummah={isFriday ? jummahTimes : []}

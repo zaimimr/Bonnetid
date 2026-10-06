@@ -45,7 +45,7 @@
   "report": "Report",
   "recentNotifications": "Recent notifications",
   "noneInNotificationCenter": "None in Notification Center",
-  "at": "{{value}} at {{value2}}",
+  "at": "{{date}} at {{time}}",
   "notifyFor": "Notify for",
   "notificationSound": "Notification sound",
   "theSoundPlaysWhen": "The sound plays when you select it. Adhan recorded by Ahmed Al-Haddad.",

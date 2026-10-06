@@ -9,7 +9,7 @@
   "duasForHajjAnd": "Duas for Hajj and Dhul Hijjah",
   "timeOffForEid": "Time off for Eid al-Adha",
   "timeOffForEid2": "Time off for Eid al-Fitr",
-  "eidIsOnLet": "Eid is on {{eidDate}}. Let your employer know {{value2}}.",
+  "eidIsOnLet": "Eid is on {{eidDate}}. Let your employer know {{deadline}}.",
   "hide": "Hide",
   "duaFor": "Dua for {{title}}",
   "ramadanDay": "Ramadan day {{dayOfRamadan}}",
@@ -57,5 +57,7 @@
   "dhulHijjahBeginsIn": "Dhul Hijjah begins in {{value}}",
   "suhoorEnds2": "Suhoor ends",
   "ramadanBeginsTomorrow": "Ramadan begins tomorrow",
-  "ramadanBeginsIn": "Ramadan begins in {{value}}"
+  "ramadanBeginsIn": "Ramadan begins in {{value}}",
+  "today": "today",
+  "byDate": "by {{date}}"
 }

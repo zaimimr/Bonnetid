@@ -36,7 +36,7 @@
   "s": "S",
   "w": "V",
   "qiblaDirectionFromYour": "Qibla-retning fra din posisjon",
-  "yourLocationIsUncertain": "Posisjonen er usikker (±{{value}}). Retningen kan være opptil {{value2}}° feil. Gå ut i åpent lende og vent noen sekunder.",
+  "yourLocationIsUncertain": "Posisjonen er usikker (±{{accuracy}}). Retningen kan være opptil {{degrees}}° feil. Gå ut i åpent lende og vent noen sekunder.",
   "youAreAtThe": "Du står ved Kaba",
   "aboutAwayThisClose": "Omtrent {{value}} unna. Så nær er kompasset ubrukelig, fordi Kaba er smalere enn feilmarginen til GPS-en. Vend deg mot Kaba slik du ser den.",
   "theGreenLinePoints": "Den grønne linjen peker mot Kaba.",

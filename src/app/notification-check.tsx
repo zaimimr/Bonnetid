@@ -194,7 +194,7 @@ export default function NotificationCheckScreen() {
                 {index > 0 && <Divider />}
                 <ListRow
                   title={prayerLabel(item.prayer)}
-                  subtitle={t('settings.at', { value: formatGregorianShort(at), value2: formatLocalClock(at) })}
+                  subtitle={t('settings.at', { date: formatGregorianShort(at), time: formatLocalClock(at) })}
                   leading={
                     <Ionicons name="notifications-outline" size={20} color={theme.colors.primary} />
                   }

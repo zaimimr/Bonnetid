@@ -36,7 +36,7 @@
   "s": "S",
   "w": "W",
   "qiblaDirectionFromYour": "Qibla direction from your location",
-  "yourLocationIsUncertain": "Your location is uncertain (±{{value}}). The direction may be off by up to {{value2}}°. Go out into the open and wait a few seconds.",
+  "yourLocationIsUncertain": "Your location is uncertain (±{{accuracy}}). The direction may be off by up to {{degrees}}°. Go out into the open and wait a few seconds.",
   "youAreAtThe": "You are at the Kaaba",
   "aboutAwayThisClose": "About {{value}} away. This close the compass is useless, because the Kaaba is narrower than the GPS margin of error. Face the Kaaba as you see it.",
   "theGreenLinePoints": "The green line points to the Kaaba.",

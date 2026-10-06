@@ -2,6 +2,6 @@
   "announcementFrom": "إعلان من {{name}}",
   "todaySPrayerTimes": "مواقيت صلاة اليوم",
   "localTimes": "أوقات محلية",
-  "theMosqueIsIn": "المسجد في بلدية أخرى، لذا تأتي صلاة الجمعة فقط من {{value3}}",
+  "theMosqueIsIn": "المسجد في بلدية أخرى، لذا تأتي صلاة الجمعة فقط من {{name}}",
   "upcomingSpecialDays": "المناسبات القادمة"
 }

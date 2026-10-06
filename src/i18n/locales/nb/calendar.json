@@ -9,7 +9,7 @@
   "invalidDate": "Ugyldig dato",
   "previousDay": "Forrige dag",
   "nextDay": "Neste dag",
-  "theMosqueIsIn": "Moskeen er i en annen kommune, så bare Jumuah kommer fra {{value}}",
+  "theMosqueIsIn": "Moskeen er i en annen kommune, så bare Jumuah kommer fra {{name}}",
   "weekdayLabels": [
     "man",
     "tir",

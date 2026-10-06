@@ -45,7 +45,7 @@
   "report": "Meld fra",
   "recentNotifications": "Siste varsler",
   "noneInNotificationCenter": "Ingen i varslingssenteret",
-  "at": "{{value}} kl. {{value2}}",
+  "at": "{{date}} kl. {{time}}",
   "notifyFor": "Varsle for",
   "notificationSound": "Varsellyd",
   "theSoundPlaysWhen": "Lyden spilles av når du velger den. Adhan innspilt av Ahmed Al-Haddad.",

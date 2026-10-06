@@ -45,7 +45,7 @@
   "report": "إبلاغ",
   "recentNotifications": "أحدث الإشعارات",
   "noneInNotificationCenter": "لا شيء في مركز الإشعارات",
-  "at": "{{value}} الساعة {{value2}}",
+  "at": "{{date}} الساعة {{time}}",
   "notifyFor": "التنبيه لـ",
   "notificationSound": "صوت الإشعار",
   "theSoundPlaysWhen": "يُشغَّل الصوت عند اختياره. الأذان بصوت أحمد الحداد.",

@@ -9,7 +9,7 @@
   "duasForHajjAnd": "Duaer for Hajj og Dhul-Hijjah",
   "timeOffForEid": "Fri til Eid al-Adha",
   "timeOffForEid2": "Fri til Eid al-Fitr",
-  "eidIsOnLet": "Eid er {{eidDate}}. Gi beskjed til arbeidsgiver {{value}}.",
+  "eidIsOnLet": "Eid er {{eidDate}}. Gi beskjed til arbeidsgiver {{deadline}}.",
   "hide": "Skjul",
   "duaFor": "Dua for {{title}}",
   "ramadanDay": "Ramadan dag {{dayOfRamadan}}",
@@ -57,5 +57,7 @@
   "dhulHijjahBeginsIn": "Dhul Hijjah begynner om {{days}} dager",
   "suhoorEnds2": "Suhoor slutter",
   "ramadanBeginsTomorrow": "Ramadan begynner i morgen",
-  "ramadanBeginsIn": "Ramadan begynner om {{days}} dager"
+  "ramadanBeginsIn": "Ramadan begynner om {{days}} dager",
+  "today": "i dag",
+  "byDate": "innen {{date}}"
 }

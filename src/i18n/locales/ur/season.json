@@ -9,7 +9,7 @@
   "duasForHajjAnd": "حج اور ذوالحجہ کی دعائیں",
   "timeOffForEid": "عید الاضحیٰ کی چھٹی",
   "timeOffForEid2": "عید الفطر کی چھٹی",
-  "eidIsOnLet": "عید {{eidDate}} کو ہے۔ اپنے آجر کو {{value4}} مطلع کریں۔",
+  "eidIsOnLet": "عید {{eidDate}} کو ہے۔ اپنے آجر کو {{deadline}} مطلع کریں۔",
   "hide": "چھپائیں",
   "duaFor": "{{title}} کی دعا",
   "ramadanDay": "رمضان کا {{dayOfRamadan}} واں دن",
@@ -57,5 +57,7 @@
   "dhulHijjahBeginsIn": "ذوالحجہ {{value}} میں شروع ہو گا",
   "suhoorEnds2": "سحری ختم",
   "ramadanBeginsTomorrow": "رمضان کل شروع ہو گا",
-  "ramadanBeginsIn": "رمضان {{value}} میں شروع ہو گا"
+  "ramadanBeginsIn": "رمضان {{value}} میں شروع ہو گا",
+  "today": "آج",
+  "byDate": "{{date}} تک"
 }

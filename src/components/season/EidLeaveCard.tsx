@@ -43,7 +43,10 @@ export function EidLeaveCard({ now }: { now: Date }) {
             </AppText>
           </View>
           <AppText size="sm" tone="textSecondary">
-            {t('season.eidIsOnLet', { eidDate, value: today ? 'i dag' : `innen ${deadlineDate}`, value2: today ? 'today' : `by ${deadlineDate}`, value3: today ? 'اليوم' : `قبل ${deadlineDate}`, value4: today ? 'آج' : `${deadlineDate} تک` })}
+            {t('season.eidIsOnLet', {
+              eidDate,
+              deadline: today ? t('season.today') : t('season.byDate', { date: deadlineDate }),
+            })}
           </AppText>
         </View>
         <IconButton

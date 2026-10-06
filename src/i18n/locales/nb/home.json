@@ -2,6 +2,6 @@
   "announcementFrom": "Kunngjøring fra {{name}}",
   "todaySPrayerTimes": "Dagens bønnetider",
   "localTimes": "Lokale tider",
-  "theMosqueIsIn": "Moskeen er i en annen kommune, så bare Jumuah kommer fra {{value}}",
+  "theMosqueIsIn": "Moskeen er i en annen kommune, så bare Jumuah kommer fra {{name}}",
   "upcomingSpecialDays": "Kommende merkedager"
 }

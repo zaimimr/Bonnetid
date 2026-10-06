@@ -18,5 +18,6 @@
     "minutes_other": "{{count}} min",
     "days_other": "{{count}} days",
     "joiner": " "
-  }
+  },
+  "theMosque": "the mosque"
 }

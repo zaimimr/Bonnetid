@@ -9,7 +9,7 @@
   "invalidDate": "Invalid date",
   "previousDay": "Previous day",
   "nextDay": "Next day",
-  "theMosqueIsIn": "The mosque is in another municipality, so only Jumuah comes from {{value2}}",
+  "theMosqueIsIn": "The mosque is in another municipality, so only Jumuah comes from {{name}}",
   "weekdayLabels": [
     "Mon",
     "Tue",

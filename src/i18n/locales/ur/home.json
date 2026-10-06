@@ -2,6 +2,6 @@
   "announcementFrom": "{{name}} کی طرف سے اعلان",
   "todaySPrayerTimes": "آج کے نماز کے اوقات",
   "localTimes": "مقامی اوقات",
-  "theMosqueIsIn": "مسجد کسی دوسری میونسپلٹی میں ہے، اس لیے صرف جمعہ {{value4}} سے آتا ہے",
+  "theMosqueIsIn": "مسجد کسی دوسری میونسپلٹی میں ہے، اس لیے صرف جمعہ {{name}} سے آتا ہے",
   "upcomingSpecialDays": "آنے والے خاص دن"
 }
