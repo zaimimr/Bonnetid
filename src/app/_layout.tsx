@@ -162,6 +162,49 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="settings-prayer-times"
+          options={{
+            headerShown: true,
+            title: t({ nb: 'Bønnetider', en: 'Prayer times', ar: 'مواقيت الصلاة', ur: 'نماز کے اوقات' }),
+            headerBackTitle: BACK,
+          }}
+        />
+        <Stack.Screen
+          name="settings-notifications"
+          options={{
+            headerShown: true,
+            title: t({ nb: 'Varsler', en: 'Notifications', ar: 'الإشعارات', ur: 'اطلاعات' }),
+            headerBackTitle: BACK,
+          }}
+        />
+        <Stack.Screen
+          name="settings-tracker"
+          options={{
+            headerShown: true,
+            title: t({ nb: 'Bønnesporing', en: 'Prayer tracker', ar: 'متابعة الصلوات', ur: 'نماز ٹریکر' }),
+            headerBackTitle: BACK,
+          }}
+        />
+        <Stack.Screen
+          name="settings-lock-screen"
+          options={{
+            headerShown: true,
+            title:
+              Platform.OS === 'ios'
+                ? t({ nb: 'Låseskjerm', en: 'Lock screen', ar: 'شاشة القفل', ur: 'لاک اسکرین' })
+                : t({ nb: 'Widget', en: 'Widget', ar: 'الأداة', ur: 'ویجیٹ' }),
+            headerBackTitle: BACK,
+          }}
+        />
+        <Stack.Screen
+          name="settings-appearance"
+          options={{
+            headerShown: true,
+            title: t({ nb: 'Utseende', en: 'Appearance', ar: 'المظهر', ur: 'ظاہری شکل' }),
+            headerBackTitle: BACK,
+          }}
+        />
+        <Stack.Screen
           name="tasbih"
           options={{
             headerShown: true,

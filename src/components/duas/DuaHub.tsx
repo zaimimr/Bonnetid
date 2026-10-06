@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from 'react';
+import { Fragment } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { t } from '@/lib/i18n';
@@ -6,7 +6,7 @@ import { useMosque } from '@/api/queries';
 import { Ionicons } from '@expo/vector-icons';
 import { ArabicText } from '@/components/duas/ArabicText';
 import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
-import { AppText, Card, Divider, ListRow, mirrored } from '@/components/ui';
+import { AppText, Card, Divider, IconTile, ListRow, mirrored } from '@/components/ui';
 import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEidMode } from '@/hooks/useEidMode';
 import { useFeature } from '@/hooks/useFeature';
@@ -25,7 +25,7 @@ import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule'
 import { wallClockToDate } from '@/lib/time';
 import { useActiveLocation } from '@/store/settings';
 import { useTheme } from '@/theme';
-import { radius, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 
 const ICONS: Record<DuaCategoryId, keyof typeof Ionicons.glyphMap> = {
   'after-adhan': 'volume-high-outline',
@@ -36,35 +36,16 @@ const ICONS: Record<DuaCategoryId, keyof typeof Ionicons.glyphMap> = {
   hajj: 'cube-outline',
 };
 
-const TILE_SIZE = 40;
-
-function Tile({ children }: { children: ReactNode }) {
-  const theme = useTheme();
-  return (
-    <View
-      style={{
-        width: TILE_SIZE,
-        height: TILE_SIZE,
-        borderRadius: radius.md,
-        backgroundColor: theme.colors.primarySoft,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-      {children}
-    </View>
-  );
-}
-
 function CategoryIcon({ category }: { category: DuaCategory }) {
   const theme = useTheme();
   return (
-    <Tile>
+    <IconTile>
       <Ionicons
         name={ICONS[category.id]}
         size={20}
         color={category.season ? theme.colors.seasonHighlight : theme.colors.primary}
       />
-    </Tile>
+    </IconTile>
   );
 }
 
@@ -103,9 +84,9 @@ export function TasbihRow({ from }: { from?: string }) {
       <ListRow
         title={t({ nb: 'Tasbih', en: 'Tasbih', ar: 'المسبحة', ur: 'تسبیح' })}
         leading={
-          <Tile>
+          <IconTile>
             <TasbihIcon size={22} color={theme.colors.primary} />
-          </Tile>
+          </IconTile>
         }
         chevron
         onPress={() => router.push({ pathname: '/tasbih', params: from ? { from } : {} })}
