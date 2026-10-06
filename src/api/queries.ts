@@ -11,7 +11,7 @@ import {
 import { approxGregorianStart, parseHijriDate, type HijriMonthCursor } from '@/lib/hijri';
 import type { HijriDay } from './types';
 
-const MOSQUE_CACHE_VERSION = 'vipps-v1';
+const MOSQUE_CACHE_VERSION = 'jamat-updated-v1';
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;

@@ -51,6 +51,7 @@ export type MosqueJamat = {
   asr_offset: number | null;
   maghrib_offset: number | null;
   isha_offset: number | null;
+  updated_at?: string | null;
   jummah?: MosqueJummah[];
 };
 

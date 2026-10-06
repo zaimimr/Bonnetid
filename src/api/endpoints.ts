@@ -184,10 +184,11 @@ type JamatPeriodRow = {
   asr_offset: number | null;
   maghrib_offset: number | null;
   isha_offset: number | null;
+  updated_at: string | null;
 };
 
 const JAMAT_COLUMNS =
-  'id, mosque_id, start_date, end_date, fajr, dhuhr, asr, maghrib, isha, fajr_offset, dhuhr_offset, asr_offset, maghrib_offset, isha_offset';
+  'id, mosque_id, start_date, end_date, fajr, dhuhr, asr, maghrib, isha, fajr_offset, dhuhr_offset, asr_offset, maghrib_offset, isha_offset, updated_at';
 
 function toHomepage(value: string | null): string | null {
   const trimmed = value?.trim();
@@ -232,6 +233,7 @@ function toJamat(row: JamatPeriodRow, jummah: MosqueJummah[]): MosqueJamat {
     asr_offset: row.asr_offset,
     maghrib_offset: row.maghrib_offset,
     isha_offset: row.isha_offset,
+    updated_at: row.updated_at,
     jummah,
   };
 }

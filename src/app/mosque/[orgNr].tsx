@@ -8,7 +8,7 @@ import { useEidPeriod } from '@/hooks/useEidPeriod';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useResponsive } from '@/hooks/useResponsive';
-import type { Mosque } from '@/api/types';
+import type { Mosque, MosqueJamat } from '@/api/types';
 import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosqueLogo } from '@/components/mosque/MosqueLogo';
 import { MosqueSelectAction } from '@/components/mosque/MosqueSelectAction';
@@ -26,7 +26,7 @@ import {
   jamatTimesForDate,
   PRAYER_LABELS,
 } from '@/lib/prayerSchedule';
-import { eidPrayerTitle } from '@/lib/hijri';
+import { eidPrayerTitle, formatGregorianShort } from '@/lib/hijri';
 import { MOON_SIGHTING_NOTE } from '@/lib/hijriSeason';
 import { JUMMAH_MISSING_FOR_MOSQUE } from '@/lib/jummahCopy';
 import { osloDateKey, osloDayKey, osloDayStart, osloTimeToLocalClock } from '@/lib/time';
@@ -237,11 +237,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
         <View>
           <SectionHeader
             title="Bønnetider i dag"
-            subtitle={
-              jamat?.start_date && jamat.end_date
-                ? `Jamaat gjelder ${jamat.start_date} til ${jamat.end_date}`
-                : undefined
-            }
+            subtitle={jamatSubtitle(jamat)}
           />
           <Card padding="sm" rounded="xl">
             {!stacked && hasJamatTimes && (
@@ -430,4 +426,16 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
       )}
     </View>
   );
+}
+
+function jamatSubtitle(jamat: MosqueJamat | null | undefined): string | undefined {
+  const lines: string[] = [];
+  if (jamat?.start_date && jamat.end_date) {
+    lines.push(`Jamaat gjelder ${jamat.start_date} til ${jamat.end_date}`);
+  }
+  const updated = jamat?.updated_at ? new Date(jamat.updated_at) : null;
+  if (updated && !Number.isNaN(updated.getTime())) {
+    lines.push(`Oppdatert ${formatGregorianShort(updated)} ${updated.getFullYear()}`);
+  }
+  return lines.length > 0 ? lines.join('\n') : undefined;
 }
