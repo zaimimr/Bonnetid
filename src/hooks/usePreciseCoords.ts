@@ -43,8 +43,11 @@ export function usePreciseCoords(active: boolean): PreciseCoords {
     }
 
     async function loop() {
-      await sampleOnce().catch(() => {});
-      if (!cancelled) {
+      const sampled = await sampleOnce().then(
+        () => true,
+        () => false,
+      );
+      if (sampled && !cancelled) {
         timer = setTimeout(loop, SAMPLE_INTERVAL_MS);
       }
     }

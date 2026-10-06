@@ -24,6 +24,7 @@ let snapshot: PositionSnapshot = {
   readAt: 0,
 };
 let inFlight: Promise<void> | null = null;
+let lastAttemptAt = 0;
 const listeners = new Set<() => void>();
 
 function publish(next: PositionSnapshot) {
@@ -65,8 +66,9 @@ async function readPosition(): Promise<PositionSnapshot> {
 
 function refreshPosition(): Promise<void> {
   if (inFlight) return inFlight;
-  if (Date.now() - snapshot.readAt < MIN_REFRESH_INTERVAL_MS) return Promise.resolve();
+  if (Date.now() - lastAttemptAt < MIN_REFRESH_INTERVAL_MS) return Promise.resolve();
 
+  lastAttemptAt = Date.now();
   inFlight = readPosition()
     .then(publish)
     .catch(() => {})

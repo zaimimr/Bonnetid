@@ -296,6 +296,7 @@ function LocationStep({ onNext }: { onNext: () => void }) {
   const [busy, setBusy] = useState(false);
   const [denied, setDenied] = useState(false);
   const running = useRef(false);
+  const openedSettings = useRef(false);
 
   const detect = useCallback(async () => {
     if (!locations || running.current) return;
@@ -315,6 +316,11 @@ function LocationStep({ onNext }: { onNext: () => void }) {
     }
   }, [locations, setLocation, onNext]);
 
+  const openSettings = () => {
+    openedSettings.current = true;
+    Linking.openSettings();
+  };
+
   useEffect(() => {
     if (!locations) return;
     let cancelled = false;
@@ -327,7 +333,9 @@ function LocationStep({ onNext }: { onNext: () => void }) {
     };
     detectIfGranted();
     const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') detectIfGranted();
+      if (state !== 'active' || !openedSettings.current) return;
+      openedSettings.current = false;
+      detectIfGranted();
     });
     return () => {
       cancelled = true;
@@ -345,7 +353,7 @@ function LocationStep({ onNext }: { onNext: () => void }) {
           ? t('onboarding.openSettings')
           : t('onboarding.findMyLocation')
       }
-      onPrimary={denied ? () => Linking.openSettings() : detect}
+      onPrimary={denied ? openSettings : detect}
       primaryLoading={busy || !locations}
       secondaryLabel={
         denied
