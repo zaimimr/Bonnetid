@@ -1,3 +1,5 @@
+import { t } from '@/lib/i18n';
+
 export const palette = {
   emerald50: '#E9F4EF',
   emerald100: '#D3EAE0',
@@ -123,9 +125,9 @@ export const arabicFonts = {
 export type ArabicFontKey = keyof typeof arabicFonts;
 
 export const arabicSizes = {
-  small: { label: 'Liten', scale: 0.85 },
-  medium: { label: 'Vanlig', scale: 1 },
-  large: { label: 'Stor', scale: 1.2 },
+  small: { label: t({ nb: 'Liten', en: 'Small', ar: 'صغير', ur: 'چھوٹا' }), scale: 0.85 },
+  medium: { label: t({ nb: 'Vanlig', en: 'Normal', ar: 'عادي', ur: 'عام' }), scale: 1 },
+  large: { label: t({ nb: 'Stor', en: 'Large', ar: 'كبير', ur: 'بڑا' }), scale: 1.2 },
 } as const;
 
 export type ArabicSizeKey = keyof typeof arabicSizes;

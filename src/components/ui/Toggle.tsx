@@ -32,9 +32,9 @@ export function Toggle({ value, onValueChange, disabled = false, accessibilityLa
     backgroundColor: interpolateColor(progress.value, [0, 1], [offTrack, onTrack]),
   }));
 
-  const travel = isRTL() ? -TRAVEL : TRAVEL;
+  const rtl = isRTL();
   const thumbStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: progress.value * travel }],
+    transform: [{ translateX: (rtl ? 1 - progress.value : progress.value) * TRAVEL }],
   }));
 
   return (
@@ -54,6 +54,7 @@ export function Toggle({ value, onValueChange, disabled = false, accessibilityLa
             borderRadius: TRACK_HEIGHT / 2,
             padding: INSET,
             justifyContent: 'center',
+            direction: 'ltr',
           },
           trackStyle,
         ]}>

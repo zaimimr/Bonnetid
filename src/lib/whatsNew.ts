@@ -24,8 +24,8 @@ export const WHATS_NEW: WhatsNewEntry[] = [
         body: t({
           nb: 'Spør Siri «Når er neste bønn?» eller be om dagens bønnetider.',
           en: 'Ask Siri «Når er neste bønn?» in Norwegian to hear the next prayer.',
-          ar: 'اسأل Siri بالنرويجية «Når er neste bønn?» لمعرفة الصلاة التالية.',
-          ur: 'اگلی نماز جاننے کے لیے Siri سے نارویجن میں پوچھیں «Når er neste bønn?»',
+          ar: 'اسأل Siri بالنرويجية \u2066«Når er neste bønn?»\u2069 لمعرفة الصلاة التالية.',
+          ur: 'اگلی نماز جاننے کے لیے Siri سے نارویجن میں پوچھیں \u2066«Når er neste bønn?»\u2069',
         }),
         icon: 'mic-outline',
         platform: 'ios',

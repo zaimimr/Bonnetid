@@ -34,18 +34,19 @@ function SlidingPill({
   itemWidth: number;
   color: string;
 }) {
+  const direction = isRTL() ? -1 : 1;
   const style = useAnimatedStyle(
     () => ({
       transform: [
         {
           translateX: withTiming(
-            (isRTL() ? -1 : 1) * (index * itemWidth + (itemWidth - PILL_WIDTH) / 2),
+            direction * (index * itemWidth + (itemWidth - PILL_WIDTH) / 2),
             SLIDE,
           ),
         },
       ],
     }),
-    [index, itemWidth],
+    [index, itemWidth, direction],
   );
 
   return (

@@ -79,5 +79,7 @@ export function matchesPlace(place: Place, normalizedQuery: string): boolean {
 }
 
 export function placeCountLabel(count: number): string {
-  return count === 1 ? '1 moské' : `${count} moskeer`;
+  return count === 1
+    ? t({ nb: '1 moské', en: '1 mosque', ar: 'مسجد واحد', ur: '1 مسجد' })
+    : t({ nb: `${count} moskeer`, en: `${count} mosques`, ar: `${count} مساجد`, ur: `${count} مساجد` });
 }
