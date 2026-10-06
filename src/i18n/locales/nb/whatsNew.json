@@ -18,5 +18,13 @@
   "moreTimesOnThe": "Flere tider på dagsiden",
   "seeDuhaMidnightAnd": "Se Duha, midnatt og Tahajjud for hver dag.",
   "giveUsFeedback": "Gi oss tilbakemelding",
-  "writeToUsRight": "Skriv til oss rett fra appen under Mer. Vi svarer i appen."
+  "writeToUsRight": "Skriv til oss rett fra appen under Mer. Vi svarer i appen.",
+  "languages": "Engelsk, arabisk og urdu",
+  "languagesBody": "Appen følger språket på telefonen.",
+  "newSettings": "Nye innstillinger",
+  "newSettingsBody": "Innstillingene er samlet på ett sted, med forhåndsvisning av varsler og widgets.",
+  "jumuahFriday": "Jumuah på fredager",
+  "jumuahFridayBody": "På fredager vises jamat-tiden for Dhuhr som Jumuah, også på klokka og i bilen.",
+  "vippsCopy": "Enklere å gi til moskeen",
+  "vippsCopyBody": "Vipps-nummeret kopieres før Vipps åpnes, så du bare limer det inn."
 }

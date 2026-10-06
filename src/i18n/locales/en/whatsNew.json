@@ -18,5 +18,13 @@
   "moreTimesOnThe": "More times on the day page",
   "seeDuhaMidnightAnd": "See Duha, midnight and Tahajjud for every day.",
   "giveUsFeedback": "Give us feedback",
-  "writeToUsRight": "Write to us right from the app under More. We reply in the app."
+  "writeToUsRight": "Write to us right from the app under More. We reply in the app.",
+  "languages": "English, Arabic and Urdu",
+  "languagesBody": "The app follows your phone language.",
+  "newSettings": "New settings",
+  "newSettingsBody": "Settings are gathered in one place, with previews of notifications and widgets.",
+  "jumuahFriday": "Jumuah on Fridays",
+  "jumuahFridayBody": "On Fridays the Dhuhr jamat time shows as Jumuah, also on your watch and in the car.",
+  "vippsCopy": "Easier to give to your mosque",
+  "vippsCopyBody": "The Vipps number is copied before Vipps opens, so you just paste it."
 }
