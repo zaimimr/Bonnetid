@@ -62,6 +62,22 @@ private struct ActivityPhase {
   var countdown: ClosedRange<Date> { PrayerFormat.countdownRange(to: windowEnd) }
 }
 
+private struct ActivityPalette {
+  let fullColor: Bool
+  let brand: Color
+  let ink: Color
+  let inkSecondary: Color
+  let inkMuted: Color
+
+  init(_ mode: WidgetRenderingMode) {
+    fullColor = mode == .fullColor
+    brand = fullColor ? PrayerColor.brand : .primary
+    ink = fullColor ? PrayerColor.ink : .primary
+    inkSecondary = fullColor ? PrayerColor.inkSecondary : .primary
+    inkMuted = fullColor ? PrayerColor.inkMuted : .secondary
+  }
+}
+
 private struct Successor {
   let isoDate: String
   let label: String
@@ -187,43 +203,46 @@ private struct ActivityContentView: View {
 }
 
 private struct SmallActivityView: View {
+  @Environment(\.widgetRenderingMode) private var renderingMode
   let phase: ActivityPhase
 
   var body: some View {
+    let palette = ActivityPalette(renderingMode)
+
     VStack(alignment: .leading, spacing: 2) {
       HStack(spacing: 5) {
         Image(systemName: PrayerFormat.symbol(for: phase.kind))
           .font(.caption)
-          .foregroundStyle(PrayerColor.brand)
+          .foregroundStyle(palette.brand)
         Text(phase.label)
           .font(.headline)
-          .foregroundStyle(PrayerColor.brand)
+          .foregroundStyle(palette.brand)
           .lineLimit(1)
       }
 
       Text(PrayerFormat.time(phase.prayerAt))
         .prayerTime(.system(.title2, design: .default).weight(.bold))
-        .foregroundStyle(PrayerColor.ink)
+        .foregroundStyle(palette.ink)
         .lineLimit(1)
 
       if !phase.windowOver {
         HStack(spacing: 4) {
           Text(phase.statusLine)
             .font(.caption)
-            .foregroundStyle(PrayerColor.inkMuted)
+            .foregroundStyle(palette.inkMuted)
           Text(timerInterval: phase.countdown, countsDown: true)
             .prayerTime(.caption)
-            .foregroundStyle(PrayerColor.inkSecondary)
+            .foregroundStyle(palette.inkSecondary)
         }
       } else if let upcoming = phase.upcomingLine {
         Text(WidgetStrings.current.nextLine(upcoming))
           .font(.caption)
-          .foregroundStyle(PrayerColor.inkSecondary)
+          .foregroundStyle(palette.inkSecondary)
           .lineLimit(1)
       } else {
         Text(phase.statusLine)
           .font(.caption)
-          .foregroundStyle(PrayerColor.inkMuted)
+          .foregroundStyle(palette.inkMuted)
           .lineLimit(1)
       }
     }
@@ -247,55 +266,62 @@ private struct CompactStatus: View {
 }
 
 private struct MarkButtons: View {
+  @Environment(\.widgetRenderingMode) private var renderingMode
   let phase: ActivityPhase
 
   var body: some View {
+    let palette = ActivityPalette(renderingMode)
+
     HStack(spacing: 8) {
       Button(
         intent: MarkPrayerIntent(isoDate: phase.isoDate, prayer: phase.kind, status: "prayed")
       ) {
         Label(WidgetStrings.current.prayed, systemImage: "checkmark")
           .font(.subheadline.weight(.semibold))
+          .foregroundStyle(palette.fullColor ? PrayerColor.surface : .primary)
           .frame(maxWidth: .infinity)
       }
       .buttonStyle(.borderedProminent)
-      .tint(PrayerColor.brand)
+      .tint(palette.fullColor ? PrayerColor.brand : Color.primary.opacity(0.3))
 
       Button(
         intent: MarkPrayerIntent(isoDate: phase.isoDate, prayer: phase.kind, status: "skipped")
       ) {
         Text(WidgetStrings.current.skip)
-          .font(.subheadline)
+          .font(.subheadline.weight(.medium))
+          .foregroundStyle(palette.fullColor ? PrayerColor.onBrandPlate : .primary)
           .frame(maxWidth: .infinity)
       }
-      .buttonStyle(.bordered)
-      .tint(PrayerColor.inkMuted)
+      .buttonStyle(.borderedProminent)
+      .tint(palette.fullColor ? PrayerColor.brandPlate : Color.primary.opacity(0.15))
     }
-    .foregroundStyle(PrayerColor.ink)
   }
 }
 
 private struct LockScreenActivityView: View {
+  @Environment(\.widgetRenderingMode) private var renderingMode
   let locationName: String
   let phase: ActivityPhase
 
   var body: some View {
+    let palette = ActivityPalette(renderingMode)
+
     VStack(alignment: .leading, spacing: 6) {
       HStack(alignment: .firstTextBaseline, spacing: 8) {
         Image(systemName: PrayerFormat.symbol(for: phase.kind))
           .font(.subheadline)
-          .foregroundStyle(PrayerColor.brand)
+          .foregroundStyle(palette.brand)
 
         Text(phase.label)
           .font(.title3)
           .fontWeight(.bold)
-          .foregroundStyle(PrayerColor.brand)
+          .foregroundStyle(palette.brand)
 
         Spacer(minLength: 8)
 
         Text(PrayerFormat.time(phase.prayerAt))
           .prayerTime(.system(.title, design: .default).weight(.bold))
-          .foregroundStyle(PrayerColor.ink)
+          .foregroundStyle(palette.ink)
       }
 
       if !phase.windowOver {
@@ -305,28 +331,28 @@ private struct LockScreenActivityView: View {
           label: { EmptyView() },
           currentValueLabel: { EmptyView() }
         )
-        .tint(PrayerColor.brand)
+        .tint(palette.brand)
       } else if let upcoming = phase.upcomingLine {
         Text(WidgetStrings.current.nextLine(upcoming))
           .font(.subheadline)
-          .foregroundStyle(PrayerColor.inkSecondary)
+          .foregroundStyle(palette.inkSecondary)
           .lineLimit(1)
       }
 
       HStack(spacing: 5) {
         Text(phase.statusLine)
           .font(.caption)
-          .foregroundStyle(PrayerColor.inkMuted)
+          .foregroundStyle(palette.inkMuted)
         if !phase.windowOver {
           Text(timerInterval: phase.countdown, countsDown: true)
             .prayerTime(.caption)
-            .fontWeight(.medium)
-            .foregroundStyle(PrayerColor.inkSecondary)
+            .fontWeight(.semibold)
+            .foregroundStyle(palette.ink)
         }
         Spacer(minLength: 8)
         Text(locationName)
           .font(.caption)
-          .foregroundStyle(PrayerColor.inkMuted)
+          .foregroundStyle(palette.inkMuted)
           .lineLimit(1)
       }
 
