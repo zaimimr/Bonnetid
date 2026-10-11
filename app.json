@@ -148,6 +148,12 @@
         "projectId": "67fb9aae-a57b-45c5-9c21-3cac544ffa2f"
       }
     },
-    "owner": "zaim"
+    "owner": "zaim",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/67fb9aae-a57b-45c5-9c21-3cac544ffa2f"
+    }
   }
 }
