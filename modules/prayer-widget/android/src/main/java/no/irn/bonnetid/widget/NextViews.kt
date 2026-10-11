@@ -50,11 +50,16 @@ object NextViews {
     val showJamat = snapshot.showJamat && snapshot.hasJamatTimes
     val headline = moment.headline
 
-    views.setImageViewResource(R.id.headline_icon, PrayerIcons.drawable(headline.kind))
-    views.setTextViewText(
-      R.id.headline_label,
-      "${strings.stateLabel(moment)} · ${headline.displayLabel}",
-    )
+    if (size == WidgetSize.MEDIUM) {
+      views.setTextViewText(R.id.location, snapshot.locationName)
+      views.setTextViewText(R.id.headline_label, headline.displayLabel)
+    } else {
+      views.setImageViewResource(R.id.headline_icon, PrayerIcons.drawable(headline.kind))
+      views.setTextViewText(
+        R.id.headline_label,
+        "${strings.stateLabel(moment)} · ${headline.displayLabel}",
+      )
+    }
     views.setTextViewText(R.id.headline_time, PrayerFormat.time(headline.printedAt(showJamat)))
 
     val status = PrayerLogStore.statusFor(context, snapshot, headline)

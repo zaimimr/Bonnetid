@@ -156,7 +156,7 @@ struct PrayerWidgetView: View {
   }
 }
 
-/// The small widget answers one question: which prayer is running, with the wait for the next one
+/// The small widget leads with the running prayer's name, then its time, with the wait for the next one
 /// underneath. Between sunrise and Dhuhr no prayer is running, so it shows the next one instead.
 private struct SmallPrayerView: View {
   let moment: PrayerMoment
@@ -167,27 +167,25 @@ private struct SmallPrayerView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
-      Text(WidgetStrings.current.stateLabel(isNow: moment.isNow))
+      Text(moment.locationName)
         .font(.caption)
         .foregroundStyle(PrayerColor.inkMuted)
+        .lineLimit(1)
+
+      Spacer(minLength: 0)
 
       HStack(spacing: 5) {
-        Image(systemName: PrayerFormat.symbol(for: shown.kind))
-          .font(.caption)
-          .foregroundStyle(PrayerColor.brand)
         Text(shown.printedLabel)
-          .font(.headline)
+          .font(.system(.title, design: .default).weight(.bold))
           .foregroundStyle(PrayerColor.brand)
           .lineLimit(1)
-          .minimumScaleFactor(0.8)
+          .minimumScaleFactor(0.6)
         PrayerStatusMark(status: status, tint: PrayerColor.brand)
       }
-      .padding(.top, 1)
 
       Text(PrayerFormat.time(shown.printedAt(showJamat: false)))
-        .prayerTime(.system(.largeTitle, design: .default).weight(.bold))
+        .prayerTime(.system(.title3, design: .default).weight(.semibold))
         .foregroundStyle(PrayerColor.ink)
-        .minimumScaleFactor(0.7)
         .lineLimit(1)
 
       Spacer(minLength: 0)

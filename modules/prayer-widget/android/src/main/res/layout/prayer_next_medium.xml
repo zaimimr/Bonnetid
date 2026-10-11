@@ -10,62 +10,68 @@
   android:paddingTop="14dp"
   android:paddingBottom="14dp">
 
-  <LinearLayout
-    android:id="@+id/headline_row"
+  <TextView
+    android:id="@+id/location"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical">
+    android:textSize="13sp"
+    android:textColor="@color/prayer_widget_on_brand_muted"
+    android:maxLines="1"
+    android:ellipsize="end"
+    android:text="Oslo" />
 
-    <ImageView
-      android:id="@+id/headline_icon"
-      android:layout_width="15dp"
-      android:layout_height="15dp"
-      android:layout_marginEnd="6dp"
-      android:contentDescription="@null"
-      android:tint="@color/prayer_widget_on_brand_secondary"
-      android:src="@drawable/prayer_icon_dhuhr" />
-
-    <TextView
-      android:id="@+id/headline_label"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_weight="1"
-      android:textSize="14sp"
-      android:textStyle="bold"
-      android:textColor="@color/prayer_widget_on_brand_secondary"
-      android:maxLines="1"
-      android:ellipsize="end"
-      android:text="Nå · Dhuhr" />
-
-    <ImageView
-      android:id="@+id/headline_check"
-      android:layout_width="13dp"
-      android:layout_height="13dp"
-      android:layout_marginStart="4dp"
-      android:visibility="gone"
-      android:tint="@color/prayer_widget_on_brand"
-      android:contentDescription="@string/prayer_widget_prayed"
-      android:src="@drawable/prayer_widget_check" />
-  </LinearLayout>
-
-  <TextView
-    android:id="@+id/headline_time"
+  <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="0dp"
     android:layout_weight="1"
-    android:layout_marginTop="4dp"
-    android:gravity="center_vertical"
-    android:textSize="44sp"
-    android:textStyle="bold"
-    android:textColor="@color/prayer_widget_on_brand"
-    android:fontFeatureSettings="tnum"
-    android:letterSpacing="-0.02"
-    android:maxLines="1"
-    android:autoSizeTextType="uniform"
-    android:autoSizeMinTextSize="22sp"
-    android:autoSizeMaxTextSize="46sp"
-    android:text="13:20" />
+    android:orientation="vertical"
+    android:gravity="center_vertical">
+
+    <LinearLayout
+      android:id="@+id/headline_row"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:gravity="center_vertical">
+
+      <TextView
+        android:id="@+id/headline_label"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical|start"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="@color/prayer_widget_on_brand"
+        android:letterSpacing="-0.02"
+        android:maxLines="1"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="18sp"
+        android:autoSizeMaxTextSize="30sp"
+        android:text="Dhuhr" />
+
+      <ImageView
+        android:id="@+id/headline_check"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="4dp"
+        android:visibility="gone"
+        android:tint="@color/prayer_widget_on_brand"
+        android:contentDescription="@string/prayer_widget_prayed"
+        android:src="@drawable/prayer_widget_check" />
+    </LinearLayout>
+
+    <TextView
+      android:id="@+id/headline_time"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textSize="20sp"
+      android:textStyle="bold"
+      android:textColor="@color/prayer_widget_on_brand_secondary"
+      android:fontFeatureSettings="tnum"
+      android:maxLines="1"
+      android:text="13:20" />
+  </LinearLayout>
 
   <ProgressBar
     android:id="@+id/progress"
