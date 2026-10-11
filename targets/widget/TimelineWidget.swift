@@ -8,7 +8,7 @@ struct TimelineWidgetEntry: TimelineEntry {
 }
 
 struct DayTimelineProvider: TimelineProvider {
-  private let knobStepMinutes = 15
+  private let knobStepMinutes = 5
   private let horizonMinutes = 12 * 60
 
   func placeholder(in context: Context) -> TimelineWidgetEntry {
@@ -24,7 +24,10 @@ struct DayTimelineProvider: TimelineProvider {
     let snapshot = PrayerSnapshot.load()
 
     var dates: Set<Date> = [now]
-    for minute in stride(from: knobStepMinutes, through: horizonMinutes, by: knobStepMinutes) {
+    for minute in stride(from: 1, through: 60, by: 1) {
+      dates.insert(now.addingTimeInterval(Double(minute) * 60))
+    }
+    for minute in stride(from: 65, through: horizonMinutes, by: knobStepMinutes) {
       dates.insert(now.addingTimeInterval(Double(minute) * 60))
     }
     if let snapshot {
@@ -75,61 +78,38 @@ private struct DayTimelineCard: View {
   let now: Date
 
   private var marker: TimelineMark? { timeline.mark(at: moment.next.at) }
-  private var strings: WidgetStrings { WidgetStrings.current }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 10) {
-      HStack(alignment: .top, spacing: 8) {
-        Text(moment.isNow ? strings.currentPrayer : strings.nextPrayer)
+    VStack(alignment: .leading, spacing: 2) {
+      HStack(alignment: .firstTextBaseline, spacing: 8) {
+        Text(moment.locationName)
           .font(.caption)
           .foregroundStyle(PrayerColor.inkMuted)
           .lineLimit(1)
-          .minimumScaleFactor(0.8)
 
         Spacer(minLength: 4)
 
-        Text(strings.timeUntilNext)
+        Text(moment.countdownLine(from: now))
           .font(.caption)
-          .foregroundStyle(PrayerColor.inkMuted)
+          .fontWeight(.medium)
+          .foregroundStyle(PrayerColor.inkSecondary)
           .lineLimit(1)
-          .minimumScaleFactor(0.7)
+          .minimumScaleFactor(0.8)
       }
 
       HStack(alignment: .firstTextBaseline, spacing: 8) {
-        VStack(alignment: .leading, spacing: 1) {
-          Text(moment.headline.printedLabel)
-            .font(.system(.title2, design: .default).weight(.bold))
-            .foregroundStyle(PrayerColor.brand)
-            .lineLimit(1)
-            .minimumScaleFactor(0.7)
-          Text(PrayerFormat.time(moment.headline.printedAt(showJamat: false)))
-            .prayerTime(.subheadline)
-            .foregroundStyle(PrayerColor.inkSecondary)
-            .lineLimit(1)
-        }
-
-        Spacer(minLength: 4)
-
-        VStack(alignment: .trailing, spacing: 1) {
-          Text(
-            timerInterval: PrayerFormat.countdownRange(to: moment.next.at, from: now),
-            countsDown: true
-          )
-          .prayerTime(.system(.title2, design: .default).weight(.bold))
-          .foregroundStyle(PrayerColor.ink)
-          .multilineTextAlignment(.trailing)
+        Text(moment.headline.printedLabel)
+          .font(.system(.title, design: .default).weight(.bold))
+          .foregroundStyle(PrayerColor.brand)
           .lineLimit(1)
-          .minimumScaleFactor(0.6)
-
-          if moment.isNow {
-            Text("\(moment.next.printedLabel) \(PrayerFormat.time(moment.next.at))")
-              .prayerTime(.subheadline)
-              .foregroundStyle(PrayerColor.inkSecondary)
-              .lineLimit(1)
-              .minimumScaleFactor(0.7)
-          }
-        }
+          .minimumScaleFactor(0.7)
+        Text(PrayerFormat.time(moment.headline.printedAt(showJamat: false)))
+          .prayerTime(.system(.title3, design: .default).weight(.semibold))
+          .foregroundStyle(PrayerColor.ink)
+          .lineLimit(1)
       }
+
+      Spacer(minLength: 4)
 
       TimelineBar(timeline: timeline, now: now, marker: marker)
     }

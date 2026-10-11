@@ -43,11 +43,6 @@ struct WidgetStrings {
   func nextLine(_ value: String) -> String {
     pick("Neste: \(value)", "Next: \(value)", "التالية: \(value)", "اگلی: \(value)")
   }
-  var currentPrayer: String { pick("Nåværende bønn", "Current prayer", "الصلاة الحالية", "موجودہ نماز") }
-  var nextPrayer: String { pick("Neste bønn", "Next prayer", "الصلاة التالية", "اگلی نماز") }
-  var timeUntilNext: String {
-    pick("Tid igjen til neste salah", "Time until next prayer", "الوقت المتبقي للصلاة التالية", "اگلی نماز میں باقی وقت")
-  }
   var jamat: String { pick("jamat", "jamaat", "جماعة", "جماعت") }
 
   var appName: String { "Bønnetid" }
@@ -79,6 +74,15 @@ struct WidgetStrings {
       "The next prayer and today's times for your location.",
       "الصلاة التالية ومواقيت اليوم لموقعك.",
       "آپ کے مقام کے لیے اگلی نماز اور آج کے اوقات۔"
+    )
+  }
+  var prayerNowWidgetName: String { pick("Bønn nå", "Prayer now", "الصلاة الآن", "ابھی کی نماز") }
+  var prayerNowWidgetDescription: String {
+    pick(
+      "Bønnen som pågår, med dagens tider ved siden av.",
+      "The prayer in progress, with today's times beside it.",
+      "الصلاة الحالية مع مواقيت اليوم بجانبها.",
+      "جاری نماز، ساتھ میں آج کے اوقات۔"
     )
   }
   var timelineWidgetName: String { pick("Tidslinje", "Timeline", "الخط الزمني", "ٹائم لائن") }

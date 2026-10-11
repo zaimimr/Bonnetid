@@ -27,16 +27,17 @@
       android:src="@drawable/prayer_icon_dhuhr" />
 
     <TextView
-      android:id="@+id/headline_label"
+      android:id="@+id/headline_time"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:layout_weight="1"
       android:textSize="15sp"
       android:textStyle="bold"
       android:textColor="@color/prayer_widget_on_brand_secondary"
+      android:fontFeatureSettings="tnum"
       android:maxLines="1"
       android:ellipsize="end"
-      android:text="Nå · Dhuhr" />
+      android:text="Nå · 13:20" />
 
     <ImageView
       android:id="@+id/headline_check"
@@ -50,7 +51,7 @@
   </LinearLayout>
 
   <TextView
-    android:id="@+id/headline_time"
+    android:id="@+id/headline_label"
     android:layout_width="match_parent"
     android:layout_height="0dp"
     android:layout_weight="1"
@@ -59,13 +60,12 @@
     android:textSize="46sp"
     android:textStyle="bold"
     android:textColor="@color/prayer_widget_on_brand"
-    android:fontFeatureSettings="tnum"
     android:letterSpacing="-0.02"
     android:maxLines="1"
     android:autoSizeTextType="uniform"
     android:autoSizeMinTextSize="26sp"
     android:autoSizeMaxTextSize="46sp"
-    android:text="13:20" />
+    android:text="Dhuhr" />
 
   <ProgressBar
     android:id="@+id/progress"

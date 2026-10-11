@@ -58,7 +58,6 @@ private struct ActivityPhase {
     guard let upcoming else { return nil }
     return "\(upcoming.label) \(PrayerFormat.time(upcoming.prayerAt))"
   }
-  var progress: ClosedRange<Date> { PrayerFormat.progressRange(from: prayerAt, to: windowEnd) }
   var countdown: ClosedRange<Date> { PrayerFormat.countdownRange(to: windowEnd) }
 }
 
@@ -169,8 +168,12 @@ struct PrayerLiveActivity: Widget {
           .widgetLanguage(strings)
         }
       } compactLeading: {
-        Image(systemName: PrayerFormat.symbol(for: phase.kind))
+        Text(phase.label)
+          .font(.caption.weight(.semibold))
           .foregroundStyle(PrayerColor.brand)
+          .lineLimit(1)
+          .minimumScaleFactor(0.7)
+          .frame(maxWidth: 64, alignment: .leading)
       } compactTrailing: {
         CompactStatus(phase: phase)
           .prayerTime(.caption2)
@@ -306,53 +309,45 @@ private struct LockScreenActivityView: View {
   var body: some View {
     let palette = ActivityPalette(renderingMode)
 
-    VStack(alignment: .leading, spacing: 6) {
-      HStack(alignment: .firstTextBaseline, spacing: 8) {
-        Image(systemName: PrayerFormat.symbol(for: phase.kind))
-          .font(.subheadline)
-          .foregroundStyle(palette.brand)
+    VStack(alignment: .leading, spacing: 4) {
+      Text(locationName)
+        .font(.caption)
+        .foregroundStyle(palette.inkMuted)
+        .lineLimit(1)
 
+      HStack(alignment: .firstTextBaseline, spacing: 8) {
         Text(phase.label)
-          .font(.title3)
-          .fontWeight(.bold)
+          .font(.system(.title, design: .default).weight(.bold))
           .foregroundStyle(palette.brand)
+          .lineLimit(1)
+          .minimumScaleFactor(0.7)
 
         Spacer(minLength: 8)
 
         Text(PrayerFormat.time(phase.prayerAt))
-          .prayerTime(.system(.title, design: .default).weight(.bold))
+          .prayerTime(.system(.title2, design: .default).weight(.semibold))
           .foregroundStyle(palette.ink)
       }
 
       if !phase.windowOver {
-        ProgressView(
-          timerInterval: phase.progress,
-          countsDown: false,
-          label: { EmptyView() },
-          currentValueLabel: { EmptyView() }
-        )
-        .tint(palette.brand)
+        HStack(spacing: 5) {
+          Text(phase.statusLine)
+            .font(.subheadline)
+            .foregroundStyle(palette.inkSecondary)
+          Text(timerInterval: phase.countdown, countsDown: true)
+            .prayerTime(.subheadline)
+            .fontWeight(.semibold)
+            .foregroundStyle(palette.ink)
+        }
       } else if let upcoming = phase.upcomingLine {
         Text(WidgetStrings.current.nextLine(upcoming))
           .font(.subheadline)
           .foregroundStyle(palette.inkSecondary)
           .lineLimit(1)
-      }
-
-      HStack(spacing: 5) {
+      } else {
         Text(phase.statusLine)
-          .font(.caption)
-          .foregroundStyle(palette.inkMuted)
-        if !phase.windowOver {
-          Text(timerInterval: phase.countdown, countsDown: true)
-            .prayerTime(.caption)
-            .fontWeight(.semibold)
-            .foregroundStyle(palette.ink)
-        }
-        Spacer(minLength: 8)
-        Text(locationName)
-          .font(.caption)
-          .foregroundStyle(palette.inkMuted)
+          .font(.subheadline)
+          .foregroundStyle(palette.inkSecondary)
           .lineLimit(1)
       }
 

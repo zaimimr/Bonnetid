@@ -254,10 +254,6 @@ enum PrayerFormat {
     now...max(end, now.addingTimeInterval(1))
   }
 
-  static func progressRange(from start: Date, to end: Date) -> ClosedRange<Date> {
-    start...max(end, start.addingTimeInterval(1))
-  }
-
   static func symbol(for kind: String) -> String {
     switch kind {
     case "fajr": return "moon.stars"

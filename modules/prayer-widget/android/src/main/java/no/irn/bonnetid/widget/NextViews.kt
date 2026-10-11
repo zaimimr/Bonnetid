@@ -50,17 +50,16 @@ object NextViews {
     val showJamat = snapshot.showJamat && snapshot.hasJamatTimes
     val headline = moment.headline
 
+    val time = PrayerFormat.time(headline.printedAt(showJamat))
+    views.setImageViewResource(R.id.headline_icon, PrayerIcons.drawable(headline.kind))
+    views.setTextViewText(R.id.headline_label, headline.displayLabel)
+    views.setTextViewText(
+      R.id.headline_time,
+      if (size == WidgetSize.TALL) "${strings.stateLabel(moment)} · $time" else time,
+    )
     if (size == WidgetSize.MEDIUM) {
       views.setTextViewText(R.id.location, snapshot.locationName)
-      views.setTextViewText(R.id.headline_label, headline.displayLabel)
-    } else {
-      views.setImageViewResource(R.id.headline_icon, PrayerIcons.drawable(headline.kind))
-      views.setTextViewText(
-        R.id.headline_label,
-        "${strings.stateLabel(moment)} · ${headline.displayLabel}",
-      )
     }
-    views.setTextViewText(R.id.headline_time, PrayerFormat.time(headline.printedAt(showJamat)))
 
     val status = PrayerLogStore.statusFor(context, snapshot, headline)
     views.setViewVisibility(
@@ -70,16 +69,15 @@ object NextViews {
     val alpha = if (status == PrayerLogStore.STATUS_SKIPPED) SKIPPED_ALPHA else 1f
     views.setFloat(R.id.headline_row, "setAlpha", alpha)
     views.setFloat(R.id.headline_time, "setAlpha", alpha)
+    views.setFloat(R.id.headline_label, "setAlpha", alpha)
 
-    // The compact row has neither the width for a prayer name beside the countdown nor the
-    // height for the bar, so it carries the countdown alone.
-    if (size != WidgetSize.COMPACT) {
-      if (moment.isNow) {
-        views.setTextViewText(R.id.countdown_label, moment.next.displayLabel)
-        views.setViewVisibility(R.id.countdown_label, View.VISIBLE)
-      } else {
-        views.setViewVisibility(R.id.countdown_label, View.GONE)
-      }
+    if (moment.isNow) {
+      views.setTextViewText(R.id.countdown_label, moment.next.displayLabel)
+      views.setViewVisibility(R.id.countdown_label, View.VISIBLE)
+    } else {
+      views.setViewVisibility(R.id.countdown_label, View.GONE)
+    }
+    if (size == WidgetSize.TALL) {
       WidgetChrome.progress(views, R.id.progress, moment, now)
     }
     WidgetChrome.countdown(views, R.id.countdown, moment.next.at, now, strings.countdownFormat)

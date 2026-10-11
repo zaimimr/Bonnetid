@@ -175,6 +175,9 @@ private struct SmallPrayerView: View {
       Spacer(minLength: 0)
 
       HStack(spacing: 5) {
+        Image(systemName: PrayerFormat.symbol(for: shown.kind))
+          .font(.title3)
+          .foregroundStyle(PrayerColor.brand)
         Text(shown.printedLabel)
           .font(.system(.title, design: .default).weight(.bold))
           .foregroundStyle(PrayerColor.brand)
@@ -190,7 +193,7 @@ private struct SmallPrayerView: View {
 
       Spacer(minLength: 0)
 
-      Text(countdownLine)
+      Text(moment.countdownLine(from: now))
         .font(.caption)
         .foregroundStyle(PrayerColor.inkSecondary)
         .lineLimit(2)
@@ -200,11 +203,13 @@ private struct SmallPrayerView: View {
     .opacity(status == "skipped" ? 0.55 : 1)
     .containerBackground(PrayerColor.surface, for: .widget)
   }
+}
 
-  private var countdownLine: String {
-    let countdown = WidgetStrings.current.countdown(to: moment.next.at, from: now)
-    if moment.isNow {
-      return "\(moment.next.printedLabel) \(countdown)"
+extension PrayerMoment {
+  func countdownLine(from now: Date) -> String {
+    let countdown = WidgetStrings.current.countdown(to: next.at, from: now)
+    if isNow {
+      return "\(next.printedLabel) \(countdown)"
     }
     return countdown
   }
@@ -214,24 +219,27 @@ private struct MediumPrayerView: View {
   let entry: PrayerTimelineEntry
   let moment: PrayerMoment
 
+  private var status: String? { moment.headline.status(in: entry.statuses) }
+
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
-      HStack(spacing: 6) {
+      HStack(alignment: .firstTextBaseline, spacing: 6) {
+        Text(moment.headline.printedLabel)
+          .font(.system(.title3, design: .default).weight(.bold))
+          .foregroundStyle(PrayerColor.brand)
+          .lineLimit(1)
+        Text(PrayerFormat.time(moment.headline.printedAt(showJamat: false)))
+          .prayerTime(.system(.subheadline, design: .default).weight(.semibold))
+          .foregroundStyle(PrayerColor.ink)
+          .lineLimit(1)
+        PrayerStatusMark(status: status, tint: PrayerColor.brand)
+        Spacer(minLength: 6)
         Text(moment.locationName)
           .font(.caption)
-          .foregroundStyle(PrayerColor.inkSecondary)
+          .foregroundStyle(PrayerColor.inkMuted)
           .lineLimit(1)
-        if !moment.hijriText.isEmpty {
-          Text("·")
-            .font(.caption)
-            .foregroundStyle(PrayerColor.inkMuted)
-          Text(moment.hijriText)
-            .font(.caption)
-            .foregroundStyle(PrayerColor.inkMuted)
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
-        }
       }
+      .opacity(status == "skipped" ? 0.55 : 1)
 
       Spacer(minLength: 8)
 
@@ -249,11 +257,9 @@ private struct MediumPrayerView: View {
       Spacer(minLength: 8)
 
       HStack(spacing: 5) {
-        Image(systemName: PrayerFormat.symbol(for: moment.headline.kind))
-          .font(.caption2)
-        Text(footerLine)
+        Text(moment.countdownLine(from: entry.date))
           .font(.caption)
-          .fontWeight(.medium)
+          .foregroundStyle(PrayerColor.inkSecondary)
           .lineLimit(1)
           .minimumScaleFactor(0.8)
         if entry.showJamat, entry.hasJamatTimes {
@@ -262,19 +268,103 @@ private struct MediumPrayerView: View {
             .foregroundStyle(PrayerColor.inkMuted)
         }
       }
-      .foregroundStyle(PrayerColor.brand)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     .containerBackground(PrayerColor.surface, for: .widget)
   }
+}
 
-  private var footerLine: String {
-    let strings = WidgetStrings.current
-    let countdown = strings.countdown(to: moment.next.at, from: entry.date)
-    if moment.isNow {
-      return "\(strings.nowLine(moment.headline.label)) · \(moment.next.label) \(countdown)"
+private struct HeroListPrayerView: View {
+  let entry: PrayerTimelineEntry
+  let moment: PrayerMoment
+
+  private var status: String? { moment.headline.status(in: entry.statuses) }
+
+  var body: some View {
+    HStack(spacing: 12) {
+      VStack(alignment: .leading, spacing: 2) {
+        Text(moment.locationName)
+          .font(.caption)
+          .foregroundStyle(PrayerColor.inkMuted)
+          .lineLimit(1)
+
+        Spacer(minLength: 0)
+
+        HStack(spacing: 5) {
+          Image(systemName: PrayerFormat.symbol(for: moment.headline.kind))
+            .font(.title3)
+            .foregroundStyle(PrayerColor.brand)
+          Text(moment.headline.printedLabel)
+            .font(.system(.title, design: .default).weight(.bold))
+            .foregroundStyle(PrayerColor.brand)
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+          PrayerStatusMark(status: status, tint: PrayerColor.brand)
+        }
+
+        Text(PrayerFormat.time(moment.headline.printedAt(showJamat: false)))
+          .prayerTime(.system(.title3, design: .default).weight(.semibold))
+          .foregroundStyle(PrayerColor.ink)
+          .lineLimit(1)
+
+        Spacer(minLength: 0)
+
+        Text(moment.countdownLine(from: entry.date))
+          .font(.caption)
+          .foregroundStyle(PrayerColor.inkSecondary)
+          .lineLimit(2)
+          .minimumScaleFactor(0.85)
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .opacity(status == "skipped" ? 0.55 : 1)
+
+      VStack(spacing: 1) {
+        ForEach(entry.dailyPrayers, id: \.at) { prayer in
+          PrayerListRow(
+            prayer: prayer,
+            isCurrent: prayer.at == entry.currentPrayerAt,
+            showJamat: entry.showJamat,
+            status: prayer.status(in: entry.statuses)
+          )
+        }
+      }
+      .frame(maxWidth: .infinity)
     }
-    return "\(moment.next.label) \(countdown)"
+    .containerBackground(PrayerColor.surface, for: .widget)
+  }
+}
+
+private struct PrayerListRow: View {
+  let prayer: PrayerEntry
+  let isCurrent: Bool
+  let showJamat: Bool
+  let status: String?
+
+  var body: some View {
+    HStack(spacing: 4) {
+      Text(prayer.printedLabel)
+        .font(.caption)
+        .fontWeight(isCurrent ? .semibold : .regular)
+        .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.inkSecondary)
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
+      PrayerStatusMark(
+        status: status,
+        tint: isCurrent ? PrayerColor.onBrandPlate : PrayerColor.brand
+      )
+      Spacer(minLength: 4)
+      Text(PrayerFormat.time(prayer.printedAt(showJamat: showJamat)))
+        .prayerTime(.system(.caption, design: .default).weight(isCurrent ? .bold : .medium))
+        .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.ink)
+        .lineLimit(1)
+    }
+    .padding(.vertical, 3)
+    .padding(.horizontal, 8)
+    .background(
+      RoundedRectangle(cornerRadius: 8, style: .continuous)
+        .fill(isCurrent ? PrayerColor.brandPlate : Color.clear)
+    )
+    .opacity(status == "skipped" ? 0.5 : 1)
   }
 }
 
@@ -397,6 +487,29 @@ private struct CircularPrayerView: View {
   }
 }
 
+private struct CircularNameTimeView: View {
+  let moment: PrayerMoment
+
+  var body: some View {
+    ZStack {
+      AccessoryWidgetBackground()
+      VStack(spacing: 0) {
+        Text(moment.headline.printedLabel)
+          .font(.system(size: 12, weight: .bold))
+          .lineLimit(1)
+          .minimumScaleFactor(0.6)
+        Text(PrayerFormat.time(moment.headline.at))
+          .prayerTime(.system(size: 12, weight: .medium))
+          .lineLimit(1)
+          .minimumScaleFactor(0.7)
+      }
+      .padding(.horizontal, 4)
+      .widgetAccentable()
+    }
+    .containerBackground(.clear, for: .widget)
+  }
+}
+
 private struct InlinePrayerView: View {
   let moment: PrayerMoment
   let now: Date
@@ -476,5 +589,41 @@ struct PrayerWidget: Widget {
       .accessoryCircular,
       .accessoryInline,
     ])
+  }
+}
+
+struct PrayerNowWidgetView: View {
+  @Environment(\.widgetFamily) private var family
+  let entry: PrayerTimelineEntry
+
+  var body: some View {
+    Group {
+      if let moment = entry.moment {
+        if family == .accessoryCircular {
+          CircularNameTimeView(moment: moment)
+        } else {
+          HeroListPrayerView(entry: entry, moment: moment)
+        }
+      } else {
+        MissingSnapshotView(family: family)
+      }
+    }
+    .widgetURL(URL(string: "bonnetid://"))
+    .widgetLanguage(WidgetStrings.current)
+  }
+}
+
+struct PrayerNowWidget: Widget {
+  var body: some WidgetConfiguration {
+    AppIntentConfiguration(
+      kind: "BonnetidPrayerNowWidget",
+      intent: PrayerWidgetConfiguration.self,
+      provider: PrayerTimelineProvider()
+    ) { entry in
+      PrayerNowWidgetView(entry: entry)
+    }
+    .configurationDisplayName(WidgetStrings.current.prayerNowWidgetName)
+    .description(WidgetStrings.current.prayerNowWidgetDescription)
+    .supportedFamilies([.systemMedium, .accessoryCircular])
   }
 }
