@@ -9,6 +9,8 @@
   <string name="prayer_status_channel_name">نماز کی حالت</string>
   <string name="prayer_status_channel_description">نماز کا وقت شروع ہونے پر لاک اسکرین پر اطلاع، ادا کی اور چھوڑیں کے ساتھ۔</string>
   <string name="prayer_timeline_widget_label">ٹائم لائن</string>
+  <string name="prayer_hijri_widget_label">ہجری تاریخ</string>
+  <string name="prayer_hijri_widget_description">ہجری کیلنڈر میں آج کی تاریخ۔</string>
   <string name="prayer_timeline_widget_description">دن ایک ٹائم لائن کی صورت میں، اگلی نماز تک باقی وقت کے ساتھ۔</string>
   <string name="prayer_timeline_bar_description">آج کی نمازوں کی ٹائم لائن</string>
 </resources>

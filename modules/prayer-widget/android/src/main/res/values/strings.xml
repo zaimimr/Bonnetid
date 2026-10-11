@@ -9,6 +9,8 @@
   <string name="prayer_status_channel_name">Bønnestatus</string>
   <string name="prayer_status_channel_description">Varsel på låseskjermen når bønnetiden starter, med Bedt og Hopp over.</string>
   <string name="prayer_timeline_widget_label">Tidslinje</string>
+  <string name="prayer_hijri_widget_label">Hijri-dato</string>
+  <string name="prayer_hijri_widget_description">Dagens dato i hijri-kalenderen.</string>
   <string name="prayer_timeline_widget_description">Dagen som en tidslinje, med tiden igjen til neste bønn.</string>
   <string name="prayer_timeline_bar_description">Tidslinje for dagens bønner</string>
 </resources>

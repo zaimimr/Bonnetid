@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/root"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  android:background="@drawable/prayer_widget_background"
+  android:paddingStart="14dp"
+  android:paddingEnd="14dp"
+  android:paddingTop="12dp"
+  android:paddingBottom="12dp">
+
+  <TextView
+    android:id="@+id/gregorian"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="12sp"
+    android:textColor="@color/prayer_widget_ink_muted"
+    android:maxLines="1"
+    android:ellipsize="end"
+    android:text="søn. 11. okt." />
+
+  <FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1" />
+
+  <TextView
+    android:id="@+id/hijri_day"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="40sp"
+    android:textStyle="bold"
+    android:textColor="@color/prayer_widget_brand"
+    android:fontFeatureSettings="tnum"
+    android:includeFontPadding="false"
+    android:maxLines="1"
+    android:text="30" />
+
+  <TextView
+    android:id="@+id/hijri_month"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="15sp"
+    android:textStyle="bold"
+    android:textColor="@color/prayer_widget_ink"
+    android:maxLines="2"
+    android:ellipsize="end"
+    android:text="Rabi al-Thani" />
+
+  <TextView
+    android:id="@+id/hijri_year"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="12sp"
+    android:textColor="@color/prayer_widget_ink_muted"
+    android:maxLines="1"
+    android:text="1448" />
+</LinearLayout>

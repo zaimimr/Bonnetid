@@ -85,6 +85,15 @@ struct WidgetStrings {
       "جاری نماز، ساتھ میں آج کے اوقات۔"
     )
   }
+  var hijriWidgetName: String { pick("Hijri-dato", "Hijri date", "التاريخ الهجري", "ہجری تاریخ") }
+  var hijriWidgetDescription: String {
+    pick(
+      "Dagens dato i hijri-kalenderen.",
+      "Today's date in the hijri calendar.",
+      "تاريخ اليوم في التقويم الهجري.",
+      "ہجری کیلنڈر میں آج کی تاریخ۔"
+    )
+  }
   var timelineWidgetName: String { pick("Tidslinje", "Timeline", "الخط الزمني", "ٹائم لائن") }
   var timelineWidgetDescription: String {
     pick(

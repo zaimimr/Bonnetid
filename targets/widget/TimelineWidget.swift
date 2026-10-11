@@ -97,17 +97,15 @@ private struct DayTimelineCard: View {
           .minimumScaleFactor(0.8)
       }
 
-      HStack(alignment: .firstTextBaseline, spacing: 8) {
-        Text(moment.headline.printedLabel)
-          .font(.system(.title, design: .default).weight(.bold))
-          .foregroundStyle(PrayerColor.brand)
-          .lineLimit(1)
-          .minimumScaleFactor(0.7)
-        Text(PrayerFormat.time(moment.headline.printedAt(showJamat: false)))
-          .prayerTime(.system(.title3, design: .default).weight(.semibold))
-          .foregroundStyle(PrayerColor.ink)
-          .lineLimit(1)
-      }
+      Text(moment.headline.printedLabel)
+        .font(.system(.title, design: .default).weight(.bold))
+        .foregroundStyle(PrayerColor.brand)
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
+      Text(PrayerFormat.time(moment.headline.printedAt(showJamat: false)))
+        .prayerTime(.system(.title3, design: .default).weight(.semibold))
+        .foregroundStyle(PrayerColor.ink)
+        .lineLimit(1)
 
       Spacer(minLength: 4)
 

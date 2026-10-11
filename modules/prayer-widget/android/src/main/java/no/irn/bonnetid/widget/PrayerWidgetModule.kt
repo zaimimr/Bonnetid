@@ -27,6 +27,7 @@ class PrayerWidgetModule : Module() {
       PrayerAppWidget.updateAll(context)
       PrayerDayWidget.updateAll(context)
       PrayerTimelineWidget.updateAll(context)
+      PrayerHijriWidget.updateAll(context)
       PrayerStatusNotifier.sync(context)
       PrayerShortcuts.update(context)
       context.sendBroadcast(Intent(WearSnapshot.ACTION_WRITTEN).setPackage(context.packageName))
