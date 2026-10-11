@@ -26,5 +26,9 @@
   "jumuahFriday": "Jumuah on Fridays",
   "jumuahFridayBody": "On Fridays the Dhuhr jamat time shows as Jumuah, also on your watch and in the car.",
   "vippsCopy": "Easier to give to your mosque",
-  "vippsCopyBody": "The Vipps number is copied before Vipps opens, so you just paste it."
+  "vippsCopyBody": "The Vipps number is copied before Vipps opens, so you just paste it.",
+  "newWidgets": "New widgets",
+  "newWidgetsBody": "Every widget is redesigned, with a new Prayer now widget.",
+  "hijriWidget": "Hijri date on your home screen",
+  "hijriWidgetBody": "A new small widget shows today's date in the hijri calendar."
 }

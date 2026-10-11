@@ -17,6 +17,13 @@ export type WhatsNewEntry = {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    version: '1.10.0',
+    items: [
+      { title: t('whatsNew.newWidgets'), body: t('whatsNew.newWidgetsBody'), icon: 'apps-outline' },
+      { title: t('whatsNew.hijriWidget'), body: t('whatsNew.hijriWidgetBody'), icon: 'calendar-outline' },
+    ],
+  },
+  {
     version: '1.9.3',
     items: [
       { title: t('whatsNew.languages'), body: t('whatsNew.languagesBody'), icon: 'language-outline' },

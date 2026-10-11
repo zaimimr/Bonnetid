@@ -26,5 +26,9 @@
   "jumuahFriday": "Jumuah på fredager",
   "jumuahFridayBody": "På fredager vises jamat-tiden for Dhuhr som Jumuah, også på klokka og i bilen.",
   "vippsCopy": "Enklere å gi til moskeen",
-  "vippsCopyBody": "Vipps-nummeret kopieres før Vipps åpnes, så du bare limer det inn."
+  "vippsCopyBody": "Vipps-nummeret kopieres før Vipps åpnes, så du bare limer det inn.",
+  "newWidgets": "Nye widgets",
+  "newWidgetsBody": "Ny utforming av alle widgets, med en ny Bønn nå-widget.",
+  "hijriWidget": "Hijri-dato på hjemskjermen",
+  "hijriWidgetBody": "En ny liten widget viser dagens dato i hijri-kalenderen."
 }
