@@ -52,5 +52,6 @@
   "donateWithVipps2": "Doner med Vipps",
   "youAreAtThe": "Du er i moskeen",
   "chooseAsMyMosque": "Velg {{mosqueName}} som min moské",
-  "chooseAsMyMosque2": "Velg som min moské"
+  "chooseAsMyMosque2": "Velg som min moské",
+  "noJumuahMosques": "Ingen moskeer med Jumuah-tider her"
 }
