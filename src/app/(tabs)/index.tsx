@@ -35,7 +35,7 @@ import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 import { formatGregorianLong, formatHijri, monthYearLabel } from '@/lib/hijri';
 import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
 import { track } from '@/lib/telemetry';
-import { isoDateIsFriday, parseDayKey } from '@/lib/time';
+import { isoDateIsFriday, isoDateIsJumuahEveOrDay, parseDayKey } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
 import { useActiveLocation, useActiveMosque, useUnreadAnnouncement } from '@/store/settings';
 import { PostHogMaskView } from 'posthog-react-native';
@@ -150,6 +150,14 @@ export default function HomeScreen() {
                   }
                 }}
                 onSelectMosque={calculated ? undefined : () => router.push('/mosque-picker')}
+                onFindJumuah={
+                  calculated || !isoDateIsJumuahEveOrDay(todayIso)
+                    ? undefined
+                    : () => {
+                        track('jumuah_nearby_opened');
+                        router.push({ pathname: '/mosques', params: { jumuah: '1' } });
+                      }
+                }
                 statusDate={todayIso}
                 now={now}
               />
