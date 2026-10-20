@@ -1,5 +1,6 @@
 import nbCalendar from './locales/nb/calendar.json' with { type: 'json' };
 import nbCommon from './locales/nb/common.json' with { type: 'json' };
+import nbCustomize from './locales/nb/customize.json' with { type: 'json' };
 import nbDuas from './locales/nb/duas.json' with { type: 'json' };
 import nbFeedback from './locales/nb/feedback.json' with { type: 'json' };
 import nbHijri from './locales/nb/hijri.json' with { type: 'json' };
@@ -21,6 +22,7 @@ import nbTravel from './locales/nb/travel.json' with { type: 'json' };
 import nbWhatsNew from './locales/nb/whatsNew.json' with { type: 'json' };
 import enCalendar from './locales/en/calendar.json' with { type: 'json' };
 import enCommon from './locales/en/common.json' with { type: 'json' };
+import enCustomize from './locales/en/customize.json' with { type: 'json' };
 import enDuas from './locales/en/duas.json' with { type: 'json' };
 import enFeedback from './locales/en/feedback.json' with { type: 'json' };
 import enHijri from './locales/en/hijri.json' with { type: 'json' };
@@ -42,6 +44,7 @@ import enTravel from './locales/en/travel.json' with { type: 'json' };
 import enWhatsNew from './locales/en/whatsNew.json' with { type: 'json' };
 import arCalendar from './locales/ar/calendar.json' with { type: 'json' };
 import arCommon from './locales/ar/common.json' with { type: 'json' };
+import arCustomize from './locales/ar/customize.json' with { type: 'json' };
 import arDuas from './locales/ar/duas.json' with { type: 'json' };
 import arFeedback from './locales/ar/feedback.json' with { type: 'json' };
 import arHijri from './locales/ar/hijri.json' with { type: 'json' };
@@ -63,6 +66,7 @@ import arTravel from './locales/ar/travel.json' with { type: 'json' };
 import arWhatsNew from './locales/ar/whatsNew.json' with { type: 'json' };
 import urCalendar from './locales/ur/calendar.json' with { type: 'json' };
 import urCommon from './locales/ur/common.json' with { type: 'json' };
+import urCustomize from './locales/ur/customize.json' with { type: 'json' };
 import urDuas from './locales/ur/duas.json' with { type: 'json' };
 import urFeedback from './locales/ur/feedback.json' with { type: 'json' };
 import urHijri from './locales/ur/hijri.json' with { type: 'json' };
@@ -107,6 +111,7 @@ export const resources = {
       tracker: nbTracker,
       travel: nbTravel,
       whatsNew: nbWhatsNew,
+      customize: nbCustomize,
     },
   },
   en: {
@@ -132,6 +137,7 @@ export const resources = {
       tracker: enTracker,
       travel: enTravel,
       whatsNew: enWhatsNew,
+      customize: enCustomize,
     },
   },
   ar: {
@@ -157,6 +163,7 @@ export const resources = {
       tracker: arTracker,
       travel: arTravel,
       whatsNew: arWhatsNew,
+      customize: arCustomize,
     },
   },
   ur: {
@@ -182,6 +189,7 @@ export const resources = {
       tracker: urTracker,
       travel: urTravel,
       whatsNew: urWhatsNew,
+      customize: urCustomize,
     },
   },
 } as const;

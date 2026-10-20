@@ -1,0 +1,30 @@
+{
+  "tabBar": "ٹیب بار",
+  "customizeHome": "جائزہ حسبِ منشا بنائیں",
+  "customize": "حسبِ منشا",
+  "shortcuts": "شارٹ کٹس",
+  "chooseUpTo": "زیادہ سے زیادہ {{count}} منتخب کریں",
+  "cards": "کارڈز",
+  "reset": "دوبارہ ترتیب دیں",
+  "moveUp": "اوپر لے جائیں",
+  "moveDown": "نیچے لے جائیں",
+  "block": {
+    "nextPrayer": "اگلی نماز",
+    "shortcuts": "شارٹ کٹس",
+    "afterPrayer": "نماز کے بعد",
+    "announcement": "مسجد کا اعلان",
+    "season": "رمضان اور تہوار",
+    "night": "مبارک راتیں",
+    "prayerTimes": "آج کے اوقاتِ نماز",
+    "specialDays": "آنے والے خاص دن"
+  },
+  "feature": {
+    "calendar": "کیلنڈر",
+    "qibla": "قبلہ",
+    "mosques": "مساجد",
+    "jumuah": "جمعہ",
+    "duas": "دعا",
+    "tasbih": "تسبیح",
+    "tracker": "ٹریکر"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "tabBar": "شريط التبويب",
+  "customizeHome": "تخصيص النظرة العامة",
+  "customize": "تخصيص",
+  "shortcuts": "اختصارات",
+  "chooseUpTo": "اختر حتى {{count}}",
+  "cards": "البطاقات",
+  "reset": "إعادة تعيين",
+  "moveUp": "نقل لأعلى",
+  "moveDown": "نقل لأسفل",
+  "block": {
+    "nextPrayer": "الصلاة القادمة",
+    "shortcuts": "اختصارات",
+    "afterPrayer": "بعد الصلاة",
+    "announcement": "إعلان المسجد",
+    "season": "رمضان والأعياد",
+    "night": "الليالي المباركة",
+    "prayerTimes": "مواقيت صلاة اليوم",
+    "specialDays": "المناسبات القادمة"
+  },
+  "feature": {
+    "calendar": "التقويم",
+    "qibla": "القبلة",
+    "mosques": "المساجد",
+    "jumuah": "الجمعة",
+    "duas": "دعاء",
+    "tasbih": "تسبيح",
+    "tracker": "المتابعة"
+  }
+}

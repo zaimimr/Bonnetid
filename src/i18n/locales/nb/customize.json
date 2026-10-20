@@ -1,0 +1,30 @@
+{
+  "tabBar": "Fanelinje",
+  "customizeHome": "Tilpass Oversikt",
+  "customize": "Tilpass",
+  "shortcuts": "Snarveier",
+  "chooseUpTo": "Velg opptil {{count}}",
+  "cards": "Kort",
+  "reset": "Tilbakestill",
+  "moveUp": "Flytt opp",
+  "moveDown": "Flytt ned",
+  "block": {
+    "nextPrayer": "Neste bønn",
+    "shortcuts": "Snarveier",
+    "afterPrayer": "Etter bønnen",
+    "announcement": "Kunngjøring fra moskeen",
+    "season": "Ramadan og høytider",
+    "night": "Hellige netter",
+    "prayerTimes": "Dagens bønnetider",
+    "specialDays": "Kommende merkedager"
+  },
+  "feature": {
+    "calendar": "Kalender",
+    "qibla": "Qibla",
+    "mosques": "Moskeer",
+    "jumuah": "Jumuah",
+    "duas": "Dua",
+    "tasbih": "Tasbih",
+    "tracker": "Sporing"
+  }
+}

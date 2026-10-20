@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { Fragment, useEffect, useMemo, type ReactNode } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
@@ -13,11 +13,13 @@ import { NotificationCheckCard } from '@/components/notifications/NotificationCh
 import { EidLeaveCard } from '@/components/season/EidLeaveCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import { NightCard } from '@/components/season/NightCard';
+import { HomeShortcuts } from '@/components/customization/HomeShortcuts';
 import {
   AppText,
   Badge,
   Card,
   ErrorState,
+  InlineLink,
   NoTimesState,
   Screen,
   SectionHeader,
@@ -29,6 +31,8 @@ import { useEidPrayers } from '@/hooks/useEidPrayers';
 import { useMosquePresence } from '@/hooks/useMosquePresence';
 import { useNow } from '@/hooks/useNow';
 import { useTimezoneNote } from '@/hooks/useTimezoneNote';
+import { useVerticalFold } from '@/hooks/useWindowGeometry';
+import { ASIDE_HOME_BLOCKS, type HomeBlockId } from '@/lib/customization';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useReviewPrompt } from '@/hooks/useReviewPrompt';
@@ -37,7 +41,12 @@ import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule'
 import { track } from '@/lib/telemetry';
 import { isoDateIsFriday, isoDateIsJumuahEveOrDay, parseDayKey } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
-import { useActiveLocation, useActiveMosque, useUnreadAnnouncement } from '@/store/settings';
+import {
+  useActiveLocation,
+  useActiveMosque,
+  useSettings,
+  useUnreadAnnouncement,
+} from '@/store/settings';
 import { PostHogMaskView } from 'posthog-react-native';
 import { t } from '@/lib/i18n';
 
@@ -52,6 +61,8 @@ export default function HomeScreen() {
   const mosque = useActiveMosque();
   const { todaySchedule, nextPrayer, isLoading, isError, refetch } = usePrayerDay(now);
   const { refreshing, onRefresh } = useRefresh();
+  const fold = useVerticalFold();
+  const homeLayout = useSettings((state) => state.homeLayout);
   const timezoneNote = useTimezoneNote(now);
   const { dayKey, isoDate: todayIso } = useActiveDayKeys(now);
   const today = useMemo(() => parseDayKey(dayKey), [dayKey]);
@@ -102,88 +113,141 @@ export default function HomeScreen() {
       .slice(0, UPCOMING_EVENT_COUNT);
   }, [specialsThisYear.data, specialsNextYear.data, todayIso]);
 
+  const blocks: Record<HomeBlockId, ReactNode> = {
+    'next-prayer': (
+      <>
+        {(nextPrayer || eidPrayers.hero) && (
+          <NextPrayerHero
+            nextPrayer={nextPrayer}
+            eidPrayer={eidPrayers.hero}
+            now={now}
+            hijriText={hijriText}
+            gregorianText={formatGregorianLong(today)}
+            onPressDate={() =>
+              router.push({ pathname: '/day/[date]', params: { date: todayIso } })
+            }
+          />
+        )}
+        <EidNearbyCard mosques={eidPrayers.nearby} />
+        <EidLeaveCard now={now} />
+      </>
+    ),
+    shortcuts: <HomeShortcuts />,
+    'after-prayer': <AfterPrayerCard now={now} />,
+    announcement: mosque && myAnnouncement && (
+      <Card
+        rounded="xl"
+        padding="md"
+        onPress={() =>
+          router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } })
+        }>
+        <MosqueAnnouncement
+          title={t('home.announcementFrom', { name: mosque.name })}
+          text={myAnnouncement}
+          compact
+          chevron
+        />
+      </Card>
+    ),
+    season: <SeasonCard />,
+    night: (
+      <NightCard
+        now={now}
+        onPress={(isoDate) =>
+          router.push({ pathname: '/day/[date]', params: { date: isoDate } })
+        }
+      />
+    ),
+    'prayer-times': todaySchedule.length > 0 && (
+      <View>
+        <PostHogMaskView>
+          <SectionHeader
+            title={t('home.todaySPrayerTimes')}
+            subtitle={
+              mosque && mosqueInLocation ? `${location.name} · ${mosque.name}` : location.name
+            }
+            trailing={calculated ? <Badge label={t('home.localTimes')} variant="neutral" /> : undefined}
+            style={timezoneNote ? { marginBottom: spacing.xs } : undefined}
+          />
+        </PostHogMaskView>
+        {timezoneNote && (
+          <AppText size="xs" tone="textMuted" style={{ marginBottom: spacing.md }}>
+            {timezoneNote}
+          </AppText>
+        )}
+        <PrayerTimesCard
+          schedule={todaySchedule}
+          highlightedName={
+            nextPrayer?.current && todaySchedule.includes(nextPrayer.current)
+              ? nextPrayer.current.name
+              : undefined
+          }
+          mosqueName={mosque?.name}
+          mosqueNote={
+            mosqueInLocation
+              ? undefined
+              : t('home.theMosqueIsIn', { name: mosque?.name ?? t('common.theMosque') })
+          }
+          jamatTimes={jamatTimes}
+          jummah={isoDateIsFriday(todayIso) ? jummahTimes : []}
+          onPressMosque={() => {
+            if (!mosque) return;
+            if (mosqueInLocation) {
+              router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } });
+            } else {
+              router.push('/mosque-picker');
+            }
+          }}
+          onSelectMosque={calculated ? undefined : () => router.push('/mosque-picker')}
+          onFindJumuah={
+            calculated || !isoDateIsJumuahEveOrDay(todayIso)
+              ? undefined
+              : () => {
+                  track('jumuah_nearby_opened');
+                  router.push({ pathname: '/mosques', params: { jumuah: '1' } });
+                }
+          }
+          statusDate={todayIso}
+          now={now}
+        />
+      </View>
+    ),
+    'special-days': upcomingEvents.length > 0 && (
+      <View>
+        <SectionHeader title={t('home.upcomingSpecialDays')} />
+        <View style={{ gap: spacing.md }}>
+          {upcomingEvents.map((event) => (
+            <EventCard
+              key={event.gregorian_date + event.special_date_name}
+              event={event}
+              onPress={() =>
+                router.push({
+                  pathname: '/day/[date]',
+                  params: { date: event.gregorian_date },
+                })
+              }
+            />
+          ))}
+        </View>
+      </View>
+    ),
+  };
+
+  const render = (ids: HomeBlockId[]) =>
+    ids.map((id) => <Fragment key={id}>{blocks[id]}</Fragment>);
+  const shown = homeLayout.filter((block) => block.visible).map((block) => block.id);
+  const main = fold ? shown.filter((id) => !ASIDE_HOME_BLOCKS.includes(id)) : shown;
+  const aside = fold ? shown.filter((id) => ASIDE_HOME_BLOCKS.includes(id)) : [];
+
   return (
     <Screen
       scroll
       refreshing={refreshing}
       onRefresh={onRefresh}
       aside={
-        <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
-          {todaySchedule.length > 0 && (
-            <View>
-              <PostHogMaskView>
-                <SectionHeader
-                  title={t('home.todaySPrayerTimes')}
-                  subtitle={
-                    mosque && mosqueInLocation ? `${location.name} · ${mosque.name}` : location.name
-                  }
-                  trailing={calculated ? <Badge label={t('home.localTimes')} variant="neutral" /> : undefined}
-                  style={timezoneNote ? { marginBottom: spacing.xs } : undefined}
-                />
-              </PostHogMaskView>
-              {timezoneNote && (
-                <AppText size="xs" tone="textMuted" style={{ marginBottom: spacing.md }}>
-                  {timezoneNote}
-                </AppText>
-              )}
-              <PrayerTimesCard
-                schedule={todaySchedule}
-                highlightedName={
-                  nextPrayer?.current && todaySchedule.includes(nextPrayer.current)
-                    ? nextPrayer.current.name
-                    : undefined
-                }
-                mosqueName={mosque?.name}
-                mosqueNote={
-                  mosqueInLocation
-                    ? undefined
-                    : t('home.theMosqueIsIn', { name: mosque?.name ?? t('common.theMosque') })
-                }
-                jamatTimes={jamatTimes}
-                jummah={isoDateIsFriday(todayIso) ? jummahTimes : []}
-                onPressMosque={() => {
-                  if (!mosque) return;
-                  if (mosqueInLocation) {
-                    router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } });
-                  } else {
-                    router.push('/mosque-picker');
-                  }
-                }}
-                onSelectMosque={calculated ? undefined : () => router.push('/mosque-picker')}
-                onFindJumuah={
-                  calculated || !isoDateIsJumuahEveOrDay(todayIso)
-                    ? undefined
-                    : () => {
-                        track('jumuah_nearby_opened');
-                        router.push({ pathname: '/mosques', params: { jumuah: '1' } });
-                      }
-                }
-                statusDate={todayIso}
-                now={now}
-              />
-            </View>
-          )}
-
-          {upcomingEvents.length > 0 && (
-            <View>
-              <SectionHeader title={t('home.upcomingSpecialDays')} />
-              <View style={{ gap: spacing.md }}>
-                {upcomingEvents.map((event) => (
-                  <EventCard
-                    key={event.gregorian_date + event.special_date_name}
-                    event={event}
-                    onPress={() =>
-                      router.push({
-                        pathname: '/day/[date]',
-                        params: { date: event.gregorian_date },
-                      })
-                    }
-                  />
-                ))}
-              </View>
-            </View>
-          )}
-        </View>
+        aside.length > 0 ? (
+          <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>{render(aside)}</View>
+        ) : undefined
       }>
       <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
         <MosquePresenceCard />
@@ -198,50 +262,15 @@ export default function HomeScreen() {
           <NoTimesState period={monthYearLabel(today)} onRetry={refetch} />
         )}
 
-        {(nextPrayer || eidPrayers.hero) && (
-          <NextPrayerHero
-            nextPrayer={nextPrayer}
-            eidPrayer={eidPrayers.hero}
-            now={now}
-            hijriText={hijriText}
-            gregorianText={formatGregorianLong(today)}
-            onPressDate={() =>
-              router.push({ pathname: '/day/[date]', params: { date: todayIso } })
-            }
+        {render(main)}
+
+        <View style={{ alignItems: 'center' }}>
+          <InlineLink
+            label={t('customize.customize')}
+            icon="sliders-horizontal"
+            onPress={() => router.push('/settings-home')}
           />
-        )}
-
-        <AfterPrayerCard now={now} />
-
-        {mosque && myAnnouncement && (
-          <Card
-            rounded="xl"
-            padding="md"
-            onPress={() =>
-              router.push({ pathname: '/mosque/[orgNr]', params: { orgNr: mosque.orgNr } })
-            }>
-            <MosqueAnnouncement
-              title={t('home.announcementFrom', { name: mosque.name })}
-              text={myAnnouncement}
-              compact
-              chevron
-            />
-          </Card>
-        )}
-
-        <EidNearbyCard mosques={eidPrayers.nearby} />
-
-        <EidLeaveCard now={now} />
-
-        <SeasonCard />
-
-        <NightCard
-          now={now}
-          onPress={(isoDate) =>
-            router.push({ pathname: '/day/[date]', params: { date: isoDate } })
-          }
-        />
-
+        </View>
       </View>
     </Screen>
   );
