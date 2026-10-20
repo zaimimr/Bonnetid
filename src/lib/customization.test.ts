@@ -9,6 +9,7 @@ import {
   orderHomeBlocks,
   setHomeBlockVisible,
   toggleSlot,
+  upgradeDefault,
 } from './customization.ts';
 
 test('normalizeSlots drops unknown and duplicate ids and caps length', () => {
@@ -64,4 +65,17 @@ test('setHomeBlockVisible keeps locked blocks visible', () => {
   const hidden = setHomeBlockVisible(layout, 'season', false);
   assert.equal(hidden.find((block) => block.id === 'season')?.visible, false);
   assert.equal(setHomeBlockVisible(layout, 'next-prayer', false), layout);
+});
+
+test('upgradeDefault replaces only an untouched previous default', () => {
+  assert.deepEqual(upgradeDefault(['calendar', 'qibla'], ['calendar', 'qibla'], ['calendar', 'qibla', 'mosques']), [
+    'calendar',
+    'qibla',
+    'mosques',
+  ]);
+  assert.deepEqual(upgradeDefault(['qibla', 'calendar'], ['calendar', 'qibla'], ['calendar', 'qibla', 'mosques']), [
+    'qibla',
+    'calendar',
+  ]);
+  assert.deepEqual(upgradeDefault(['calendar'], ['calendar', 'qibla'], ['calendar', 'qibla', 'mosques']), ['calendar']);
 });
