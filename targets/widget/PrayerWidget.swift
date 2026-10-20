@@ -175,7 +175,7 @@ private struct SmallPrayerView: View {
       Spacer(minLength: 0)
 
       HStack(spacing: 5) {
-        Image(systemName: PrayerFormat.symbol(for: shown.kind))
+        Image(PrayerFormat.symbol(for: shown.kind))
           .font(.title3)
           .foregroundStyle(PrayerColor.brand)
         Text(shown.printedLabel)
@@ -291,7 +291,7 @@ private struct HeroListPrayerView: View {
         Spacer(minLength: 0)
 
         HStack(spacing: 5) {
-          Image(systemName: PrayerFormat.symbol(for: moment.headline.kind))
+          Image(PrayerFormat.symbol(for: moment.headline.kind))
             .font(.title3)
             .foregroundStyle(PrayerColor.brand)
           Text(moment.headline.printedLabel)
@@ -419,7 +419,7 @@ private struct PrayerStatusMark: View {
 
   var body: some View {
     if status == "prayed" {
-      Image(systemName: "checkmark.circle.fill")
+      Image("bt.check-circle-fill")
         .font(.caption2)
         .foregroundStyle(tint)
     }
@@ -434,7 +434,7 @@ private struct RectangularPrayerView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 1) {
       HStack(spacing: 4) {
-        Image(systemName: PrayerFormat.symbol(for: moment.headline.kind))
+        Image(PrayerFormat.symbol(for: moment.headline.kind))
           .font(.caption2)
         Text(moment.headline.printedLabel)
           .font(.headline)
@@ -442,7 +442,7 @@ private struct RectangularPrayerView: View {
         Text(PrayerFormat.time(moment.headline.at))
           .prayerTime(.headline)
         if status == "prayed" {
-          Image(systemName: "checkmark.circle.fill")
+          Image("bt.check-circle-fill")
             .font(.caption2)
         }
       }
@@ -526,8 +526,8 @@ private struct InlinePrayerView: View {
   var body: some View {
     Label(
       text,
-      systemImage: status == "prayed"
-        ? "checkmark.circle.fill"
+      image: status == "prayed"
+        ? "bt.check-circle-fill"
         : PrayerFormat.symbol(for: moment.headline.kind)
     )
     .containerBackground(.clear, for: .widget)
@@ -541,10 +541,10 @@ private struct MissingSnapshotView: View {
   var body: some View {
     switch family {
     case .accessoryInline:
-      Label(strings.openApp, systemImage: "moon")
+      Label(strings.openApp, image: "bt.moon")
         .containerBackground(.clear, for: .widget)
     case .accessoryCircular:
-      Image(systemName: "moon")
+      Image("bt.moon")
         .containerBackground(.clear, for: .widget)
     case .accessoryRectangular:
       VStack(alignment: .leading) {
@@ -555,7 +555,7 @@ private struct MissingSnapshotView: View {
       .containerBackground(.clear, for: .widget)
     default:
       VStack(alignment: .leading, spacing: 6) {
-        Image(systemName: "moon.stars")
+        Image("bt.moon-stars")
           .font(.title3)
           .foregroundStyle(PrayerColor.brand)
         Text(strings.openApp)

@@ -256,13 +256,13 @@ enum PrayerFormat {
 
   static func symbol(for kind: String) -> String {
     switch kind {
-    case "fajr": return "moon.stars"
-    case "sunrise", "fajr_endtime": return "sunrise"
-    case "duhr": return "sun.max"
-    case "asr": return "cloud.sun"
-    case "maghrib": return "sunset"
-    case "isha": return "moon"
-    default: return "clock"
+    case "fajr": return "bt.moon-stars"
+    case "sunrise", "fajr_endtime": return "bt.sunrise"
+    case "duhr": return "bt.sun"
+    case "asr": return "bt.cloud-sun"
+    case "maghrib": return "bt.sunset"
+    case "isha": return "bt.moon"
+    default: return "bt.clock"
     }
   }
 }

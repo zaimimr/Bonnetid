@@ -105,7 +105,7 @@ struct NextPrayerSnippet: View {
     if let moment {
       let next = moment.next
       HStack(alignment: .center, spacing: 12) {
-        Image(systemName: PrayerFormat.symbol(for: next.kind))
+        Image(PrayerFormat.symbol(for: next.kind))
           .font(.title2)
           .foregroundStyle(PrayerColor.brand)
         VStack(alignment: .leading, spacing: 2) {
@@ -149,7 +149,7 @@ struct TodayPrayersSnippet: View {
           .foregroundStyle(PrayerColor.inkSecondary)
         ForEach(prayers, id: \.at) { prayer in
           HStack(spacing: 10) {
-            Image(systemName: PrayerFormat.symbol(for: prayer.kind))
+            Image(PrayerFormat.symbol(for: prayer.kind))
               .font(.subheadline)
               .foregroundStyle(PrayerColor.brand)
               .frame(width: 22)
@@ -178,7 +178,7 @@ struct TodayPrayersSnippet: View {
 
 private struct MissingSnippet: View {
   var body: some View {
-    Label("Åpne Bønnetid for å hente tidene", systemImage: "moon.stars")
+    Label("Åpne Bønnetid for å hente tidene", image: "bt.moon-stars")
       .font(.subheadline)
       .foregroundStyle(PrayerColor.inkSecondary)
       .padding()

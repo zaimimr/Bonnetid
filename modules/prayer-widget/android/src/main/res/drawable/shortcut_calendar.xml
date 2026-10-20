@@ -2,7 +2,7 @@
   android:width="48dp" android:height="48dp"
   android:viewportWidth="48" android:viewportHeight="48">
   <path android:fillColor="@color/prayer_widget_brand_plate" android:pathData="M24,2a22,22 0 1 1 0,44a22,22 0 1 1 0,-44z" />
-  <group android:translateX="12" android:translateY="12">
-    <path android:fillColor="@color/prayer_widget_on_brand_plate" android:pathData="M20,3h-1V1h-2v2H7V1H5v2H4c-1.1,0 -2,0.9 -2,2v16c0,1.1 0.9,2 2,2h16c1.1,0 2,-0.9 2,-2V5c0,-1.1 -0.9,-2 -2,-2zM20,21H4V8h16v13z" />
+  <group android:translateX="12" android:translateY="12" android:scaleX="0.09375" android:scaleY="0.09375">
+    <path android:fillColor="@color/prayer_widget_on_brand_plate" android:pathData="M208,32 L184,32 L184,24 A8 8 0 0 0 168,24 L168,32 L88,32 L88,24 A8 8 0 0 0 72,24 L72,32 L48,32 A16 16 0 0 0 32,48 L32,208 A16 16 0 0 0 48,224 L208,224 A16 16 0 0 0 224,208 L224,48 A16 16 0 0 0 208,32 Z M72,48 L72,56 A8 8 0 0 0 88,56 L88,48 L168,48 L168,56 A8 8 0 0 0 184,56 L184,48 L208,48 L208,80 L48,80 L48,48 Z M208,208 L48,208 L48,96 L208,96 L208,208 Z M140,132 A12 12 0 1 1 128,120 A12 12 0 0 1 140,132 Z M184,132 A12 12 0 1 1 172,120 A12 12 0 0 1 184,132 Z M96,172 A12 12 0 1 1 84,160 A12 12 0 0 1 96,172 Z M140,172 A12 12 0 1 1 128,160 A12 12 0 0 1 140,172 Z M184,172 A12 12 0 1 1 172,160 A12 12 0 0 1 184,172 Z" />
   </group>
 </vector>

@@ -183,7 +183,7 @@ private struct TimelineBar: View {
           )
 
         ForEach(glyphs, id: \.at) { mark in
-          Image(systemName: mark.symbol)
+          Image(mark.symbol)
             .font(.system(size: glyphSize))
             .foregroundStyle(mark.at == marker?.at ? PrayerColor.brand : PrayerColor.inkMuted)
             .frame(width: glyphSlot, height: glyphBand)
@@ -238,7 +238,7 @@ private struct TimelineMissingView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 6) {
-      Image(systemName: "clock")
+      Image("bt.clock")
         .font(.title3)
         .foregroundStyle(PrayerColor.brand)
       Text(strings.openApp)

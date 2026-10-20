@@ -69,7 +69,7 @@ struct ComplicationView: View {
         case .accessoryInline:
           Text("\(next.printedLabel) \(time) · \(countdown)")
         case .accessoryCorner:
-          Image(systemName: PrayerFormat.symbol(for: next.kind))
+          Image(PrayerFormat.symbol(for: next.kind))
             .font(.title3)
             .widgetAccentable()
             .widgetLabel {
@@ -78,7 +78,7 @@ struct ComplicationView: View {
         default:
           VStack(alignment: .leading, spacing: 1) {
             HStack(spacing: 4) {
-              Image(systemName: PrayerFormat.symbol(for: next.kind))
+              Image(PrayerFormat.symbol(for: next.kind))
                 .font(.caption)
               Text(next.printedLabel)
                 .font(.headline)
@@ -113,7 +113,7 @@ struct ComplicationView: View {
           }
           .frame(maxWidth: .infinity, alignment: .leading)
         default:
-          Image(systemName: "moon.stars")
+          Image("bt.moon-stars")
             .widgetAccentable()
         }
       }

@@ -181,7 +181,7 @@ struct PrayerLiveActivity: Widget {
           .frame(maxWidth: 54)
           .widgetLanguage(strings)
       } minimal: {
-        Image(systemName: PrayerFormat.symbol(for: phase.kind))
+        Image(PrayerFormat.symbol(for: phase.kind))
           .foregroundStyle(PrayerColor.brand)
       }
       .widgetURL(URL(string: "bonnetid://"))
@@ -214,7 +214,7 @@ private struct SmallActivityView: View {
 
     VStack(alignment: .leading, spacing: 2) {
       HStack(spacing: 5) {
-        Image(systemName: PrayerFormat.symbol(for: phase.kind))
+        Image(PrayerFormat.symbol(for: phase.kind))
           .font(.caption)
           .foregroundStyle(palette.brand)
         Text(phase.label)
@@ -279,7 +279,7 @@ private struct MarkButtons: View {
       Button(
         intent: MarkPrayerIntent(isoDate: phase.isoDate, prayer: phase.kind, status: "prayed")
       ) {
-        Label(WidgetStrings.current.prayed, systemImage: "checkmark")
+        Label(WidgetStrings.current.prayed, image: "bt.check")
           .font(.subheadline.weight(.semibold))
           .foregroundStyle(palette.fullColor ? PrayerColor.surface : .primary)
           .frame(maxWidth: .infinity)

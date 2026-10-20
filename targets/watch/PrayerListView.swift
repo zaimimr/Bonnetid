@@ -31,7 +31,7 @@ struct PrayerListView: View {
       }
     } else {
       VStack(spacing: 8) {
-        Image(systemName: "moon.stars")
+        Image("bt.moon-stars")
           .font(.title2)
           .foregroundStyle(WatchColor.brand)
         Text("Åpne Bønnetid på iPhone for å hente tidene")
@@ -82,7 +82,7 @@ private struct NextPrayerPage: View {
         .foregroundStyle(WatchColor.inkMuted)
 
       HStack(alignment: .firstTextBaseline, spacing: 6) {
-        Image(systemName: PrayerFormat.symbol(for: next.kind))
+        Image(PrayerFormat.symbol(for: next.kind))
           .font(.system(size: 20, weight: .semibold))
           .foregroundStyle(WatchColor.brand)
         Text(next.printedLabel)
@@ -191,7 +191,7 @@ private struct PrayerRow: View {
 
   var body: some View {
     HStack(spacing: 6) {
-      Image(systemName: PrayerFormat.symbol(for: prayer.kind))
+      Image(PrayerFormat.symbol(for: prayer.kind))
         .font(.system(size: 13, weight: .medium))
         .foregroundStyle(isNext ? WatchColor.onBrandPlate : WatchColor.brand)
         .frame(width: 18)
