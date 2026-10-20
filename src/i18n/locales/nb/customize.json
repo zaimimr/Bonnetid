@@ -3,8 +3,6 @@
   "customizeHome": "Tilpass Oversikt",
   "customize": "Tilpass",
   "shortcuts": "Snarveier",
-  "chooseUpTo": "Velg opptil {{count}}",
-  "cards": "Kort",
   "reset": "Tilbakestill",
   "moveUp": "Flytt opp",
   "moveDown": "Flytt ned",
@@ -26,5 +24,13 @@
     "duas": "Dua",
     "tasbih": "Tasbih",
     "tracker": "Sporing"
-  }
+  },
+  "done": "Ferdig",
+  "addCard": "Legg til kort",
+  "addShortcut": "Legg til snarvei",
+  "add": "Legg til",
+  "remove": "Fjern",
+  "drag": "Flytt",
+  "showsWhenRelevant": "Vises når den er aktuell",
+  "chooseUpTo": "Velg opptil {{count}}"
 }

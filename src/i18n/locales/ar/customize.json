@@ -3,8 +3,6 @@
   "customizeHome": "تخصيص النظرة العامة",
   "customize": "تخصيص",
   "shortcuts": "اختصارات",
-  "chooseUpTo": "اختر حتى {{count}}",
-  "cards": "البطاقات",
   "reset": "إعادة تعيين",
   "moveUp": "نقل لأعلى",
   "moveDown": "نقل لأسفل",
@@ -26,5 +24,13 @@
     "duas": "دعاء",
     "tasbih": "تسبيح",
     "tracker": "المتابعة"
-  }
+  },
+  "done": "تم",
+  "addCard": "إضافة بطاقة",
+  "addShortcut": "إضافة اختصار",
+  "add": "إضافة",
+  "remove": "إزالة",
+  "drag": "نقل",
+  "showsWhenRelevant": "تظهر عند الحاجة",
+  "chooseUpTo": "اختر حتى {{count}}"
 }

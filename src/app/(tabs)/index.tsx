@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useMemo, type ReactNode } from 'react';
 import { View } from 'react-native';
+import { useAnimatedRef } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
 import { AfterPrayerCard } from '@/components/duas/AfterPrayerCard';
@@ -13,6 +14,7 @@ import { NotificationCheckCard } from '@/components/notifications/NotificationCh
 import { EidLeaveCard } from '@/components/season/EidLeaveCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import { NightCard } from '@/components/season/NightCard';
+import { HomeEditor } from '@/components/customization/HomeEditor';
 import { HomeShortcuts } from '@/components/customization/HomeShortcuts';
 import {
   AppText,
@@ -41,6 +43,7 @@ import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule'
 import { track } from '@/lib/telemetry';
 import { isoDateIsFriday, isoDateIsJumuahEveOrDay, parseDayKey } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
+import { useHomeEdit } from '@/store/homeEdit';
 import {
   useActiveLocation,
   useActiveMosque,
@@ -63,6 +66,9 @@ export default function HomeScreen() {
   const { refreshing, onRefresh } = useRefresh();
   const fold = useVerticalFold();
   const homeLayout = useSettings((state) => state.homeLayout);
+  const editing = useHomeEdit((state) => state.editing);
+  const setEditing = useHomeEdit((state) => state.setEditing);
+  const scrollRef = useAnimatedRef<any>();
   const timezoneNote = useTimezoneNote(now);
   const { dayKey, isoDate: todayIso } = useActiveDayKeys(now);
   const today = useMemo(() => parseDayKey(dayKey), [dayKey]);
@@ -132,7 +138,7 @@ export default function HomeScreen() {
         <EidLeaveCard now={now} />
       </>
     ),
-    shortcuts: <HomeShortcuts />,
+    shortcuts: <HomeShortcuts editing={editing} />,
     'after-prayer': <AfterPrayerCard now={now} />,
     announcement: mosque && myAnnouncement && (
       <Card
@@ -236,42 +242,52 @@ export default function HomeScreen() {
   const render = (ids: HomeBlockId[]) =>
     ids.map((id) => <Fragment key={id}>{blocks[id]}</Fragment>);
   const shown = homeLayout.filter((block) => block.visible).map((block) => block.id);
-  const main = fold ? shown.filter((id) => !ASIDE_HOME_BLOCKS.includes(id)) : shown;
-  const aside = fold ? shown.filter((id) => ASIDE_HOME_BLOCKS.includes(id)) : [];
+  const main = fold && !editing ? shown.filter((id) => !ASIDE_HOME_BLOCKS.includes(id)) : shown;
+  const aside = fold && !editing ? shown.filter((id) => ASIDE_HOME_BLOCKS.includes(id)) : [];
 
   return (
     <Screen
       scroll
       refreshing={refreshing}
       onRefresh={onRefresh}
+      scrollRef={scrollRef}
       aside={
         aside.length > 0 ? (
           <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>{render(aside)}</View>
         ) : undefined
       }>
-      <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
-        <MosquePresenceCard />
-
-        <NotificationCheckCard />
-
-        {isLoading && <Skeleton height={220} rounded="xl" />}
-
-        {isError && <ErrorState onRetry={refetch} />}
-
-        {!isLoading && !isError && todaySchedule.length === 0 && (
-          <NoTimesState period={monthYearLabel(today)} onRetry={refetch} />
-        )}
-
-        {render(main)}
-
-        <View style={{ alignItems: 'center' }}>
-          <InlineLink
-            label={t('customize.customize')}
-            icon="sliders-horizontal"
-            onPress={() => router.push('/settings-home')}
-          />
+      {editing ? (
+        <View style={{ marginTop: spacing.lg }}>
+          <HomeEditor blocks={blocks} scrollRef={scrollRef} />
         </View>
-      </View>
+      ) : (
+        <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
+          <MosquePresenceCard />
+
+          <NotificationCheckCard />
+
+          {isLoading && <Skeleton height={220} rounded="xl" />}
+
+          {isError && <ErrorState onRetry={refetch} />}
+
+          {!isLoading && !isError && todaySchedule.length === 0 && (
+            <NoTimesState period={monthYearLabel(today)} onRetry={refetch} />
+          )}
+
+          {render(main)}
+
+          <View style={{ alignItems: 'center' }}>
+            <InlineLink
+              label={t('customize.customize')}
+              icon="sliders-horizontal"
+              onPress={() => {
+                setEditing(true);
+                scrollRef.current?.scrollTo({ y: 0, animated: true });
+              }}
+            />
+          </View>
+        </View>
+      )}
     </Screen>
   );
 }

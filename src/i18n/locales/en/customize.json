@@ -3,8 +3,6 @@
   "customizeHome": "Customize Overview",
   "customize": "Customize",
   "shortcuts": "Shortcuts",
-  "chooseUpTo": "Choose up to {{count}}",
-  "cards": "Cards",
   "reset": "Reset",
   "moveUp": "Move up",
   "moveDown": "Move down",
@@ -26,5 +24,13 @@
     "duas": "Dua",
     "tasbih": "Tasbih",
     "tracker": "Tracker"
-  }
+  },
+  "done": "Done",
+  "addCard": "Add card",
+  "addShortcut": "Add shortcut",
+  "add": "Add",
+  "remove": "Remove",
+  "drag": "Move",
+  "showsWhenRelevant": "Shows when relevant",
+  "chooseUpTo": "Choose up to {{count}}"
 }

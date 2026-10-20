@@ -1,12 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  addHomeBlock,
   DEFAULT_TAB_SLOTS,
   HOME_BLOCK_IDS,
-  moveHomeBlock,
   moveSlot,
   normalizeHomeLayout,
   normalizeSlots,
+  orderHomeBlocks,
   setHomeBlockVisible,
   toggleSlot,
 } from './customization.ts';
@@ -48,11 +49,25 @@ test('normalizeHomeLayout keeps order, appends missing blocks, forces locked vis
   assert.deepEqual(normalizeHomeLayout(null).map((block) => block.id), [...HOME_BLOCK_IDS]);
 });
 
-test('moveHomeBlock and setHomeBlockVisible', () => {
+test('orderHomeBlocks applies the dragged order and keeps hidden blocks last', () => {
+  const layout = setHomeBlockVisible(normalizeHomeLayout([]), 'night', false);
+  const visible = layout.filter((block) => block.visible).map((block) => block.id);
+  const ordered = orderHomeBlocks(layout, [...visible].reverse());
+  assert.deepEqual(ordered.map((block) => block.id), [...[...visible].reverse(), 'night']);
+  assert.equal(ordered.at(-1)?.visible, false);
+});
+
+test('addHomeBlock shows a hidden block after the visible ones', () => {
+  const layout = setHomeBlockVisible(setHomeBlockVisible(normalizeHomeLayout([]), 'night', false), 'season', false);
+  const added = addHomeBlock(layout, 'night');
+  const index = added.findIndex((block) => block.id === 'night');
+  assert.deepEqual(added[index], { id: 'night', visible: true });
+  assert.equal(added[index - 1].visible, true);
+  assert.deepEqual(added[index + 1], { id: 'season', visible: false });
+});
+
+test('setHomeBlockVisible keeps locked blocks visible', () => {
   const layout = normalizeHomeLayout([]);
-  const moved = moveHomeBlock(layout, 'shortcuts', -1);
-  assert.deepEqual(moved.slice(0, 2).map((block) => block.id), ['shortcuts', 'next-prayer']);
-  assert.equal(moveHomeBlock(layout, 'next-prayer', -1), layout);
   const hidden = setHomeBlockVisible(layout, 'season', false);
   assert.equal(hidden.find((block) => block.id === 'season')?.visible, false);
   assert.equal(setHomeBlockVisible(layout, 'next-prayer', false), layout);
