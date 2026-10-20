@@ -1,25 +1,13 @@
 import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon, type IconName } from '@/components/icons';
 import { AppTabBar } from '@/components/navigation/AppTabBar';
 import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 import { useOnboardingDone, useSettingsHydrated } from '@/store/settings';
 import { useSupportThread } from '@/hooks/useSupportThread';
 import { t } from '@/lib/i18n';
 
-type IconName = keyof typeof Ionicons.glyphMap;
-
-function TabIcon({
-  name,
-  activeName,
-  focused,
-  color,
-}: {
-  name: IconName;
-  activeName: IconName;
-  focused: boolean;
-  color: string;
-}) {
-  return <Ionicons name={focused ? activeName : name} size={22} color={color} />;
+function TabIcon({ name, focused, color }: { name: IconName; focused: boolean; color: string }) {
+  return <Icon name={name} size={22} color={color} weight={focused ? 'fill' : 'regular'} />;
 }
 
 export default function TabsLayout() {
@@ -36,7 +24,7 @@ export default function TabsLayout() {
         options={{
           title: t('navigation.today'),
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="home-outline" activeName="home" focused={focused} color={color as string} />
+            <TabIcon name="house" focused={focused} color={color as string} />
           ),
         }}
       />
@@ -45,7 +33,7 @@ export default function TabsLayout() {
         options={{
           title: t('navigation.calendar'),
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="calendar-outline" activeName="calendar" focused={focused} color={color as string} />
+            <TabIcon name="calendar-dots" focused={focused} color={color as string} />
           ),
         }}
       />
@@ -54,7 +42,7 @@ export default function TabsLayout() {
         options={{
           title: t('navigation.qibla'),
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="compass-outline" activeName="compass" focused={focused} color={color as string} />
+            <TabIcon name="compass" focused={focused} color={color as string} />
           ),
         }}
       />
@@ -64,7 +52,7 @@ export default function TabsLayout() {
           title: t('navigation.more'),
           tabBarBadge: unread > 0 ? '' : undefined,
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="apps-outline" activeName="apps" focused={focused} color={color as string} />
+            <TabIcon name="squares-four" focused={focused} color={color as string} />
           ),
         }}
       />
