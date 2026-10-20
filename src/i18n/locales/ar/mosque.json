@@ -52,5 +52,6 @@
   "donateWithVipps2": "تبرّع عبر Vipps",
   "youAreAtThe": "أنت في المسجد",
   "chooseAsMyMosque": "اختيار {{mosqueName}} مسجدًا لي",
-  "chooseAsMyMosque2": "اختيار كمسجدي"
+  "chooseAsMyMosque2": "اختيار كمسجدي",
+  "noJumuahMosques": "لا توجد مساجد بأوقات صلاة الجمعة هنا"
 }

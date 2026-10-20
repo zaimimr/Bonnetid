@@ -35,6 +35,7 @@ export type PrayerTimesCardProps = {
   now?: Date;
   onPressMosque?: () => void;
   onSelectMosque?: () => void;
+  onFindJumuah?: () => void;
 };
 
 export function PrayerTimesCard({
@@ -48,6 +49,7 @@ export function PrayerTimesCard({
   now,
   onPressMosque,
   onSelectMosque,
+  onFindJumuah,
 }: PrayerTimesCardProps) {
   const theme = useTheme();
   const log = usePrayerLog((state) => state.log);
@@ -240,6 +242,30 @@ export function PrayerTimesCard({
             </View>
           ))}
         </View>
+      )}
+
+      {onFindJumuah && (
+        <Pressable
+          onPress={onFindJumuah}
+          accessibilityRole="button"
+          style={({ pressed }) => [
+            {
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing.sm,
+              paddingVertical: spacing.md,
+              paddingHorizontal: spacing.md,
+              borderTopWidth: 1,
+              borderTopColor: theme.colors.border,
+            },
+            pressed && { opacity: opacity.pressed },
+          ]}>
+          <Ionicons name="people-outline" size={18} color={theme.colors.primary} />
+          <AppText size="sm" weight="medium" tone="primary" style={{ flex: 1 }}>
+            {t('prayer.jumuahNearby')}
+          </AppText>
+          <Ionicons name="chevron-forward" size={16} color={theme.colors.primary} style={mirrored} />
+        </Pressable>
       )}
 
       {hasMosque && (

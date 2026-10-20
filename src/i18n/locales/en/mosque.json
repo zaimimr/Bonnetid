@@ -52,5 +52,6 @@
   "donateWithVipps2": "Donate with Vipps",
   "youAreAtThe": "You are at the mosque",
   "chooseAsMyMosque": "Choose {{mosqueName}} as my mosque",
-  "chooseAsMyMosque2": "Choose as my mosque"
+  "chooseAsMyMosque2": "Choose as my mosque",
+  "noJumuahMosques": "No mosques with Jumuah times here"
 }

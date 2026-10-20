@@ -6,6 +6,7 @@ const OSLO_STANDARD_OFFSET = 60;
 const OSLO_SUMMER_OFFSET = 120;
 const MARCH = 2;
 const OCTOBER = 9;
+const THURSDAY = 4;
 const FRIDAY = 5;
 const NEIGHBOUR_DAYS = [-1, 1];
 
@@ -252,6 +253,11 @@ export function isoWeekday(isoDate: string): number {
 
 export function isoDateIsFriday(isoDate: string): boolean {
   return isoWeekday(isoDate) === FRIDAY;
+}
+
+export function isoDateIsJumuahEveOrDay(isoDate: string): boolean {
+  const weekday = isoWeekday(isoDate);
+  return weekday === THURSDAY || weekday === FRIDAY;
 }
 
 export function addIsoDays(isoDate: string, days: number): string {

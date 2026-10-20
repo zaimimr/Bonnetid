@@ -43,7 +43,13 @@ type MosqueWithDistance = {
 
 const CALCULATED_MESSAGE: Record<MosqueListMode, string> = t('mosque.calculatedMessage', { returnObjects: true });
 
-export function MosqueList({ mode }: { mode: MosqueListMode }) {
+export function MosqueList({
+  mode,
+  initialJumuahOnly = false,
+}: {
+  mode: MosqueListMode;
+  initialJumuahOnly?: boolean;
+}) {
   const picking = mode === 'pick';
   const router = useRouter();
   const theme = useTheme();
@@ -55,6 +61,7 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
   const [view, setView] = useState<MosqueViewMode>('list');
   const [sort, setSort] = useState<SortMode>('distance');
   const [query, setQuery] = useState('');
+  const [jumuahOnly, setJumuahOnly] = useState(initialJumuahOnly);
   const { refreshing, onRefresh } = useRefresh();
   const { status: gpsStatus, getPosition } = useDevicePosition();
   const eidPeriod = useEidPeriod();
@@ -81,6 +88,7 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
             : null,
       }))
       .filter(({ mosque }) => {
+        if (jumuahOnly && mosque.jummah.length === 0) return false;
         if (!normalized) return true;
         if (mosque.name.toLowerCase().includes(normalized)) return true;
         if (mosque.post?.city.toLowerCase().includes(normalized)) return true;
@@ -96,7 +104,7 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
     const mine = sorted.findIndex((item) => item.mosque.org_nr === selectedOrgNr);
     if (mine <= 0) return sorted;
     return [sorted[mine], ...sorted.slice(0, mine), ...sorted.slice(mine + 1)];
-  }, [inPlace, byIso, query, sort, coords.lat, coords.lon, selectedOrgNr]);
+  }, [inPlace, byIso, query, jumuahOnly, sort, coords.lat, coords.lon, selectedOrgNr]);
 
   const withJummah = useMemo(
     () => inPlace.filter((mosque) => mosque.jummah.length > 0).length,
@@ -169,7 +177,9 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
   const mapCenter = place ? { lat: place.lat, lon: place.lon } : { lat: coords.lat, lon: coords.lon };
 
   const search = query.trim();
-  const emptyMessage = place
+  const emptyMessage = jumuahOnly && !search
+    ? t('mosque.noJumuahMosques')
+    : place
     ? search
       ? t('mosque.noMosquesInMatch', { name: place.name, search })
       : t('mosque.weHaveNoRegistered', { name: place.name })
@@ -259,6 +269,15 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
               active={sort === 'name'}
               onPress={() => setSort('name')}
             />
+            <SortChip
+              label={t('mosque.jumuah')}
+              icon="people-outline"
+              active={jumuahOnly}
+              onPress={() => {
+                track('mosque_jumuah_filter', { on: !jumuahOnly });
+                setJumuahOnly(!jumuahOnly);
+              }}
+            />
           </View>
         </View>
       </View>
@@ -318,7 +337,7 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
             />
           )}
           ListFooterComponent={
-            place && withJummah === 0 && visible.length > 0 ? (
+            !jumuahOnly && place && withJummah === 0 && visible.length > 0 ? (
               <AppText size="xs" tone="textMuted" style={{ marginTop: spacing.lg }}>
                 {jummahMissingForPlace(place.name)}
               </AppText>
