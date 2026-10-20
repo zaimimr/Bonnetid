@@ -14,7 +14,7 @@ function DuaScreen() {
   if (!dua) {
     return (
       <Screen edges={[]}>
-        <EmptyState message={t('duas.couldNotFindThis')} icon="book-outline" />
+        <EmptyState message={t('duas.couldNotFindThis')} icon="book-open" />
       </Screen>
     );
   }

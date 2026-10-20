@@ -15,7 +15,7 @@ export function DuaLink({ duaId, category, label }: DuaLinkProps) {
   return (
     <InlineLink
       label={label}
-      icon="book-outline"
+      icon="book-open"
       onPress={() =>
         duaId
           ? router.push({ pathname: '/duas/[id]', params: { id: duaId } })

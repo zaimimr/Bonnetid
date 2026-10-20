@@ -1,5 +1,5 @@
 import { Pressable, type StyleProp, type ViewStyle } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon, type IconName } from '@/components/icons';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius } from '@/theme/tokens';
 
@@ -7,7 +7,7 @@ const SIZE = 44;
 const ICON_SIZE = 20;
 
 export type IconButtonProps = {
-  name: keyof typeof Ionicons.glyphMap;
+  name: IconName;
   accessibilityLabel: string;
   onPress: () => void;
   disabled?: boolean;
@@ -45,7 +45,7 @@ export function IconButton({
         pressed && !disabled && { opacity: opacity.pressed },
         style,
       ]}>
-      <Ionicons name={name} size={ICON_SIZE} color={theme.colors.textPrimary} />
+      <Icon name={name} size={ICON_SIZE} color={theme.colors.textPrimary} />
     </Pressable>
   );
 }

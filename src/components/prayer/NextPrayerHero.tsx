@@ -1,5 +1,5 @@
 import { Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText, Card, mirrored } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -69,7 +69,7 @@ export function NextPrayerHero({
             {hijriText}
           </AppText>
         </View>
-        {onPressDate && <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} style={mirrored} />}
+        {onPressDate && <Icon name="caret-right" size={14} color={theme.colors.textMuted} style={mirrored} />}
       </Pressable>
     </Card>
   );

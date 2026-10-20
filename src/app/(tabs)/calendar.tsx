@@ -324,7 +324,7 @@ function DatesView({
         {eventsLoading && <Skeleton height={180} rounded="xl" />}
         {eventsError && <ErrorState onRetry={onEventsRetry} />}
         {!eventsLoading && !eventsError && events.length === 0 && (
-          <EmptyState message={t('calendar.noSpecialDaysThis')} icon="calendar-clear-outline" />
+          <EmptyState message={t('calendar.noSpecialDaysThis')} icon="calendar-blank" />
         )}
         <View style={{ gap: spacing.md }}>
           {events.map((event) => (

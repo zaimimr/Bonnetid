@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
 import { useEidMode } from '@/hooks/useEidMode';
@@ -27,7 +27,7 @@ export function EidBanner() {
         alignItems: 'center',
         gap: spacing.sm,
       }}>
-      <Ionicons name="moon-outline" size={18} color={theme.colors.onEidSurface} />
+      <Icon name="moon" size={18} color={theme.colors.onEidSurface} />
       <View style={{ flex: 1 }}>
         <AppText size="sm" weight="semibold" style={{ color: theme.colors.onEidSurface }}>
           {mode.phase === 'eve'

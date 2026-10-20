@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText, Badge, Card, mirrored } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -78,10 +78,10 @@ export function MosqueCard({
         </View>
 
         {accessory === 'chevron' && (
-          <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} style={mirrored} />
+          <Icon name="caret-right" size={18} color={theme.colors.textMuted} style={mirrored} />
         )}
         {accessory === 'check' && (
-          <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
+          <Icon name="check-circle" size={22} color={theme.colors.primary} />
         )}
       </View>
     </Card>

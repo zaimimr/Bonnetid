@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useIsFocused, useRouter, type Href } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon, type IconName } from '@/components/icons';
 import { AppText, Badge, Card, Divider, FeatureCard, ListRow, Screen } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { useIsCalculatedMode, usePrayerTrackerEnabled } from '@/store/settings';
-import { Icon, type IconName } from '@/components/icons';
 import { useFeature } from '@/hooks/useFeature';
 import { useSupportThread } from '@/hooks/useSupportThread';
 import { FeedbackSheet } from '@/components/feedback/FeedbackSheet';
@@ -91,7 +90,7 @@ export default function MoreScreen() {
       <Card padding="sm" rounded="xl">
         <ListRow
           title={t('more.sendFeedback')}
-          leading={<Ionicons name="chatbubble-ellipses-outline" size={20} color={theme.colors.primary} />}
+          leading={<Icon name="chat-circle-dots" size={20} color={theme.colors.primary} />}
           trailing={support.unread > 0 ? <Badge label={String(support.unread)} /> : undefined}
           chevron
           onPress={() => setFeedbackOpen(true)}
@@ -100,7 +99,7 @@ export default function MoreScreen() {
         <Divider />
         <ListRow
           title={t('more.whatSNew')}
-          leading={<Ionicons name="sparkles-outline" size={20} color={theme.colors.primary} />}
+          leading={<Icon name="sparkle" size={20} color={theme.colors.primary} />}
           chevron
           onPress={() => router.push('/whats-new')}
           style={ROW}

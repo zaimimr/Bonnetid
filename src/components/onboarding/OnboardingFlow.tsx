@@ -3,7 +3,7 @@ import { AppState, Linking, Platform, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import * as Location from 'expo-location';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon, type IconName } from '@/components/icons';
 import Animated, { FadeIn, FadeInDown, ReduceMotion } from 'react-native-reanimated';
 import { t } from '@/lib/i18n';
 import { AppText, Button, Card, Divider, ListRow, Screen } from '@/components/ui';
@@ -134,7 +134,7 @@ function LineArt() {
 }
 
 type StepShellProps = {
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: IconName;
   title: string;
   body: string;
   children?: React.ReactNode;
@@ -173,7 +173,7 @@ function StepShell({
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Ionicons name={icon} size={28} color={theme.colors.primary} />
+          <Icon name={icon} size={28} color={theme.colors.primary} />
         </View>
 
         <AppText size="xxl" weight="bold" heading>
@@ -200,8 +200,8 @@ function StatusLine({ tone, text }: { tone: 'success' | 'textMuted'; text: strin
   const theme = useTheme();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-      <Ionicons
-        name={tone === 'success' ? 'checkmark-circle' : 'information-circle-outline'}
+      <Icon
+        name={tone === 'success' ? 'check-circle' : 'info'}
         size={18}
         color={tone === 'success' ? theme.colors.success : theme.colors.textMuted}
       />
@@ -345,7 +345,7 @@ function LocationStep({ onNext }: { onNext: () => void }) {
 
   return (
     <StepShell
-      icon="location-outline"
+      icon="map-pin"
       title={t('onboarding.whereAreYou')}
       body={t('onboarding.toShowTheRight')}
       primaryLabel={
@@ -383,7 +383,7 @@ function MosqueStep({ onNext }: { onNext: () => void }) {
 
   return (
     <StepShell
-      icon="business-outline"
+      icon="mosque"
       title={t('onboarding.chooseYourMosque')}
       body={t('onboarding.chooseYourMosqueAnd')}
       primaryLabel={mosque ? CONTINUE : t('onboarding.chooseMosque')}
@@ -419,7 +419,7 @@ function AsrStep({ onNext }: { onNext: () => void }) {
 
   return (
     <StepShell
-      icon="partly-sunny-outline"
+      icon="cloud-sun"
       title={t('onboarding.chooseAsrMethod')}
       body={t('onboarding.theAsrTimeDepends')}
       primaryLabel={CONTINUE}
@@ -433,7 +433,7 @@ function AsrStep({ onNext }: { onNext: () => void }) {
               subtitle={option.description}
               trailing={
                 option.value === current ? (
-                  <Ionicons name="checkmark" size={22} color={theme.colors.primary} />
+                  <Icon name="check" size={22} color={theme.colors.primary} />
                 ) : undefined
               }
               onPress={() => setAsrMethod(option.value)}
@@ -468,7 +468,7 @@ function NotificationStep({ onNext }: { onNext: () => void }) {
   if (!notificationsSupported) {
     return (
       <StepShell
-        icon="notifications-outline"
+        icon="bell-simple"
         title={NOTIFY_TITLE}
         body={t('onboarding.notificationsRequireAnInstalled')}
         primaryLabel={CONTINUE}
@@ -479,7 +479,7 @@ function NotificationStep({ onNext }: { onNext: () => void }) {
 
   return (
     <StepShell
-      icon="notifications-outline"
+      icon="bell-simple"
       title={NOTIFY_TITLE}
       body={t('onboarding.getANotificationWhen')}
       primaryLabel={
@@ -526,7 +526,7 @@ function TrackerStep({ onNext }: { onNext: () => void }) {
 
   return (
     <StepShell
-      icon="checkmark-done-outline"
+      icon="prayer-tracker"
       title={t('onboarding.keepTrackOfYour')}
       body={body}
       primaryLabel={

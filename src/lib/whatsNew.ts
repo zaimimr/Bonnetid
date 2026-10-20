@@ -1,10 +1,11 @@
+import type { IconName } from '../components/icons/Icon.tsx';
 import type { FeatureFlag } from './featureFlags.ts';
 import { t } from './i18n.ts';
 
 export type WhatsNewItem = {
   title: string;
   body: string;
-  icon: string;
+  icon: IconName;
   route?: string;
   flag?: FeatureFlag;
   platform?: 'ios' | 'android';
@@ -19,17 +20,17 @@ export const WHATS_NEW: WhatsNewEntry[] = [
   {
     version: '1.10.0',
     items: [
-      { title: t('whatsNew.newWidgets'), body: t('whatsNew.newWidgetsBody'), icon: 'apps-outline' },
-      { title: t('whatsNew.hijriWidget'), body: t('whatsNew.hijriWidgetBody'), icon: 'calendar-outline' },
+      { title: t('whatsNew.newWidgets'), body: t('whatsNew.newWidgetsBody'), icon: 'squares-four' },
+      { title: t('whatsNew.hijriWidget'), body: t('whatsNew.hijriWidgetBody'), icon: 'calendar-dots' },
     ],
   },
   {
     version: '1.9.3',
     items: [
-      { title: t('whatsNew.languages'), body: t('whatsNew.languagesBody'), icon: 'language-outline' },
-      { title: t('whatsNew.newSettings'), body: t('whatsNew.newSettingsBody'), icon: 'settings-outline' },
-      { title: t('whatsNew.jumuahFriday'), body: t('whatsNew.jumuahFridayBody'), icon: 'people-outline' },
-      { title: t('whatsNew.vippsCopy'), body: t('whatsNew.vippsCopyBody'), icon: 'heart-outline' },
+      { title: t('whatsNew.languages'), body: t('whatsNew.languagesBody'), icon: 'translate' },
+      { title: t('whatsNew.newSettings'), body: t('whatsNew.newSettingsBody'), icon: 'gear-six' },
+      { title: t('whatsNew.jumuahFriday'), body: t('whatsNew.jumuahFridayBody'), icon: 'users-three' },
+      { title: t('whatsNew.vippsCopy'), body: t('whatsNew.vippsCopyBody'), icon: 'heart' },
     ],
   },
   {
@@ -38,37 +39,37 @@ export const WHATS_NEW: WhatsNewEntry[] = [
       {
         title: 'Siri',
         body: t('whatsNew.askSiriNarEr'),
-        icon: 'mic-outline',
+        icon: 'microphone',
         platform: 'ios',
       },
       {
         title: 'Apple Watch',
         body: t('whatsNew.theNextPrayerAnd'),
-        icon: 'watch-outline',
+        icon: 'watch',
         platform: 'ios',
       },
       {
         title: 'CarPlay',
         body: t('whatsNew.seeTheNextPrayer'),
-        icon: 'car-outline',
+        icon: 'car',
         platform: 'ios',
       },
       {
         title: t('whatsNew.shortcuts'),
         body: t('whatsNew.pressAndHoldThe'),
-        icon: 'flash-outline',
+        icon: 'lightning',
         platform: 'android',
       },
       {
         title: 'Wear OS',
         body: t('whatsNew.theNextPrayerAnd2'),
-        icon: 'watch-outline',
+        icon: 'watch',
         platform: 'android',
       },
       {
         title: t('whatsNew.duaAndDhikr'),
         body: t('whatsNew.duasForPrayerRamadan'),
-        icon: 'book-outline',
+        icon: 'book-open',
         route: '/duas',
         flag: 'duas',
       },
@@ -82,18 +83,18 @@ export const WHATS_NEW: WhatsNewEntry[] = [
       {
         title: t('whatsNew.hijriCalendar'),
         body: t('whatsNew.theCalendarCanShow'),
-        icon: 'calendar-outline',
+        icon: 'calendar-dots',
         route: '/calendar',
       },
       {
         title: t('whatsNew.moreTimesOnThe'),
         body: t('whatsNew.seeDuhaMidnightAnd'),
-        icon: 'time-outline',
+        icon: 'clock',
       },
       {
         title: t('whatsNew.giveUsFeedback'),
         body: t('whatsNew.writeToUsRight'),
-        icon: 'chatbubble-ellipses-outline',
+        icon: 'chat-circle-dots',
         route: '/feedback',
       },
     ],

@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { Card, Divider, ListRow, Toggle } from '@/components/ui';
 import { LockScreenPreview } from '@/components/settings/LockScreenPreview';
 import {
@@ -46,7 +46,7 @@ export default function TrackerSettingsScreen() {
             <ListRow
               title={t('settings.countdownOnTheLock')}
               subtitle={hasIsland ? t('settings.alsoInTheDynamic') : undefined}
-              leading={<Ionicons name="timer-outline" size={20} color={theme.colors.primary} />}
+              leading={<Icon name="timer" size={20} color={theme.colors.primary} />}
               trailing={<Toggle value={liveActivityEnabled} onValueChange={toggleLockScreen} />}
               style={ROW}
             />
@@ -55,7 +55,7 @@ export default function TrackerSettingsScreen() {
             <ListRow
               title={t('settings.showJamaatTimesIn')}
               subtitle={mosque ? mosque.name : t('settings.chooseAMosqueFirst')}
-              leading={<Ionicons name="people-outline" size={20} color={theme.colors.primary} />}
+              leading={<Icon name="users-three" size={20} color={theme.colors.primary} />}
               trailing={
                 <Toggle
                   value={widgetShowJamat}
@@ -74,7 +74,7 @@ export default function TrackerSettingsScreen() {
           <ListRow
             title={t('settings.markPrayers')}
             subtitle={t('settings.tickOffThePrayers')}
-            leading={<Ionicons name="checkmark-done-outline" size={20} color={theme.colors.primary} />}
+            leading={<Icon name="prayer-tracker" size={20} color={theme.colors.primary} />}
             trailing={<Toggle value={trackerEnabled} onValueChange={setTrackerEnabled} />}
             style={ROW}
           />
@@ -84,7 +84,7 @@ export default function TrackerSettingsScreen() {
               <ListRow
                 title={t('settings.prayerCardOnThe')}
                 subtitle={t('settings.countdownWithPrayedAnd')}
-                leading={<Ionicons name="timer-outline" size={20} color={theme.colors.primary} />}
+                leading={<Icon name="timer" size={20} color={theme.colors.primary} />}
                 trailing={<Toggle value={liveActivityEnabled} onValueChange={toggleLockScreen} />}
                 style={ROW}
               />

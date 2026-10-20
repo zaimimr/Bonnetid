@@ -1,5 +1,5 @@
 import { Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText, TextField } from '@/components/ui';
 import type { FlowQuestion, SurveyAnswer } from '@/lib/surveyFlow';
@@ -92,11 +92,11 @@ export function SurveyQuestionView({ question, value, onChange }: SurveyQuestion
             const selected = multiple ? selectedList.includes(choice) : value === choice;
             const icon = multiple
               ? selected
-                ? 'checkbox'
-                : 'square-outline'
+                ? 'check-square'
+                : 'square'
               : selected
-                ? 'radio-button-on'
-                : 'radio-button-off';
+                ? 'radio-button'
+                : 'circle';
             return (
               <Pressable
                 key={choice}
@@ -120,7 +120,7 @@ export function SurveyQuestionView({ question, value, onChange }: SurveyQuestion
                   borderRadius: radius.md,
                   backgroundColor: theme.colors.surfaceSunken,
                 }}>
-                <Ionicons name={icon} size={20} color={theme.colors.primary} />
+                <Icon name={icon} size={20} color={theme.colors.primary} weight={selected ? 'fill' : 'regular'} />
                 <AppText style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0 }}>{choice}</AppText>
               </Pressable>
             );

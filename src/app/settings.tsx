@@ -1,9 +1,8 @@
-import type { ComponentProps } from 'react';
 import { Linking, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon, type IconName } from '@/components/icons';
 import { PostHogMaskView } from 'posthog-react-native';
 import { AppText, Card, Divider, IconTile, ListRow, Toggle } from '@/components/ui';
 import {
@@ -28,13 +27,11 @@ import { t } from '@/lib/i18n';
 
 const PRIVACY_POLICY_URL = 'https://zaimimr.github.io/bonnetid-personvern/';
 
-type IconName = ComponentProps<typeof Ionicons>['name'];
-
 function Tile({ icon }: { icon: IconName }) {
   const theme = useTheme();
   return (
     <IconTile>
-      <Ionicons name={icon} size={20} color={theme.colors.primary} />
+      <Icon name={icon} size={20} color={theme.colors.primary} />
     </IconTile>
   );
 }
@@ -104,7 +101,7 @@ export default function SettingsScreen() {
                 ? t('settings.localTimesFollowsYour', { name: location.name })
                 : t('settings.followsYourLocation', { name: location.name })
             }
-            leading={<Tile icon="location-outline" />}
+            leading={<Tile icon="map-pin" />}
             style={ROW}
           />
         </PostHogMaskView>
@@ -114,7 +111,7 @@ export default function SettingsScreen() {
             <ListRow
               title={t('settings.myMosque')}
               subtitle={mosque?.name ?? t('settings.notSelected')}
-              leading={<Tile icon="business-outline" />}
+              leading={<Tile icon="mosque" />}
               chevron
               onPress={() => router.push('/mosque-picker')}
               style={ROW}
@@ -129,7 +126,7 @@ export default function SettingsScreen() {
               ? t('settings.setBy', { name: mosque.name })
               : asrMethodLabel(asrMethod ?? 'irn')
           }
-          leading={<Tile icon="partly-sunny-outline" />}
+          leading={<Tile icon="cloud-sun" />}
           chevron
           onPress={() => router.push('/asr-method')}
           style={ROW}
@@ -144,7 +141,7 @@ export default function SettingsScreen() {
                   ? calculationMethodLabel(calculationMethod)
                   : `${t('settings.automatic')} · ${calculationMethodLabel(autoCalculationMethod)}`
               }
-              leading={<Tile icon="calculator-outline" />}
+              leading={<Tile icon="calculator" />}
               chevron
               onPress={() => router.push('/calculation-method')}
               style={ROW}
@@ -156,7 +153,7 @@ export default function SettingsScreen() {
       <Card padding="sm" rounded="xl">
         <HubRow
           title={t('settings.notifications')}
-          icon="notifications-outline"
+          icon="bell-simple"
           value={notificationsEnabled ? ON : OFF}
           href="/settings-notifications"
         />
@@ -165,7 +162,7 @@ export default function SettingsScreen() {
             <Divider />
             <HubRow
               title={TRACKER_TITLE}
-              icon="checkmark-done-outline"
+              icon="prayer-tracker"
               href="/settings-tracker"
             />
           </>
@@ -173,7 +170,7 @@ export default function SettingsScreen() {
         <Divider />
         <HubRow
           title={t('settings.appearance')}
-          icon="contrast-outline"
+          icon="circle-half"
           value={themeLabel}
           href="/settings-appearance"
         />
@@ -182,7 +179,7 @@ export default function SettingsScreen() {
             <Divider />
             <HubRow
               title={t('settings.duas')}
-              icon="book-outline"
+              icon="book-open"
               href="/dua-settings"
             />
           </>
@@ -214,7 +211,7 @@ export default function SettingsScreen() {
           title={t('settings.helpUsImprove')}
           subtitle={t('settings.shareUsefulData')}
           leading={
-<Tile icon="analytics-outline" />
+<Tile icon="chart-line" />
           }
           trailing={
             <Toggle
@@ -231,9 +228,9 @@ export default function SettingsScreen() {
         <ListRow
           title={t('settings.privacy')}
           leading={
-<Tile icon="shield-checkmark-outline" />
+<Tile icon="shield-check" />
           }
-          trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
+          trailing={<Icon name="arrow-square-out" size={18} color={theme.colors.textMuted} />}
           onPress={() => Linking.openURL(PRIVACY_POLICY_URL).catch(() => {})}
           style={ROW}
         />

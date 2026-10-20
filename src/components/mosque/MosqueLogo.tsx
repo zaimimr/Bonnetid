@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, type StyleProp, type ViewStyle } from 'react-native';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { useTheme } from '@/theme';
 import { radius } from '@/theme/tokens';
 
@@ -48,7 +48,7 @@ export function MosqueLogo({ uri, size = 'md', style }: MosqueLogoProps) {
           onError={() => setFailed(true)}
         />
       ) : (
-        <Ionicons name="business-outline" size={icon} color={theme.colors.textMuted} />
+        <Icon name="mosque" size={icon} color={theme.colors.textMuted} />
       )}
     </View>
   );

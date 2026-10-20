@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { isRTL } from '@/lib/i18n';
 import { AppText, Card, mirrored } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -43,7 +43,7 @@ export function EventCard({ event, onPress }: EventCardProps) {
             {formatHijri(event.hijri_date, event.hijri_month_text)}
           </AppText>
         </View>
-        {onPress && <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} style={mirrored} />}
+        {onPress && <Icon name="caret-right" size={18} color={theme.colors.textMuted} style={mirrored} />}
       </View>
     </Card>
   );

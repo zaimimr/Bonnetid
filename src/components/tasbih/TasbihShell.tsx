@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInDown, FadeOut, ReduceMotion } from 'react-native-reanimated';
 import { t } from '@/lib/i18n';
@@ -45,7 +45,7 @@ function ResetButton({ onPress }: { onPress: () => void }) {
       accessibilityRole="button"
       accessibilityLabel={t('tasbih.reset')}
       style={({ pressed }) => ({ padding: 6, opacity: pressed ? opacity.pressed : 1 })}>
-      <Ionicons name="refresh" size={24} color={theme.colors.primary} />
+      <Icon name="arrow-clockwise" size={24} color={theme.colors.primary} />
     </Pressable>
   );
 }

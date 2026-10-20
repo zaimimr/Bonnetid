@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { AppText, Card, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
 import { PrayerActionButton, PrayerStatusMark } from '@/components/prayer/PrayerStatusControl';
 import { WeekOverview } from '@/components/prayer/WeekOverview';
@@ -120,7 +120,7 @@ function TrackerScreen() {
           {loading && <Skeleton height={240} rounded="xl" />}
           {!loading && failed && <ErrorState onRetry={refetch} />}
           {!loading && !failed && schedule.length === 0 && (
-            <EmptyState message={t('tracker.noPrayerTimesFor')} icon="time-outline" />
+            <EmptyState message={t('tracker.noPrayerTimesFor')} icon="clock" />
           )}
 
           {!loading && !failed && schedule.length > 0 && (
@@ -226,8 +226,8 @@ function DayArrow({
         },
         pressed && !disabled && { opacity: opacity.pressed },
       ]}>
-      <Ionicons
-        name={(direction === 'back') !== isRTL() ? 'chevron-back' : 'chevron-forward'}
+      <Icon
+        name={(direction === 'back') !== isRTL() ? 'caret-left' : 'caret-right'}
         size={20}
         color={theme.colors.textSecondary}
       />

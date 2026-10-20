@@ -42,7 +42,7 @@ export function Sheet({ visible, onClose, title, children }: SheetProps) {
             <AppText size="xl" weight="bold" heading style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0 }}>
               {title}
             </AppText>
-            <IconButton name="close" accessibilityLabel={t('common.close')} onPress={onClose} />
+            <IconButton name="x" accessibilityLabel={t('common.close')} onPress={onClose} />
           </View>
           <ScrollView bounces={false} keyboardShouldPersistTaps="handled">
             {children}

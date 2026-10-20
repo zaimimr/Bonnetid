@@ -1,5 +1,5 @@
 import { Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t, isRTL } from '@/lib/i18n';
 import { AppText, IconButton } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -65,7 +65,7 @@ export function MonthNav({
             style={{ flexShrink: 1 }}>
             {subtitle ?? ' '}
           </AppText>
-          {onSwap && <Ionicons name="swap-vertical" size={15} color={theme.colors.primary} />}
+          {onSwap && <Icon name="arrows-down-up" size={15} color={theme.colors.primary} />}
         </View>
       </Pressable>
 
@@ -98,12 +98,12 @@ export function MonthNav({
           </Pressable>
         )}
         <IconButton
-          name={isRTL() ? 'chevron-forward' : 'chevron-back'}
+          name={isRTL() ? 'caret-right' : 'caret-left'}
           accessibilityLabel={t('calendar.previousMonth')}
           onPress={onPrev}
         />
         <IconButton
-          name={isRTL() ? 'chevron-back' : 'chevron-forward'}
+          name={isRTL() ? 'caret-left' : 'caret-right'}
           accessibilityLabel={t('calendar.nextMonth')}
           onPress={onNext}
         />

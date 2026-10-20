@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText, Button } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -84,7 +84,7 @@ export const LeafletMap = forwardRef<LeafletMapHandle, LeafletMapProps>(function
           padding: spacing.xl,
           backgroundColor: theme.colors.surfaceSunken,
         }}>
-        <Ionicons name="map-outline" size={40} color={theme.colors.textMuted} />
+        <Icon name="map-trifold" size={40} color={theme.colors.textMuted} />
         <AppText tone="textSecondary" align="center">
           {fallbackMessage}
         </AppText>

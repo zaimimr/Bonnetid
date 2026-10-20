@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Linking, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import {
   Button,
   Card,
@@ -61,7 +61,7 @@ export default function NotificationCheckScreen() {
   if (!notificationsSupported) {
     return (
       <Screen edges={[]}>
-        <EmptyState message={t('settings.notAvailableInExpo')} icon="notifications-off-outline" />
+        <EmptyState message={t('settings.notAvailableInExpo')} icon="bell-simple-slash" />
       </Screen>
     );
   }
@@ -77,7 +77,7 @@ export default function NotificationCheckScreen() {
   if (!status.enabled) {
     return (
       <Screen edges={[]}>
-        <EmptyState message={t('settings.notificationsAreTurnedOff')} icon="notifications-off-outline" />
+        <EmptyState message={t('settings.notificationsAreTurnedOff')} icon="bell-simple-slash" />
       </Screen>
     );
   }
@@ -98,11 +98,11 @@ export default function NotificationCheckScreen() {
 
   const icon = (issue: NotificationIssue | null) =>
     issue == null ? (
-      <Ionicons name="checkmark-circle" size={22} color={theme.colors.success} />
+      <Icon name="check-circle" size={22} color={theme.colors.success} />
     ) : issue.severity === 'broken' ? (
-      <Ionicons name="alert-circle" size={22} color={theme.colors.danger} />
+      <Icon name="warning-circle" size={22} color={theme.colors.danger} />
     ) : (
-      <Ionicons name="information-circle" size={22} color={theme.colors.notice} />
+      <Icon name="info" size={22} color={theme.colors.notice} />
     );
 
   const fixButton = (issue: NotificationIssue | null, label: string, action: () => void | Promise<void>) =>
@@ -196,7 +196,7 @@ export default function NotificationCheckScreen() {
                   title={prayerLabel(item.prayer)}
                   subtitle={t('settings.at', { date: formatGregorianShort(at), time: formatLocalClock(at) })}
                   leading={
-                    <Ionicons name="notifications-outline" size={20} color={theme.colors.primary} />
+                    <Icon name="bell-simple" size={20} color={theme.colors.primary} />
                   }
                   style={ROW}
                 />

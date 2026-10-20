@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon, type IconName } from '@/components/icons';
 import { AppText } from './AppText';
 import { Button } from './Button';
 import { useTheme } from '@/theme';
@@ -16,7 +16,7 @@ export function ErrorState({
   const theme = useTheme();
   return (
     <View style={{ alignItems: 'center', gap: spacing.md, paddingVertical: spacing.xxxl }}>
-      <Ionicons name="cloud-offline-outline" size={40} color={theme.colors.textMuted} />
+      <Icon name="cloud-slash" size={40} color={theme.colors.textMuted} />
       <AppText tone="textSecondary" align="center">
         {message}
       </AppText>
@@ -29,15 +29,15 @@ export function ErrorState({
 
 export function EmptyState({
   message,
-  icon = 'search-outline',
+  icon = 'magnifying-glass',
 }: {
   message: string;
-  icon?: keyof typeof Ionicons.glyphMap;
+  icon?: IconName;
 }) {
   const theme = useTheme();
   return (
     <View style={{ alignItems: 'center', gap: spacing.md, paddingVertical: spacing.xxxl }}>
-      <Ionicons name={icon} size={40} color={theme.colors.textMuted} />
+      <Icon name={icon} size={40} color={theme.colors.textMuted} />
       <AppText tone="textSecondary" align="center">
         {message}
       </AppText>
@@ -49,7 +49,7 @@ export function NoTimesState({ period, onRetry }: { period: string; onRetry: () 
   const theme = useTheme();
   return (
     <View style={{ alignItems: 'center', gap: spacing.md, paddingVertical: spacing.xxxl }}>
-      <Ionicons name="calendar-clear-outline" size={40} color={theme.colors.textMuted} />
+      <Icon name="calendar-blank" size={40} color={theme.colors.textMuted} />
       <AppText tone="textSecondary" align="center">
         {t('common.prayerTimesForHave', { period })}
       </AppText>

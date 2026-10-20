@@ -20,7 +20,7 @@ function DuasScreen() {
   if (!selected) {
     return (
       <Screen edges={[]}>
-        <EmptyState message={t('duas.couldNotFindThis2')} icon="book-outline" />
+        <EmptyState message={t('duas.couldNotFindThis2')} icon="book-open" />
       </Screen>
     );
   }

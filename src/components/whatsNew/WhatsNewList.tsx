@@ -1,10 +1,9 @@
 import { Fragment } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText, Card, Divider, mirrored } from '@/components/ui';
-import { Icon } from '@/components/icons';
 import { useFeature } from '@/hooks/useFeature';
 import type { FeatureFlag } from '@/lib/featureFlags';
 import { track } from '@/lib/telemetry';
@@ -41,15 +40,7 @@ function WhatsNewRow({ item, onPress }: { item: WhatsNewItem; onPress?: () => vo
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        {item.icon === 'tasbih' ? (
-          <Icon name="tasbih" size={20} color={theme.colors.primary} />
-        ) : (
-          <Ionicons
-            name={item.icon as keyof typeof Ionicons.glyphMap}
-            size={20}
-            color={theme.colors.primary}
-          />
-        )}
+        <Icon name={item.icon} size={20} color={theme.colors.primary} />
       </View>
       <View style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, gap: spacing.xxs }}>
         <AppText weight="semibold">{item.title}</AppText>
@@ -58,8 +49,8 @@ function WhatsNewRow({ item, onPress }: { item: WhatsNewItem; onPress?: () => vo
         </AppText>
       </View>
       {onPress ? (
-        <Ionicons
-          name="chevron-forward"
+        <Icon
+          name="caret-right"
           size={18}
           color={theme.colors.textMuted}
           style={[{ alignSelf: 'center' }, mirrored]}

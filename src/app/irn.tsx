@@ -1,6 +1,6 @@
 import { Linking, View } from 'react-native';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { AppText, Card, Divider, ListRow, Screen, SectionHeader } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
@@ -43,8 +43,8 @@ export default function IrnScreen() {
         <ListRow
           title="Felles bønnetid"
           subtitle={t('irn.aboutTheProjectBehind')}
-          leading={<Ionicons name="time-outline" size={20} color={theme.colors.primary} />}
-          trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
+          leading={<Icon name="clock" size={20} color={theme.colors.primary} />}
+          trailing={<Icon name="arrow-square-out" size={18} color={theme.colors.textMuted} />}
           onPress={() => Linking.openURL(PROJECT_URL).catch(() => {})}
           style={{ paddingHorizontal: spacing.md }}
         />
@@ -52,8 +52,8 @@ export default function IrnScreen() {
         <ListRow
           title="irn.no"
           subtitle={t('irn.islamicCouncilOfNorway2')}
-          leading={<Ionicons name="globe-outline" size={20} color={theme.colors.primary} />}
-          trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
+          leading={<Icon name="globe" size={20} color={theme.colors.primary} />}
+          trailing={<Icon name="arrow-square-out" size={18} color={theme.colors.textMuted} />}
           onPress={() => Linking.openURL(HOME_URL).catch(() => {})}
           style={{ paddingHorizontal: spacing.md }}
         />

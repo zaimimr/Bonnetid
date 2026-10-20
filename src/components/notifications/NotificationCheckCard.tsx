@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText, Card, mirrored } from '@/components/ui';
 import { useNotificationHealth } from '@/hooks/useNotificationHealth';
@@ -25,7 +25,7 @@ export function NotificationCheckCard() {
         router.push('/notification-check');
       }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-        <Ionicons name="alert-circle" size={24} color={theme.colors.danger} />
+        <Icon name="warning-circle" size={24} color={theme.colors.danger} />
         <View style={{ flex: 1 }}>
           <AppText weight="semibold">
             {t('notifications.prayerNotificationsAreNot')}
@@ -34,7 +34,7 @@ export function NotificationCheckCard() {
             {NOTIFICATION_ISSUE_LABELS[broken.key]}
           </AppText>
         </View>
-        <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} style={mirrored} />
+        <Icon name="caret-right" size={18} color={theme.colors.textMuted} style={mirrored} />
       </View>
     </Card>
   );

@@ -1,6 +1,6 @@
 import { Pressable, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText, Badge } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -20,7 +20,7 @@ export function MosqueSelectAction({
   if (selected) {
     return (
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-        <Ionicons name="checkmark-circle" size={15} color={theme.colors.primary} />
+        <Icon name="check-circle" size={15} color={theme.colors.primary} />
         <Badge label={t('mosque.myMosque')} variant="primary" />
       </View>
     );
@@ -51,7 +51,7 @@ export function MosqueSelectAction({
         },
         pressed && { opacity: opacity.pressed },
       ]}>
-      <Ionicons name="add-circle-outline" size={15} color={theme.colors.onPrimarySoft} />
+      <Icon name="plus-circle" size={15} color={theme.colors.onPrimarySoft} />
       <AppText size="sm" weight="semibold" tone="onPrimarySoft" style={{ flexShrink: 1 }}>
         {t('mosque.chooseAsMyMosque2')}
       </AppText>

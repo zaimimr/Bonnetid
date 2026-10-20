@@ -11,7 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import Svg, { Circle, Line, Polygon, Polyline } from 'react-native-svg';
 import { t } from '@/lib/i18n';
 import { AppText, Button, EmptyState } from '@/components/ui';
@@ -70,7 +70,7 @@ export function QiblaAr({ qiblaBearing, uncertaintyDegrees = 0 }: QiblaArProps) 
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: spacing.lg }}>
         <EmptyState
           message={t('qibla.allowCameraAccessTo')}
-          icon="camera-outline"
+          icon="camera"
         />
         {cameraPermission.canAskAgain && (
           <Button
@@ -87,7 +87,7 @@ export function QiblaAr({ qiblaBearing, uncertaintyDegrees = 0 }: QiblaArProps) 
     return (
       <EmptyState
         message={t('qibla.allowLocationAccessTo2')}
-        icon="compass-outline"
+        icon="compass"
       />
     );
   }
@@ -96,7 +96,7 @@ export function QiblaAr({ qiblaBearing, uncertaintyDegrees = 0 }: QiblaArProps) 
     return (
       <EmptyState
         message={t('qibla.thisDeviceLacksThe')}
-        icon="hardware-chip-outline"
+        icon="cpu"
       />
     );
   }
@@ -244,7 +244,7 @@ function ArOverlay({
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Ionicons name="cube" size={24} color={guideColor} />
+          <Icon name="cube" size={24} color={guideColor} />
         </View>
       )}
 
@@ -285,7 +285,7 @@ function ArOverlay({
             gap: spacing.sm,
             maxWidth: '100%',
           }}>
-          {aligned && <Ionicons name="checkmark-circle" size={18} color={AR_ALIGNED} />}
+          {aligned && <Icon name="check-circle" size={18} color={AR_ALIGNED} />}
           <AppText
             size="sm"
             weight="semibold"
@@ -374,9 +374,9 @@ function RotateHint() {
           alignItems: 'center',
           gap: spacing.md,
         }}>
-        <Ionicons name="sync-outline" size={20} color={AR_INK} />
+        <Icon name="arrows-clockwise" size={20} color={AR_INK} />
         <Animated.View style={phoneStyle}>
-          <Ionicons name="phone-portrait-outline" size={30} color={AR_INK} />
+          <Icon name="device-mobile" size={30} color={AR_INK} />
         </Animated.View>
       </View>
       <View
@@ -425,11 +425,11 @@ function IntroCoach() {
         },
       ]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.lg }}>
-        <Ionicons name="sync-outline" size={40} color={AR_INK} />
+        <Icon name="arrows-clockwise" size={40} color={AR_INK} />
         <Animated.View style={phoneStyle}>
-          <Ionicons name="phone-portrait-outline" size={96} color={AR_INK} />
+          <Icon name="device-mobile" size={96} color={AR_INK} />
         </Animated.View>
-        <Ionicons name="sync-outline" size={40} color={AR_INK} />
+        <Icon name="arrows-clockwise" size={40} color={AR_INK} />
       </View>
       <View style={{ alignItems: 'center', gap: spacing.sm }}>
         <AppText size="xl" weight="bold" color={AR_INK} align="center" style={AR_TEXT_SHADOW}>
@@ -477,9 +477,9 @@ function TiltHint() {
           alignItems: 'center',
           gap: spacing.md,
         }}>
-        <Ionicons name="arrow-up" size={20} color={AR_INK} />
+        <Icon name="arrow-up" size={20} color={AR_INK} />
         <Animated.View style={phoneStyle}>
-          <Ionicons name="phone-portrait-outline" size={30} color={AR_INK} />
+          <Icon name="device-mobile" size={30} color={AR_INK} />
         </Animated.View>
       </View>
       <View
@@ -525,8 +525,8 @@ function EdgeArrow({ side, viewport }: { side: 'left' | 'right'; viewport: Viewp
         },
         animatedStyle,
       ]}>
-      <Ionicons
-        name={side === 'left' ? 'chevron-back' : 'chevron-forward'}
+      <Icon
+        name={side === 'left' ? 'caret-left' : 'caret-right'}
         size={44}
         color={AR_INK}
       />

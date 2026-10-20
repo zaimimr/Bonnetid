@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { AppText, Card, Divider, ListRow, Screen } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
@@ -37,7 +37,7 @@ export default function NotificationSoundScreen() {
               subtitle={option.description}
               trailing={
                 option.key === notificationSound ? (
-                  <Ionicons name="checkmark" size={22} color={theme.colors.primary} />
+                  <Icon name="check" size={22} color={theme.colors.primary} />
                 ) : undefined
               }
               onPress={() => selectSound(option)}

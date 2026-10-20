@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon, type IconName } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText, Card } from '@/components/ui';
 import type { ExtraTime, ExtraTimeName } from '@/lib/extraTimes';
 import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 
-const ICONS: Record<ExtraTimeName, keyof typeof Ionicons.glyphMap> = {
-  duha: 'sunny-outline',
-  midnight: 'moon-outline',
-  tahajjud: 'star-outline',
+const ICONS: Record<ExtraTimeName, IconName> = {
+  duha: 'sun',
+  midnight: 'moon',
+  tahajjud: 'star',
 };
 
 export function ExtraTimesCard({ times }: { times: ExtraTime[] }) {
@@ -37,7 +37,7 @@ export function ExtraTimesCard({ times }: { times: ExtraTime[] }) {
                 borderBottomWidth: index === times.length - 1 ? 0 : 1,
                 borderBottomColor: theme.colors.border,
               }}>
-              <Ionicons name={ICONS[entry.name]} size={20} color={theme.colors.textMuted} />
+              <Icon name={ICONS[entry.name]} size={20} color={theme.colors.textMuted} />
               <View style={{ flex: 1, gap: spacing.xxs }}>
                 <AppText weight="medium">{entry.label}</AppText>
                 {held === entry.name && (
@@ -77,8 +77,8 @@ export function ExtraTimesCard({ times }: { times: ExtraTime[] }) {
             ? t('prayer.showFewerTimes')
             : t('prayer.showMoreTimes')}
         </AppText>
-        <Ionicons
-          name={expanded ? 'chevron-up' : 'chevron-down'}
+        <Icon
+          name={expanded ? 'caret-up' : 'caret-down'}
           size={16}
           color={theme.colors.onPrimarySoft}
         />

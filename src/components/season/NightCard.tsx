@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { DuaLink } from '@/components/duas/DuaLink';
 import { AppText, Card } from '@/components/ui';
@@ -30,7 +30,7 @@ export function NightCard({ now, onPress }: NightCardProps) {
           alignItems: isStacked ? 'flex-start' : 'center',
           gap: spacing.md,
         }}>
-        <Ionicons name="moon-outline" size={22} color={theme.colors.seasonHighlight} />
+        <Icon name="moon" size={22} color={theme.colors.seasonHighlight} />
         <View style={{ flex: isStacked ? undefined : 1, gap: spacing.xxs }}>
           <AppText weight="semibold">{nightHeadline(night)}</AppText>
           <AppText size="sm" tone="textSecondary">

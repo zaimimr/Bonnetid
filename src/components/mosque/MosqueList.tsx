@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { useMosques } from '@/api/queries';
 import type { Mosque } from '@/api/types';
@@ -180,7 +180,7 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
   if (calculated) {
     return (
       <Screen edges={[]}>
-        <EmptyState message={CALCULATED_MESSAGE[mode]} icon="business-outline" />
+        <EmptyState message={CALCULATED_MESSAGE[mode]} icon="mosque" />
       </Screen>
     );
   }
@@ -199,7 +199,7 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
               borderRadius: radius.md,
               paddingHorizontal: spacing.md,
             }}>
-            <Ionicons name="search" size={18} color={theme.colors.textMuted} />
+            <Icon name="magnifying-glass" size={18} color={theme.colors.textMuted} />
             <PostHogMaskView style={{ flex: 1 }}>
               <TextInput
                 value={query}
@@ -218,7 +218,7 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
             </PostHogMaskView>
             {query.length > 0 && (
               <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel={t('mosque.clearSearch')}>
-                <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
+                <Icon name="x-circle" size={18} color={theme.colors.textMuted} />
               </Pressable>
             )}
           </View>
@@ -249,13 +249,13 @@ export function MosqueList({ mode }: { mode: MosqueListMode }) {
             }}>
             <SortChip
               label={t('mosque.nearestMe')}
-              icon="navigate-outline"
+              icon="navigation-arrow"
               active={sort === 'distance'}
               onPress={() => setSort('distance')}
             />
             <SortChip
               label={t('mosque.nameAZ')}
-              icon="text-outline"
+              icon="text-aa"
               active={sort === 'name'}
               onPress={() => setSort('name')}
             />
