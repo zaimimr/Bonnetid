@@ -8,6 +8,17 @@ import type { PrayerName } from '@/lib/prayerSchedule';
 import type { ArabicFontKey, ArabicSizeKey } from '@/theme/tokens';
 import { addActiveDay, localDayKey } from '@/lib/reviewTrigger';
 import { migrateSettings } from './settingsMigration';
+import {
+  DEFAULT_HOME_LAYOUT,
+  DEFAULT_SHORTCUTS,
+  DEFAULT_TAB_SLOTS,
+  normalizeHomeLayout,
+  normalizeSlots,
+  MAX_SHORTCUTS,
+  MAX_TAB_SLOTS,
+  type FeatureId,
+  type HomeBlock,
+} from '@/lib/customization';
 import { useFeature } from '@/hooks/useFeature';
 
 export type LocationMode = 'norway' | 'calculated';
@@ -110,6 +121,12 @@ type SettingsState = {
   markAnnouncementRead: (orgNr: string, announcement: string) => void;
   dismissedEidLeave: string[];
   dismissEidLeave: (eidIso: string) => void;
+  tabSlots: FeatureId[];
+  setTabSlots: (tabSlots: FeatureId[]) => void;
+  homeLayout: HomeBlock[];
+  setHomeLayout: (homeLayout: HomeBlock[]) => void;
+  shortcuts: FeatureId[];
+  setShortcuts: (shortcuts: FeatureId[]) => void;
   completeOnboarding: (version: string) => void;
   registerLaunch: () => void;
   markReviewRequested: (version: string) => void;
@@ -215,6 +232,12 @@ export const useSettings = create<SettingsState>()(
       dismissedEidLeave: [],
       dismissEidLeave: (eidIso) =>
         set((state) => ({ dismissedEidLeave: [...state.dismissedEidLeave, eidIso] })),
+      tabSlots: DEFAULT_TAB_SLOTS,
+      setTabSlots: (tabSlots) => set({ tabSlots }),
+      homeLayout: DEFAULT_HOME_LAYOUT,
+      setHomeLayout: (homeLayout) => set({ homeLayout }),
+      shortcuts: DEFAULT_SHORTCUTS,
+      setShortcuts: (shortcuts) => set({ shortcuts }),
       completeOnboarding: (version) => set({ onboardingDone: true, lastSeenWhatsNew: version }),
       registerLaunch: () =>
         set((state) => ({
@@ -265,7 +288,7 @@ export const useSettings = create<SettingsState>()(
     {
       name: 'bonnetid-settings',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 5,
+      version: 6,
       migrate: (persisted) => {
         const state = persisted as Partial<SettingsState> | undefined;
         if (!state) return persisted as SettingsState;
@@ -282,6 +305,13 @@ export const useSettings = create<SettingsState>()(
         if (state.calculationMethod === DEFAULT_CALCULATION_METHOD) {
           state.calculationMethod = null;
         }
+        state.tabSlots = normalizeSlots(state.tabSlots, MAX_TAB_SLOTS, DEFAULT_TAB_SLOTS);
+        state.shortcuts = normalizeSlots(state.shortcuts, MAX_SHORTCUTS, DEFAULT_SHORTCUTS);
+        state.homeLayout = Array.isArray(state.homeLayout)
+          ? normalizeHomeLayout(state.homeLayout)
+          : DEFAULT_HOME_LAYOUT.map((block) =>
+              block.id === 'shortcuts' ? { ...block, visible: false } : block,
+            );
         return migrateSettings(
           state as Record<string, unknown>,
           '1.8.0',

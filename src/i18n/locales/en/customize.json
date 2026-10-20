@@ -1,0 +1,30 @@
+{
+  "tabBar": "Tab bar",
+  "customizeHome": "Customize Overview",
+  "customize": "Customize",
+  "shortcuts": "Shortcuts",
+  "chooseUpTo": "Choose up to {{count}}",
+  "cards": "Cards",
+  "reset": "Reset",
+  "moveUp": "Move up",
+  "moveDown": "Move down",
+  "block": {
+    "nextPrayer": "Next prayer",
+    "shortcuts": "Shortcuts",
+    "afterPrayer": "After the prayer",
+    "announcement": "Mosque announcement",
+    "season": "Ramadan and holy days",
+    "night": "Blessed nights",
+    "prayerTimes": "Today's prayer times",
+    "specialDays": "Upcoming special days"
+  },
+  "feature": {
+    "calendar": "Calendar",
+    "qibla": "Qibla",
+    "mosques": "Mosques",
+    "jumuah": "Jumuah",
+    "duas": "Dua",
+    "tasbih": "Tasbih",
+    "tracker": "Tracker"
+  }
+}

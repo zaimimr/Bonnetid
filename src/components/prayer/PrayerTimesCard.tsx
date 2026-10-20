@@ -260,11 +260,11 @@ export function PrayerTimesCard({
             },
             pressed && { opacity: opacity.pressed },
           ]}>
-          <Ionicons name="people-outline" size={18} color={theme.colors.primary} />
+          <Icon name="minbar" size={18} color={theme.colors.primary} />
           <AppText size="sm" weight="medium" tone="primary" style={{ flex: 1 }}>
             {t('prayer.jumuahNearby')}
           </AppText>
-          <Ionicons name="chevron-forward" size={16} color={theme.colors.primary} style={mirrored} />
+          <Icon name="caret-right" size={16} color={theme.colors.primary} style={mirrored} />
         </Pressable>
       )}
 

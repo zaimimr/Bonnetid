@@ -14,7 +14,7 @@ import { duration, spacing } from '@/theme/tokens';
 
 export type AppTabBarProps = Parameters<
   NonNullable<ComponentProps<typeof Tabs>['tabBar']>
->[0];
+>[0] & { visible: string[] };
 
 const PILL_WIDTH = 64;
 const PILL_HEIGHT = 32;
@@ -68,10 +68,13 @@ function SlidingPill({
   );
 }
 
-export function AppTabBar({ state, descriptors, navigation, insets }: AppTabBarProps) {
+export function AppTabBar({ state, descriptors, navigation, insets, visible }: AppTabBarProps) {
   const theme = useTheme();
   const [width, setWidth] = useState(0);
-  const itemWidth = width / state.routes.length;
+  const routes = state.routes.filter((route) => visible.includes(route.name));
+  const itemWidth = width / routes.length;
+  const focusedKey = state.routes[state.index]?.key;
+  const pillIndex = routes.findIndex((route) => route.key === focusedKey);
 
   return (
     <View
@@ -84,12 +87,12 @@ export function AppTabBar({ state, descriptors, navigation, insets }: AppTabBarP
         paddingTop: spacing.md,
         paddingBottom: Math.max(insets.bottom, spacing.md),
       }}>
-      {itemWidth > 0 && (
-        <SlidingPill index={state.index} itemWidth={itemWidth} color={theme.colors.primarySoft} />
+      {itemWidth > 0 && pillIndex >= 0 && (
+        <SlidingPill index={pillIndex} itemWidth={itemWidth} color={theme.colors.primarySoft} />
       )}
-      {state.routes.map((route, index) => {
+      {routes.map((route) => {
         const { options } = descriptors[route.key];
-        const focused = state.index === index;
+        const focused = route.key === focusedKey;
         const color = focused ? theme.colors.tabBarActive : theme.colors.tabBarInactive;
         const title = options.title ?? route.name;
 

@@ -1,10 +1,12 @@
-import { Card, SegmentedControl } from '@/components/ui';
-import { Field, SettingsPage } from '@/components/settings/shared';
+import { useRouter } from 'expo-router';
+import { Card, Divider, ListRow, SegmentedControl } from '@/components/ui';
+import { Field, ROW, SettingsPage } from '@/components/settings/shared';
 import { track } from '@/lib/telemetry';
 import { useSettings } from '@/store/settings';
 import { t } from '@/lib/i18n';
 
 export default function AppearanceSettingsScreen() {
+  const router = useRouter();
   const themePreference = useSettings((state) => state.themePreference);
   const setThemePreference = useSettings((state) => state.setThemePreference);
 
@@ -25,6 +27,21 @@ export default function AppearanceSettingsScreen() {
             ]}
           />
         </Field>
+      </Card>
+      <Card padding="sm" rounded="xl">
+        <ListRow
+          title={t('customize.tabBar')}
+          chevron
+          onPress={() => router.push('/settings-tabs')}
+          style={ROW}
+        />
+        <Divider />
+        <ListRow
+          title={t('customize.customizeHome')}
+          chevron
+          onPress={() => router.push('/settings-home')}
+          style={ROW}
+        />
       </Card>
     </SettingsPage>
   );

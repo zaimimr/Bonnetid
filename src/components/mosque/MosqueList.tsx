@@ -271,7 +271,7 @@ export function MosqueList({
             />
             <SortChip
               label={t('mosque.jumuah')}
-              icon="people-outline"
+              icon="minbar"
               active={jumuahOnly}
               onPress={() => {
                 track('mosque_jumuah_filter', { on: !jumuahOnly });
