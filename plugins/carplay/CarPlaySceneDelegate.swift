@@ -12,7 +12,7 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
   private let prayersTemplate: CPListTemplate = {
     let template = CPListTemplate(title: "Neste bønn", sections: [])
     template.tabTitle = "Neste bønn"
-    template.tabImage = UIImage(systemName: "clock")
+    template.tabImage = UIImage(named: "bt.clock")
     template.emptyViewTitleVariants = [CarPlayText.missing]
     return template
   }()
@@ -20,7 +20,7 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
   private let mosquesTemplate: CPListTemplate = {
     let template = CPListTemplate(title: "Moskeer", sections: [])
     template.tabTitle = "Moskeer"
-    template.tabImage = UIImage(systemName: "mappin.and.ellipse")
+    template.tabImage = UIImage(named: "bt.mosque-pin")
     template.emptyViewTitleVariants = [CarPlayText.noMosques]
     return template
   }()

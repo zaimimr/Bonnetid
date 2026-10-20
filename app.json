@@ -121,6 +121,7 @@
       "./plugins/withSceneLifecycle",
       "./plugins/withSiriShortcuts",
       "./plugins/withCarPlay",
+      "./plugins/withSymbols",
       "expo-image",
       "expo-status-bar",
       [

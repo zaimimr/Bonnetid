@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText, Card } from '@/components/ui';
 import { formatDistance } from '@/lib/geo';
@@ -24,7 +24,7 @@ export function QiblaHaramNotice({ distanceKm }: QiblaHaramNoticeProps) {
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <Ionicons name="cube" size={30} color={theme.colors.onPrimarySoft} />
+        <Icon name="cube" size={30} color={theme.colors.onPrimarySoft} />
       </View>
       <AppText size="xl" weight="bold" heading align="center">
         {t('qibla.youAreAtThe')}

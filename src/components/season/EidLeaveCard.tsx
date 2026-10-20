@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText, Card, IconButton } from '@/components/ui';
 import { useHijriLookahead } from '@/hooks/useHijriSeason';
@@ -35,7 +35,7 @@ export function EidLeaveCard({ now }: { now: Date }) {
       <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm }}>
         <View style={{ flex: 1, gap: spacing.xs }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-            <Ionicons name="megaphone-outline" size={15} color={theme.colors.primary} />
+            <Icon name="megaphone" size={15} color={theme.colors.primary} />
             <AppText size="xs" weight="semibold" tone="primary" style={{ flex: 1 }}>
               {leave.eid === 'adha'
                 ? t('season.timeOffForEid')
@@ -50,7 +50,7 @@ export function EidLeaveCard({ now }: { now: Date }) {
           </AppText>
         </View>
         <IconButton
-          name="close"
+          name="x"
           accessibilityLabel={t('season.hide')}
           onPress={() => {
             track('eid_leave_dismissed', { eid: leave.eid });

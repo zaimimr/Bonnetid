@@ -1,5 +1,5 @@
 import { Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -15,8 +15,8 @@ export function PrayerStatusMark({ label }: PrayerStatusMarkProps) {
   const theme = useTheme();
 
   return (
-    <Ionicons
-      name="checkmark"
+    <Icon
+      name="check"
       size={STATUS_MARK_SIZE}
       color={theme.colors.textMuted}
       accessibilityLabel={t('prayer.isMarkedAsPrayed', { label })}
@@ -59,8 +59,8 @@ export function PrayerActionButton({ label, marked, onPress }: PrayerActionButto
           },
           pressed && { opacity: opacity.pressed },
         ]}>
-        <Ionicons
-          name={marked ? 'arrow-undo-outline' : 'checkmark'}
+        <Icon
+          name={marked ? 'arrow-u-up-left' : 'check'}
           size={18}
           color={marked ? theme.colors.textSecondary : theme.colors.onPrimary}
         />

@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { ActionSheetIOS, Linking, Platform, Pressable, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { useMosque, usePrayerTimes } from '@/api/queries';
 import { toPreference, useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { useEidPeriod } from '@/hooks/useEidPeriod';
@@ -180,7 +180,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                 disabled={!mosque.lat || !mosque.lon}
                 hitSlop={spacing.xs}
                 style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-                <Ionicons name="location-outline" size={16} color={theme.colors.primary} />
+                <Icon name="map-pin" size={16} color={theme.colors.primary} />
                 <AppText
                   size="sm"
                   tone={mosque.lat && mosque.lon ? 'primary' : 'textSecondary'}
@@ -196,7 +196,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
             ) : null}
             {ASR_METHOD_LABELS[mosque.asr_method] && (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-                <Ionicons name="time-outline" size={16} color={theme.colors.textMuted} />
+                <Icon name="clock" size={16} color={theme.colors.textMuted} />
                 <AppText size="sm" tone="textSecondary" style={{ flex: 1 }}>
                   {ASR_METHOD_LABELS[mosque.asr_method]}
                 </AppText>
@@ -230,8 +230,8 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                   ? t('mosque.opensVippsNumber', { vipps_number: mosque.vipps_number })
                   : t('mosque.opensVipps')
               }
-              leading={<Ionicons name="heart-outline" size={20} color={theme.colors.primary} />}
-              trailing={<Ionicons name="open-outline" size={18} color={theme.colors.textMuted} />}
+              leading={<Icon name="heart" size={20} color={theme.colors.primary} />}
+              trailing={<Icon name="arrow-square-out" size={18} color={theme.colors.textMuted} />}
               onPress={() => {
                 track('mosque_donation_opened', { source: 'detail' });
                 openVipps(mosque.vipps_number);
@@ -338,7 +338,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
                   key={`${time}-${index}`}
                   title={eidTimes.length > 1 ? `${eidTitle} ${index + 1}` : eidTitle}
                   leading={
-                    <Ionicons name="sparkles-outline" size={20} color={theme.colors.primary} />
+                    <Icon name="sparkle" size={20} color={theme.colors.primary} />
                   }
                   trailing={
                     <AppText weight="semibold" tabular>
@@ -406,14 +406,14 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
             {mosque.contact_name && (
               <ListRow
                 title={mosque.contact_name}
-                leading={<Ionicons name="person-outline" size={20} color={theme.colors.primary} />}
+                leading={<Icon name="user" size={20} color={theme.colors.primary} />}
                 style={{ paddingHorizontal: spacing.md }}
               />
             )}
             {mosque.contact_phone && (
               <ListRow
                 title={mosque.contact_phone}
-                leading={<Ionicons name="call-outline" size={20} color={theme.colors.primary} />}
+                leading={<Icon name="phone" size={20} color={theme.colors.primary} />}
                 onPress={() => Linking.openURL(`tel:${mosque.contact_phone}`).catch(() => {})}
                 style={{ paddingHorizontal: spacing.md }}
               />
@@ -421,7 +421,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
             {mosque.contact_email && (
               <ListRow
                 title={mosque.contact_email}
-                leading={<Ionicons name="mail-outline" size={20} color={theme.colors.primary} />}
+                leading={<Icon name="envelope-simple" size={20} color={theme.colors.primary} />}
                 onPress={() => Linking.openURL(`mailto:${mosque.contact_email}`).catch(() => {})}
                 style={{ paddingHorizontal: spacing.md }}
               />
@@ -429,7 +429,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
             {mosque.homepage && (
               <ListRow
                 title={mosque.homepage.replace(/^https?:\/\//i, '')}
-                leading={<Ionicons name="globe-outline" size={20} color={theme.colors.primary} />}
+                leading={<Icon name="globe" size={20} color={theme.colors.primary} />}
                 onPress={() => Linking.openURL(mosque.homepage!).catch(() => {})}
                 style={{ paddingHorizontal: spacing.md }}
               />

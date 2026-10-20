@@ -6,7 +6,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import Svg, { Path } from 'react-native-svg';
 import { t } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
@@ -104,7 +104,7 @@ export function QiblaCompass({
   return (
     <View style={{ alignItems: 'center', gap: spacing.xl }}>
       <View style={{ width: compassSize, height: compassSize + 20, alignItems: 'center' }}>
-        <Ionicons
+        <Icon
           name="caret-down"
           size={26}
           color={isAligned ? theme.colors.primary : theme.colors.textMuted}
@@ -182,7 +182,7 @@ export function QiblaCompass({
                 },
                 kaabaStyle,
               ]}>
-              <Ionicons
+              <Icon
                 name="cube"
                 size={22}
                 color={isAligned ? theme.colors.onPrimary : theme.colors.onPrimarySoft}

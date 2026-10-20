@@ -10,7 +10,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
 import { BEADS_PER_ROUND, SEQUENCE, isClosing } from '@/lib/tasbih';
@@ -143,7 +143,7 @@ function CompleteCheck({ size }: { size: number }) {
         circleStyle,
       ]}>
       <Animated.View style={tickStyle}>
-        <Ionicons name="checkmark" size={size * 0.55} color={theme.colors.onPrimary} />
+        <Icon name="check" size={size * 0.55} color={theme.colors.onPrimary} />
       </Animated.View>
     </Animated.View>
   );

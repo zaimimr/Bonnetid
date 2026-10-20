@@ -172,7 +172,7 @@ function MosquePinCard({
             </View>
           )}
         </View>
-        <IconButton name="close" accessibilityLabel={t('mosque.close')} onPress={onClose} />
+        <IconButton name="x" accessibilityLabel={t('mosque.close')} onPress={onClose} />
       </View>
       <Button label={actionLabel} onPress={onSelect} fullWidth style={{ marginTop: spacing.md }} />
     </Card>

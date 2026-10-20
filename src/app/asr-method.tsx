@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { AppText, Card, Divider, ListRow, Screen } from '@/components/ui';
 import { useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
 import { ASR_METHOD_OPTIONS, type AsrMethodOption } from '@/lib/asrMethods';
@@ -36,7 +36,7 @@ export default function AsrMethodScreen() {
               subtitle={option.description}
               trailing={
                 option.value === current ? (
-                  <Ionicons name="checkmark" size={22} color={theme.colors.primary} />
+                  <Icon name="check" size={22} color={theme.colors.primary} />
                 ) : undefined
               }
               onPress={locked ? undefined : () => select(option)}

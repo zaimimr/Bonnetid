@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
 import * as Device from 'expo-device';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { AppText, Button, Card, SegmentedControl, Screen, TextField } from '@/components/ui';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useSupportThread } from '@/hooks/useSupportThread';
@@ -77,7 +77,7 @@ export default function FeedbackScreen() {
     return (
       <Screen edges={['bottom']}>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md }}>
-          <Ionicons name="checkmark-circle" size={72} color={theme.colors.success} />
+          <Icon name="check-circle" size={72} color={theme.colors.success} />
           <AppText size="xl" weight="semibold" align="center">
             {t('feedback.thanksForYourFeedback')}
           </AppText>

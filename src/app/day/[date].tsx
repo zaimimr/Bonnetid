@@ -105,7 +105,7 @@ export default function DayScreen() {
   if (!valid) {
     return (
       <Screen edges={[]}>
-        <EmptyState message={t('calendar.invalidDate')} icon="calendar-clear-outline" />
+        <EmptyState message={t('calendar.invalidDate')} icon="calendar-blank" />
       </Screen>
     );
   }
@@ -134,7 +134,7 @@ export default function DayScreen() {
           gap: spacing.md,
         }}>
         <IconButton
-          name={isRTL() ? 'chevron-forward' : 'chevron-back'}
+          name={isRTL() ? 'caret-right' : 'caret-left'}
           accessibilityLabel={t('calendar.previousDay')}
           onPress={() => goToDay(-1)}
         />
@@ -167,7 +167,7 @@ export default function DayScreen() {
           )}
         </View>
         <IconButton
-          name={isRTL() ? 'chevron-back' : 'chevron-forward'}
+          name={isRTL() ? 'caret-left' : 'caret-right'}
           accessibilityLabel={t('calendar.nextDay')}
           onPress={() => goToDay(1)}
         />

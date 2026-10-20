@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { Card, Divider, ListRow, Toggle } from '@/components/ui';
 import { NotificationPreview } from '@/components/settings/NotificationPreview';
 import { ROW, SettingsPage } from '@/components/settings/shared';
@@ -66,7 +66,7 @@ export default function NotificationSettingsScreen() {
         <ListRow
           title={t('settings.turnOnNotifications')}
           subtitle={notificationsSupported ? undefined : t('settings.notAvailableInExpo')}
-          leading={<Ionicons name="notifications-outline" size={20} color={theme.colors.primary} />}
+          leading={<Icon name="bell-simple" size={20} color={theme.colors.primary} />}
           trailing={
             <Toggle
               value={notificationsEnabled}
@@ -83,7 +83,7 @@ export default function NotificationSettingsScreen() {
           <ListRow
             title={t('settings.prayerNotifications')}
             subtitle={`${prayerSummary} · ${getNotificationSound(notificationSound).label}`}
-            leading={<Ionicons name="time-outline" size={20} color={theme.colors.primary} />}
+            leading={<Icon name="clock" size={20} color={theme.colors.primary} />}
             chevron
             onPress={() => router.push('/notification-prayers')}
             style={ROW}
@@ -92,7 +92,7 @@ export default function NotificationSettingsScreen() {
           <ListRow
             title={t('settings.fastingAndSpecialDays')}
             subtitle={fastingSummary}
-            leading={<Ionicons name="moon-outline" size={20} color={theme.colors.primary} />}
+            leading={<Icon name="moon" size={20} color={theme.colors.primary} />}
             chevron
             onPress={() => router.push('/fasting-reminders')}
             style={ROW}
@@ -105,7 +105,7 @@ export default function NotificationSettingsScreen() {
                 ? t('settings.n30MinutesBeforeIf')
                 : t('settings.n30MinutesBefore')
             }
-            leading={<Ionicons name="hourglass-outline" size={20} color={theme.colors.primary} />}
+            leading={<Icon name="hourglass" size={20} color={theme.colors.primary} />}
             trailing={<Toggle value={endReminderEnabled} onValueChange={setEndReminderEnabled} />}
             style={ROW}
           />
@@ -116,7 +116,7 @@ export default function NotificationSettingsScreen() {
         <Card padding="sm" rounded="xl">
           <ListRow
             title={t('settings.notificationCheck')}
-            leading={<Ionicons name="pulse-outline" size={20} color={theme.colors.primary} />}
+            leading={<Icon name="pulse" size={20} color={theme.colors.primary} />}
             chevron
             onPress={() => router.push('/notification-check')}
             style={ROW}

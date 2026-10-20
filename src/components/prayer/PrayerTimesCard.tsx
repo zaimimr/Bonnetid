@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { isRTL, t } from '@/lib/i18n';
 import { AppText, Badge, Card, mirrored } from '@/components/ui';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
@@ -230,7 +230,7 @@ export function PrayerTimesCard({
                 borderBottomWidth: index === jummah.length - 1 ? 0 : 1,
                 borderBottomColor: theme.colors.border,
               }}>
-              <Ionicons name="people-outline" size={18} color={theme.colors.primary} />
+              <Icon name="users-three" size={18} color={theme.colors.primary} />
               <AppText weight="medium" style={{ flexShrink: 1 }}>
                 {jummah.length > 1 ? `${JUMUAH} ${index + 1}` : JUMUAH}
               </AppText>
@@ -257,12 +257,12 @@ export function PrayerTimesCard({
             },
             pressed && { opacity: opacity.pressed },
           ]}>
-          <Ionicons name="business-outline" size={15} color={theme.colors.textMuted} />
+          <Icon name="mosque" size={15} color={theme.colors.textMuted} />
           <AppText size="xs" tone="textMuted" style={{ flex: 1 }} numberOfLines={2}>
             {mosqueNote ??
               t('prayer.jamaatTimesFrom', { mosqueName })}
           </AppText>
-          <Ionicons name="chevron-forward" size={14} color={theme.colors.textMuted} style={mirrored} />
+          <Icon name="caret-right" size={14} color={theme.colors.textMuted} style={mirrored} />
         </Pressable>
       )}
 
@@ -281,11 +281,11 @@ export function PrayerTimesCard({
             },
             pressed && { opacity: opacity.pressed },
           ]}>
-          <Ionicons name="business-outline" size={18} color={theme.colors.primary} />
+          <Icon name="mosque" size={18} color={theme.colors.primary} />
           <AppText size="sm" weight="medium" tone="primary" style={{ flex: 1 }}>
             {t('prayer.chooseYourMosqueTo')}
           </AppText>
-          <Ionicons name="chevron-forward" size={16} color={theme.colors.primary} style={mirrored} />
+          <Icon name="caret-right" size={16} color={theme.colors.primary} style={mirrored} />
         </Pressable>
       )}
     </Card>

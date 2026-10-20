@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -24,7 +24,7 @@ export function TravelBanner() {
         alignItems: 'center',
         gap: spacing.sm,
       }}>
-      <Ionicons name="airplane-outline" size={18} color={theme.colors.onTravelSurface} />
+      <Icon name="airplane" size={18} color={theme.colors.onTravelSurface} />
       <View style={{ flex: 1 }}>
         <PostHogMaskView>
           <AppText size="sm" weight="semibold" style={{ color: theme.colors.onTravelSurface }}>

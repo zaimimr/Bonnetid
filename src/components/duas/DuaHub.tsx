@@ -3,9 +3,8 @@ import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { t } from '@/lib/i18n';
 import { useMosque } from '@/api/queries';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon, type IconName } from '@/components/icons';
 import { ArabicText } from '@/components/duas/ArabicText';
-import { Icon } from '@/components/icons';
 import { AppText, Card, Divider, IconTile, ListRow, mirrored } from '@/components/ui';
 import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEidMode } from '@/hooks/useEidMode';
@@ -27,20 +26,20 @@ import { useActiveLocation } from '@/store/settings';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 
-const ICONS: Record<DuaCategoryId, keyof typeof Ionicons.glyphMap> = {
-  'after-adhan': 'volume-high-outline',
-  'wudu-mosque': 'water-outline',
-  'after-salah': 'heart-outline',
-  ramadan: 'moon-outline',
-  eid: 'star-outline',
-  hajj: 'cube-outline',
+const ICONS: Record<DuaCategoryId, IconName> = {
+  'after-adhan': 'speaker-high',
+  'wudu-mosque': 'drop',
+  'after-salah': 'heart',
+  ramadan: 'moon',
+  eid: 'star',
+  hajj: 'kaaba',
 };
 
 function CategoryIcon({ category }: { category: DuaCategory }) {
   const theme = useTheme();
   return (
     <IconTile>
-      <Ionicons
+      <Icon
         name={ICONS[category.id]}
         size={20}
         color={category.season ? theme.colors.seasonHighlight : theme.colors.primary}
@@ -69,7 +68,7 @@ export function FeaturedCategoryCard({ category }: { category: DuaCategory }) {
             {category.title}
           </AppText>
         </View>
-        <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} style={mirrored} />
+        <Icon name="caret-right" size={18} color={theme.colors.textMuted} style={mirrored} />
       </View>
       {preview && <ArabicText>{preview.arabic}</ArabicText>}
     </Card>

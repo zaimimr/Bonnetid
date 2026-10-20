@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { AppText } from './AppText';
 import { mirrored } from './rtl';
 import { useTheme } from '@/theme';
@@ -46,8 +46,8 @@ export function ListRow({
         </View>
       )}
       {chevron && (
-        <Ionicons
-          name="chevron-forward"
+        <Icon
+          name="caret-right"
           size={18}
           color={theme.colors.textMuted}
           style={[{ marginStart: spacing.sm }, mirrored]}

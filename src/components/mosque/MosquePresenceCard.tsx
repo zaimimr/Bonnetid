@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosqueLogo } from '@/components/mosque/MosqueLogo';
@@ -50,7 +50,7 @@ export function MosquePresenceCard() {
             {mosque.name}
           </AppText>
         </View>
-        <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} style={mirrored} />
+        <Icon name="caret-right" size={18} color={theme.colors.textMuted} style={mirrored} />
       </View>
       {announcement && <MosqueAnnouncement text={announcement} compact />}
       {donationEnabled && (

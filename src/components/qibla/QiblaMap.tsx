@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { LeafletMap, type LeafletMapHandle } from '@/components/map/LeafletMap';
 import {
@@ -90,7 +90,7 @@ export function QiblaMap({
           borderWidth: 1,
           borderColor: theme.colors.border,
         }}>
-        <Ionicons name="information-circle-outline" size={18} color={theme.colors.primary} />
+        <Icon name="info" size={18} color={theme.colors.primary} />
         <AppText size="sm" tone="textSecondary" style={{ flex: 1 }}>
           {heading == null
             ? t('qibla.theGreenLinePoints')

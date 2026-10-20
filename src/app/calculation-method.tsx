@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { AppText, Card, Divider, ListRow, Screen } from '@/components/ui';
 import { useAutoCalculationMethod } from '@/hooks/useEffectiveCalculationMethod';
 import {
@@ -25,7 +25,7 @@ export default function CalculationMethodScreen() {
     track('calculation_method_changed', { method: method ?? 'auto' });
   };
 
-  const checkmark = <Ionicons name="checkmark" size={22} color={theme.colors.primary} />;
+  const checkmark = <Icon name="check" size={22} color={theme.colors.primary} />;
   const autoLabel = calculationMethodLabel(autoMethod);
   const autoSubtitle = location.country
     ? t('settings.commonIn', { autoLabel, country: location.country })

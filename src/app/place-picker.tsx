@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Pressable, SectionList, TextInput, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { AppText, EmptyState, ErrorState, Screen, Skeleton } from '@/components/ui';
 import { useFontScale } from '@/hooks/useFontScale';
 import { usePlaces } from '@/hooks/usePlaces';
@@ -90,7 +90,7 @@ export default function PlacePickerScreen() {
             borderRadius: radius.md,
             paddingHorizontal: spacing.md,
           }}>
-          <Ionicons name="search" size={18} color={theme.colors.textMuted} />
+          <Icon name="magnifying-glass" size={18} color={theme.colors.textMuted} />
           <PostHogMaskView style={{ flex: 1 }}>
             <TextInput
               value={query}
@@ -109,7 +109,7 @@ export default function PlacePickerScreen() {
           </PostHogMaskView>
           {query.length > 0 && (
             <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel={t('places.clearSearch')}>
-              <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
+              <Icon name="x-circle" size={18} color={theme.colors.textMuted} />
             </Pressable>
           )}
         </View>
@@ -130,8 +130,8 @@ export default function PlacePickerScreen() {
             },
             pressed && { opacity: opacity.pressed },
           ]}>
-          <Ionicons
-            name={forTimes ? 'navigate-outline' : 'earth-outline'}
+          <Icon
+            name={forTimes ? 'navigation-arrow' : 'globe-hemisphere-west'}
             size={18}
             color={placeIso == null ? theme.colors.onPrimarySoft : theme.colors.textSecondary}
           />
@@ -151,7 +151,7 @@ export default function PlacePickerScreen() {
             </AppText>
           </View>
           {placeIso == null && (
-            <Ionicons name="checkmark-circle" size={22} color={theme.colors.onPrimarySoft} />
+            <Icon name="check-circle" size={22} color={theme.colors.onPrimarySoft} />
           )}
         </Pressable>
 
@@ -207,7 +207,7 @@ export default function PlacePickerScreen() {
                     </AppText>
                     {chosen ? (
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-                        <Ionicons name="checkmark-circle" size={16} color={theme.colors.primary} />
+                        <Icon name="check-circle" size={16} color={theme.colors.primary} />
                         <AppText size="sm" weight="medium" tone="primary" numberOfLines={1}>
                           {chosen.name}
                         </AppText>
@@ -223,8 +223,8 @@ export default function PlacePickerScreen() {
                     )}
                   </View>
                   {!searching && (
-                    <Ionicons
-                      name={isOpen ? 'chevron-up' : 'chevron-down'}
+                    <Icon
+                      name={isOpen ? 'caret-up' : 'caret-down'}
                       size={20}
                       color={theme.colors.textSecondary}
                     />
@@ -289,7 +289,7 @@ export default function PlacePickerScreen() {
                       </AppText>
                     )}
                     {isSelected && (
-                      <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
+                      <Icon name="check-circle" size={22} color={theme.colors.primary} />
                     )}
                   </Pressable>
                 </View>

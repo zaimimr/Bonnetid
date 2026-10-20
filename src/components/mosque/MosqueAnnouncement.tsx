@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText, mirrored } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -22,7 +22,7 @@ export function MosqueAnnouncement({
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
       <View style={{ flex: 1, gap: spacing.xs }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-          <Ionicons name="megaphone-outline" size={15} color={theme.colors.primary} />
+          <Icon name="megaphone" size={15} color={theme.colors.primary} />
           <AppText size="xs" weight="semibold" tone="primary" style={{ flex: 1 }} numberOfLines={1}>
             {title}
           </AppText>
@@ -31,7 +31,7 @@ export function MosqueAnnouncement({
           {text}
         </AppText>
       </View>
-      {chevron && <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} style={mirrored} />}
+      {chevron && <Icon name="caret-right" size={18} color={theme.colors.textMuted} style={mirrored} />}
     </View>
   );
 }

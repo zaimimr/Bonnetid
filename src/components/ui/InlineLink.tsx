@@ -1,5 +1,5 @@
 import { Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon, type IconName } from '@/components/icons';
 import { AppText } from './AppText';
 import { mirrored } from './rtl';
 import { useTheme } from '@/theme';
@@ -7,7 +7,7 @@ import { hitSlop, opacity, spacing } from '@/theme/tokens';
 
 export type InlineLinkProps = {
   label: string;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: IconName;
   onPress: () => void;
 };
 
@@ -27,11 +27,11 @@ export function InlineLink({ label, icon, onPress }: InlineLinkProps) {
         opacity: pressed ? opacity.pressed : 1,
       })}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-        <Ionicons name={icon} size={16} color={theme.colors.primary} />
+        <Icon name={icon} size={16} color={theme.colors.primary} />
         <AppText size="sm" weight="semibold" tone="primary" style={{ flexShrink: 1 }}>
           {label}
         </AppText>
-        <Ionicons name="chevron-forward" size={14} color={theme.colors.primary} style={mirrored} />
+        <Icon name="caret-right" size={14} color={theme.colors.primary} style={mirrored} />
       </View>
     </Pressable>
   );

@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { compareVersions, pendingWhatsNew, visibleItems, WHATS_NEW, type WhatsNewEntry } from './whatsNew.ts';
+import { compareVersions, pendingWhatsNew, visibleItems, WHATS_NEW, type WhatsNewEntry, type WhatsNewItem } from './whatsNew.ts';
 
 const entries: WhatsNewEntry[] = [
-  { version: '1.10.0', items: [{ title: 'C', body: 'c', icon: 'star-outline' }] },
-  { version: '1.9.0', items: [{ title: 'B', body: 'b', icon: 'star-outline' }] },
-  { version: '1.8.0', items: [{ title: 'A', body: 'a', icon: 'star-outline' }] },
+  { version: '1.10.0', items: [{ title: 'C', body: 'c', icon: 'star' }] },
+  { version: '1.9.0', items: [{ title: 'B', body: 'b', icon: 'star' }] },
+  { version: '1.8.0', items: [{ title: 'A', body: 'a', icon: 'star' }] },
 ];
 
 test('compareVersions is numeric per segment', () => {
@@ -25,18 +25,18 @@ test('nothing pending when lastSeen is null or current', () => {
 });
 
 test('items behind a disabled flag are hidden', () => {
-  const items = [
-    { title: 'x', body: 'x', icon: 'a', flag: 'duas' as const },
-    { title: 'y', body: 'y', icon: 'b' },
+  const items: WhatsNewItem[] = [
+    { title: 'x', body: 'x', icon: 'sun', flag: 'duas' },
+    { title: 'y', body: 'y', icon: 'sun' },
   ];
   assert.deepEqual(visibleItems(items, (flag) => flag !== 'duas', 'ios').map((i) => i.title), ['y']);
 });
 
 test('items for another platform are hidden', () => {
-  const items = [
-    { title: 'x', body: 'x', icon: 'a', platform: 'ios' as const },
-    { title: 'y', body: 'y', icon: 'b', platform: 'android' as const },
-    { title: 'z', body: 'z', icon: 'c' },
+  const items: WhatsNewItem[] = [
+    { title: 'x', body: 'x', icon: 'sun', platform: 'ios' },
+    { title: 'y', body: 'y', icon: 'sun', platform: 'android' },
+    { title: 'z', body: 'z', icon: 'sun' },
   ];
   assert.deepEqual(visibleItems(items, () => true, 'android').map((i) => i.title), ['y', 'z']);
 });

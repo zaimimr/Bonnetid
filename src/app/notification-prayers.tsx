@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/components/icons';
 import { Card, Divider, ListRow, Screen, SectionHeader, Toggle } from '@/components/ui';
 import { getNotificationSound } from '@/lib/notificationSounds';
 import { PRAYER_LABELS } from '@/lib/prayerSchedule';
@@ -49,7 +49,7 @@ export default function NotificationPrayersScreen() {
         <ListRow
           title={t('settings.notificationSound')}
           subtitle={getNotificationSound(notificationSound).label}
-          leading={<Ionicons name="musical-notes-outline" size={20} color={theme.colors.primary} />}
+          leading={<Icon name="music-notes" size={20} color={theme.colors.primary} />}
           chevron
           onPress={() => router.push('/notification-sound')}
           style={{ paddingHorizontal: spacing.md }}

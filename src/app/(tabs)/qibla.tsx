@@ -1,7 +1,7 @@
 import { Platform, Pressable, ScrollView, View } from 'react-native';
 import { useCallback, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon, type IconName } from '@/components/icons';
 import { QiblaAr } from '@/components/qibla/QiblaAr';
 import { QiblaCompass } from '@/components/qibla/QiblaCompass';
 import { QiblaHaramNotice } from '@/components/qibla/QiblaHaramNotice';
@@ -78,7 +78,7 @@ export default function QiblaScreen() {
           {permissionDenied && view === 'compass' ? (
             <EmptyState
               message={t('qibla.allowLocationAccessTo')}
-              icon="compass-outline"
+              icon="compass"
             />
           ) : null}
 
@@ -194,7 +194,7 @@ function RotateNotice({ bearing }: { bearing: number }) {
   const theme = useTheme();
   return (
     <Card rounded="xl" style={{ alignItems: 'center', gap: spacing.md }}>
-      <Ionicons name="phone-portrait-outline" size={32} color={theme.colors.primary} />
+      <Icon name="device-mobile" size={32} color={theme.colors.primary} />
       <AppText size="display" weight="bold" heading tabular>
         {Math.round(bearing)}°
       </AppText>
@@ -216,10 +216,10 @@ function ViewSwitcher({
 }) {
   const theme = useTheme();
 
-  const options: { value: QiblaView; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { value: 'compass', label: t('qibla.compass'), icon: 'compass-outline' },
-    { value: 'map', label: t('qibla.map'), icon: 'map-outline' },
-    ...(arEnabled ? [{ value: '3d' as const, label: 'AR', icon: 'cube-outline' as const }] : []),
+  const options: { value: QiblaView; label: string; icon: IconName }[] = [
+    { value: 'compass', label: t('qibla.compass'), icon: 'compass' },
+    { value: 'map', label: t('qibla.map'), icon: 'map-trifold' },
+    ...(arEnabled ? [{ value: '3d' as const, label: 'AR', icon: 'cube' as const }] : []),
   ];
 
   return (
@@ -252,7 +252,7 @@ function ViewSwitcher({
               },
               pressed && { opacity: opacity.pressed },
             ]}>
-            <Ionicons
+            <Icon
               name={option.icon}
               size={16}
               color={isActive ? theme.colors.primary : theme.colors.textMuted}

@@ -1,5 +1,5 @@
 import { ActivityIndicator, Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon, type IconName } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
 import type { GpsStatus } from '@/hooks/useNearestLocation';
@@ -46,7 +46,7 @@ export function PickActions({
         {gpsStatus === 'locating' ? (
           <ActivityIndicator size="small" color={theme.colors.onPrimarySoft} />
         ) : (
-          <Ionicons name="navigate" size={18} color={theme.colors.onPrimarySoft} />
+          <Icon name="navigation-arrow" size={18} color={theme.colors.onPrimarySoft} />
         )}
         <View style={{ flex: 1 }}>
           <AppText weight="semibold" tone="onPrimarySoft">
@@ -86,7 +86,7 @@ export function PickActions({
             },
             pressed && { opacity: opacity.pressed },
           ]}>
-          <Ionicons name="close-circle-outline" size={18} color={theme.colors.danger} />
+          <Icon name="x-circle" size={18} color={theme.colors.danger} />
           <View style={{ flex: 1 }}>
             <AppText weight="semibold" tone="danger">
               {t('mosque.removeSelectedMosque')}
@@ -143,8 +143,8 @@ export function PlaceFilterButton({
         },
         pressed && { opacity: opacity.pressed },
       ]}>
-      <Ionicons
-        name="funnel-outline"
+      <Icon
+        name="funnel"
         size={15}
         color={active ? theme.colors.filterActiveText : theme.colors.textMuted}
       />
@@ -158,10 +158,10 @@ export function PlaceFilterButton({
       </AppText>
       {active ? (
         <Pressable onPress={onClear} hitSlop={8} accessibilityLabel={t('mosque.removePlaceFilter')}>
-          <Ionicons name="close-circle" size={16} color={theme.colors.filterActiveText} />
+          <Icon name="x-circle" size={16} color={theme.colors.filterActiveText} />
         </Pressable>
       ) : (
-        <Ionicons name="chevron-down" size={14} color={theme.colors.textMuted} />
+        <Icon name="caret-down" size={14} color={theme.colors.textMuted} />
       )}
     </Pressable>
   );
@@ -174,7 +174,7 @@ export function SortChip({
   onPress,
 }: {
   label: string;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: IconName;
   active: boolean;
   onPress: () => void;
 }) {
@@ -199,7 +199,7 @@ export function SortChip({
         },
         pressed && { opacity: opacity.pressed },
       ]}>
-      <Ionicons
+      <Icon
         name={icon}
         size={15}
         color={active ? theme.colors.onPrimarySoft : theme.colors.textMuted}
@@ -219,7 +219,7 @@ export function SortChip({
 export function ModeToggle({ view, onChange }: { view: MosqueViewMode; onChange: (view: MosqueViewMode) => void }) {
   const theme = useTheme();
 
-  const options: { value: MosqueViewMode; icon: keyof typeof Ionicons.glyphMap; label: string }[] = [
+  const options: { value: MosqueViewMode; icon: IconName; label: string }[] = [
     {
       value: 'list',
       icon: 'list',
@@ -227,7 +227,7 @@ export function ModeToggle({ view, onChange }: { view: MosqueViewMode; onChange:
     },
     {
       value: 'map',
-      icon: 'map-outline',
+      icon: 'map-trifold',
       label: t('mosque.mapView'),
     },
   ];
@@ -258,7 +258,7 @@ export function ModeToggle({ view, onChange }: { view: MosqueViewMode; onChange:
               },
               pressed && { opacity: opacity.pressed },
             ]}>
-            <Ionicons
+            <Icon
               name={option.icon}
               size={18}
               color={isActive ? theme.colors.primary : theme.colors.textMuted}
