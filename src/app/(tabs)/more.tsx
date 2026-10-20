@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useIsFocused, useRouter } from 'expo-router';
-import { Icon } from '@/components/icons';
-import { AppText, Badge, Card, Divider, FeatureCard, ListRow, Screen } from '@/components/ui';
+import { Icon, type IconName } from '@/components/icons';
+import { AppText, Badge, Card, Divider, ListRow, Screen } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { FEATURES, useAvailableFeatures } from '@/components/customization/features';
@@ -11,6 +11,7 @@ import { FeedbackSheet } from '@/components/feedback/FeedbackSheet';
 import { t } from '@/lib/i18n';
 
 const ROW = { paddingHorizontal: spacing.md } as const;
+const COLUMNS = 3;
 
 export default function MoreScreen() {
   const router = useRouter();
@@ -19,6 +20,23 @@ export default function MoreScreen() {
   const isFocused = useIsFocused();
   const support = useSupportThread(isFocused);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const tiles: { key: string; icon: IconName; label: string; onPress: () => void }[] = [
+    ...available.map((id) => ({
+      key: id,
+      icon: FEATURES[id].icon,
+      label: FEATURES[id].label,
+      onPress: () => router.push(FEATURES[id].href),
+    })),
+    {
+      key: 'settings',
+      icon: 'gear-six',
+      label: t('more.settings'),
+      onPress: () => router.push('/settings'),
+    },
+  ];
+  const rows = Array.from({ length: Math.ceil(tiles.length / COLUMNS) }, (_, index) =>
+    tiles.slice(index * COLUMNS, index * COLUMNS + COLUMNS),
+  );
 
   return (
     <Screen scroll contentStyle={{ flexGrow: 1, paddingBottom: spacing.lg }}>
@@ -28,20 +46,27 @@ export default function MoreScreen() {
         </AppText>
       </View>
 
-      <View style={{ gap: spacing.md }}>
-        {available.map((id) => (
-          <FeatureCard
-            key={id}
-            icon={<Icon name={FEATURES[id].icon} size={24} color={theme.colors.primary} />}
-            title={FEATURES[id].title}
-            onPress={() => router.push(FEATURES[id].href)}
-          />
+      <View style={{ gap: spacing.sm }}>
+        {rows.map((row) => (
+          <View key={row[0].key} style={{ flexDirection: 'row', gap: spacing.sm }}>
+            {row.map((tile) => (
+              <Card
+                key={tile.key}
+                padding="sm"
+                rounded="xl"
+                onPress={tile.onPress}
+                style={{ flex: 1, alignItems: 'center', gap: spacing.xs, paddingVertical: spacing.lg }}>
+                <Icon name={tile.icon} size={28} color={theme.colors.primary} />
+                <AppText size="sm" weight="medium" align="center" numberOfLines={1}>
+                  {tile.label}
+                </AppText>
+              </Card>
+            ))}
+            {Array.from({ length: COLUMNS - row.length }, (_, index) => (
+              <View key={index} style={{ flex: 1 }} />
+            ))}
+          </View>
         ))}
-        <FeatureCard
-          icon={<Icon name="gear-six" size={24} color={theme.colors.primary} />}
-          title={t('more.settings')}
-          onPress={() => router.push('/settings')}
-        />
       </View>
 
       <View style={{ flexGrow: 1, minHeight: spacing.xl }} />
