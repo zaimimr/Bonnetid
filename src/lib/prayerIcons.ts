@@ -1,21 +1,15 @@
+import type { IconName } from '@/components/icons';
 import type { PrayerName } from './prayerSchedule';
 
-export type PrayerIconFamily = 'ionicons' | 'feather' | 'material-community';
-
-export type PrayerIcon = {
-  family: PrayerIconFamily;
-  name: string;
+export const PRAYER_ICONS: Record<PrayerName, IconName> = {
+  fajr: 'moon-stars',
+  fajr_endtime: 'sunrise',
+  duhr: 'sun',
+  asr: 'cloud-sun',
+  maghrib: 'sunset',
+  isha: 'moon',
 };
 
-export const PRAYER_ICONS: Record<PrayerName, PrayerIcon> = {
-  fajr: { family: 'material-community', name: 'weather-night' },
-  fajr_endtime: { family: 'feather', name: 'sunrise' },
-  duhr: { family: 'ionicons', name: 'sunny' },
-  asr: { family: 'ionicons', name: 'partly-sunny-outline' },
-  maghrib: { family: 'feather', name: 'sunset' },
-  isha: { family: 'ionicons', name: 'moon' },
-};
-
-export function prayerIcon(name: PrayerName): PrayerIcon {
+export function prayerIcon(name: PrayerName): IconName {
   return PRAYER_ICONS[name];
 }

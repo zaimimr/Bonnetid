@@ -5,7 +5,7 @@ import { t } from '@/lib/i18n';
 import { useMosque } from '@/api/queries';
 import { Ionicons } from '@expo/vector-icons';
 import { ArabicText } from '@/components/duas/ArabicText';
-import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
+import { Icon } from '@/components/icons';
 import { AppText, Card, Divider, IconTile, ListRow, mirrored } from '@/components/ui';
 import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEidMode } from '@/hooks/useEidMode';
@@ -85,7 +85,7 @@ export function TasbihRow({ from }: { from?: string }) {
         title={t('duas.tasbih')}
         leading={
           <IconTile>
-            <TasbihIcon size={22} color={theme.colors.primary} />
+            <Icon name="tasbih" size={22} color={theme.colors.primary} />
           </IconTile>
         }
         chevron

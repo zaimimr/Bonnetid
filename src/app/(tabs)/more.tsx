@@ -6,7 +6,7 @@ import { AppText, Badge, Card, Divider, FeatureCard, ListRow, Screen } from '@/c
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { useIsCalculatedMode, usePrayerTrackerEnabled } from '@/store/settings';
-import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
+import { Icon, type IconName } from '@/components/icons';
 import { useFeature } from '@/hooks/useFeature';
 import { useSupportThread } from '@/hooks/useSupportThread';
 import { FeedbackSheet } from '@/components/feedback/FeedbackSheet';
@@ -16,31 +16,31 @@ const ROW = { paddingHorizontal: spacing.md } as const;
 
 type Feature = {
   href: Href;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: IconName;
   title: string;
 };
 
 const TRACKER_FEATURE: Feature = {
   href: '/tracker',
-  icon: 'checkmark-done-outline',
+  icon: 'prayer-tracker',
   title: t('more.prayerTracker'),
 };
 
 const MOSQUE_FEATURE: Feature = {
   href: '/mosques',
-  icon: 'business-outline',
+  icon: 'mosque',
   title: t('more.mosques'),
 };
 
 const DUAS_FEATURE: Feature = {
   href: '/duas',
-  icon: 'book-outline',
+  icon: 'dua-hands',
   title: t('more.duaAndDhikr'),
 };
 
 const SETTINGS_FEATURE: Feature = {
   href: '/settings',
-  icon: 'settings-outline',
+  icon: 'gear-six',
   title: t('more.settings'),
 };
 
@@ -73,14 +73,14 @@ export default function MoreScreen() {
         {features.map((feature) => (
           <FeatureCard
             key={feature.title}
-            icon={<Ionicons name={feature.icon} size={24} color={theme.colors.primary} />}
+            icon={<Icon name={feature.icon} size={24} color={theme.colors.primary} />}
             title={feature.title}
             onPress={() => router.push(feature.href)}
           />
         ))}
         {!duasEnabled && tasbihEnabled && (
           <FeatureCard
-            icon={<TasbihIcon size={24} color={theme.colors.primary} />}
+            icon={<Icon name="tasbih" size={24} color={theme.colors.primary} />}
             title={t('more.tasbih')}
             onPress={() => router.push('/tasbih')}
           />

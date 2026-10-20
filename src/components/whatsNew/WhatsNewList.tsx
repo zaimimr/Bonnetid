@@ -4,7 +4,7 @@ import { useRouter, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '@/lib/i18n';
 import { AppText, Card, Divider, mirrored } from '@/components/ui';
-import { TasbihIcon } from '@/components/tasbih/TasbihIcon';
+import { Icon } from '@/components/icons';
 import { useFeature } from '@/hooks/useFeature';
 import type { FeatureFlag } from '@/lib/featureFlags';
 import { track } from '@/lib/telemetry';
@@ -42,7 +42,7 @@ function WhatsNewRow({ item, onPress }: { item: WhatsNewItem; onPress?: () => vo
           justifyContent: 'center',
         }}>
         {item.icon === 'tasbih' ? (
-          <TasbihIcon size={20} color={theme.colors.primary} />
+          <Icon name="tasbih" size={20} color={theme.colors.primary} />
         ) : (
           <Ionicons
             name={item.icon as keyof typeof Ionicons.glyphMap}
