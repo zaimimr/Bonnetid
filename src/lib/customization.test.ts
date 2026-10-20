@@ -4,7 +4,6 @@ import {
   addHomeBlock,
   DEFAULT_TAB_SLOTS,
   HOME_BLOCK_IDS,
-  moveSlot,
   normalizeHomeLayout,
   normalizeSlots,
   orderHomeBlocks,
@@ -26,12 +25,6 @@ test('toggleSlot adds until max and removes', () => {
   assert.deepEqual(toggleSlot(['calendar'], 'qibla', 3), ['calendar', 'qibla']);
   assert.deepEqual(toggleSlot(['calendar', 'qibla'], 'calendar', 3), ['qibla']);
   assert.deepEqual(toggleSlot(['calendar', 'qibla', 'duas'], 'tasbih', 3), ['calendar', 'qibla', 'duas']);
-});
-
-test('moveSlot reorders within bounds', () => {
-  assert.deepEqual(moveSlot(['calendar', 'qibla', 'duas'], 'duas', -1), ['calendar', 'duas', 'qibla']);
-  assert.deepEqual(moveSlot(['calendar', 'qibla'], 'calendar', -1), ['calendar', 'qibla']);
-  assert.deepEqual(moveSlot(['calendar', 'qibla'], 'qibla', 1), ['calendar', 'qibla']);
 });
 
 test('normalizeHomeLayout keeps order, appends missing blocks, forces locked visible', () => {

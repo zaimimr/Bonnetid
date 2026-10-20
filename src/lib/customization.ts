@@ -48,16 +48,6 @@ export function toggleSlot(slots: FeatureId[], id: FeatureId, max: number): Feat
   return [...slots, id];
 }
 
-export function moveSlot(slots: FeatureId[], id: FeatureId, delta: number): FeatureId[] {
-  const from = slots.indexOf(id);
-  const to = from + delta;
-  if (from < 0 || to < 0 || to >= slots.length) return slots;
-  const next = [...slots];
-  next.splice(from, 1);
-  next.splice(to, 0, id);
-  return next;
-}
-
 export function normalizeHomeLayout(layout: unknown): HomeBlock[] {
   const blocks = Array.isArray(layout) ? layout : [];
   const seen = new Set<HomeBlockId>();

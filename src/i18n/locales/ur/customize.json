@@ -1,11 +1,7 @@
 {
-  "tabBar": "ٹیب بار",
-  "customizeHome": "جائزہ حسبِ منشا بنائیں",
   "customize": "حسبِ منشا",
   "shortcuts": "شارٹ کٹس",
   "reset": "دوبارہ ترتیب دیں",
-  "moveUp": "اوپر لے جائیں",
-  "moveDown": "نیچے لے جائیں",
   "block": {
     "nextPrayer": "اگلی نماز",
     "shortcuts": "شارٹ کٹس",
@@ -32,5 +28,5 @@
   "remove": "ہٹائیں",
   "drag": "منتقل کریں",
   "showsWhenRelevant": "ضرورت کے وقت دکھائی دیتا ہے",
-  "chooseUpTo": "زیادہ سے زیادہ {{count}} منتخب کریں"
+  "addTab": "ٹیب شامل کریں"
 }

@@ -1,11 +1,7 @@
 {
-  "tabBar": "Tab bar",
-  "customizeHome": "Customize Overview",
   "customize": "Customize",
   "shortcuts": "Shortcuts",
   "reset": "Reset",
-  "moveUp": "Move up",
-  "moveDown": "Move down",
   "block": {
     "nextPrayer": "Next prayer",
     "shortcuts": "Shortcuts",
@@ -32,5 +28,5 @@
   "remove": "Remove",
   "drag": "Move",
   "showsWhenRelevant": "Shows when relevant",
-  "chooseUpTo": "Choose up to {{count}}"
+  "addTab": "Add tab"
 }
