@@ -1,4 +1,5 @@
 import type { PropsWithChildren, ReactNode, Ref } from 'react';
+import Animated from 'react-native-reanimated';
 import { ScrollView, StyleSheet, View, type ViewStyle, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useVerticalFold } from '@/hooks/useWindowGeometry';
@@ -68,7 +69,7 @@ export function Screen({
       paddingEnd: side + (rtl ? left : right),
     };
     return scroll ? (
-      <ScrollView
+      <Animated.ScrollView
         ref={primary ? scrollRef : undefined}
         style={[base, style]}
         contentContainerStyle={[padding, styles.scrollContent, contentStyle]}
@@ -83,7 +84,7 @@ export function Screen({
           ) : undefined
         }>
         <View style={inner}>{content}</View>
-      </ScrollView>
+      </Animated.ScrollView>
     ) : (
       <View style={[base, padding, style, contentStyle]}>
         <View style={[inner, { flex: 1 }]}>{content}</View>

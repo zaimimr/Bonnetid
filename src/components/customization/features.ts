@@ -1,6 +1,6 @@
 import type { Href } from 'expo-router';
 import type { IconName } from '@/components/icons';
-import { FEATURE_IDS, type FeatureId } from '@/lib/customization';
+import { FEATURE_IDS, type FeatureId, type HomeBlockId } from '@/lib/customization';
 import { useFeature } from '@/hooks/useFeature';
 import { useIsCalculatedMode, usePrayerTrackerEnabled } from '@/store/settings';
 import { t } from '@/lib/i18n';
@@ -81,3 +81,14 @@ export function useAvailableFeatures(): FeatureId[] {
   };
   return FEATURE_IDS.filter((id) => available[id]);
 }
+
+export const HOME_BLOCKS: Record<HomeBlockId, { label: string; icon: IconName }> = {
+  'next-prayer': { label: t('customize.block.nextPrayer'), icon: 'timer' },
+  shortcuts: { label: t('customize.block.shortcuts'), icon: 'squares-four' },
+  'after-prayer': { label: t('customize.block.afterPrayer'), icon: 'dua-hands' },
+  announcement: { label: t('customize.block.announcement'), icon: 'megaphone' },
+  season: { label: t('customize.block.season'), icon: 'lantern' },
+  night: { label: t('customize.block.night'), icon: 'moon-stars' },
+  'prayer-times': { label: t('customize.block.prayerTimes'), icon: 'clock' },
+  'special-days': { label: t('customize.block.specialDays'), icon: 'star-and-crescent' },
+};

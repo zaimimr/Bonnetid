@@ -75,14 +75,18 @@ export function normalizeHomeLayout(layout: unknown): HomeBlock[] {
   return result;
 }
 
-export function moveHomeBlock(layout: HomeBlock[], id: HomeBlockId, delta: number): HomeBlock[] {
-  const from = layout.findIndex((block) => block.id === id);
-  const to = from + delta;
-  if (from < 0 || to < 0 || to >= layout.length) return layout;
-  const next = [...layout];
-  const [block] = next.splice(from, 1);
-  next.splice(to, 0, block);
-  return next;
+export function orderHomeBlocks(layout: HomeBlock[], visibleIds: HomeBlockId[]): HomeBlock[] {
+  const shown = visibleIds.filter((id) => layout.some((block) => block.id === id && block.visible));
+  return [
+    ...shown.map((id) => ({ id, visible: true })),
+    ...layout.filter((block) => !shown.includes(block.id)),
+  ];
+}
+
+export function addHomeBlock(layout: HomeBlock[], id: HomeBlockId): HomeBlock[] {
+  const shown = layout.filter((block) => block.visible && block.id !== id);
+  const hidden = layout.filter((block) => !block.visible && block.id !== id);
+  return [...shown, { id, visible: true }, ...hidden];
 }
 
 export function setHomeBlockVisible(

@@ -2,11 +2,13 @@ import { useRouter } from 'expo-router';
 import { Card, Divider, ListRow, SegmentedControl } from '@/components/ui';
 import { Field, ROW, SettingsPage } from '@/components/settings/shared';
 import { track } from '@/lib/telemetry';
+import { useHomeEdit } from '@/store/homeEdit';
 import { useSettings } from '@/store/settings';
 import { t } from '@/lib/i18n';
 
 export default function AppearanceSettingsScreen() {
   const router = useRouter();
+  const setHomeEditing = useHomeEdit((state) => state.setEditing);
   const themePreference = useSettings((state) => state.themePreference);
   const setThemePreference = useSettings((state) => state.setThemePreference);
 
@@ -39,7 +41,10 @@ export default function AppearanceSettingsScreen() {
         <ListRow
           title={t('customize.customizeHome')}
           chevron
-          onPress={() => router.push('/settings-home')}
+          onPress={() => {
+            setHomeEditing(true);
+            router.navigate('/');
+          }}
           style={ROW}
         />
       </Card>
