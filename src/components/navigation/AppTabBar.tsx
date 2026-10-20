@@ -9,6 +9,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { isRTL } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
+import { TabBarEditor } from '@/components/customization/TabBarEditor';
+import { useHomeEdit } from '@/store/homeEdit';
 import { useTheme } from '@/theme';
 import { duration, spacing } from '@/theme/tokens';
 
@@ -71,10 +73,13 @@ function SlidingPill({
 export function AppTabBar({ state, descriptors, navigation, insets, visible }: AppTabBarProps) {
   const theme = useTheme();
   const [width, setWidth] = useState(0);
-  const routes = state.routes.filter((route) => visible.includes(route.name));
+  const editing = useHomeEdit((edit) => edit.editing);
+  const routes = visible.flatMap((name) => state.routes.filter((route) => route.name === name));
   const itemWidth = width / routes.length;
   const focusedKey = state.routes[state.index]?.key;
   const pillIndex = routes.findIndex((route) => route.key === focusedKey);
+
+  if (editing) return <TabBarEditor bottomInset={insets.bottom} />;
 
   return (
     <View

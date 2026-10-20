@@ -10,6 +10,7 @@ import {
   addHomeBlock,
   DEFAULT_HOME_LAYOUT,
   DEFAULT_SHORTCUTS,
+  DEFAULT_TAB_SLOTS,
   LOCKED_HOME_BLOCKS,
   orderHomeBlocks,
   setHomeBlockVisible,
@@ -34,6 +35,7 @@ export function HomeEditor({
   const homeLayout = useSettings((state) => state.homeLayout);
   const setHomeLayout = useSettings((state) => state.setHomeLayout);
   const setShortcuts = useSettings((state) => state.setShortcuts);
+  const setTabSlots = useSettings((state) => state.setTabSlots);
   const setEditing = useHomeEdit((state) => state.setEditing);
   const [adding, setAdding] = useState(false);
   const shown = homeLayout.filter((block) => block.visible).map((block) => block.id);
@@ -50,7 +52,7 @@ export function HomeEditor({
     <View style={{ gap: spacing.lg }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
         <AppText size="xl" weight="bold" heading style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0 }}>
-          {t('customize.customizeHome')}
+          {t('customize.customize')}
         </AppText>
         <Button label={t('customize.done')} size="sm" onPress={() => setEditing(false)} />
       </View>
@@ -93,6 +95,7 @@ export function HomeEditor({
           onPress={() => {
             save(DEFAULT_HOME_LAYOUT);
             setShortcuts(DEFAULT_SHORTCUTS);
+            setTabSlots(DEFAULT_TAB_SLOTS);
           }}
           style={{ flexGrow: 1, flexBasis: 0 }}
         />

@@ -1,11 +1,7 @@
 {
-  "tabBar": "شريط التبويب",
-  "customizeHome": "تخصيص النظرة العامة",
   "customize": "تخصيص",
   "shortcuts": "اختصارات",
   "reset": "إعادة تعيين",
-  "moveUp": "نقل لأعلى",
-  "moveDown": "نقل لأسفل",
   "block": {
     "nextPrayer": "الصلاة القادمة",
     "shortcuts": "اختصارات",
@@ -32,5 +28,5 @@
   "remove": "إزالة",
   "drag": "نقل",
   "showsWhenRelevant": "تظهر عند الحاجة",
-  "chooseUpTo": "اختر حتى {{count}}"
+  "addTab": "إضافة تبويب"
 }

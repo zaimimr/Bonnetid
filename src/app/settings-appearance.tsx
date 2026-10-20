@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Card, Divider, ListRow, SegmentedControl } from '@/components/ui';
+import { Card, ListRow, SegmentedControl } from '@/components/ui';
 import { Field, ROW, SettingsPage } from '@/components/settings/shared';
 import { track } from '@/lib/telemetry';
 import { useHomeEdit } from '@/store/homeEdit';
@@ -32,14 +32,7 @@ export default function AppearanceSettingsScreen() {
       </Card>
       <Card padding="sm" rounded="xl">
         <ListRow
-          title={t('customize.tabBar')}
-          chevron
-          onPress={() => router.push('/settings-tabs')}
-          style={ROW}
-        />
-        <Divider />
-        <ListRow
-          title={t('customize.customizeHome')}
+          title={t('customize.customize')}
           chevron
           onPress={() => {
             setHomeEditing(true);

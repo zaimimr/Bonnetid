@@ -187,14 +187,6 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
-          name="settings-tabs"
-          options={{
-            headerShown: true,
-            title: t('customize.tabBar'),
-            headerBackTitle: BACK,
-          }}
-        />
-        <Stack.Screen
           name="tasbih"
           options={{
             headerShown: true,

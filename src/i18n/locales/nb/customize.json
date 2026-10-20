@@ -1,11 +1,7 @@
 {
-  "tabBar": "Fanelinje",
-  "customizeHome": "Tilpass Oversikt",
   "customize": "Tilpass",
   "shortcuts": "Snarveier",
   "reset": "Tilbakestill",
-  "moveUp": "Flytt opp",
-  "moveDown": "Flytt ned",
   "block": {
     "nextPrayer": "Neste bønn",
     "shortcuts": "Snarveier",
@@ -32,5 +28,5 @@
   "remove": "Fjern",
   "drag": "Flytt",
   "showsWhenRelevant": "Vises når den er aktuell",
-  "chooseUpTo": "Velg opptil {{count}}"
+  "addTab": "Legg til fane"
 }
