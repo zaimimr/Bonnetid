@@ -50,17 +50,18 @@ export default function MoreScreen() {
         {rows.map((row) => (
           <View key={row[0].key} style={{ flexDirection: 'row', gap: spacing.sm }}>
             {row.map((tile) => (
-              <Card
-                key={tile.key}
-                padding="sm"
-                rounded="xl"
-                onPress={tile.onPress}
-                style={{ flex: 1, alignItems: 'center', gap: spacing.xs, paddingVertical: spacing.lg }}>
-                <Icon name={tile.icon} size={28} color={theme.colors.primary} />
-                <AppText size="sm" weight="medium" align="center" numberOfLines={1}>
-                  {tile.label}
-                </AppText>
-              </Card>
+              <View key={tile.key} style={{ flex: 1 }}>
+                <Card
+                  padding="sm"
+                  rounded="xl"
+                  onPress={tile.onPress}
+                  style={{ alignItems: 'center', gap: spacing.xs, paddingVertical: spacing.lg }}>
+                  <Icon name={tile.icon} size={28} color={theme.colors.primary} />
+                  <AppText size="sm" weight="medium" align="center" numberOfLines={1}>
+                    {tile.label}
+                  </AppText>
+                </Card>
+              </View>
             ))}
             {Array.from({ length: COLUMNS - row.length }, (_, index) => (
               <View key={index} style={{ flex: 1 }} />
