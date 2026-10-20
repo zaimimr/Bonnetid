@@ -77,7 +77,10 @@ export function AppTabBar({ state, descriptors, navigation, insets, visible }: A
   const routes = visible.flatMap((name) => state.routes.filter((route) => route.name === name));
   const itemWidth = width / routes.length;
   const focusedKey = state.routes[state.index]?.key;
-  const pillIndex = routes.findIndex((route) => route.key === focusedKey);
+  const highlightedKey = routes.some((route) => route.key === focusedKey)
+    ? focusedKey
+    : routes.at(-1)?.key;
+  const pillIndex = routes.findIndex((route) => route.key === highlightedKey);
 
   if (editing) return <TabBarEditor bottomInset={insets.bottom} />;
 
@@ -98,7 +101,8 @@ export function AppTabBar({ state, descriptors, navigation, insets, visible }: A
       {routes.map((route) => {
         const { options } = descriptors[route.key];
         const focused = route.key === focusedKey;
-        const color = focused ? theme.colors.tabBarActive : theme.colors.tabBarInactive;
+        const highlighted = route.key === highlightedKey;
+        const color = highlighted ? theme.colors.tabBarActive : theme.colors.tabBarInactive;
         const title = options.title ?? route.name;
 
         const onPress = () => {
@@ -117,7 +121,7 @@ export function AppTabBar({ state, descriptors, navigation, insets, visible }: A
             onLongPress={() => navigation.emit({ type: 'tabLongPress', target: route.key })}
             accessibilityRole="tab"
             accessibilityLabel={title}
-            accessibilityState={{ selected: focused }}
+            accessibilityState={{ selected: highlighted }}
             style={{ flex: 1, alignItems: 'center', gap: spacing.xs }}>
             {({ pressed }) => (
               <>
@@ -141,7 +145,7 @@ export function AppTabBar({ state, descriptors, navigation, insets, visible }: A
                       opacity: pressed ? 1 : 0,
                     }}
                   />
-                  {options.tabBarIcon?.({ focused, color, size: 22 })}
+                  {options.tabBarIcon?.({ focused: highlighted, color, size: 22 })}
                   {options.tabBarBadge !== undefined && (
                     <View
                       style={{
@@ -158,7 +162,7 @@ export function AppTabBar({ state, descriptors, navigation, insets, visible }: A
                 </View>
                 <AppText
                   size="xs"
-                  weight={focused ? 'semibold' : 'medium'}
+                  weight={highlighted ? 'semibold' : 'medium'}
                   color={color}
                   align="center"
                   maxFontSizeMultiplier={MAX_TAB_FONT_SCALE}

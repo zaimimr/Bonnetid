@@ -1,64 +1,24 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { useIsFocused, useRouter, type Href } from 'expo-router';
-import { Icon, type IconName } from '@/components/icons';
+import { useIsFocused, useRouter } from 'expo-router';
+import { Icon } from '@/components/icons';
 import { AppText, Badge, Card, Divider, FeatureCard, ListRow, Screen } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
-import { useIsCalculatedMode, usePrayerTrackerEnabled } from '@/store/settings';
-import { useFeature } from '@/hooks/useFeature';
+import { FEATURES, useAvailableFeatures } from '@/components/customization/features';
 import { useSupportThread } from '@/hooks/useSupportThread';
 import { FeedbackSheet } from '@/components/feedback/FeedbackSheet';
 import { t } from '@/lib/i18n';
 
 const ROW = { paddingHorizontal: spacing.md } as const;
 
-type Feature = {
-  href: Href;
-  icon: IconName;
-  title: string;
-};
-
-const TRACKER_FEATURE: Feature = {
-  href: '/tracker',
-  icon: 'prayer-tracker',
-  title: t('more.prayerTracker'),
-};
-
-const MOSQUE_FEATURE: Feature = {
-  href: '/mosques',
-  icon: 'mosque',
-  title: t('more.mosques'),
-};
-
-const DUAS_FEATURE: Feature = {
-  href: '/duas',
-  icon: 'dua-hands',
-  title: t('more.duaAndDhikr'),
-};
-
-const SETTINGS_FEATURE: Feature = {
-  href: '/settings',
-  icon: 'gear-six',
-  title: t('more.settings'),
-};
-
 export default function MoreScreen() {
   const router = useRouter();
   const theme = useTheme();
-  const trackerEnabled = usePrayerTrackerEnabled();
-  const calculated = useIsCalculatedMode();
-  const duasEnabled = useFeature('duas');
-  const tasbihEnabled = useFeature('tasbih');
+  const available = useAvailableFeatures();
   const isFocused = useIsFocused();
   const support = useSupportThread(isFocused);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const features = [
-    ...(trackerEnabled ? [TRACKER_FEATURE] : []),
-    ...(calculated ? [] : [MOSQUE_FEATURE]),
-    ...(duasEnabled ? [DUAS_FEATURE] : []),
-    SETTINGS_FEATURE,
-  ];
 
   return (
     <Screen scroll contentStyle={{ flexGrow: 1, paddingBottom: spacing.lg }}>
@@ -69,21 +29,19 @@ export default function MoreScreen() {
       </View>
 
       <View style={{ gap: spacing.md }}>
-        {features.map((feature) => (
+        {available.map((id) => (
           <FeatureCard
-            key={feature.title}
-            icon={<Icon name={feature.icon} size={24} color={theme.colors.primary} />}
-            title={feature.title}
-            onPress={() => router.push(feature.href)}
+            key={id}
+            icon={<Icon name={FEATURES[id].icon} size={24} color={theme.colors.primary} />}
+            title={FEATURES[id].title}
+            onPress={() => router.push(FEATURES[id].href)}
           />
         ))}
-        {!duasEnabled && tasbihEnabled && (
-          <FeatureCard
-            icon={<Icon name="tasbih" size={24} color={theme.colors.primary} />}
-            title={t('more.tasbih')}
-            onPress={() => router.push('/tasbih')}
-          />
-        )}
+        <FeatureCard
+          icon={<Icon name="gear-six" size={24} color={theme.colors.primary} />}
+          title={t('more.settings')}
+          onPress={() => router.push('/settings')}
+        />
       </View>
 
       <View style={{ flexGrow: 1, minHeight: spacing.xl }} />
