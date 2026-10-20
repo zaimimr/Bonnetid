@@ -17,3 +17,5 @@ export * from './Sheet';
 export * from './TextField';
 export * from './rtl';
 export * from './IconTile';
+export * from './PressableScale';
+export * from './motion';

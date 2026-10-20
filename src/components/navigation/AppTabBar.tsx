@@ -1,18 +1,13 @@
-import { useState, type ComponentProps } from 'react';
+import { useState, type ComponentProps, type ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import type { Tabs } from 'expo-router';
-import Animated, {
-  Easing,
-  ReduceMotion,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { ReduceMotion, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { isRTL } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
 import { TabBarEditor } from '@/components/customization/TabBarEditor';
 import { useHomeEdit } from '@/store/homeEdit';
 import { useTheme } from '@/theme';
-import { duration, spacing } from '@/theme/tokens';
+import { pressScale, spacing, spring } from '@/theme/tokens';
 
 export type AppTabBarProps = Parameters<
   NonNullable<ComponentProps<typeof Tabs>['tabBar']>
@@ -21,11 +16,20 @@ export type AppTabBarProps = Parameters<
 const PILL_WIDTH = 64;
 const PILL_HEIGHT = 32;
 const MAX_TAB_FONT_SCALE = 1.15;
-const SLIDE = {
-  duration: duration.normal,
-  easing: Easing.out(Easing.cubic),
-  reduceMotion: ReduceMotion.System,
-};
+const SLIDE = { ...spring.slide, reduceMotion: ReduceMotion.System };
+const PRESS = { ...spring.press, reduceMotion: ReduceMotion.System };
+
+function PressScale({ pressed, children }: { pressed: boolean; children: ReactNode }) {
+  const style = useAnimatedStyle(
+    () => ({ transform: [{ scale: withSpring(pressed ? pressScale.control : 1, PRESS) }] }),
+    [pressed],
+  );
+  return (
+    <Animated.View style={[{ alignItems: 'center', gap: spacing.xs }, style]}>
+      {children}
+    </Animated.View>
+  );
+}
 
 function SlidingPill({
   index,
@@ -41,7 +45,7 @@ function SlidingPill({
     () => ({
       transform: [
         {
-          translateX: withTiming(
+          translateX: withSpring(
             direction * (index * itemWidth + (itemWidth - PILL_WIDTH) / 2),
             SLIDE,
           ),
@@ -124,7 +128,7 @@ export function AppTabBar({ state, descriptors, navigation, insets, visible }: A
             accessibilityState={{ selected: highlighted }}
             style={{ flex: 1, alignItems: 'center', gap: spacing.xs }}>
             {({ pressed }) => (
-              <>
+              <PressScale pressed={pressed}>
                 <View
                   style={{
                     width: PILL_WIDTH,
@@ -169,7 +173,7 @@ export function AppTabBar({ state, descriptors, navigation, insets, visible }: A
                   numberOfLines={1}>
                   {title}
                 </AppText>
-              </>
+              </PressScale>
             )}
           </Pressable>
         );

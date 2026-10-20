@@ -1,7 +1,8 @@
-import { ActivityIndicator, Pressable, type StyleProp, type ViewStyle } from 'react-native';
+import { ActivityIndicator, type StyleProp, type ViewStyle } from 'react-native';
 import { AppText } from './AppText';
+import { PressableScale } from './PressableScale';
 import { useTheme } from '@/theme';
-import { opacity, radius, spacing } from '@/theme/tokens';
+import { opacity, pressScale, radius, spacing } from '@/theme/tokens';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -63,19 +64,15 @@ export function Button({
   };
 
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
       disabled={disabled || loading}
-      style={({ pressed }) => [
-        container,
-        pressed && { opacity: opacity.pressed },
-        (disabled || loading) && { opacity: opacity.disabled },
-        style,
-      ]}>
+      scaleTo={pressScale.control}
+      style={[container, (disabled || loading) && { opacity: opacity.disabled }, style]}>
       {loading && <ActivityIndicator size="small" color={labelColors[variant]} />}
       <AppText size={size === 'lg' ? 'lg' : 'md'} weight="semibold" color={labelColors[variant]}>
         {label}
       </AppText>
-    </Pressable>
+    </PressableScale>
   );
 }

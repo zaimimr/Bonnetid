@@ -149,6 +149,16 @@ export const duration = {
   slow: 400,
 } as const;
 
+export const spring = {
+  press: { damping: 22, stiffness: 420, mass: 0.6 },
+  slide: { damping: 24, stiffness: 260, mass: 0.8 },
+} as const;
+
+export const pressScale = {
+  card: 0.98,
+  control: 0.95,
+} as const;
+
 export const hitSlop = { top: 8, bottom: 8, left: 8, right: 8 } as const;
 
 export const opacity = {

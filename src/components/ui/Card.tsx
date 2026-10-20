@@ -1,7 +1,8 @@
 import type { PropsWithChildren } from 'react';
-import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
+import { View, type StyleProp, type ViewStyle } from 'react-native';
+import { PressableScale } from './PressableScale';
 import { useTheme } from '@/theme';
-import { opacity, radius, spacing, type RadiusToken, type SpacingToken } from '@/theme/tokens';
+import { radius, spacing, type RadiusToken, type SpacingToken } from '@/theme/tokens';
 
 export type CardProps = PropsWithChildren<{
   onPress?: () => void;
@@ -41,11 +42,9 @@ export function Card({
 
   if (onPress) {
     return (
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [base, shadow, pressed && { opacity: opacity.pressed }, style]}>
+      <PressableScale onPress={onPress} style={[base, shadow, style]}>
         {children}
-      </Pressable>
+      </PressableScale>
     );
   }
 

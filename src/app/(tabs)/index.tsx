@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, type ReactNode } from 'react';
 import { View } from 'react-native';
-import { useAnimatedRef } from 'react-native-reanimated';
+import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
 import { AfterPrayerCard } from '@/components/duas/AfterPrayerCard';
@@ -20,6 +20,7 @@ import {
   AppText,
   Badge,
   Card,
+  enterUp,
   ErrorState,
   InlineLink,
   NoTimesState,
@@ -257,11 +258,14 @@ export default function HomeScreen() {
         ) : undefined
       }>
       {editing ? (
-        <View style={{ marginTop: spacing.lg }}>
+        <Animated.View key="edit" entering={enterUp()} style={{ marginTop: spacing.lg }}>
           <HomeEditor blocks={blocks} scrollRef={scrollRef} />
-        </View>
+        </Animated.View>
       ) : (
-        <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>
+        <Animated.View
+          key="view"
+          entering={enterUp()}
+          style={{ marginTop: spacing.lg, gap: spacing.lg }}>
           <MosquePresenceCard />
 
           <NotificationCheckCard />
@@ -286,7 +290,7 @@ export default function HomeScreen() {
               }}
             />
           </View>
-        </View>
+        </Animated.View>
       )}
     </Screen>
   );
