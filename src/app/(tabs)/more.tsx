@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { useIsFocused, useRouter } from 'expo-router';
 import { Icon, type IconName } from '@/components/icons';
-import { AppText, Badge, Card, Divider, ListRow, Screen } from '@/components/ui';
+import { AppText, Badge, Card, Divider, enterUp, ListRow, Screen } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 import { FEATURES, useAvailableFeatures } from '@/components/customization/features';
@@ -47,8 +48,11 @@ export default function MoreScreen() {
       </View>
 
       <View style={{ gap: spacing.sm }}>
-        {rows.map((row) => (
-          <View key={row[0].key} style={{ flexDirection: 'row', gap: spacing.sm }}>
+        {rows.map((row, rowIndex) => (
+          <Animated.View
+            key={row[0].key}
+            entering={enterUp(rowIndex)}
+            style={{ flexDirection: 'row', gap: spacing.sm }}>
             {row.map((tile) => (
               <View key={tile.key} style={{ flex: 1 }}>
                 <Card
@@ -66,7 +70,7 @@ export default function MoreScreen() {
             {Array.from({ length: COLUMNS - row.length }, (_, index) => (
               <View key={index} style={{ flex: 1 }} />
             ))}
-          </View>
+          </Animated.View>
         ))}
       </View>
 

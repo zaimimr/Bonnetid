@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 import { Tabs } from 'expo-router';
+import { useReducedMotion } from 'react-native-reanimated';
 import { Icon, type IconName } from '@/components/icons';
 import { AppTabBar } from '@/components/navigation/AppTabBar';
 import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
@@ -8,6 +9,7 @@ import { FEATURE_IDS } from '@/lib/customization';
 import { useOnboardingDone, useSettings, useSettingsHydrated } from '@/store/settings';
 import { useSupportThread } from '@/hooks/useSupportThread';
 import { useTheme } from '@/theme';
+import { duration } from '@/theme/tokens';
 import { t } from '@/lib/i18n';
 
 const isAndroid = Platform.OS === 'android';
@@ -23,6 +25,7 @@ export default function TabsLayout() {
   const { unread } = useSupportThread();
   const tabSlots = useSettings((state) => state.tabSlots);
   const available = useAvailableFeatures();
+  const reduceMotion = useReducedMotion();
 
   if (hydrated && !onboardingDone) return <OnboardingFlow />;
 
@@ -44,6 +47,8 @@ export default function TabsLayout() {
         headerTitleStyle: { color: theme.colors.textPrimary },
         headerTintColor: theme.colors.primary,
         sceneStyle: { backgroundColor: theme.colors.background },
+        animation: reduceMotion ? 'none' : 'fade',
+        transitionSpec: { animation: 'timing', config: { duration: duration.fast } },
       }}>
       <Tabs.Screen
         name="index"
