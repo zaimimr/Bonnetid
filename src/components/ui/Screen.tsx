@@ -21,6 +21,7 @@ export type ScreenProps = PropsWithChildren<{
   onRefresh?: () => void;
   scrollRef?: Ref<ScrollView>;
   aside?: ReactNode;
+  header?: ReactNode;
 }>;
 
 export function Screen({
@@ -35,6 +36,7 @@ export function Screen({
   onRefresh,
   scrollRef,
   aside,
+  header,
 }: ScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -117,6 +119,18 @@ export function Screen({
     <View style={shell}>
       <TravelBanner />
       <EidBanner />
+      {header != null && (
+        <View
+          style={{
+            paddingStart: side + insets.left,
+            paddingEnd: side + insets.right,
+            paddingVertical: spacing.md,
+            borderBottomWidth: StyleSheet.hairlineWidth,
+            borderColor: theme.colors.border,
+          }}>
+          <View style={[inner, { flexGrow: 0 }]}>{header}</View>
+        </View>
+      )}
       {body}
     </View>
   );

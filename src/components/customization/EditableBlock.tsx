@@ -23,35 +23,36 @@ export function EditableBlock({
   const theme = useTheme();
   const [empty, setEmpty] = useState(false);
 
-  return (
-    <View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm }}>
-        {onRemove && (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`${t('customize.remove')}: ${label}`}
-            hitSlop={10}
-            onPress={onRemove}>
-            <Icon name="minus-circle" size={24} color={theme.colors.danger} weight="fill" />
-          </Pressable>
-        )}
-        <AppText
-          size="sm"
-          weight="semibold"
-          tone="textSecondary"
-          numberOfLines={1}
-          style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0 }}>
-          {label}
-        </AppText>
-        <Sortable.Handle>
-          <View
-            accessible
-            accessibilityLabel={`${t('customize.drag')}: ${label}`}
-            style={{ padding: spacing.xs }}>
-            <Icon name="dots-six-vertical" size={24} color={theme.colors.textMuted} />
-          </View>
-        </Sortable.Handle>
+  const header = (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm }}>
+      {onRemove && (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${t('customize.remove')}: ${label}`}
+          hitSlop={10}
+          onPress={onRemove}>
+          <Icon name="minus-circle" size={24} color={theme.colors.danger} weight="fill" />
+        </Pressable>
+      )}
+      <AppText
+        size="sm"
+        weight="semibold"
+        tone="textSecondary"
+        numberOfLines={1}
+        style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0 }}>
+        {label}
+      </AppText>
+      <View
+        accessible
+        accessibilityLabel={`${t('customize.drag')}: ${label}`}
+        style={{ padding: spacing.xs }}>
+        <Icon name="dots-six-vertical" size={24} color={theme.colors.textMuted} />
       </View>
+    </View>
+  );
+
+  const content = (
+    <>
       <View
         pointerEvents={interactive ? 'auto' : 'none'}
         onLayout={(event) => setEmpty(event.nativeEvent.layout.height === 0)}
@@ -69,6 +70,18 @@ export function EditableBlock({
           </AppText>
         </Card>
       )}
+    </>
+  );
+
+  return interactive ? (
+    <View>
+      <Sortable.Handle>{header}</Sortable.Handle>
+      {content}
     </View>
+  ) : (
+    <Sortable.Handle>
+      {header}
+      {content}
+    </Sortable.Handle>
   );
 }

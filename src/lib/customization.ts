@@ -3,8 +3,11 @@ export const FEATURE_IDS = ['calendar', 'qibla', 'mosques', 'jumuah', 'duas', 't
 export type FeatureId = (typeof FEATURE_IDS)[number];
 
 export const MAX_TAB_SLOTS = 3;
-export const DEFAULT_TAB_SLOTS: FeatureId[] = ['calendar', 'qibla', 'mosques'];
-export const PREVIOUS_DEFAULT_TAB_SLOTS: FeatureId[] = ['calendar', 'qibla'];
+export const DEFAULT_TAB_SLOTS: FeatureId[] = ['calendar', 'qibla', 'jumuah'];
+export const PREVIOUS_DEFAULT_TAB_SLOTS: FeatureId[][] = [
+  ['calendar', 'qibla'],
+  ['calendar', 'qibla', 'mosques'],
+];
 
 export const MAX_SHORTCUTS = 4;
 export const DEFAULT_SHORTCUTS: FeatureId[] = ['duas', 'tasbih', 'jumuah', 'tracker'];

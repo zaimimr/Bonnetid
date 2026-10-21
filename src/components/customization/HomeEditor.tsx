@@ -31,15 +31,11 @@ export function HomeEditor({
   blocks: Record<HomeBlockId, ReactNode>;
   scrollRef: AnimatedRef<any>;
 }) {
-  const theme = useTheme();
   const homeLayout = useSettings((state) => state.homeLayout);
   const setHomeLayout = useSettings((state) => state.setHomeLayout);
   const setShortcuts = useSettings((state) => state.setShortcuts);
   const setTabSlots = useSettings((state) => state.setTabSlots);
-  const setEditing = useHomeEdit((state) => state.setEditing);
-  const [adding, setAdding] = useState(false);
   const shown = homeLayout.filter((block) => block.visible).map((block) => block.id);
-  const hidden = homeLayout.filter((block) => !block.visible).map((block) => block.id);
 
   const save = (next: HomeBlock[]) => {
     setHomeLayout(next);
@@ -50,13 +46,6 @@ export function HomeEditor({
 
   return (
     <View style={{ gap: spacing.lg }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-        <AppText size="xl" weight="bold" heading style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0 }}>
-          {t('customize.customize')}
-        </AppText>
-        <Button label={t('customize.done')} size="sm" onPress={() => setEditing(false)} />
-      </View>
-
       <Sortable.Grid
         columns={1}
         data={shown}
@@ -81,25 +70,48 @@ export function HomeEditor({
         )}
       />
 
-      <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-        <Button
-          label={t('customize.addCard')}
-          variant="secondary"
-          disabled={hidden.length === 0}
-          onPress={() => setAdding(true)}
-          style={{ flexGrow: 1, flexBasis: 0 }}
-        />
-        <Button
-          label={t('customize.reset')}
-          variant="ghost"
-          onPress={() => {
-            save(DEFAULT_HOME_LAYOUT);
-            setShortcuts(DEFAULT_SHORTCUTS);
-            setTabSlots(DEFAULT_TAB_SLOTS);
-          }}
-          style={{ flexGrow: 1, flexBasis: 0 }}
-        />
-      </View>
+      <Button
+        label={t('customize.reset')}
+        variant="ghost"
+        onPress={() => {
+          save(DEFAULT_HOME_LAYOUT);
+          setShortcuts(DEFAULT_SHORTCUTS);
+          setTabSlots(DEFAULT_TAB_SLOTS);
+        }}
+      />
+    </View>
+  );
+}
+
+export function HomeEditorHeader() {
+  const theme = useTheme();
+  const homeLayout = useSettings((state) => state.homeLayout);
+  const setHomeLayout = useSettings((state) => state.setHomeLayout);
+  const setEditing = useHomeEdit((state) => state.setEditing);
+  const [adding, setAdding] = useState(false);
+  const hidden = homeLayout.filter((block) => !block.visible).map((block) => block.id);
+
+  const add = (id: HomeBlockId) => {
+    const next = addHomeBlock(homeLayout, id);
+    setHomeLayout(next);
+    track('home_layout_changed', {
+      blocks: next.filter((block) => block.visible).map((block) => block.id).join(','),
+    });
+  };
+
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+      <AppText size="xl" weight="bold" heading numberOfLines={1} style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0 }}>
+        {t('customize.customize')}
+      </AppText>
+      <Button
+        label={t('customize.addCard')}
+        variant="secondary"
+        size="sm"
+        disabled={hidden.length === 0}
+        onPress={() => setAdding(true)}
+      />
+      <Button label={t('customize.done')} size="sm" onPress={() => setEditing(false)} />
 
       <Sheet visible={adding} onClose={() => setAdding(false)} title={t('customize.addCard')}>
         {hidden.map((id, index) => (
@@ -114,7 +126,7 @@ export function HomeEditor({
               }
               trailing={<Icon name="plus-circle" size={24} color={theme.colors.primary} weight="fill" />}
               onPress={() => {
-                save(addHomeBlock(homeLayout, id));
+                add(id);
                 if (hidden.length === 1) setAdding(false);
               }}
             />

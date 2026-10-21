@@ -291,7 +291,7 @@ export const useSettings = create<SettingsState>()(
     {
       name: 'bonnetid-settings',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 7,
+      version: 8,
       migrate: (persisted, version) => {
         const state = persisted as Partial<SettingsState> | undefined;
         if (!state) return persisted as SettingsState;
@@ -310,8 +310,13 @@ export const useSettings = create<SettingsState>()(
         }
         state.tabSlots = normalizeSlots(state.tabSlots, MAX_TAB_SLOTS, DEFAULT_TAB_SLOTS);
         state.shortcuts = normalizeSlots(state.shortcuts, MAX_SHORTCUTS, DEFAULT_SHORTCUTS);
+        if (version < 8) {
+          state.tabSlots = PREVIOUS_DEFAULT_TAB_SLOTS.reduce(
+            (slots, previous) => upgradeDefault(slots, previous, DEFAULT_TAB_SLOTS),
+            state.tabSlots,
+          );
+        }
         if (version < 7) {
-          state.tabSlots = upgradeDefault(state.tabSlots, PREVIOUS_DEFAULT_TAB_SLOTS, DEFAULT_TAB_SLOTS);
           state.shortcuts = upgradeDefault(state.shortcuts, PREVIOUS_DEFAULT_SHORTCUTS, DEFAULT_SHORTCUTS);
         }
         state.homeLayout = Array.isArray(state.homeLayout)
