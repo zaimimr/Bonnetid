@@ -1,11 +1,13 @@
 import { Platform } from 'react-native';
 import { Tabs } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { useReducedMotion } from 'react-native-reanimated';
 import { Icon, type IconName } from '@/components/icons';
 import { AppTabBar } from '@/components/navigation/AppTabBar';
 import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 import { FEATURES, useAvailableFeatures } from '@/components/customization/features';
 import { FEATURE_IDS } from '@/lib/customization';
+import { useHomeEdit } from '@/store/homeEdit';
 import { useOnboardingDone, useSettings, useSettingsHydrated } from '@/store/settings';
 import { useSupportThread } from '@/hooks/useSupportThread';
 import { useTheme } from '@/theme';
@@ -26,6 +28,7 @@ export default function TabsLayout() {
   const tabSlots = useSettings((state) => state.tabSlots);
   const available = useAvailableFeatures();
   const reduceMotion = useReducedMotion();
+  const setEditing = useHomeEdit((state) => state.setEditing);
 
   if (hydrated && !onboardingDone) return <OnboardingFlow />;
 
@@ -38,6 +41,13 @@ export default function TabsLayout() {
   return (
     <Tabs
       tabBar={(props) => <AppTabBar {...props} visible={visible} />}
+      screenListeners={({ navigation }) => ({
+        tabLongPress: () => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+          navigation.navigate('index');
+          setEditing(true);
+        },
+      })}
       screenOptions={{
         headerShown: false,
         headerStyle: {

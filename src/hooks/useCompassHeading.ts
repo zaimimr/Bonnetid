@@ -12,7 +12,8 @@ export type CompassState = {
 
 const MOTION_INTERVAL_MS = 50;
 const MOTION_SMOOTHING = 0.25;
-const MIN_CHANGE_DEGREES = 0.5;
+const HEADING_SMOOTHING = 0.35;
+const MIN_CHANGE_DEGREES = 1;
 
 const INITIAL: CompassState = { heading: null, accuracy: null, permissionDenied: false };
 
@@ -75,7 +76,9 @@ function startSource(): () => void {
         declination = signedDelta(reading.magHeading, reading.trueHeading);
       }
       if (motionDriven) return;
-      publish(reading.trueHeading >= 0 ? reading.trueHeading : reading.magHeading);
+      const raw = reading.trueHeading >= 0 ? reading.trueHeading : reading.magHeading;
+      fused = smoothHeading(fused, raw, HEADING_SMOOTHING);
+      publish(fused);
     });
     if (cancelled) headingSubscription.remove();
   }

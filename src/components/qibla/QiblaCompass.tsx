@@ -10,11 +10,11 @@ import { Icon } from '@/components/icons';
 import Svg, { Path } from 'react-native-svg';
 import { t } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
+import { useQiblaAligned } from '@/hooks/useQiblaAligned';
 import { useResponsive } from '@/hooks/useResponsive';
 import {
   formatAccuracy,
   isBearingTrustworthy,
-  isQiblaAligned,
   normalizeAngleDelta,
 } from '@/lib/geo';
 import { useTheme } from '@/theme';
@@ -84,7 +84,7 @@ export function QiblaCompass({
   );
 
   const trustworthy = isBearingTrustworthy(uncertaintyDegrees);
-  const isAligned = isQiblaAligned(heading, qiblaBearing, uncertaintyDegrees);
+  const isAligned = useQiblaAligned(heading, qiblaBearing, uncertaintyDegrees);
   const wedgeHalfAngle = Math.min(uncertaintyDegrees, 89);
 
   useEffect(() => {

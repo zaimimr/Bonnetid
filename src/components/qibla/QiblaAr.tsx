@@ -17,13 +17,20 @@ import { t } from '@/lib/i18n';
 import { AppText, Button, EmptyState } from '@/components/ui';
 import { useArPose } from '@/hooks/useArPose';
 import { buildArScene, type ArScene, type Viewport } from '@/lib/arProjection';
-import { isBearingTrustworthy, isQiblaAligned } from '@/lib/geo';
+import { isBearingTrustworthy, QIBLA_TURN_STEP_DEGREES } from '@/lib/geo';
+import { useQiblaAligned } from '@/hooks/useQiblaAligned';
 import { palette, radius, spacing } from '@/theme/tokens';
 
 const AR_INK = palette.neutral0;
 const AR_SCRIM = 'rgba(0, 0, 0, 0.55)';
 const AR_GUIDE = palette.gold400;
 const AR_ALIGNED = palette.emerald400;
+
+const turnStep = (delta: number) =>
+  Math.max(
+    QIBLA_TURN_STEP_DEGREES,
+    Math.round(Math.abs(delta) / QIBLA_TURN_STEP_DEGREES) * QIBLA_TURN_STEP_DEGREES,
+  );
 const AR_TEXT_SHADOW = {
   textShadowColor: 'rgba(0, 0, 0, 0.75)',
   textShadowOffset: { width: 0, height: 1 },
@@ -43,7 +50,7 @@ export function QiblaAr({ qiblaBearing, uncertaintyDegrees = 0 }: QiblaArProps) 
   );
 
   const trustworthy = isBearingTrustworthy(uncertaintyDegrees);
-  const aligned = pose ? isQiblaAligned(pose.heading, qiblaBearing, uncertaintyDegrees) : false;
+  const aligned = useQiblaAligned(pose?.heading ?? null, qiblaBearing, uncertaintyDegrees);
   const wasAligned = useRef(false);
   const granted = cameraPermission?.granted ?? false;
   const [introDone, setIntroDone] = useState(false);
@@ -169,11 +176,11 @@ function ArOverlay({
       ? t('qibla.raiseThePhoneTowards')
       : scene.pitchHint === 'lower'
         ? t('qibla.lowerThePhoneTowards')
-        : Math.abs(scene.deltaDeg) <= 5
+        : aligned
           ? null
           : scene.deltaDeg > 0
-            ? t('qibla.turnToTheRight', { value: Math.round(Math.abs(scene.deltaDeg)) })
-            : t('qibla.turnToTheLeft', { value: Math.round(Math.abs(scene.deltaDeg)) });
+            ? t('qibla.turnToTheRight', { value: turnStep(scene.deltaDeg) })
+            : t('qibla.turnToTheLeft', { value: turnStep(scene.deltaDeg) });
 
   const compassPoor = headingAccuracy != null && headingAccuracy >= 0 && headingAccuracy <= 1;
 

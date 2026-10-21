@@ -24,7 +24,11 @@ export function qiblaBearing(lat: number, lon: number): number {
   return bearingBetween(lat, lon, KAABA.lat, KAABA.lon);
 }
 
-export const QIBLA_ALIGNED_THRESHOLD_DEGREES = 5;
+export const QIBLA_ALIGNED_THRESHOLD_DEGREES = 8;
+
+export const QIBLA_RELEASE_THRESHOLD_DEGREES = 12;
+
+export const QIBLA_TURN_STEP_DEGREES = 5;
 
 export const HARAM_RADIUS_KM = 0.05;
 
@@ -56,8 +60,10 @@ export function isQiblaAligned(
   heading: number,
   bearing: number,
   uncertaintyDegrees = 0,
+  wasAligned = false,
 ): boolean {
-  const tolerance = Math.max(QIBLA_ALIGNED_THRESHOLD_DEGREES, uncertaintyDegrees);
+  const threshold = wasAligned ? QIBLA_RELEASE_THRESHOLD_DEGREES : QIBLA_ALIGNED_THRESHOLD_DEGREES;
+  const tolerance = Math.max(threshold, uncertaintyDegrees);
   return Math.abs(normalizeAngleDelta(bearing - heading)) <= tolerance;
 }
 

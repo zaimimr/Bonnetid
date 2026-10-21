@@ -2,6 +2,8 @@ import { Fragment, useEffect, useMemo, type ReactNode } from 'react';
 import { View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
 import { AfterPrayerCard } from '@/components/duas/AfterPrayerCard';
 import { NextPrayerHero } from '@/components/prayer/NextPrayerHero';
@@ -14,7 +16,7 @@ import { NotificationCheckCard } from '@/components/notifications/NotificationCh
 import { EidLeaveCard } from '@/components/season/EidLeaveCard';
 import { SeasonCard } from '@/components/season/SeasonCard';
 import { NightCard } from '@/components/season/NightCard';
-import { HomeEditor } from '@/components/customization/HomeEditor';
+import { HomeEditor, HomeEditorHeader } from '@/components/customization/HomeEditor';
 import { HomeShortcuts } from '@/components/customization/HomeShortcuts';
 import {
   AppText,
@@ -240,6 +242,19 @@ export default function HomeScreen() {
     ),
   };
 
+  const startEditing = () => setEditing(true);
+  const longPress = Gesture.LongPress()
+    .minDuration(500)
+    .runOnJS(true)
+    .onStart(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+      startEditing();
+    });
+
+  useEffect(() => {
+    if (editing) scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, [editing, scrollRef]);
+
   const render = (ids: HomeBlockId[]) =>
     ids.map((id) => <Fragment key={id}>{blocks[id]}</Fragment>);
   const shown = homeLayout.filter((block) => block.visible).map((block) => block.id);
@@ -252,6 +267,7 @@ export default function HomeScreen() {
       refreshing={refreshing}
       onRefresh={onRefresh}
       scrollRef={scrollRef}
+      header={editing ? <HomeEditorHeader /> : undefined}
       aside={
         aside.length > 0 ? (
           <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>{render(aside)}</View>
@@ -262,35 +278,34 @@ export default function HomeScreen() {
           <HomeEditor blocks={blocks} scrollRef={scrollRef} />
         </Animated.View>
       ) : (
-        <Animated.View
-          key="view"
-          entering={enterUp()}
-          style={{ marginTop: spacing.lg, gap: spacing.lg }}>
-          <MosquePresenceCard />
+        <GestureDetector gesture={longPress}>
+          <Animated.View
+            key="view"
+            entering={enterUp()}
+            style={{ marginTop: spacing.lg, gap: spacing.lg }}>
+            <MosquePresenceCard />
 
-          <NotificationCheckCard />
+            <NotificationCheckCard />
 
-          {isLoading && <Skeleton height={220} rounded="xl" />}
+            {isLoading && <Skeleton height={220} rounded="xl" />}
 
-          {isError && <ErrorState onRetry={refetch} />}
+            {isError && <ErrorState onRetry={refetch} />}
 
-          {!isLoading && !isError && todaySchedule.length === 0 && (
-            <NoTimesState period={monthYearLabel(today)} onRetry={refetch} />
-          )}
+            {!isLoading && !isError && todaySchedule.length === 0 && (
+              <NoTimesState period={monthYearLabel(today)} onRetry={refetch} />
+            )}
 
-          {render(main)}
+            {render(main)}
 
-          <View style={{ alignItems: 'center' }}>
-            <InlineLink
-              label={t('customize.customize')}
-              icon="sliders-horizontal"
-              onPress={() => {
-                setEditing(true);
-                scrollRef.current?.scrollTo({ y: 0, animated: true });
-              }}
-            />
-          </View>
-        </Animated.View>
+            <View style={{ alignItems: 'center' }}>
+              <InlineLink
+                label={t('customize.customize')}
+                icon="sliders-horizontal"
+                onPress={startEditing}
+              />
+            </View>
+          </Animated.View>
+        </GestureDetector>
       )}
     </Screen>
   );
