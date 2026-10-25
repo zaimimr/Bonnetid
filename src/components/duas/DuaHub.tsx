@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { t } from '@/lib/i18n';
-import { useMosque } from '@/api/queries';
+import { useMosque, useMosqueJamatPeriods } from '@/api/queries';
 import { Icon, type IconName } from '@/components/icons';
 import { ArabicText } from '@/components/duas/ArabicText';
 import { AppText, Card, Divider, IconTile, ListRow, mirrored } from '@/components/ui';
@@ -20,7 +20,7 @@ import {
   type DuaCategory,
   type DuaCategoryId,
 } from '@/lib/duas';
-import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
+import { adhanTimesFromSchedule, jamatTimesForDate, mosqueJamatForDate } from '@/lib/prayerSchedule';
 import { wallClockToDate } from '@/lib/time';
 import { useActiveLocation } from '@/store/settings';
 import { useTheme } from '@/theme';
@@ -103,13 +103,17 @@ function useHubCategories() {
   const location = useActiveLocation();
   const { isoDate } = useActiveDayKeys(now);
   const presenceDetails = useMosque(presence?.mosque.org_nr ?? '', { enabled: presence != null });
+  const presencePeriods = useMosqueJamatPeriods(presence?.mosque.org_nr ?? '', {
+    enabled: presence != null,
+  });
+  const presenceJamat = mosqueJamatForDate(presenceDetails.data, presencePeriods.data, isoDate);
   const current = nextPrayer?.current ?? null;
   const jamatClock = current
     ? jamatTimesForDate(
-        presenceDetails.data?.jamat,
+        presenceJamat.jamat,
         isoDate,
         adhanTimesFromSchedule(todaySchedule),
-        presenceDetails.data?.jummah ?? [],
+        presenceJamat.jummah,
         now,
       )[current.name]
     : null;

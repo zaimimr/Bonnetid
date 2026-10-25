@@ -6,7 +6,7 @@ import {
   setPrayerSnapshot,
   startOrUpdatePrayerActivity,
 } from '../../modules/prayer-widget';
-import { useHijriMonth, useMosque, useMosques } from '@/api/queries';
+import { useHijriMonth, useMosque, useMosqueJamatPeriods, useMosques } from '@/api/queries';
 import type { PrayerDay } from '@/api/types';
 import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
@@ -19,6 +19,7 @@ import {
   adhanTimesFromSchedule,
   buildDaySchedule,
   jamatTimesForDate,
+  mosqueJamatForDate,
   nextPrayerDay,
   type PrayerEntry,
 } from '@/lib/prayerSchedule';
@@ -54,6 +55,7 @@ export function useWidgetSync(now: Date) {
   const trackerEnabled = useSettings((state) => state.prayerTrackerEnabled);
   const lockScreenEnabled = liveActivityEnabled && trackerEnabled;
   const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
+  const jamatPeriods = useMosqueJamatPeriods(mosque?.orgNr ?? '', { enabled: mosque != null });
   const mosqueList = useMosques();
 
   const { dayKey } = useActiveDayKeys(now);
@@ -94,8 +96,9 @@ export function useWidgetSync(now: Date) {
       const hijriRow = hijriRows.find((entry) => entry.gregorian_date === iso);
       // The Jumuah rides along separately, so a widget can drop back to Dhuhr on its own
       // once the last congregation is over, without the app having to write a new snapshot.
+      const { jamat, jummah } = mosqueJamatForDate(mosqueDetails.data, jamatPeriods.data, iso);
       const jamatTimes = jamatTimesForDate(
-        mosqueInLocation ? mosqueDetails.data?.jamat : null,
+        mosqueInLocation ? jamat : null,
         iso,
         mosqueInLocation ? adhanTimesFromSchedule(schedule) : {},
       );
@@ -105,7 +108,7 @@ export function useWidgetSync(now: Date) {
         schedule,
         hijriText: hijriRow ? formatHijri(hijriRow.hijri_date, hijriRow.hijri_month_text) : '',
         jamatTimes,
-        jummah: jummahSlotFor(iso, mosqueDetails.data?.jummah ?? []),
+        jummah: jummahSlotFor(iso, jummah),
       };
     });
 
@@ -121,8 +124,8 @@ export function useWidgetSync(now: Date) {
     asrMethod,
     zone,
     mosqueInLocation,
-    mosqueDetails.data?.jamat,
-    mosqueDetails.data?.jummah,
+    mosqueDetails.data,
+    jamatPeriods.data,
   ]);
 
   // The car app ranks these against its own position, so every mosque with coordinates ships.

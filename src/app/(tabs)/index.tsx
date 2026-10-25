@@ -4,7 +4,7 @@ import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { useHijriMonth, useMosque, useSpecialDates } from '@/api/queries';
+import { useHijriMonth, useMosque, useMosqueJamatPeriods, useSpecialDates } from '@/api/queries';
 import { AfterPrayerCard } from '@/components/duas/AfterPrayerCard';
 import { NextPrayerHero } from '@/components/prayer/NextPrayerHero';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
@@ -42,7 +42,7 @@ import { usePrayerDay } from '@/hooks/usePrayerDay';
 import { useRefresh } from '@/hooks/useRefresh';
 import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 import { formatGregorianLong, formatHijri, monthYearLabel } from '@/lib/hijri';
-import { adhanTimesFromSchedule, jamatTimesForDate } from '@/lib/prayerSchedule';
+import { adhanTimesFromSchedule, jamatTimesForDate, mosqueJamatForDate } from '@/lib/prayerSchedule';
 import { track } from '@/lib/telemetry';
 import { isoDateIsFriday, isoDateIsJumuahEveOrDay, parseDayKey } from '@/lib/time';
 import { spacing } from '@/theme/tokens';
@@ -78,6 +78,7 @@ export default function HomeScreen() {
 
   const hijriMonth = useHijriMonth(today.getFullYear(), today.getMonth() + 1);
   const mosqueDetails = useMosque(mosque?.orgNr ?? '', { enabled: mosque != null });
+  const jamatPeriods = useMosqueJamatPeriods(mosque?.orgNr ?? '', { enabled: mosque != null });
   const presence = useMosquePresence();
   const specialsThisYear = useSpecialDates(today.getFullYear());
   const specialsNextYear = useSpecialDates(today.getFullYear() + 1);
@@ -89,7 +90,11 @@ export default function HomeScreen() {
 
   const mosqueIso = mosqueDetails.data?.location_iso;
   const mosqueInLocation = mosqueIso == null || mosqueIso === location.iso;
-  const jummahTimes = mosqueDetails.data?.jummah ?? [];
+  const { jamat: todayJamat, jummah: jummahTimes } = mosqueJamatForDate(
+    mosqueDetails.data,
+    jamatPeriods.data,
+    todayIso,
+  );
   const unreadAnnouncement = useUnreadAnnouncement(
     mosque?.orgNr,
     mosqueDetails.data?.announcement,
@@ -108,7 +113,7 @@ export default function HomeScreen() {
     now,
   );
   const jamatTimes = jamatTimesForDate(
-    mosqueInLocation ? mosqueDetails.data?.jamat : null,
+    mosqueInLocation ? todayJamat : null,
     todayIso,
     mosqueInLocation ? adhanTimesFromSchedule(todaySchedule) : {},
     jummahTimes,

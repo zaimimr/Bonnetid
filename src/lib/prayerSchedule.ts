@@ -1,4 +1,4 @@
-import type { PrayerDay } from '@/api/types';
+import type { Mosque, MosqueJamat, MosqueJummah, PrayerDay } from '@/api/types';
 import type { AsrMethodPreference } from '@/store/settings';
 import { t } from './i18n.ts';
 import { jummahSlotFor, jummahSlotIsOpen } from './jummah.ts';
@@ -147,6 +147,16 @@ export function findJamatPeriod<T extends JamatSource>(
         (!period.end_date || isoDate <= period.end_date),
     ) ?? null
   );
+}
+
+export function mosqueJamatForDate(
+  mosque: Mosque | undefined,
+  periods: MosqueJamat[] | undefined,
+  isoDate: string,
+): { jamat: MosqueJamat | null; jummah: MosqueJummah[] } {
+  const jamat = findJamatPeriod(periods, isoDate) ?? mosque?.jamat ?? null;
+  const jummah = jamat?.jummah?.length ? jamat.jummah : (mosque?.jummah ?? []);
+  return { jamat, jummah };
 }
 
 export function adhanTimesFromSchedule(entries: PrayerEntry[]): AdhanTimes {

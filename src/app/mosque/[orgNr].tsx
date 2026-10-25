@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { ActionSheetIOS, Linking, Platform, Pressable, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { Icon } from '@/components/icons';
-import { useMosque, usePrayerTimes } from '@/api/queries';
+import { useMosque, useMosqueJamatPeriods, usePrayerTimes } from '@/api/queries';
 import { toPreference, useEffectiveAsrMethod } from '@/hooks/useEffectiveAsrMethod';
 import { useEidPeriod } from '@/hooks/useEidPeriod';
 import { useRefresh } from '@/hooks/useRefresh';
@@ -24,6 +24,7 @@ import {
   adhanTimesFromSchedule,
   buildDaySchedule,
   jamatTimesForDate,
+  mosqueJamatForDate,
   PRAYER_LABELS,
 } from '@/lib/prayerSchedule';
 import { eidPrayerTitle, formatGregorianShort } from '@/lib/hijri';
@@ -78,7 +79,6 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
   const { isWide } = useResponsive();
   const stacked = isStacked && !isWide;
   const columnWidth = scaleWidth(TIME_COLUMN_WIDTH, scale);
-  const jamat = mosque.jamat;
   const selectedMosque = useSettings((state) => state.mosque);
   const setMosque = useSettings((state) => state.setMosque);
   const calculated = useIsCalculatedMode();
@@ -95,6 +95,8 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
 
   const now = useNow(60_000);
   const today = useMemo(() => osloDayStart(now), [now]);
+  const jamatPeriods = useMosqueJamatPeriods(mosque.org_nr);
+  const { jamat, jummah } = mosqueJamatForDate(mosque, jamatPeriods.data, osloDateKey(today));
   const month = usePrayerTimes(
     mosque.location_iso ?? '',
     today.getFullYear(),
@@ -112,7 +114,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
     jamat,
     osloDateKey(today),
     adhanTimes,
-    mosque.jummah,
+    jummah,
     now,
   );
 

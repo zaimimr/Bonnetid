@@ -17,7 +17,7 @@ import { spacing } from '@/theme/tokens';
 import {
   adhanTimesFromSchedule,
   buildDaySchedule,
-  findJamatPeriod,
+  mosqueJamatForDate,
   jamatTimesForDate,
   nextPrayerDay,
 } from '@/lib/prayerSchedule';
@@ -81,12 +81,11 @@ export default function DayScreen() {
   const isFriday = date.getDay() === FRIDAY;
   const mosqueIso = mosqueDetails.data?.location_iso;
   const mosqueInLocation = mosqueIso == null || mosqueIso === location.iso;
-  const jamatPeriod =
-    findJamatPeriod(jamatPeriods.data, isoDate ?? '') ?? mosqueDetails.data?.jamat;
-  const jummahTimes =
-    jamatPeriod && 'jummah' in jamatPeriod && jamatPeriod.jummah && jamatPeriod.jummah.length > 0
-      ? jamatPeriod.jummah
-      : (mosqueDetails.data?.jummah ?? []);
+  const { jamat: jamatPeriod, jummah: jummahTimes } = mosqueJamatForDate(
+    mosqueDetails.data,
+    jamatPeriods.data,
+    isoDate ?? '',
+  );
   // Only today's card drops back to Dhuhr; a past Friday should keep showing its Jumuah.
   const jamatTimes = jamatTimesForDate(
     mosqueInLocation ? jamatPeriod : null,
