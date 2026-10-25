@@ -24,6 +24,7 @@ import { useNotificationResponses } from '@/hooks/useNotificationResponses';
 import { useAutoLocation } from '@/hooks/useAutoLocation';
 import { useTravelMode } from '@/hooks/useTravelMode';
 import { useFastingReminders } from '@/hooks/useFastingReminders';
+import { useClockChangeReminder } from '@/hooks/useClockChangeReminder';
 import { useNotificationOpenFlag } from '@/hooks/useNotificationOpenFlag';
 import { WhatsNewHost } from '@/components/whatsNew/WhatsNewHost';
 import { SurveyHost } from '@/components/survey/SurveyHost';
@@ -80,6 +81,7 @@ function RootNavigator() {
   useNotificationScheduler();
   useNotificationResponses();
   useFastingReminders(now);
+  useClockChangeReminder(now);
   useNotificationOpenFlag();
   const registerLaunch = useSettings((state) => state.registerLaunch);
   useEffect(() => {

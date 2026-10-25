@@ -27,5 +27,9 @@
   "skip": "Hopp over",
   "reminders": "Påminnelser",
   "itIsTimeFor": "Det er tid for {{label}} i {{locationName}}.",
-  "lastsUntil": "{{start}}\nVarer til {{endClock}} ({{duration}})."
+  "lastsUntil": "{{start}}\nVarer til {{endClock}} ({{duration}}).",
+  "clockChange": "Timeskifte",
+  "clockChangeTitle": "Timeskifte i natt",
+  "clockChangeForward": "Klokken stilles en time frem i natt. Fra i morgen er bønnetidene omtrent en time senere på klokken.",
+  "clockChangeBack": "Klokken stilles en time tilbake i natt. Fra i morgen er bønnetidene omtrent en time tidligere på klokken."
 }

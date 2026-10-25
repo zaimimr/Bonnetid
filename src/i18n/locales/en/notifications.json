@@ -27,5 +27,9 @@
   "skip": "Skip",
   "reminders": "Reminders",
   "itIsTimeFor": "It is time for {{label}} in {{locationName}}.",
-  "lastsUntil": "{{start}}\nLasts until {{endClock}} ({{duration}})."
+  "lastsUntil": "{{start}}\nLasts until {{endClock}} ({{duration}}).",
+  "clockChange": "Clock change",
+  "clockChangeTitle": "Clock change tonight",
+  "clockChangeForward": "The clocks go forward one hour tonight. From tomorrow, prayer times are about one hour later on the clock.",
+  "clockChangeBack": "The clocks go back one hour tonight. From tomorrow, prayer times are about one hour earlier on the clock."
 }

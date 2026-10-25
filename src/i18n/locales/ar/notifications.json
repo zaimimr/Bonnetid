@@ -27,5 +27,9 @@
   "skip": "تخطٍّ",
   "reminders": "التذكيرات",
   "itIsTimeFor": "حان وقت {{label}} في {{locationName}}.",
-  "lastsUntil": "{{start}}\nيستمر حتى {{endClock}} ({{duration}})."
+  "lastsUntil": "{{start}}\nيستمر حتى {{endClock}} ({{duration}}).",
+  "clockChange": "تغيير الساعة",
+  "clockChangeTitle": "تغيير الساعة الليلة",
+  "clockChangeForward": "تُقدَّم الساعة ساعة واحدة الليلة. ابتداءً من الغد تصبح أوقات الصلاة متأخرة نحو ساعة على الساعة.",
+  "clockChangeBack": "تُؤخَّر الساعة ساعة واحدة الليلة. ابتداءً من الغد تصبح أوقات الصلاة مبكرة نحو ساعة على الساعة."
 }

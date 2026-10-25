@@ -29,6 +29,20 @@ export function osloOffsetMinutes(instant: Date): number {
   return time >= summerStart && time < summerEnd ? OSLO_SUMMER_OFFSET : OSLO_STANDARD_OFFSET;
 }
 
+export type ClockChange = { at: Date; direction: 'forward' | 'back' };
+
+export function nextOsloClockChange(now: Date): ClockChange | null {
+  const time = now.getTime();
+  if (Number.isNaN(time)) return null;
+  const year = now.getUTCFullYear();
+  const candidates: ClockChange[] = [
+    { at: new Date(lastSundayAtOneUtc(year, MARCH)), direction: 'forward' },
+    { at: new Date(lastSundayAtOneUtc(year, OCTOBER)), direction: 'back' },
+    { at: new Date(lastSundayAtOneUtc(year + 1, MARCH)), direction: 'forward' },
+  ];
+  return candidates.find((change) => change.at.getTime() > time) ?? null;
+}
+
 export function deviceOffsetMinutes(instant: Date = new Date()): number {
   return -instant.getTimezoneOffset();
 }

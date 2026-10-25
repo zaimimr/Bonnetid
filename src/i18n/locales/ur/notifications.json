@@ -27,5 +27,9 @@
   "skip": "چھوڑ دیں",
   "reminders": "یاد دہانیاں",
   "itIsTimeFor": "{{locationName}} میں {{label}} کا وقت ہو گیا ہے۔",
-  "lastsUntil": "{{start}}\n{{endClock}} تک ({{duration}})۔"
+  "lastsUntil": "{{start}}\n{{endClock}} تک ({{duration}})۔",
+  "clockChange": "گھڑی کی تبدیلی",
+  "clockChangeTitle": "آج رات گھڑی بدلے گی",
+  "clockChangeForward": "آج رات گھڑیاں ایک گھنٹہ آگے کی جائیں گی۔ کل سے نماز کے اوقات گھڑی کے مطابق تقریباً ایک گھنٹہ بعد ہوں گے۔",
+  "clockChangeBack": "آج رات گھڑیاں ایک گھنٹہ پیچھے کی جائیں گی۔ کل سے نماز کے اوقات گھڑی کے مطابق تقریباً ایک گھنٹہ پہلے ہوں گے۔"
 }
