@@ -228,7 +228,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
             <ListRow
               title={t('mosque.donateWithVipps')}
               subtitle={
-                mosque.vipps_number
+                mosque.vipps_number && !mosque.vipps_url
                   ? t('mosque.opensVippsNumber', { vipps_number: mosque.vipps_number })
                   : t('mosque.opensVipps')
               }
@@ -236,7 +236,7 @@ function MosqueDetail({ mosque }: { mosque: Mosque }) {
               trailing={<Icon name="arrow-square-out" size={18} color={theme.colors.textMuted} />}
               onPress={() => {
                 track('mosque_donation_opened', { source: 'detail' });
-                openVipps(mosque.vipps_number);
+                openVipps(mosque);
               }}
               style={{ paddingHorizontal: spacing.md }}
             />

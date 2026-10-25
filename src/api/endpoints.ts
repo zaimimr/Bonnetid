@@ -1,6 +1,6 @@
 import { HIJRI_META, type HijriMeta } from '@/lib/hijriMeta';
 import { language } from '@/lib/i18n';
-import { vippsNumberFrom } from '@/lib/mosqueDonations';
+import { vippsNumberFrom, vippsUrlFrom } from '@/lib/mosqueDonations';
 import { supabase } from './supabase';
 import type { ApiLocation, HijriDay, Mosque, MosqueJamat, MosqueJummah, PrayerDay } from './types';
 
@@ -150,6 +150,8 @@ type MosqueRow = {
   reg_navn: string | null;
   org_name2: string | null;
   org_info: string | null;
+  vipps_nr: string | null;
+  vipps_nr_url: string | null;
   address: string | null;
   post_no: string | null;
   lat: number | null;
@@ -169,7 +171,7 @@ type MosqueRow = {
 };
 
 const MOSQUE_COLUMNS =
-  'organisasjonsnummer, reg_navn, org_name2, org_info, address, post_no, lat, lon, map_only, asr_method, contact_name, contact_phone, contact_email, reg_hjemmeside, logo, announcement, show_eid, eidprayer_time1, eidprayer_time2, eidprayer_time3';
+  'organisasjonsnummer, reg_navn, org_name2, org_info, vipps_nr, vipps_nr_url, address, post_no, lat, lon, map_only, asr_method, contact_name, contact_phone, contact_email, reg_hjemmeside, logo, announcement, show_eid, eidprayer_time1, eidprayer_time2, eidprayer_time3';
 
 type JamatPeriodRow = {
   id: number;
@@ -268,7 +270,8 @@ function toMosque(
     homepage: toHomepage(row.reg_hjemmeside),
     logo: toLogo(row.logo),
     announcement: toAnnouncement(row.announcement),
-    vipps_number: vippsNumberFrom(row.org_info, row.announcement),
+    vipps_number: row.vipps_nr?.trim() || vippsNumberFrom(row.org_info, row.announcement),
+    vipps_url: vippsUrlFrom(row.vipps_nr_url),
     asr_method: toAsrMethod(row.asr_method),
     show_eid: row.show_eid ?? false,
     eid_prayers: [row.eidprayer_time1, row.eidprayer_time2, row.eidprayer_time3]

@@ -65,7 +65,7 @@ export function MosquePresenceCard() {
           fullWidth
           onPress={() => {
             track('mosque_donation_opened', { source: 'presence' });
-            openVipps(mosque.vipps_number);
+            openVipps(mosque);
           }}
         />
       )}

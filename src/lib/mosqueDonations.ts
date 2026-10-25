@@ -16,9 +16,25 @@ export function vippsNumberFrom(...texts: (string | null | undefined)[]): string
   return null;
 }
 
-export async function openVipps(vippsNumber?: string | null): Promise<void> {
-  if (vippsNumber) await setStringAsync(vippsNumber).catch(() => false);
+export function vippsUrlFrom(url: string | null | undefined): string | null {
+  const trimmed = url?.trim();
+  return trimmed && /^(https|vipps|mobilepay):\/\//i.test(trimmed) ? trimmed : null;
+}
+
+function openVippsApp() {
   Linking.openURL(VIPPS_APP_URL).catch(() => {
     Linking.openURL(VIPPS_STORE_URL).catch(() => {});
   });
+}
+
+export async function openVipps(mosque: {
+  vipps_number: string | null;
+  vipps_url?: string | null;
+}): Promise<void> {
+  if (mosque.vipps_url) {
+    Linking.openURL(mosque.vipps_url).catch(openVippsApp);
+    return;
+  }
+  if (mosque.vipps_number) await setStringAsync(mosque.vipps_number).catch(() => false);
+  openVippsApp();
 }
