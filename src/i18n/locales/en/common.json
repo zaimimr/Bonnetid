@@ -19,5 +19,7 @@
     "days_other": "{{count}} days",
     "joiner": " "
   },
-  "theMosque": "the mosque"
+  "theMosque": "the mosque",
+  "outageTitle": "IRN is having technical problems",
+  "outageBody": "Parts of the app may not work or may be out of date. We are working on it."
 }

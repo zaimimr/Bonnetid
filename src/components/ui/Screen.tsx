@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useVerticalFold } from '@/hooks/useWindowGeometry';
 import { useResponsive } from '@/hooks/useResponsive';
 import { EidBanner } from '@/components/eid/EidBanner';
+import { OutageBanner } from '@/components/status/OutageBanner';
 import { TravelBanner } from '@/components/travel/TravelBanner';
 import { isRTL } from '@/lib/i18n';
 import { useTheme } from '@/theme';
@@ -117,6 +118,7 @@ export function Screen({
 
   return (
     <View style={shell}>
+      <OutageBanner />
       <TravelBanner />
       <EidBanner />
       {header != null && (
