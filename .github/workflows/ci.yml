@@ -30,3 +30,8 @@ jobs:
 
       - name: Lint
         run: npx expo lint
+
+      - name: Test
+        run: |
+          TZ=Europe/Oslo npm test
+          TZ=Asia/Karachi npm test

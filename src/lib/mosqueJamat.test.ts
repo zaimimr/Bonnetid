@@ -64,3 +64,24 @@ test('jamatTimesForDate uses the adhan time for a 0 offset without a fixed time'
   const jamat = { ...thisWeek, maghrib_offset: 0 };
   assert.equal(jamatTimesForDate(jamat, '2026-10-25', { maghrib: '16:46' }).maghrib, '16:46');
 });
+
+test('jamatTimesForDate follows the bonnetider.eu rule for every fixed and offset combination', () => {
+  const adhan = { maghrib: '16:46' };
+  const fixed = osloTimeToLocalClock('2026-10-25', '17:00') ?? undefined;
+  const cases: [string | null, number | null, string | undefined][] = [
+    ['17:00', null, fixed],
+    ['17:00', 0, fixed],
+    ['17:00', 5, fixed],
+    [null, 5, '16:51'],
+    [null, 0, '16:46'],
+    [null, null, undefined],
+  ];
+  for (const [maghrib, maghrib_offset, expected] of cases) {
+    const jamat = { ...thisWeek, maghrib, maghrib_offset };
+    assert.equal(
+      jamatTimesForDate(jamat, '2026-10-25', adhan).maghrib,
+      expected,
+      `fixed ${maghrib}, offset ${maghrib_offset}`,
+    );
+  }
+});

@@ -48,6 +48,7 @@ bridge is a `requireOptionalNativeModule`, so every call no-ops there.
 - Pure logic (time parsing, qibla bearing, hijri formatting, schedule building) lives in `src/lib` and takes explicit arguments, no hooks.
 - App-facing date formats (kept from the old REST API): `PrayerDay.date` is `dd-mm-yyyy`, `HijriDay.hijri_date` is `yyyy-m-d`, `PrayerDay.hijri_date` is `d-m-yyyy`, `HijriDay.gregorian_date` is ISO `yyyy-mm-dd`. DB dates are ISO; DB times are `HH:MM:SS` and get trimmed to `HH:MM` in `endpoints.ts`.
 - Offline/Ramadan caching: react-query cache persists to AsyncStorage (`_layout.tsx`, buster `v2`, maxAge 60 days). Prayer times/hijri data are immutable, so hooks use multi-day `staleTime` - most opens hit zero network. Bump the buster when changing cached data shapes.
+- Jamat time per prayer mirrors bonnetider.eu (IRN's own display): the fixed time column wins; only when it is empty is the jamat adhan + `_offset` minutes, 0 included. `00:00` counts as empty. Covered by `src/lib/mosqueJamat.test.ts`; never change the rule to make a test pass.
 - Path alias `@/*` maps to `src/*`.
 - Telemetry is PostHog EU through `src/lib/telemetry.ts` (`track`, `trackError`, `posthog`). Sentry is gone. Feature flags via `useFeature(flag)` / `FeatureGate`, default ON unless PostHog returns `false`.
 - Interruptions (review prompt, survey, what's new) go through `useSession().claimInterruption`, so at most one shows per session. New release notes go in `src/lib/whatsNew.ts`.
