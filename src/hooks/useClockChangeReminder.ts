@@ -1,18 +1,26 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { zoneFor } from '@/hooks/usePrayerMonth';
-import { clockChangeReminder } from '@/lib/clockChange';
+import { clockChangeReminders } from '@/lib/clockChange';
 import {
   cancelClockChangeNotifications,
-  scheduleClockChangeReminder,
+  scheduleClockChangeReminders,
 } from '@/lib/clockChangeNotifications';
+import { osloDateKey, osloWallClockToDate } from '@/lib/time';
 import { useActiveLocation, useSettings } from '@/store/settings';
 
 export function useClockChangeReminder(now: Date) {
   const notificationsEnabled = useSettings((state) => state.notificationsEnabled);
   const location = useActiveLocation();
   const inNorway = zoneFor(location) === 'oslo';
-  const reminder = notificationsEnabled && inNorway ? clockChangeReminder(now) : null;
-  const syncKey = reminder ? `${reminder.eveIso}|${reminder.body}` : '';
+  const todayIso = osloDateKey(now);
+  const reminders = useMemo(
+    () =>
+      notificationsEnabled && inNorway
+        ? clockChangeReminders(osloWallClockToDate(todayIso, '00:00'))
+        : [],
+    [notificationsEnabled, inNorway, todayIso],
+  );
+  const syncKey = reminders.map((reminder) => `${reminder.eveIso}|${reminder.body}`).join(',');
 
   const lastSyncKey = useRef<string | null>(null);
 
@@ -20,10 +28,10 @@ export function useClockChangeReminder(now: Date) {
     if (syncKey === lastSyncKey.current) return;
     lastSyncKey.current = syncKey;
 
-    if (!reminder) {
+    if (reminders.length === 0) {
       cancelClockChangeNotifications().catch(() => {});
       return;
     }
-    scheduleClockChangeReminder(reminder).catch(() => {});
-  }, [syncKey, reminder]);
+    scheduleClockChangeReminders(reminders).catch(() => {});
+  }, [syncKey, reminders]);
 }

@@ -31,16 +31,20 @@ export function osloOffsetMinutes(instant: Date): number {
 
 export type ClockChange = { at: Date; direction: 'forward' | 'back' };
 
-export function nextOsloClockChange(now: Date): ClockChange | null {
+export function upcomingOsloClockChanges(now: Date, count: number): ClockChange[] {
   const time = now.getTime();
-  if (Number.isNaN(time)) return null;
-  const year = now.getUTCFullYear();
-  const candidates: ClockChange[] = [
-    { at: new Date(lastSundayAtOneUtc(year, MARCH)), direction: 'forward' },
-    { at: new Date(lastSundayAtOneUtc(year, OCTOBER)), direction: 'back' },
-    { at: new Date(lastSundayAtOneUtc(year + 1, MARCH)), direction: 'forward' },
-  ];
-  return candidates.find((change) => change.at.getTime() > time) ?? null;
+  if (Number.isNaN(time)) return [];
+  const changes: ClockChange[] = [];
+  for (let year = now.getUTCFullYear(); changes.length < count; year++) {
+    const yearChanges: ClockChange[] = [
+      { at: new Date(lastSundayAtOneUtc(year, MARCH)), direction: 'forward' },
+      { at: new Date(lastSundayAtOneUtc(year, OCTOBER)), direction: 'back' },
+    ];
+    for (const change of yearChanges) {
+      if (change.at.getTime() > time && changes.length < count) changes.push(change);
+    }
+  }
+  return changes;
 }
 
 export function deviceOffsetMinutes(instant: Date = new Date()): number {

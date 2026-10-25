@@ -25,7 +25,7 @@ export async function cancelClockChangeNotifications(): Promise<void> {
   }
 }
 
-export async function scheduleClockChangeReminder(reminder: ClockChangeReminder): Promise<void> {
+export async function scheduleClockChangeReminders(reminders: ClockChangeReminder[]): Promise<void> {
   if (!notificationsSupported) return;
   await cancelClockChangeNotifications();
   if (!(await hasNotificationPermission())) return;
@@ -40,13 +40,16 @@ export async function scheduleClockChangeReminder(reminder: ClockChangeReminder)
     channelId = CHANNEL_ID;
   }
 
-  await Notifications.scheduleNotificationAsync({
-    identifier: `${IDENTIFIER_PREFIX}${reminder.eveIso}`,
-    content: { title: reminder.title, body: reminder.body },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DATE,
-      date: reminder.fireAt,
-      channelId,
-    },
-  });
+  for (const reminder of reminders) {
+    if (reminder.fireAt.getTime() <= Date.now()) continue;
+    await Notifications.scheduleNotificationAsync({
+      identifier: `${IDENTIFIER_PREFIX}${reminder.eveIso}`,
+      content: { title: reminder.title, body: reminder.body },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: reminder.fireAt,
+        channelId,
+      },
+    });
+  }
 }
