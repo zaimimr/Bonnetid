@@ -76,7 +76,16 @@ So `--profile testing` and `--profile testing-automotive` fail after the matchin
 2. **Create new release**. If the button is greyed out, a draft release is blocking the track - open it with "Edit release" and reuse it.
 3. **Add from library** -> tick the new version code -> Add to release.
 4. A reused draft can still carry an old bundle, which then fails review with "This APK will not be served to any users because it is completely shadowed by one or more APKs with higher version codes." Remove it: the row's **Manage artifact** menu -> Remove app bundle. It stays in the artifact library.
-5. Set the release name to `<versionCode> (<version>)`, write the Norwegian release notes inside `<no-NO>` tags, **Next**, then **Save and publish**.
+5. Set the release name to `<versionCode> (<version>)`, paste the release notes, **Next**, then **Save and publish**.
+
+### Release notes on every Play release
+
+`eas submit` sends no release notes, so every Play release it creates (mobile and automotive production) lands with empty "What's new". Add them by hand on all four Play releases: production + internal, mobile + automotive.
+
+- Write the notes once from the `whatsNew.ts` entry, in all five Play languages: `<no-NO>`, `<ar>`, `<en-GB>`, `<en-US>`, `<ur>`. The field must read "Release notes provided for 5 of 5 languages".
+- Production: Test and release -> Production -> Releases -> **Manage release** on the new version -> **Edit release details** -> paste -> Save. This edits the release in place, even while it is in review. Do not create a new release with the same bundle; Play refuses it ("This release does not add or remove any app bundles"). Repeat with the form-factor dropdown on **Automotive OS only**.
+- Internal: paste them in step 5 above.
+- iOS: set "What's New" per locale (no, en-GB, ar, ur) on the App Store version before submitting for review.
 
 A remaining "no deobfuscation file" warning is harmless. A warning that the release "will not be available to any users because you haven't specified any testers" means that track has no tester list - the bundle still lands, but nobody receives it. Tell the user; do not add testers on your own.
 
