@@ -30,5 +30,13 @@
   "newWidgets": "New widgets",
   "newWidgetsBody": "Every widget is redesigned, with a new Prayer now widget.",
   "hijriWidget": "Hijri date on your home screen",
-  "hijriWidgetBody": "A new small widget shows today's date in the hijri calendar."
+  "hijriWidgetBody": "A new small widget shows today's date in the hijri calendar.",
+  "customize": "Make the app yours",
+  "customizeBody": "Press and hold on Overview to move cards and pick your tabs.",
+  "clockChange": "Clock change alert",
+  "clockChangeBody": "The evening before the clocks change, you get a heads-up that prayer times shift.",
+  "calmerQibla": "Calmer qibla",
+  "calmerQiblaBody": "The compass holds steadier when the phone is still.",
+  "vippsLink": "Vipps straight to the mosque",
+  "vippsLinkBody": "The donate button opens the mosque's own Vipps payment."
 }

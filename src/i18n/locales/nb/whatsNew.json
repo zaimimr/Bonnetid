@@ -30,5 +30,13 @@
   "newWidgets": "Nye widgets",
   "newWidgetsBody": "Ny utforming av alle widgets, med en ny Bønn nå-widget.",
   "hijriWidget": "Hijri-dato på hjemskjermen",
-  "hijriWidgetBody": "En ny liten widget viser dagens dato i hijri-kalenderen."
+  "hijriWidgetBody": "En ny liten widget viser dagens dato i hijri-kalenderen.",
+  "customize": "Tilpass appen",
+  "customizeBody": "Hold inne på Oversikt for å flytte kort og velge fanene du vil ha.",
+  "clockChange": "Varsel om timeskifte",
+  "clockChangeBody": "Kvelden før klokken stilles får du beskjed om at bønnetidene flytter seg.",
+  "calmerQibla": "Roligere qibla",
+  "calmerQiblaBody": "Kompasset står stødigere når telefonen ligger i ro.",
+  "vippsLink": "Vipps rett til moskeen",
+  "vippsLinkBody": "Gi-knappen åpner moskeens egen Vipps-betaling."
 }
