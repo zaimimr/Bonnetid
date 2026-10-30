@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { refreshPosition } from '@/hooks/useTravelDetection';
 import { track } from '@/lib/telemetry';
 
 const MUTABLE_KEYS = new Set(['mosques', 'mosque', 'mosque-jamat-periods']);
@@ -12,10 +13,13 @@ export function useRefresh() {
     setRefreshing(true);
     track('pull_to_refresh');
     try {
-      await queryClient.refetchQueries({
-        type: 'active',
-        predicate: (query) => MUTABLE_KEYS.has(String(query.queryKey[0])) || query.isStale(),
-      });
+      await Promise.all([
+        refreshPosition(true),
+        queryClient.refetchQueries({
+          type: 'active',
+          predicate: (query) => MUTABLE_KEYS.has(String(query.queryKey[0])) || query.isStale(),
+        }),
+      ]);
     } finally {
       setRefreshing(false);
     }

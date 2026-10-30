@@ -1,4 +1,4 @@
-import { Linking, View } from 'react-native';
+import { ActivityIndicator, Linking, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
@@ -22,10 +22,17 @@ import { asrMethodLabel } from '@/lib/asrMethods';
 import { calculationMethodLabel } from '@/lib/calculationMethods';
 import { useMosqueAsrOverride } from '@/hooks/useEffectiveAsrMethod';
 import { useAutoCalculationMethod } from '@/hooks/useEffectiveCalculationMethod';
+import { useLocationStatus, type LocationIssue } from '@/hooks/useLocationStatus';
 import { useActiveLocation, useActiveMosque, useSettings } from '@/store/settings';
 import { t } from '@/lib/i18n';
 
 const PRIVACY_POLICY_URL = 'https://zaimimr.github.io/bonnetid-personvern/';
+
+const LOCATION_ISSUE_TEXT: Record<LocationIssue, string> = {
+  denied: t('settings.locationDenied'),
+  servicesOff: t('settings.locationServicesOff'),
+  approximate: t('settings.locationApproximate'),
+};
 
 function Tile({ icon }: { icon: IconName }) {
   const theme = useTheme();
@@ -71,6 +78,7 @@ export default function SettingsScreen() {
   const theme = useTheme();
   const location = useActiveLocation();
   const calculated = location.mode === 'calculated';
+  const locationStatus = useLocationStatus();
   const calculationMethod = useSettings((state) => state.calculationMethod);
   const autoCalculationMethod = useAutoCalculationMethod(location);
   const mosque = useActiveMosque();
@@ -97,11 +105,27 @@ export default function SettingsScreen() {
           <ListRow
             title={t('settings.location')}
             subtitle={
-              calculated
-                ? t('settings.localTimesFollowsYour', { name: location.name })
-                : t('settings.followsYourLocation', { name: location.name })
+              locationStatus.refreshing
+                ? t('settings.locationUpdating')
+                : locationStatus.issue
+                  ? LOCATION_ISSUE_TEXT[locationStatus.issue]
+                  : calculated
+                    ? t('settings.localTimesFollowsYour', { name: location.name })
+                    : t('settings.followsYourLocation', { name: location.name })
             }
             leading={<Tile icon="map-pin" />}
+            trailing={
+              locationStatus.refreshing ? (
+                <ActivityIndicator color={theme.colors.textMuted} />
+              ) : locationStatus.issue ? (
+                <Icon
+                  name="warning-circle"
+                  size={22}
+                  color={locationStatus.issue === 'denied' ? theme.colors.danger : theme.colors.notice}
+                />
+              ) : undefined
+            }
+            onPress={locationStatus.refresh}
             style={ROW}
           />
         </PostHogMaskView>

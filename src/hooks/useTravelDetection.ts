@@ -8,6 +8,9 @@ import type { PlaceCountry } from '@/store/settings';
 import { t } from '@/lib/i18n';
 
 const MIN_REFRESH_INTERVAL_MS = 60_000;
+const FOREGROUND_POLL_MS = 2 * 60_000;
+const POSITION_TIMEOUT_MS = 20_000;
+const LAST_KNOWN_MAX_AGE_MS = 5 * 60_000;
 const FALLBACK_PLACE_NAME = t('travel.yourLocation');
 
 type PositionSnapshot = {
@@ -43,6 +46,33 @@ function getSnapshot(): PositionSnapshot {
   return snapshot;
 }
 
+async function positionWithin(
+  accuracy: Location.Accuracy,
+  askForAccuracy: boolean,
+): Promise<Location.LocationObject | null> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<null>((resolve) => {
+    timer = setTimeout(() => resolve(null), POSITION_TIMEOUT_MS);
+  });
+  const position = await Promise.race([
+    Location.getCurrentPositionAsync({ accuracy, mayShowUserSettingsDialog: askForAccuracy }).catch(
+      () => null,
+    ),
+    timeout,
+  ]);
+  clearTimeout(timer);
+  return position;
+}
+
+export async function currentPosition(askForAccuracy = false): Promise<Location.LocationObject> {
+  const position =
+    (await positionWithin(Location.Accuracy.Balanced, askForAccuracy)) ??
+    (await positionWithin(Location.Accuracy.High, false)) ??
+    (await Location.getLastKnownPositionAsync({ maxAge: LAST_KNOWN_MAX_AGE_MS }));
+  if (position) return position;
+  throw new Error('Location unavailable');
+}
+
 async function readPosition(): Promise<PositionSnapshot> {
   const permission = await Location.getForegroundPermissionsAsync();
   if (!permission.granted) {
@@ -53,10 +83,7 @@ async function readPosition(): Promise<PositionSnapshot> {
       readAt: Date.now(),
     };
   }
-  const position = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.Balanced,
-    mayShowUserSettingsDialog: false,
-  });
+  const position = await currentPosition();
   return {
     coords: { lat: position.coords.latitude, lon: position.coords.longitude },
     accuracyM: position.coords.accuracy,
@@ -65,9 +92,9 @@ async function readPosition(): Promise<PositionSnapshot> {
   };
 }
 
-function refreshPosition(): Promise<void> {
+export function refreshPosition(force = false): Promise<void> {
   if (inFlight) return inFlight;
-  if (Date.now() - lastAttemptAt < MIN_REFRESH_INTERVAL_MS) return Promise.resolve();
+  if (!force && Date.now() - lastAttemptAt < MIN_REFRESH_INTERVAL_MS) return Promise.resolve();
 
   lastAttemptAt = Date.now();
   inFlight = readPosition()
@@ -90,10 +117,16 @@ export function useSharedPosition(): PositionSnapshot {
 
   useEffect(() => {
     refreshPosition();
+    const poll = setInterval(() => {
+      if (AppState.currentState === 'active') refreshPosition();
+    }, FOREGROUND_POLL_MS);
     const subscription = AppState.addEventListener('change', (state) => {
       if (state === 'active') refreshPosition();
     });
-    return () => subscription.remove();
+    return () => {
+      clearInterval(poll);
+      subscription.remove();
+    };
   }, []);
 
   return position;
@@ -149,10 +182,7 @@ export async function requestCoords(askForAccuracy = false): Promise<Coords | nu
   try {
     const permission = await Location.requestForegroundPermissionsAsync();
     if (!permission.granted) return null;
-    const position = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
-      mayShowUserSettingsDialog: askForAccuracy,
-    });
+    const position = await currentPosition(askForAccuracy);
     const coords = { lat: position.coords.latitude, lon: position.coords.longitude };
     publish({
       coords,

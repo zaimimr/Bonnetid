@@ -3,6 +3,9 @@ import * as Location from 'expo-location';
 import { fetchKommuneIso } from '@/api/kartverket';
 import { useLocations } from '@/api/queries';
 import type { ApiLocation } from '@/api/types';
+import { currentPosition, useSharedPosition } from '@/hooks/useTravelDetection';
+import { distanceKm } from '@/lib/geo';
+import type { Coords } from '@/lib/travelMode';
 import { nearestLocation } from './useNearestLocation';
 import { track, trackError } from '@/lib/telemetry';
 import { isCoveredByLocationData, isInsideNorwayBounds } from '@/lib/travelMode';
@@ -28,11 +31,15 @@ export async function detectNearestLocation(
 ): Promise<SavedLocation | null> {
   const { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== 'granted') return null;
-  const position = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.Balanced,
-    mayShowUserSettingsDialog: askForAccuracy,
-  });
-  const { latitude, longitude } = position.coords;
+  const position = await currentPosition(askForAccuracy);
+  return locationAt(locations, position.coords.latitude, position.coords.longitude);
+}
+
+export async function locationAt(
+  locations: ApiLocation[],
+  latitude: number,
+  longitude: number,
+): Promise<SavedLocation | null> {
   if (!isInsideNorway(latitude, longitude)) return null;
 
   const kommuneIso = await fetchKommuneIso(latitude, longitude);
@@ -46,26 +53,35 @@ export async function detectNearestLocation(
   return nearest ? toSavedLocation(nearest) : null;
 }
 
+const REDETECT_DISTANCE_KM = 1;
+
 export function useAutoLocation() {
   const { data: locations } = useLocations();
   const setLocation = useSettings((state) => state.setLocation);
   const mode = useSettings((state) => state.location)?.mode;
   const onboardingDone = useSettings((state) => state.onboardingDone);
-  const hasRun = useRef(false);
+  const { coords } = useSharedPosition();
+  const detectedAt = useRef<Coords | null>(null);
 
   useEffect(() => {
-    if (hasRun.current || !locations) return;
-    if (!onboardingDone) return;
-    if (mode === 'calculated') return;
-    hasRun.current = true;
+    if (!locations || !coords || !onboardingDone || mode === 'calculated') return;
+    const last = detectedAt.current;
+    if (last && distanceKm(last.lat, last.lon, coords.lat, coords.lon) < REDETECT_DISTANCE_KM) return;
+    detectedAt.current = coords;
 
-    detectNearestLocation(locations)
+    locationAt(locations, coords.lat, coords.lon)
       .then((detected) => {
-        if (detected) {
-          setLocation(detected);
-          track('location_detected', { iso: detected.iso, source: 'auto' });
+        if (!detected) {
+          detectedAt.current = null;
+          return;
         }
+        if (detected.iso === useSettings.getState().location?.iso) return;
+        setLocation(detected);
+        track('location_detected', { iso: detected.iso, source: 'auto' });
       })
-      .catch((error) => trackError(error, 'auto-location'));
-  }, [locations, mode, onboardingDone, setLocation]);
+      .catch((error) => {
+        detectedAt.current = null;
+        trackError(error, 'auto-location');
+      });
+  }, [coords, locations, mode, onboardingDone, setLocation]);
 }
