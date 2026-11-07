@@ -25,12 +25,10 @@ const COLUMNS = [
   PRAYER_LABELS.maghrib,
   PRAYER_LABELS.isha,
 ];
-const DATE_COLUMN_WIDTH = 40;
-const TIME_TEXT_WIDTH = 32;
-const MAX_TABLE_FONT_SCALE = 1.3;
+const DATE_COLUMN_WIDTH = 30;
+const TIME_TEXT_WIDTH = 40;
 const WEEKDAY_LETTERS = t('prayer.weekdayLetters', { returnObjects: true });
 const FRIDAY = 5;
-const MARKER_SIZE = 5;
 
 export type MonthPrayerTableProps = {
   days: PrayerDay[];
@@ -60,10 +58,10 @@ export function MonthPrayerTable({
   const { scale } = useFontScale();
   const today = todayDayKey ?? osloDayKey();
   const [tableWidth, setTableWidth] = useState(0);
-  const contentWidth = tableWidth - spacing.sm * 2 - spacing.xs * COLUMNS.length;
+  const contentWidth = tableWidth - spacing.xs * 2 - spacing.xxs * COLUMNS.length;
   const fitScale =
     tableWidth > 0 ? contentWidth / (DATE_COLUMN_WIDTH + TIME_TEXT_WIDTH * COLUMNS.length) : 1;
-  const tableScale = Math.max(1, Math.min(scale, MAX_TABLE_FONT_SCALE, fitScale));
+  const tableScale = Math.max(1, Math.min(scale, fitScale));
   const dateColumnWidth = scaleWidth(DATE_COLUMN_WIDTH, tableScale);
   const timeColumnStyle = { flex: 1 };
 
@@ -84,14 +82,17 @@ export function MonthPrayerTable({
         style={{
           flexDirection: 'row',
           paddingVertical: spacing.sm,
-          paddingHorizontal: spacing.sm,
-          gap: spacing.xs,
+          paddingHorizontal: spacing.xs,
+          gap: spacing.xxs,
         }}>
         <AppText
           size="xs"
           weight="medium"
           tone="textMuted"
           maxFontSizeMultiplier={tableScale}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.7}
           style={{ width: dateColumnWidth }}>
           {t('prayer.date')}
         </AppText>
@@ -126,8 +127,8 @@ export function MonthPrayerTable({
                 flexDirection: 'row',
                 alignItems: 'center',
                 paddingVertical: spacing.sm,
-                paddingHorizontal: spacing.sm,
-                gap: spacing.xs,
+                paddingHorizontal: spacing.xs,
+                gap: spacing.xxs,
                 borderRadius: radius.md,
                 backgroundColor: isToday ? theme.colors.primarySoft : 'transparent',
               },
@@ -142,48 +143,39 @@ export function MonthPrayerTable({
               }}>
               <AppText
                 size="sm"
-                weight={isToday || isFriday ? 'bold' : 'medium'}
-                tone={isToday ? 'onPrimarySoft' : isFriday ? 'primary' : 'textPrimary'}
+                weight={isToday || isFriday || isSpecial ? 'bold' : 'medium'}
+                tone={
+                  isSpecial
+                    ? 'accent'
+                    : isToday
+                      ? 'onPrimarySoft'
+                      : isFriday
+                        ? 'primary'
+                        : 'textPrimary'
+                }
                 maxFontSizeMultiplier={tableScale}
                 tabular>
                 {calendar === 'hijri' ? (hijriDayNumber(day) ?? date.getDate()) : date.getDate()}
               </AppText>
               <AppText
                 size="xs"
-                tone={isFriday ? 'primary' : 'textMuted'}
+                tone={isSpecial ? 'accent' : isFriday ? 'primary' : 'textMuted'}
                 maxFontSizeMultiplier={tableScale}>
                 {WEEKDAY_LETTERS[date.getDay()]}
               </AppText>
-              {isSpecial && (
-                <View
-                  style={{
-                    position: 'absolute',
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    justifyContent: 'center',
-                  }}>
-                  <View
-                    style={{
-                      width: MARKER_SIZE,
-                      height: MARKER_SIZE,
-                      borderRadius: radius.full,
-                      backgroundColor: theme.colors.accent,
-                    }}
-                  />
-                </View>
-              )}
             </View>
             {timesFor(day).map((time, index) => (
               <AppText
                 key={COLUMNS[index]}
-                size="xs"
+                size="sm"
                 weight={isToday ? 'semibold' : 'regular'}
                 tone={isToday ? 'onPrimarySoft' : index === 1 ? 'textMuted' : 'textSecondary'}
                 align="center"
                 tabular
                 maxFontSizeMultiplier={tableScale}
                 numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
                 style={timeColumnStyle}>
                 {time ? formatZonedClock(wallClockToDate(date, time, zone), zone) : '–'}
               </AppText>
@@ -195,7 +187,7 @@ export function MonthPrayerTable({
   );
 
   return (
-    <Card padding="sm" rounded="xl">
+    <Card padding="xs" rounded="xl">
       {table}
     </Card>
   );
