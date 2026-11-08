@@ -16,7 +16,7 @@ const DAY_HEIGHT = 48;
 const DAY_WIDTH = 40;
 const WIDE_DAY_WIDTH = 56;
 const MAX_GRID_FONT_SCALE = 1.25;
-const MARKER_SIZE = 5;
+const FRIDAY = 5;
 
 type GridCell = {
   iso: string;
@@ -119,6 +119,8 @@ export function MonthGrid({
 
           const isToday = cell.iso === todayIso;
           const isSpecial = Boolean(cell.hijri?.special_date_name);
+          const [year, month, day] = cell.iso.split('-').map(Number);
+          const isFriday = new Date(year, month - 1, day).getDay() === FRIDAY;
           const label = isSpecial
             ? t('calendar.combined', { primary: cell.primary, special_date_name: cell.hijri?.special_date_name })
             : String(cell.primary);
@@ -146,37 +148,32 @@ export function MonthGrid({
                   borderRadius: radius.md,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: isToday ? theme.colors.primary : 'transparent',
+                  backgroundColor: isToday ? theme.colors.primarySoft : 'transparent',
                   gap: 1,
                 }}>
                 <AppText
                   size="sm"
-                  weight={isToday ? 'bold' : 'medium'}
-                  color={isToday ? theme.colors.onPrimary : theme.colors.textPrimary}
+                  weight={isToday || isFriday || isSpecial ? 'bold' : 'medium'}
+                  tone={
+                    isSpecial
+                      ? 'accent'
+                      : isToday
+                        ? 'onPrimarySoft'
+                        : isFriday
+                          ? 'primary'
+                          : 'textPrimary'
+                  }
                   maxFontSizeMultiplier={MAX_GRID_FONT_SCALE}>
                   {cell.primary}
                 </AppText>
                 {cell.secondary != null && (
                   <AppText
                     size="xs"
-                    color={isToday ? theme.colors.onPrimary : theme.colors.textMuted}
+                    tone={isSpecial ? 'accent' : isFriday ? 'primary' : 'textMuted'}
                     maxFontSizeMultiplier={MAX_GRID_FONT_SCALE}>
                     {cell.secondary}
                   </AppText>
                 )}
-                <View
-                  style={{
-                    width: MARKER_SIZE,
-                    height: MARKER_SIZE,
-                    borderRadius: radius.full,
-                    marginTop: 1,
-                    backgroundColor: isSpecial
-                      ? isToday
-                        ? theme.colors.onPrimary
-                        : theme.colors.accent
-                      : 'transparent',
-                  }}
-                />
               </View>
             </Pressable>
           );
