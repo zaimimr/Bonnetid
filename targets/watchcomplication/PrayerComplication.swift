@@ -123,6 +123,13 @@ struct ComplicationView: View {
 }
 
 @main
+struct BonnetidComplications: WidgetBundle {
+  var body: some Widget {
+    PrayerComplication()
+    TasbihComplication()
+  }
+}
+
 struct PrayerComplication: Widget {
   var body: some WidgetConfiguration {
     StaticConfiguration(kind: "BonnetidWatchComplication", provider: ComplicationProvider()) { entry in

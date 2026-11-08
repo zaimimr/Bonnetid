@@ -1,5 +1,6 @@
 import ActivityKit
 import ExpoModulesCore
+import WatchConnectivity
 import WidgetKit
 
 let appGroupIdentifier = "group.no.irn.bonnetid"
@@ -59,6 +60,11 @@ public class PrayerWidgetModule: Module {
 
     Function("isTestFlight") { () -> Bool in
       Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+    }
+
+    Function("watchStatus") { () -> [String: Bool]? in
+      guard WCSession.isSupported(), WCSession.default.activationState == .activated else { return nil }
+      return ["paired": WCSession.default.isPaired, "installed": WCSession.default.isWatchAppInstalled]
     }
 
     Function("hasDynamicIsland") { () -> Bool in

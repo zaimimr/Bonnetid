@@ -28,6 +28,7 @@ import { useClockChangeReminder } from '@/hooks/useClockChangeReminder';
 import { useNotificationOpenFlag } from '@/hooks/useNotificationOpenFlag';
 import { WhatsNewHost } from '@/components/whatsNew/WhatsNewHost';
 import { SurveyHost } from '@/components/survey/SurveyHost';
+import { WatchAppHost } from '@/components/watch/WatchAppHost';
 import { useWidgetSync } from '@/hooks/useWidgetSync';
 import { useNow } from '@/hooks/useNow';
 import { usePrayerLogSync } from '@/hooks/usePrayerLogSync';
@@ -319,6 +320,7 @@ function RootNavigator() {
       </Stack>
       <WhatsNewHost />
       <SurveyHost />
+      <WatchAppHost />
     </NavigationThemeProvider>
   );
 }

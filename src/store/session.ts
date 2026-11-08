@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type Interruption = 'review' | 'survey' | 'whats_new';
+export type Interruption = 'review' | 'survey' | 'whats_new' | 'watch_app';
 
 type SessionState = {
   interruption: Interruption | null;

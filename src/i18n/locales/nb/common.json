@@ -21,5 +21,11 @@
   },
   "theMosque": "moskeen",
   "outageTitle": "IRN har tekniske problemer",
-  "outageBody": "Noe i appen kan virke feil eller være utdatert. Vi jobber med saken."
+  "outageBody": "Noe i appen kan virke feil eller være utdatert. Vi jobber med saken.",
+  "watchApp": {
+    "title": "Bønnetid på Apple Watch",
+    "body": "Se bønnetidene og tell tasbih fra håndleddet.",
+    "steps": "Åpne Watch-appen på iPhone, gå til Tilgjengelige apper og trykk Installer ved Bønnetid.",
+    "ok": "OK"
+  }
 }

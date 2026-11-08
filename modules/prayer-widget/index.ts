@@ -23,6 +23,7 @@ type PrayerWidgetNativeModule = {
   setSnapshot: (json: string) => void;
   areLiveActivitiesEnabled: () => boolean;
   hasDynamicIsland?: () => boolean;
+  watchStatus?: () => WatchStatus | null;
   isTestFlight?: () => boolean;
   windowGeometry?: () => Promise<WindowGeometry>;
   startOrUpdateActivity: (state: PrayerActivityState) => Promise<void>;
@@ -34,6 +35,8 @@ type PrayerWidgetNativeModule = {
   isIgnoringBatteryOptimizations?: () => boolean;
   openSystemSettings?: (kind: SystemSettingsKind) => void;
 };
+
+export type WatchStatus = { paired: boolean; installed: boolean };
 
 export type FoldFrame = { x: number; y: number; width: number; height: number };
 
@@ -71,6 +74,14 @@ export function isTestFlight() {
     return native?.isTestFlight?.() ?? false;
   } catch {
     return false;
+  }
+}
+
+export function watchStatus(): WatchStatus | null {
+  try {
+    return native?.watchStatus?.() ?? null;
+  } catch {
+    return null;
   }
 }
 

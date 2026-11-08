@@ -21,5 +21,11 @@
   },
   "theMosque": "the mosque",
   "outageTitle": "IRN is having technical problems",
-  "outageBody": "Parts of the app may not work or may be out of date. We are working on it."
+  "outageBody": "Parts of the app may not work or may be out of date. We are working on it.",
+  "watchApp": {
+    "title": "Bønnetid on Apple Watch",
+    "body": "See prayer times and count tasbih from your wrist.",
+    "steps": "Open the Watch app on your iPhone, go to Available Apps and tap Install next to Bønnetid.",
+    "ok": "OK"
+  }
 }

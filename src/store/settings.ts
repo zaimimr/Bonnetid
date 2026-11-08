@@ -103,6 +103,8 @@ type SettingsState = {
   analyticsEnabled: boolean;
   setAnalyticsEnabled: (enabled: boolean) => void;
   lastSeenWhatsNew: string | null;
+  watchPromptSeen: boolean;
+  markWatchPromptSeen: () => void;
   setLastSeenWhatsNew: (version: string) => void;
   seenSurveys: string[];
   markSurveySeen: (id: string) => void;
@@ -206,6 +208,8 @@ export const useSettings = create<SettingsState>()(
       analyticsEnabled: true,
       setAnalyticsEnabled: (analyticsEnabled) => set({ analyticsEnabled }),
       lastSeenWhatsNew: null,
+      watchPromptSeen: false,
+      markWatchPromptSeen: () => set({ watchPromptSeen: true }),
       setLastSeenWhatsNew: (lastSeenWhatsNew) => set({ lastSeenWhatsNew }),
       seenSurveys: [],
       markSurveySeen: (id) =>

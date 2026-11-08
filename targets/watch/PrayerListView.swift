@@ -23,45 +23,63 @@ private extension Color {
 
 struct PrayerListView: View {
   let snapshot: PrayerSnapshot?
+  @Binding var page: WatchPage
 
   var body: some View {
-    if let snapshot {
-      TimelineView(.everyMinute) { context in
-        PrayerPages(snapshot: snapshot, now: context.date)
-      }
-    } else {
-      VStack(spacing: 8) {
-        Image("bt.moon-stars")
-          .font(.title2)
-          .foregroundStyle(WatchColor.brand)
-        Text("Åpne Bønnetid på iPhone for å hente tidene")
-          .font(.footnote)
-          .multilineTextAlignment(.center)
-          .foregroundStyle(WatchColor.inkSecondary)
-      }
-      .padding()
+    TimelineView(.everyMinute) { context in
+      PrayerPages(snapshot: snapshot, now: context.date, page: $page)
     }
   }
 }
 
+enum WatchPage: Hashable {
+  case next, today, tasbih
+}
+
 private struct PrayerPages: View {
-  let snapshot: PrayerSnapshot
+  let snapshot: PrayerSnapshot?
   let now: Date
+  @Binding var page: WatchPage
 
   var body: some View {
-    let moment = PrayerMoment.resolve(from: snapshot, at: now)
-    let prayers = snapshot.dailyPrayers(for: moment?.next.at ?? now, now: now)
+    let moment = snapshot.flatMap { PrayerMoment.resolve(from: $0, at: now) }
+    let nextAdhan = snapshot?.allPrayers.first { $0.isPrayer && $0.at > now }?.at
 
     NavigationStack {
-      TabView {
-        if let moment {
-          NextPrayerPage(moment: moment, mosqueName: snapshot.mosqueName, now: now)
-            .navigationTitle(snapshot.locationName)
-            .containerBackground(WatchColor.backdrop, for: .tabView)
-        }
-        TodayPage(prayers: prayers, nextAt: moment?.next.at, hijriText: snapshot.hijriText(for: now))
+      TabView(selection: $page) {
+        if let snapshot {
+          if let moment {
+            NextPrayerPage(moment: moment, mosqueName: snapshot.mosqueName, now: now)
+              .navigationTitle(snapshot.locationName)
+              .containerBackground(WatchColor.backdrop, for: .tabView)
+              .tag(WatchPage.next)
+          }
+          TodayPage(
+            prayers: snapshot.dailyPrayers(for: moment?.next.at ?? now, now: now),
+            nextAt: moment?.next.at,
+            hijriText: snapshot.hijriText(for: now)
+          )
           .navigationTitle("I dag")
           .containerBackground(WatchColor.backdrop, for: .tabView)
+          .tag(WatchPage.today)
+        } else {
+          VStack(spacing: 8) {
+            Image("bt.moon-stars")
+              .font(.title2)
+              .foregroundStyle(WatchColor.brand)
+            Text("Åpne Bønnetid på iPhone for å hente tidene")
+              .font(.footnote)
+              .multilineTextAlignment(.center)
+              .foregroundStyle(WatchColor.inkSecondary)
+          }
+          .padding()
+          .containerBackground(WatchColor.backdrop, for: .tabView)
+          .tag(WatchPage.next)
+        }
+        TasbihPage(nextAdhan: nextAdhan)
+          .navigationTitle("Tasbih")
+          .containerBackground(WatchColor.backdrop, for: .tabView)
+          .tag(WatchPage.tasbih)
       }
       .tabViewStyle(.verticalPage)
     }
