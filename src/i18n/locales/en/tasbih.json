@@ -12,5 +12,7 @@
   "startOver": "Start over",
   "countOf": "Count, {{count}} of {{target}}",
   "count": "Count, {{count}}",
-  "tapAnywhereToCount": "Tap anywhere to count"
+  "tapAnywhereToCount": "Tap anywhere to count",
+  "resume": "Continue from {{count}}",
+  "resumeOf": "Continue from {{count}} of {{target}}"
 }

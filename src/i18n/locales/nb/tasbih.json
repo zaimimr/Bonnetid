@@ -12,5 +12,7 @@
   "startOver": "Begynn på nytt",
   "countOf": "Tell, {{count}} av {{target}}",
   "count": "Tell, {{count}}",
-  "tapAnywhereToCount": "Trykk hvor som helst for å telle"
+  "tapAnywhereToCount": "Trykk hvor som helst for å telle",
+  "resume": "Fortsett fra {{count}}",
+  "resumeOf": "Fortsett fra {{count}} av {{target}}"
 }

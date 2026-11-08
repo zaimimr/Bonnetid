@@ -85,7 +85,7 @@ export type TasbihShellProps = {
 
 export function TasbihShell({ session, fromDuas = false, children }: TasbihShellProps) {
   const insets = useSafeAreaInsets();
-  const { state, target, tap, reset, setMode, setGoal } = session;
+  const { state, target, resumeOffer, tap, reset, resume, setMode, setGoal } = session;
   const untouched = state.count === 0 && state.step === 0;
   const label = target
     ? t('tasbih.countOf', { count: state.count, target })
@@ -126,6 +126,19 @@ export function TasbihShell({ session, fromDuas = false, children }: TasbihShell
           {state.done ? (
             <Animated.View entering={rise} exiting={fadeOut}>
               <FinishAction session={session} fromDuas={fromDuas} />
+            </Animated.View>
+          ) : resumeOffer ? (
+            <Animated.View entering={fade} exiting={fadeOut}>
+              <Button
+                label={
+                  resumeOffer.target
+                    ? t('tasbih.resumeOf', resumeOffer)
+                    : t('tasbih.resume', { count: resumeOffer.count })
+                }
+                variant="secondary"
+                onPress={resume}
+                style={{ alignSelf: 'center', minWidth: 200 }}
+              />
             </Animated.View>
           ) : untouched ? (
             <Animated.View entering={fade} exiting={fadeOut}>

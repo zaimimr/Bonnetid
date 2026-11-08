@@ -62,6 +62,15 @@ export function targetOf(state: TasbihState): number | null {
   return isClosing(state) ? SEQUENCE_TOTAL : SEQUENCE_TARGET;
 }
 
+export function progressOf(state: TasbihState): number {
+  if (state.mode !== 'sequence' || isClosing(state)) return state.count;
+  return state.step * SEQUENCE_TARGET + state.count;
+}
+
+export function totalOf(state: TasbihState): number | null {
+  return state.mode === 'sequence' ? SEQUENCE_TOTAL : state.goal;
+}
+
 export function phraseOf(state: TasbihState): TasbihPhrase | null {
   if (state.mode !== 'sequence') return null;
   if (state.done || isClosing(state)) return COMPLETION_PHRASE;

@@ -12,5 +12,7 @@
   "startOver": "البدء من جديد",
   "countOf": "عُدّ، {{count}} من {{target}}",
   "count": "عُدّ، {{count}}",
-  "tapAnywhereToCount": "اضغط في أي مكان للعدّ"
+  "tapAnywhereToCount": "اضغط في أي مكان للعدّ",
+  "resume": "تابع من {{count}}",
+  "resumeOf": "تابع من {{count}} من {{target}}"
 }

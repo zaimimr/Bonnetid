@@ -12,5 +12,7 @@
   "startOver": "نئے سرے سے شروع کریں",
   "countOf": "گنیں، {{target}} میں سے {{count}}",
   "count": "گنیں، {{count}}",
-  "tapAnywhereToCount": "گننے کے لیے کہیں بھی دبائیں"
+  "tapAnywhereToCount": "گننے کے لیے کہیں بھی دبائیں",
+  "resume": "{{count}} سے جاری رکھیں",
+  "resumeOf": "{{target}} میں سے {{count}} سے جاری رکھیں"
 }
