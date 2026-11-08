@@ -38,5 +38,13 @@
   "calmerQibla": "Roligere qibla",
   "calmerQiblaBody": "Kompasset står stødigere når telefonen ligger i ro.",
   "vippsLink": "Vipps rett til moskeen",
-  "vippsLinkBody": "Gi-knappen åpner moskeens egen Vipps-betaling."
+  "vippsLinkBody": "Gi-knappen åpner moskeens egen Vipps-betaling.",
+  "watchTasbih": "Tasbih på Apple Watch",
+  "watchTasbihBody": "Tell tasbih fra håndleddet, med egen komplikasjon til urskiven.",
+  "tasbihResume": "Fortsett der du slapp",
+  "tasbihResumeBody": "Går du ut av tasbih midt i en telling, kan du fortsette når du kommer tilbake.",
+  "clearerCalendar": "Tydeligere kalender",
+  "clearerCalendarBody": "Større tider i månedstabellen, og i dag, fredager og spesielle dager er markert.",
+  "followsLocation": "Følger med når du reiser",
+  "followsLocationBody": "Bønnetidene bytter til riktig kommune når du flytter deg."
 }

@@ -38,5 +38,13 @@
   "calmerQibla": "قبلة أكثر ثباتاً",
   "calmerQiblaBody": "البوصلة أكثر ثباتاً عندما يكون الهاتف ساكناً.",
   "vippsLink": "Vipps مباشرة إلى المسجد",
-  "vippsLinkBody": "زر التبرع يفتح صفحة الدفع الخاصة بالمسجد في Vipps."
+  "vippsLinkBody": "زر التبرع يفتح صفحة الدفع الخاصة بالمسجد في Vipps.",
+  "watchTasbih": "التسبيح على Apple Watch",
+  "watchTasbihBody": "عُدّ التسبيح من معصمك، مع إضافة خاصة لواجهة الساعة.",
+  "tasbihResume": "تابع من حيث توقفت",
+  "tasbihResumeBody": "إذا خرجت من التسبيح في منتصف العد، يمكنك المتابعة عند عودتك.",
+  "clearerCalendar": "تقويم أوضح",
+  "clearerCalendarBody": "أوقات أكبر في الجدول الشهري، مع تمييز اليوم والجمعة والأيام الخاصة.",
+  "followsLocation": "يتبعك عند السفر",
+  "followsLocationBody": "تنتقل أوقات الصلاة إلى البلدية الصحيحة عند تنقلك."
 }

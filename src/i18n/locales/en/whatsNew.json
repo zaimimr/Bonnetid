@@ -38,5 +38,13 @@
   "calmerQibla": "Calmer qibla",
   "calmerQiblaBody": "The compass holds steadier when the phone is still.",
   "vippsLink": "Vipps straight to the mosque",
-  "vippsLinkBody": "The donate button opens the mosque's own Vipps payment."
+  "vippsLinkBody": "The donate button opens the mosque's own Vipps payment.",
+  "watchTasbih": "Tasbih on Apple Watch",
+  "watchTasbihBody": "Count tasbih from your wrist, with its own watch face complication.",
+  "tasbihResume": "Continue where you left off",
+  "tasbihResumeBody": "If you leave tasbih mid-count, you can continue when you come back.",
+  "clearerCalendar": "Clearer calendar",
+  "clearerCalendarBody": "Bigger times in the monthly table, with today, Fridays and special days marked.",
+  "followsLocation": "Follows you when you travel",
+  "followsLocationBody": "Prayer times switch to the right municipality when you move."
 }
