@@ -1,25 +1,39 @@
 import { useRef, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Alert, Pressable, View } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import Sortable from 'react-native-sortables';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '@/components/icons';
 import { ArabicText } from '@/components/duas/ArabicText';
-import { AppText, Button, Card, SegmentedControl, Sheet, TextField } from '@/components/ui';
+import { AppText, Button, Card, SegmentedControl, TextField } from '@/components/ui';
 import { t } from '@/lib/i18n';
-import { DHIKR, DHIKR_IDS, GOAL_PRESETS, clampTarget, type DhikrId, type TasbihSeries } from '@/lib/tasbih';
+import { DHIKR, DHIKR_INFO, GOAL_PRESETS, clampTarget, type DhikrId, type TasbihSeries } from '@/lib/tasbih';
 import { useTasbihStore } from '@/store/tasbih';
 import { useTheme } from '@/theme';
 import { hitSlop, radius, spacing } from '@/theme/tokens';
+import { DashedButton } from './DashedButton';
+import { DhikrPicker } from './DhikrPicker';
 
 type DraftStep = { key: string; dhikr: DhikrId; target: number };
 type TargetOption = '33' | '99' | '100' | 'custom';
 
-const TARGET_OPTIONS: { value: TargetOption; label: string }[] = [
-  ...GOAL_PRESETS.map((goal) => ({ value: String(goal) as TargetOption, label: String(goal) })),
-  { value: 'custom', label: t('tasbih.custom') },
-];
+function targetOptions(custom: number | null): { value: TargetOption; label: string }[] {
+  return [
+    ...GOAL_PRESETS.map((goal) => ({ value: String(goal) as TargetOption, label: String(goal) })),
+    { value: 'custom', label: custom === null ? t('tasbih.custom') : String(custom) },
+  ];
+}
+
+function HeaderText({ label, onPress, disabled, bold }: { label: string; onPress: () => void; disabled?: boolean; bold?: boolean }) {
+  return (
+    <Pressable onPress={onPress} disabled={disabled} hitSlop={hitSlop} accessibilityRole="button" style={{ paddingHorizontal: 6 }}>
+      <AppText weight={bold ? 'semibold' : 'regular'} tone={disabled ? 'textMuted' : 'primary'}>
+        {label}
+      </AppText>
+    </Pressable>
+  );
+}
 
 function StepCard({
   index,
@@ -42,8 +56,8 @@ function StepCard({
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
         <View
           style={{
-            width: 28,
-            height: 28,
+            width: 26,
+            height: 26,
             borderRadius: radius.full,
             backgroundColor: theme.colors.primarySoft,
             alignItems: 'center',
@@ -53,7 +67,7 @@ function StepCard({
             {index + 1}
           </AppText>
         </View>
-        <AppText weight="semibold" style={{ flex: 1 }} numberOfLines={1}>
+        <AppText weight="semibold" style={{ flex: 1 }} numberOfLines={2}>
           {name}
         </AppText>
         <Pressable
@@ -72,7 +86,7 @@ function StepCard({
       <ArabicText>{DHIKR[step.dhikr].arabic}</ArabicText>
       <SegmentedControl
         value={custom ? 'custom' : (String(step.target) as TargetOption)}
-        options={TARGET_OPTIONS}
+        options={targetOptions(custom ? step.target : null)}
         onChange={(value) => {
           setCustom(value === 'custom');
           if (value !== 'custom') onChange(Number(value));
@@ -110,6 +124,7 @@ export function SeriesEditor({ id }: { id?: string }) {
     (existing?.steps ?? []).map((step, index) => ({ key: `initial-${index}`, ...step })),
   );
   const [adding, setAdding] = useState(false);
+  const markRecent = useTasbihStore((store) => store.markRecent);
 
   const save = () => {
     const series: TasbihSeries = {
@@ -121,9 +136,28 @@ export function SeriesEditor({ id }: { id?: string }) {
     router.back();
   };
 
+  const confirmDelete = (series: TasbihSeries) =>
+    Alert.alert(t('tasbih.deleteConfirm', { name: series.name }), undefined, [
+      { text: t('tasbih.cancel'), style: 'cancel' },
+      {
+        text: t('tasbih.delete'),
+        style: 'destructive',
+        onPress: () => {
+          deleteSeries(series.id);
+          router.back();
+        },
+      },
+    ]);
+
   return (
     <>
-      <Stack.Screen options={{ title: existing ? t('tasbih.editSeries') : t('tasbih.newSeries') }} />
+      <Stack.Screen
+        options={{
+          title: existing ? t('tasbih.editSeries') : t('tasbih.newSeries'),
+          headerLeft: () => <HeaderText label={t('tasbih.cancel')} onPress={() => router.back()} />,
+          headerRight: () => <HeaderText label={t('tasbih.save')} onPress={save} disabled={steps.length === 0} bold />,
+        }}
+      />
       <Animated.ScrollView
         ref={scrollRef}
         keyboardShouldPersistTaps="handled"
@@ -165,43 +199,20 @@ export function SeriesEditor({ id }: { id?: string }) {
             />
           )}
         />
-        <Button label={t('tasbih.addDhikr')} variant="secondary" onPress={() => setAdding(true)} />
-        <Button label={t('tasbih.save')} onPress={save} disabled={steps.length === 0} />
+        <DashedButton label={t('tasbih.addDhikr')} onPress={() => setAdding(true)} />
         {existing ? (
-          <Button
-            label={t('tasbih.deleteSeries')}
-            variant="ghost"
-            onPress={() => {
-              deleteSeries(existing.id);
-              router.back();
-            }}
-          />
+          <Button label={t('tasbih.deleteSeries')} variant="ghost" onPress={() => confirmDelete(existing)} />
         ) : null}
       </Animated.ScrollView>
-      <Sheet visible={adding} onClose={() => setAdding(false)} title={t('tasbih.addDhikr')}>
-        <View style={{ gap: spacing.xs }}>
-          {DHIKR_IDS.map((dhikr) => (
-            <Pressable
-              key={dhikr}
-              onPress={() => {
-                setSteps((current) => [...current, keyed(dhikr, dhikr === 'tahlil' ? 1 : 33)]);
-                setAdding(false);
-              }}
-              accessibilityRole="button"
-              style={({ pressed }) => ({
-                padding: spacing.md,
-                borderRadius: radius.lg,
-                backgroundColor: pressed ? theme.colors.surfaceSunken : 'transparent',
-                gap: spacing.xxs,
-              })}>
-              <AppText weight="semibold">{t(`tasbih.names.${dhikr}`)}</AppText>
-              <AppText size="sm" tone="textMuted" numberOfLines={2}>
-                {DHIKR[dhikr].meaning}
-              </AppText>
-            </Pressable>
-          ))}
-        </View>
-      </Sheet>
+      <DhikrPicker
+        visible={adding}
+        added={steps.map((step) => step.dhikr)}
+        onClose={() => setAdding(false)}
+        onAdd={(ids) => {
+          markRecent(ids);
+          setSteps((current) => [...current, ...ids.map((dhikr) => keyed(dhikr, DHIKR_INFO[dhikr].count))]);
+        }}
+      />
     </>
   );
 }

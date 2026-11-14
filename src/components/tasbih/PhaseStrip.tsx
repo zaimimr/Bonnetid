@@ -46,7 +46,7 @@ export function PhaseStrip({ session }: { session: TasbihSession }) {
           </AppText>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xxs, flexShrink: 1 }}>
             <AppText size="sm" tone="textMuted" numberOfLines={1}>
-              {next && !state.done ? t('tasbih.next', { name: t(`tasbih.names.${next.dhikr}`) }) : t('tasbih.allSteps')}
+              {next ? t('tasbih.next', { name: t(`tasbih.names.${next.dhikr}`) }) : t('tasbih.last')}
             </AppText>
             <Icon name="caret-down" size={14} color={theme.colors.textMuted} />
           </View>
@@ -100,6 +100,9 @@ export function PhaseStrip({ session }: { session: TasbihSession }) {
               </Pressable>
             );
           })}
+          <AppText size="sm" tone="textMuted" align="center" style={{ marginTop: spacing.sm }}>
+            {t('tasbih.jumpHint')}
+          </AppText>
         </View>
       </Sheet>
     </>

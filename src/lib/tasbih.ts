@@ -1,4 +1,5 @@
 import { duaById } from './duas.ts';
+import { t } from './i18n.ts';
 
 export type TasbihPhrase = {
   arabic: string;
@@ -6,8 +7,47 @@ export type TasbihPhrase = {
   meaning: string;
 };
 
-export const DHIKR_IDS = ['subhanallah', 'alhamdulillah', 'allahu-akbar', 'astaghfirullah', 'tahlil'] as const;
+export const DHIKR_IDS = [
+  'subhanallah',
+  'alhamdulillah',
+  'allahu-akbar',
+  'astaghfirullah',
+  'tahlil',
+  'la-ilaha-illallah',
+  'subhanallahi-wa-bihamdih',
+  'subhanallahil-azim',
+  'salawat',
+  'la-hawla',
+  'astaghfirullah-wa-atubu',
+  'hasbunallah',
+  'yunus',
+  'bismillah-protection',
+  'audhu-bikalimat',
+  'bismika-amutu',
+  'rabbana-atina',
+] as const;
 export type DhikrId = (typeof DHIKR_IDS)[number];
+
+export const DHIKR_CATEGORIES = [
+  'after-prayer',
+  'morning-evening',
+  'sleep',
+  'protection',
+  'forgiveness',
+  'praise',
+  'worry',
+  'quran',
+] as const;
+export type DhikrCategory = (typeof DHIKR_CATEGORIES)[number];
+
+export type DhikrInfo = {
+  count: number;
+  short: boolean;
+  categories: DhikrCategory[];
+  source: string;
+};
+
+export const FREE_DHIKR: DhikrId[] = ['subhanallah', 'alhamdulillah', 'allahu-akbar', 'astaghfirullah', 'la-ilaha-illallah'];
 
 export type TasbihStep = { dhikr: DhikrId; target: number };
 export type TasbihSeries = { id: string; name: string; steps: TasbihStep[] };
@@ -47,13 +87,86 @@ const completion = duaById('tasbih-completion');
 
 export const COMPLETION_DUA_ID = completion?.id ?? null;
 
+function own(id: DhikrId, arabicText: string, latin: string): TasbihPhrase {
+  return phrase(arabicText, latin, t(`tasbih.meanings.${id}` as 'tasbih.meanings.salawat'));
+}
+
 export const DHIKR: Record<DhikrId, TasbihPhrase> = {
   subhanallah: phrase(arabic[0], transliteration[0], meaning[0]),
   alhamdulillah: phrase(arabic[1], transliteration[1], meaning[1]),
   'allahu-akbar': phrase(arabic[2], transliteration[2], meaning[2]),
   astaghfirullah: phrase(istighfar?.arabic, istighfar?.transliteration, istighfar?.meaning),
   tahlil: phrase(completion?.arabic, completion?.transliteration, completion?.meaning),
+  'la-ilaha-illallah': own('la-ilaha-illallah', 'لَا إِلَٰهَ إِلَّا اللَّهُ', 'La ilaha illallah'),
+  'subhanallahi-wa-bihamdih': own('subhanallahi-wa-bihamdih', 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', 'Subhanallahi wa bihamdih'),
+  'subhanallahil-azim': own(
+    'subhanallahil-azim',
+    'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ',
+    "Subhanallahi wa bihamdih, subhanallahil-'azim",
+  ),
+  salawat: own('salawat', 'اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ', "Allahumma salli 'ala Muhammad"),
+  'la-hawla': own('la-hawla', 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', 'La hawla wa la quwwata illa billah'),
+  'astaghfirullah-wa-atubu': own('astaghfirullah-wa-atubu', 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ', 'Astaghfirullaha wa atubu ilayh'),
+  hasbunallah: own('hasbunallah', 'حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ', "Hasbunallahu wa ni'mal-wakil"),
+  yunus: own(
+    'yunus',
+    'لَا إِلَٰهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ',
+    'La ilaha illa anta subhanaka inni kuntu minaz-zalimin',
+  ),
+  'bismillah-protection': own(
+    'bismillah-protection',
+    'بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ',
+    "Bismillahil-ladhi la yadurru ma'asmihi shay'un fil-ardi wa la fis-sama'i wa huwas-sami'ul-'alim",
+  ),
+  'audhu-bikalimat': own(
+    'audhu-bikalimat',
+    'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',
+    "A'udhu bikalimatillahit-tammati min sharri ma khalaq",
+  ),
+  'bismika-amutu': own('bismika-amutu', 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا', 'Bismika Allahumma amutu wa ahya'),
+  'rabbana-atina': own(
+    'rabbana-atina',
+    'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ',
+    "Rabbana atina fid-dunya hasanatan wa fil-akhirati hasanatan wa qina 'adhaban-nar",
+  ),
 };
+
+function info(count: number, categories: DhikrCategory[], source: string, short = false): DhikrInfo {
+  return { count, short, categories, source };
+}
+
+export const DHIKR_INFO: Record<DhikrId, DhikrInfo> = {
+  subhanallah: info(33, ['after-prayer', 'sleep', 'praise'], 'Sahih Muslim 597', true),
+  alhamdulillah: info(33, ['after-prayer', 'sleep', 'praise'], 'Sahih Muslim 597', true),
+  'allahu-akbar': info(33, ['after-prayer', 'sleep', 'praise'], 'Sahih Muslim 597', true),
+  astaghfirullah: info(100, ['after-prayer', 'forgiveness'], 'Sahih Muslim 591', true),
+  tahlil: info(1, ['after-prayer'], 'Sahih Muslim 597'),
+  'la-ilaha-illallah': info(100, ['praise', 'morning-evening'], 'Jami at-Tirmidhi 3383', true),
+  'subhanallahi-wa-bihamdih': info(100, ['morning-evening', 'praise'], 'Sahih Muslim 2692', true),
+  'subhanallahil-azim': info(33, ['praise'], 'Sahih al-Bukhari 6406'),
+  salawat: info(10, ['morning-evening', 'praise'], 'Sahih Muslim 408', true),
+  'la-hawla': info(10, ['worry', 'morning-evening'], 'Sahih al-Bukhari 6384', true),
+  'astaghfirullah-wa-atubu': info(100, ['forgiveness', 'morning-evening'], 'Sahih Muslim 2702', true),
+  hasbunallah: info(33, ['worry', 'quran'], 'Al-Imran 3:173', true),
+  yunus: info(33, ['worry', 'forgiveness', 'quran'], 'Al-Anbiya 21:87'),
+  'bismillah-protection': info(3, ['protection', 'morning-evening'], 'Sunan Abi Dawud 5088'),
+  'audhu-bikalimat': info(3, ['protection', 'morning-evening'], 'Sahih Muslim 2709'),
+  'bismika-amutu': info(1, ['sleep'], 'Sahih al-Bukhari 6324'),
+  'rabbana-atina': info(1, ['quran'], 'Al-Baqarah 2:201'),
+};
+
+export function dhikrIn(category: DhikrCategory): DhikrId[] {
+  return DHIKR_IDS.filter((id) => DHIKR_INFO[id].categories.includes(category));
+}
+
+export function searchDhikr(query: string, names: Record<DhikrId, string>, categoryNames: Record<DhikrCategory, string>): DhikrId[] {
+  const needle = query.trim().toLocaleLowerCase();
+  if (!needle) return [];
+  return DHIKR_IDS.filter((id) =>
+    [names[id], DHIKR[id].transliteration, DHIKR[id].meaning, DHIKR[id].arabic, ...DHIKR_INFO[id].categories.map((c) => categoryNames[c])]
+      .some((text) => text.toLocaleLowerCase().includes(needle)),
+  );
+}
 
 export const AFTER_PRAYER_STEPS: TasbihStep[] = [
   { dhikr: 'subhanallah', target: 33 },
@@ -89,21 +202,41 @@ export function targetOf(state: TasbihState, steps: TasbihStep[]): number | null
   return currentStep(state, steps)?.target ?? null;
 }
 
-export function phraseOf(state: TasbihState, steps: TasbihStep[]): TasbihPhrase | null {
-  const step = currentStep(state, steps);
-  return step ? DHIKR[step.dhikr] : null;
+export function dhikrOf(state: TasbihState, steps: TasbihStep[], freeDhikr: DhikrId | null = null): DhikrId | null {
+  if (isFree(state)) return freeDhikr;
+  return currentStep(state, steps)?.dhikr ?? null;
 }
 
-export function totalKey(state: TasbihState, steps: TasbihStep[]): string {
-  return currentStep(state, steps)?.dhikr ?? FREE_ID;
+export function phraseOf(state: TasbihState, steps: TasbihStep[], freeDhikr: DhikrId | null = null): TasbihPhrase | null {
+  const id = dhikrOf(state, steps, freeDhikr);
+  return id ? DHIKR[id] : null;
+}
+
+export function totalKey(state: TasbihState, steps: TasbihStep[], freeDhikr: DhikrId | null = null): string {
+  return dhikrOf(state, steps, freeDhikr) ?? FREE_ID;
+}
+
+export function ringBeads(target: number | null): number {
+  return target !== null && target >= 10 && target <= BEADS_PER_ROUND ? target : BEADS_PER_ROUND;
+}
+
+export type RingKind = 'once' | 'arcs' | 'beads';
+
+export function ringKind(target: number | null): RingKind {
+  if (target === 1) return 'once';
+  if (target !== null && target < 10) return 'arcs';
+  return 'beads';
 }
 
 export function beadsFilled(state: TasbihState, target: number | null): number {
-  if (state.done) return BEADS_PER_ROUND;
-  if (target !== null && target < BEADS_PER_ROUND) {
-    return Math.floor((state.count * BEADS_PER_ROUND) / target);
-  }
+  const beads = ringBeads(target);
+  if (state.done) return beads;
+  if (target !== null && target <= BEADS_PER_ROUND) return Math.min(state.count, beads);
   return state.count % BEADS_PER_ROUND;
+}
+
+export function seriesTotal(steps: TasbihStep[]): number {
+  return steps.reduce((sum, step) => sum + step.target, 0);
 }
 
 export function stepFractions(state: TasbihState, steps: TasbihStep[]): number[] {

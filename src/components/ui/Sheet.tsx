@@ -12,9 +12,10 @@ export type SheetProps = {
   onClose: () => void;
   title: string;
   children: ReactNode;
+  footer?: ReactNode;
 };
 
-export function Sheet({ visible, onClose, title, children }: SheetProps) {
+export function Sheet({ visible, onClose, title, children, footer }: SheetProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -47,6 +48,7 @@ export function Sheet({ visible, onClose, title, children }: SheetProps) {
           <ScrollView bounces={false} keyboardShouldPersistTaps="handled">
             {children}
           </ScrollView>
+          {footer ? <View style={{ paddingTop: spacing.md }}>{footer}</View> : null}
         </View>
       </KeyboardAvoidingView>
     </Modal>

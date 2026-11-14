@@ -13,15 +13,18 @@ import {
   advance,
   initialTasbih,
   jumpTo,
+  dhikrOf,
   phraseOf,
   targetOf,
   totalKey,
+  type DhikrId,
   type TasbihGoal,
   type TasbihSeries,
   type TasbihState,
   type TasbihTapResult,
 } from '@/lib/tasbih';
 import { isUntouched, parseSavedTasbih, resumable, savedTasbih, shouldSave } from '@/lib/tasbihResume';
+import { todayCount } from '@/lib/tasbihStats';
 import { useTasbihStore } from '@/store/tasbih';
 
 const STORAGE_KEY = 'tasbih_v2';
@@ -74,6 +77,9 @@ export function useTasbih(seriesId: string, resumeNow = false) {
   const setFreeGoal = useTasbihStore((store) => store.setFreeGoal);
   const addToTotal = useTasbihStore((store) => store.addToTotal);
   const totals = useTasbihStore((store) => store.totals);
+  const daily = useTasbihStore((store) => store.daily);
+  const freeDhikr = useTasbihStore((store) => store.freeDhikr);
+  const setStoredFreeDhikr = useTasbihStore((store) => store.setFreeDhikr);
   const [state, setState] = useState(() => initialTasbih(seriesId, seriesId === FREE_ID ? freeGoal : null));
   const [offer, setOffer] = useState<TasbihState | null>(null);
   const now = useNow(60_000);
@@ -106,10 +112,10 @@ export function useTasbih(seriesId: string, resumeNow = false) {
     if (state.done) return;
     const { next, result } = advance(state, steps);
     feel(result);
-    addToTotal(totalKey(state, steps));
+    addToTotal(totalKey(state, steps, freeDhikr));
     setOffer(null);
     setState(next);
-  }, [state, steps, addToTotal]);
+  }, [state, steps, freeDhikr, addToTotal]);
 
   const reset = useCallback(() => {
     Haptics.selectionAsync().catch(() => {});
@@ -135,6 +141,15 @@ export function useTasbih(seriesId: string, resumeNow = false) {
     [setFreeGoal],
   );
 
+  const setFreeDhikr = useCallback(
+    (dhikr: DhikrId) => {
+      setStoredFreeDhikr(dhikr);
+      setOffer(null);
+      setState((current) => initialTasbih(FREE_ID, current.goal));
+    },
+    [setStoredFreeDhikr],
+  );
+
   const jump = useCallback(
     (step: number) => {
       Haptics.selectionAsync().catch(() => {});
@@ -144,21 +159,27 @@ export function useTasbih(seriesId: string, resumeNow = false) {
     [steps],
   );
 
-  const resumeOffer = offer && isUntouched(state) ? { count: offer.count, target: targetOf(offer, steps) } : null;
+  const resumeOffer =
+    offer && isUntouched(state)
+      ? { count: offer.count, target: targetOf(offer, steps), dhikr: dhikrOf(offer, steps, freeDhikr) }
+      : null;
 
   return {
     series,
     steps,
     state,
-    phrase: phraseOf(state, steps),
+    dhikr: dhikrOf(state, steps, freeDhikr),
+    phrase: phraseOf(state, steps, freeDhikr),
     target: targetOf(state, steps),
-    total: totals[totalKey(state, steps)] ?? 0,
+    total: totals[totalKey(state, steps, freeDhikr)] ?? 0,
+    today: todayCount(daily, now, totalKey(state, steps, freeDhikr)),
     totals,
     resumeOffer,
     tap,
     reset,
     resume,
     setGoal,
+    setFreeDhikr,
     jump,
   };
 }

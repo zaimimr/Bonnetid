@@ -206,6 +206,14 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="tasbih-stats"
+          options={{
+            headerShown: true,
+            title: t('tasbih.stats'),
+            headerBackTitle: BACK,
+          }}
+        />
+        <Stack.Screen
           name="tasbih-series"
           options={{
             headerShown: true,

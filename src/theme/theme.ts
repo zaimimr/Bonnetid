@@ -48,6 +48,9 @@ export type ThemeColors = {
   eidSurface: string;
   onEidSurface: string;
   eidSurfaceMuted: string;
+  seriesMid: string;
+  seriesLight: string;
+  seriesGold: string;
 };
 
 export type Theme = {
@@ -105,6 +108,9 @@ export const lightTheme: Theme = {
     eidSurface: palette.gold50,
     onEidSurface: palette.gold700,
     eidSurfaceMuted: palette.gold600,
+    seriesMid: palette.emerald400,
+    seriesLight: palette.emerald200,
+    seriesGold: palette.gold400,
   },
 };
 
@@ -158,6 +164,9 @@ export const darkTheme: Theme = {
     eidSurface: palette.gold900,
     onEidSurface: palette.gold100,
     eidSurfaceMuted: palette.gold200,
+    seriesMid: palette.emerald500,
+    seriesLight: palette.emerald800,
+    seriesGold: palette.gold400,
   },
 };
 

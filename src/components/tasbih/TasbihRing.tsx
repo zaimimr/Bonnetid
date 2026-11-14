@@ -10,18 +10,41 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { Icon } from '@/components/icons';
+import Svg, { Path } from 'react-native-svg';
 import { t } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
-import { BEADS_PER_ROUND, beadsFilled } from '@/lib/tasbih';
+import { beadsFilled, isFree, ringBeads, ringKind } from '@/lib/tasbih';
 import { useTheme } from '@/theme';
 import { counterType, radius, spacing } from '@/theme/tokens';
 import type { TasbihSession } from './useTasbih';
 
-const BEAD = 13;
 const MAX_RING = 288;
+const ARC_RING = 220;
+const ARC_STROKE = 16;
 
-function Bead({ index, filled, current, x, y }: { index: number; filled: boolean; current: boolean; x: number; y: number }) {
+function beadSize(beads: number): number {
+  if (beads <= 12) return 22;
+  if (beads <= 20) return 17;
+  return 13;
+}
+
+function Bead({
+  index,
+  beads,
+  size,
+  filled,
+  current,
+  x,
+  y,
+}: {
+  index: number;
+  beads: number;
+  size: number;
+  filled: boolean;
+  current: boolean;
+  x: number;
+  y: number;
+}) {
   const theme = useTheme();
   const fill = useSharedValue(filled ? 1 : 0);
 
@@ -30,11 +53,11 @@ function Bead({ index, filled, current, x, y }: { index: number; filled: boolean
       fill.value = withSpring(1, { damping: 14, stiffness: 260, reduceMotion: ReduceMotion.System });
     } else {
       fill.value = withDelay(
-        (BEADS_PER_ROUND - index) * 14,
+        (beads - index) * 14,
         withTiming(0, { duration: 220, easing: Easing.out(Easing.cubic), reduceMotion: ReduceMotion.System }),
       );
     }
-  }, [filled, index, fill]);
+  }, [filled, index, beads, fill]);
 
   const fillStyle = useAnimatedStyle(() => ({
     opacity: fill.value,
@@ -45,10 +68,10 @@ function Bead({ index, filled, current, x, y }: { index: number; filled: boolean
     <View
       style={{
         position: 'absolute',
-        left: x - BEAD / 2,
-        top: y - BEAD / 2,
-        width: BEAD,
-        height: BEAD,
+        left: x - size / 2,
+        top: y - size / 2,
+        width: size,
+        height: size,
         borderRadius: radius.full,
         backgroundColor: theme.colors.surfaceSunken,
         borderWidth: current ? 2 : 1,
@@ -60,8 +83,8 @@ function Bead({ index, filled, current, x, y }: { index: number; filled: boolean
             position: 'absolute',
             top: -1,
             left: -1,
-            width: BEAD,
-            height: BEAD,
+            width: size,
+            height: size,
             borderRadius: radius.full,
             backgroundColor: theme.colors.primary,
           },
@@ -103,47 +126,64 @@ function PulseCount({ count }: { count: number }) {
   );
 }
 
-function CompleteCheck({ size }: { size: number }) {
+function arcPath(center: number, r: number, from: number, to: number): string {
+  const point = (angle: number) => `${center + Math.cos(angle) * r} ${center + Math.sin(angle) * r}`;
+  const large = to - from > Math.PI ? 1 : 0;
+  return `M ${point(from)} A ${r} ${r} 0 ${large} 1 ${point(to)}`;
+}
+
+function Arcs({ segments, filled }: { segments: number; filled: number }) {
   const theme = useTheme();
-  const circle = useSharedValue(0);
-  const tick = useSharedValue(0);
-
-  useEffect(() => {
-    circle.value = withSpring(1, { damping: 12, stiffness: 180, reduceMotion: ReduceMotion.System });
-    tick.value = withDelay(
-      180,
-      withSpring(1, { damping: 9, stiffness: 220, reduceMotion: ReduceMotion.System }),
-    );
-  }, [circle, tick]);
-
-  const circleStyle = useAnimatedStyle(() => ({
-    opacity: circle.value,
-    transform: [{ scale: 0.3 + circle.value * 0.7 }],
-  }));
-  const tickStyle = useAnimatedStyle(() => ({
-    opacity: tick.value,
-    transform: [{ scale: tick.value }, { rotate: `${(1 - tick.value) * -25}deg` }],
-  }));
+  const center = ARC_RING / 2;
+  const r = center - ARC_STROKE / 2;
+  const gap = 0.32;
+  const sweep = (Math.PI * 2) / segments;
 
   return (
-    <Animated.View
-      accessibilityLabel={t('tasbih.complete')}
-      style={[
-        {
-          position: 'absolute',
-          width: size,
-          height: size,
-          borderRadius: radius.full,
-          backgroundColor: theme.colors.primary,
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-        circleStyle,
-      ]}>
-      <Animated.View style={tickStyle}>
-        <Icon name="check" size={size * 0.55} color={theme.colors.onPrimary} />
-      </Animated.View>
-    </Animated.View>
+    <Svg width={ARC_RING} height={ARC_RING} style={{ position: 'absolute' }}>
+      {Array.from({ length: segments }, (_, index) => {
+        const from = -Math.PI / 2 + index * sweep + gap / 2;
+        return (
+          <Path
+            key={index}
+            d={arcPath(center, r, from, from + sweep - gap)}
+            stroke={index < filled ? theme.colors.primary : theme.colors.border}
+            strokeWidth={ARC_STROKE}
+            strokeLinecap="round"
+            fill="none"
+          />
+        );
+      })}
+    </Svg>
+  );
+}
+
+function Center({ count, target }: { count: number; target: number | null }) {
+  return (
+    <>
+      <PulseCount count={count} />
+      <AppText size="sm" tone="textMuted" tabular>
+        {target ? t('tasbih.of', { target }) : t('tasbih.noGoal').toLocaleLowerCase()}
+      </AppText>
+    </>
+  );
+}
+
+function OnceChip() {
+  const theme = useTheme();
+  return (
+    <View
+      style={{
+        alignSelf: 'center',
+        paddingHorizontal: spacing.lg,
+        paddingVertical: spacing.sm,
+        borderRadius: radius.full,
+        backgroundColor: theme.colors.primarySoft,
+      }}>
+      <AppText size="sm" weight="semibold" color={theme.colors.onPrimarySoft}>
+        {t('tasbih.once')}
+      </AppText>
+    </View>
   );
 }
 
@@ -151,8 +191,11 @@ export function TasbihRing({ session }: { session: TasbihSession }) {
   const { width } = useWindowDimensions();
   const { state, target, total } = session;
   const [fit, setFit] = useState<number | null>(null);
-  const size = Math.min(width - spacing.xxxl * 2, MAX_RING);
-  const ringRadius = size / 2 - BEAD;
+  const kind = ringKind(target);
+  const beads = ringBeads(target);
+  const bead = beadSize(beads);
+  const size = kind === 'arcs' ? ARC_RING : Math.min(width - spacing.xxxl * 2, MAX_RING);
+  const ringRadius = size / 2 - bead;
   const filled = beadsFilled(state, target);
   const scale = useSharedValue(1);
 
@@ -167,6 +210,14 @@ export function TasbihRing({ session }: { session: TasbihSession }) {
 
   const ringStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
+  if (kind === 'once') {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <OnceChip />
+      </View>
+    );
+  }
+
   return (
     <View
       onLayout={(event) => {
@@ -176,37 +227,34 @@ export function TasbihRing({ session }: { session: TasbihSession }) {
       style={{ flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center', gap: spacing.sm }}>
       <Animated.View
         style={[{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }, ringStyle]}>
-        <View style={{ position: 'absolute', width: size, height: size }}>
-          {Array.from({ length: BEADS_PER_ROUND }, (_, index) => {
-            const angle = (index / BEADS_PER_ROUND) * Math.PI * 2 - Math.PI / 2;
-            return (
-              <Bead
-                key={index}
-                index={index}
-                filled={index < filled}
-                current={!state.done && index === filled}
-                x={size / 2 + Math.cos(angle) * ringRadius}
-                y={size / 2 + Math.sin(angle) * ringRadius}
-              />
-            );
-          })}
-        </View>
-        {state.done ? (
-          <CompleteCheck size={size * 0.6} />
+        {kind === 'arcs' ? (
+          <Arcs segments={target ?? 1} filled={state.count} />
         ) : (
-          <>
-            <PulseCount count={state.count} />
-            {target ? (
-              <AppText size="sm" tone="textMuted" tabular>
-                {t('tasbih.of', { target })}
-              </AppText>
-            ) : null}
-          </>
+          <View style={{ position: 'absolute', width: size, height: size }}>
+            {Array.from({ length: beads }, (_, index) => {
+              const angle = (index / beads) * Math.PI * 2 - Math.PI / 2;
+              return (
+                <Bead
+                  key={index}
+                  index={index}
+                  beads={beads}
+                  size={bead}
+                  filled={index < filled}
+                  current={index === filled}
+                  x={size / 2 + Math.cos(angle) * ringRadius}
+                  y={size / 2 + Math.sin(angle) * ringRadius}
+                />
+              );
+            })}
+          </View>
         )}
+        <Center count={state.count} target={target} />
       </Animated.View>
-      <AppText size="sm" tone="textMuted" tabular align="center">
-        {t('tasbih.total', { count: total })}
-      </AppText>
+      {isFree(state) ? (
+        <AppText size="sm" tone="textMuted" tabular align="center">
+          {t('tasbih.total', { count: total })}
+        </AppText>
+      ) : null}
     </View>
   );
 }

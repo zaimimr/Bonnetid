@@ -3,7 +3,16 @@ import test from 'node:test';
 import {
   AFTER_PRAYER_STEPS,
   DHIKR,
+  DHIKR_CATEGORIES,
+  DHIKR_IDS,
+  DHIKR_INFO,
+  MAX_TARGET,
   advance,
+  dhikrIn,
+  phraseOf,
+  ringBeads,
+  ringKind,
+  seriesTotal,
   linkedParts,
   beadsFilled,
   initialTasbih,
@@ -58,13 +67,45 @@ test('free count with a goal finishes at the goal, without one it never does', (
   assert.equal(totalKey(open, []), 'free');
 });
 
-test('beads fill proportionally below 33 and wrap above', () => {
+test('one bead per count up to 33, wrapping rounds above', () => {
   const state = initialTasbih('free', 11);
-  assert.equal(beadsFilled({ ...state, count: 0 }, 1), 0);
-  assert.equal(beadsFilled({ ...state, count: 5 }, 11), 15);
+  assert.equal(beadsFilled({ ...state, count: 5 }, 11), 5);
+  assert.equal(beadsFilled({ ...state, done: true }, 10), 10);
   assert.equal(beadsFilled({ ...state, count: 40 }, 99), 7);
   assert.equal(beadsFilled({ ...state, count: 40 }, null), 7);
   assert.equal(beadsFilled({ ...state, done: true }, 99), 33);
+});
+
+test('ring shape follows the target', () => {
+  assert.equal(ringKind(1), 'once');
+  assert.equal(ringKind(3), 'arcs');
+  assert.equal(ringKind(10), 'beads');
+  assert.equal(ringKind(null), 'beads');
+  assert.equal(ringBeads(10), 10);
+  assert.equal(ringBeads(33), 33);
+  assert.equal(ringBeads(100), 33);
+  assert.equal(ringBeads(null), 33);
+});
+
+test('free count follows the chosen dhikr', () => {
+  const state = initialTasbih('free', 33);
+  assert.equal(totalKey(state, [], 'alhamdulillah'), 'alhamdulillah');
+  assert.equal(phraseOf(state, [], null), null);
+  assert.equal(phraseOf(state, [], 'subhanallah'), DHIKR.subhanallah);
+});
+
+test('every dhikr has a phrase, a category and a sane default count', () => {
+  for (const id of DHIKR_IDS) {
+    assert.ok(DHIKR[id].arabic.length > 0, id);
+    assert.ok(DHIKR[id].transliteration.length > 0, id);
+    assert.ok(DHIKR_INFO[id].categories.length > 0, id);
+    assert.ok(DHIKR_INFO[id].count >= 1 && DHIKR_INFO[id].count <= MAX_TARGET, id);
+  }
+  for (const category of DHIKR_CATEGORIES) assert.ok(dhikrIn(category).length > 0, category);
+});
+
+test('series total sums step targets', () => {
+  assert.equal(seriesTotal(AFTER_PRAYER_STEPS), 100);
 });
 
 test('step fractions and jumping', () => {
