@@ -1,3 +1,4 @@
+import { CATALOG, CATALOG_IDS, type CatalogId } from './dhikrCatalog.ts';
 import { duaById } from './duas.ts';
 import { t } from './i18n.ts';
 
@@ -25,6 +26,7 @@ export const DHIKR_IDS = [
   'audhu-bikalimat',
   'bismika-amutu',
   'rabbana-atina',
+  ...CATALOG_IDS,
 ] as const;
 export type DhikrId = (typeof DHIKR_IDS)[number];
 
@@ -37,6 +39,9 @@ export const DHIKR_CATEGORIES = [
   'praise',
   'worry',
   'quran',
+  'salawat',
+  'travel',
+  'sunnah',
 ] as const;
 export type DhikrCategory = (typeof DHIKR_CATEGORIES)[number];
 
@@ -44,7 +49,6 @@ export type DhikrInfo = {
   count: number;
   short: boolean;
   categories: DhikrCategory[];
-  source: string;
 };
 
 export const FREE_DHIKR: DhikrId[] = ['subhanallah', 'alhamdulillah', 'allahu-akbar', 'astaghfirullah', 'la-ilaha-illallah'];
@@ -91,7 +95,12 @@ function own(id: DhikrId, arabicText: string, latin: string): TasbihPhrase {
   return phrase(arabicText, latin, t(`tasbih.meanings.${id}` as 'tasbih.meanings.salawat'));
 }
 
+const catalogPhrases = Object.fromEntries(
+  CATALOG_IDS.map((id) => [id, own(id, CATALOG[id].arabic, CATALOG[id].transliteration)]),
+) as Record<CatalogId, TasbihPhrase>;
+
 export const DHIKR: Record<DhikrId, TasbihPhrase> = {
+  ...catalogPhrases,
   subhanallah: phrase(arabic[0], transliteration[0], meaning[0]),
   alhamdulillah: phrase(arabic[1], transliteration[1], meaning[1]),
   'allahu-akbar': phrase(arabic[2], transliteration[2], meaning[2]),
@@ -131,28 +140,33 @@ export const DHIKR: Record<DhikrId, TasbihPhrase> = {
   ),
 };
 
-function info(count: number, categories: DhikrCategory[], source: string, short = false): DhikrInfo {
-  return { count, short, categories, source };
+function info(count: number, categories: DhikrCategory[], short = false): DhikrInfo {
+  return { count, short, categories };
 }
 
+const catalogInfo = Object.fromEntries(
+  CATALOG_IDS.map((id) => [id, info(CATALOG[id].count, CATALOG[id].categories, CATALOG[id].short)]),
+) as Record<CatalogId, DhikrInfo>;
+
 export const DHIKR_INFO: Record<DhikrId, DhikrInfo> = {
-  subhanallah: info(33, ['after-prayer', 'sleep', 'praise'], 'Sahih Muslim 597', true),
-  alhamdulillah: info(33, ['after-prayer', 'sleep', 'praise'], 'Sahih Muslim 597', true),
-  'allahu-akbar': info(33, ['after-prayer', 'sleep', 'praise'], 'Sahih Muslim 597', true),
-  astaghfirullah: info(100, ['after-prayer', 'forgiveness'], 'Sahih Muslim 591', true),
-  tahlil: info(1, ['after-prayer'], 'Sahih Muslim 597'),
-  'la-ilaha-illallah': info(100, ['praise', 'morning-evening'], 'Jami at-Tirmidhi 3383', true),
-  'subhanallahi-wa-bihamdih': info(100, ['morning-evening', 'praise'], 'Sahih Muslim 2692', true),
-  'subhanallahil-azim': info(33, ['praise'], 'Sahih al-Bukhari 6406'),
-  salawat: info(10, ['morning-evening', 'praise'], 'Sahih Muslim 408', true),
-  'la-hawla': info(10, ['worry', 'morning-evening'], 'Sahih al-Bukhari 6384', true),
-  'astaghfirullah-wa-atubu': info(100, ['forgiveness', 'morning-evening'], 'Sahih Muslim 2702', true),
-  hasbunallah: info(33, ['worry', 'quran'], 'Al-Imran 3:173', true),
-  yunus: info(33, ['worry', 'forgiveness', 'quran'], 'Al-Anbiya 21:87'),
-  'bismillah-protection': info(3, ['protection', 'morning-evening'], 'Sunan Abi Dawud 5088'),
-  'audhu-bikalimat': info(3, ['protection', 'morning-evening'], 'Sahih Muslim 2709'),
-  'bismika-amutu': info(1, ['sleep'], 'Sahih al-Bukhari 6324'),
-  'rabbana-atina': info(1, ['quran'], 'Al-Baqarah 2:201'),
+  ...catalogInfo,
+  subhanallah: info(33, ['after-prayer', 'sleep', 'praise'], true),
+  alhamdulillah: info(33, ['after-prayer', 'sleep', 'praise'], true),
+  'allahu-akbar': info(33, ['after-prayer', 'sleep', 'praise'], true),
+  astaghfirullah: info(100, ['after-prayer', 'forgiveness'], true),
+  tahlil: info(1, ['after-prayer']),
+  'la-ilaha-illallah': info(100, ['praise', 'morning-evening'], true),
+  'subhanallahi-wa-bihamdih': info(100, ['morning-evening', 'praise'], true),
+  'subhanallahil-azim': info(33, ['praise']),
+  salawat: info(10, ['morning-evening', 'praise', 'salawat'], true),
+  'la-hawla': info(10, ['worry', 'morning-evening'], true),
+  'astaghfirullah-wa-atubu': info(100, ['forgiveness', 'morning-evening'], true),
+  hasbunallah: info(33, ['worry', 'quran'], true),
+  yunus: info(33, ['worry', 'forgiveness', 'quran']),
+  'bismillah-protection': info(3, ['protection', 'morning-evening']),
+  'audhu-bikalimat': info(3, ['protection', 'morning-evening']),
+  'bismika-amutu': info(1, ['sleep']),
+  'rabbana-atina': info(1, ['quran']),
 };
 
 export function dhikrIn(category: DhikrCategory): DhikrId[] {

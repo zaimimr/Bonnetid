@@ -37,6 +37,9 @@ const CATEGORY_ICONS: Record<DhikrCategory, IconName> = {
   praise: 'sparkle',
   worry: 'heart',
   quran: 'book-open',
+  salawat: 'star-and-crescent',
+  travel: 'airplane',
+  sunnah: 'chat-circle-dots',
 };
 
 const NAMES = Object.fromEntries(DHIKR_IDS.map((id) => [id, t(`tasbih.names.${id}`)])) as Record<DhikrId, string>;
