@@ -10,6 +10,7 @@ import { isFree } from '@/lib/tasbih';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import { Completion } from './Completion';
+import { DhikrInfoSheet } from './DhikrInfoSheet';
 import { PhaseStrip } from './PhaseStrip';
 import { PhraseBlock } from './PhraseBlock';
 import { SettingsSheet } from './SettingsSheet';
@@ -69,7 +70,8 @@ function ResumeBanner({ session }: { session: TasbihSession }) {
 export function TasbihCounter({ session, fromDuas = false }: { session: TasbihSession; fromDuas?: boolean }) {
   const insets = useSafeAreaInsets();
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const { state, series, target, phrase, tap, reset } = session;
+  const [infoOpen, setInfoOpen] = useState(false);
+  const { state, series, target, phrase, dhikr, tap, reset } = session;
   const free = isFree(state);
   const confirmReset = () => {
     if (state.count === 0 && state.step === 0 && !state.done) return;
@@ -87,6 +89,9 @@ export function TasbihCounter({ session, fromDuas = false }: { session: TasbihSe
           title: free ? t('tasbih.freeCount') : (series?.name ?? t('navigation.tasbih')),
           headerRight: () => (
             <View style={{ flexDirection: 'row', gap: spacing.xs }}>
+              {dhikr && !state.done ? (
+                <HeaderIcon name="info" label={t('tasbih.about')} onPress={() => setInfoOpen(true)} />
+              ) : null}
               <HeaderIcon name="sliders-horizontal" label={t('tasbih.settings')} onPress={() => setSettingsOpen(true)} />
               <HeaderIcon name="arrow-clockwise" label={t('tasbih.reset')} onPress={confirmReset} />
             </View>
@@ -124,6 +129,7 @@ export function TasbihCounter({ session, fromDuas = false }: { session: TasbihSe
         </View>
       )}
       <SettingsSheet session={session} visible={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <DhikrInfoSheet dhikr={dhikr} visible={infoOpen} onClose={() => setInfoOpen(false)} />
     </>
   );
 }
