@@ -7,7 +7,7 @@ struct PrayerWidgetConfiguration: WidgetConfigurationIntent {
   static var title: LocalizedStringResource = "Bønnetider"
   static var description = IntentDescription("Velg hva widgeten viser.")
 
-  @Parameter(title: "Vis jamat-tider", description: "Krever at du har valgt en moské i appen.", default: false)
+  @Parameter(title: "Vis jamat-tider", description: "Krever at du har valgt en moské i appen.", default: true)
   var showJamat: Bool
 
   init() {}

@@ -197,7 +197,7 @@ export const useSettings = create<SettingsState>()(
       endReminderEnabled: true,
       prayerTrackerEnabled: false,
       liveActivityEnabled: true,
-      widgetShowJamat: false,
+      widgetShowJamat: true,
       ramadanRemindersEnabled: true,
       dhulHijjahRemindersEnabled: true,
       voluntaryFasts: NO_VOLUNTARY_FASTS,
@@ -295,7 +295,7 @@ export const useSettings = create<SettingsState>()(
     {
       name: 'bonnetid-settings',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 8,
+      version: 9,
       migrate: (persisted, version) => {
         const state = persisted as Partial<SettingsState> | undefined;
         if (!state) return persisted as SettingsState;
@@ -314,6 +314,9 @@ export const useSettings = create<SettingsState>()(
         }
         state.tabSlots = normalizeSlots(state.tabSlots, MAX_TAB_SLOTS, DEFAULT_TAB_SLOTS);
         state.shortcuts = normalizeSlots(state.shortcuts, MAX_SHORTCUTS, DEFAULT_SHORTCUTS);
+        if (version < 9) {
+          state.widgetShowJamat = true;
+        }
         if (version < 8) {
           state.tabSlots = PREVIOUS_DEFAULT_TAB_SLOTS.reduce(
             (slots, previous) => upgradeDefault(slots, previous, DEFAULT_TAB_SLOTS),

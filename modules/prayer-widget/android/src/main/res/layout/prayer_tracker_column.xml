@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/tracker_item"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical"
+  android:gravity="center"
+  android:paddingTop="4dp"
+  android:paddingBottom="4dp">
+
+  <TextView
+    android:id="@+id/column_label"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:textSize="11sp"
+    android:textColor="@color/prayer_widget_ink_secondary"
+    android:maxLines="1"
+    android:ellipsize="end"
+    android:text="Fajr" />
+
+  <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp">
+    <FrameLayout
+      android:id="@+id/tracker_mark"
+      android:layout_width="34dp"
+      android:layout_height="34dp"
+      android:background="@drawable/prayer_tracker_ring">
+
+      <ImageView
+        android:id="@+id/tracker_check"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:tint="@color/prayer_widget_surface"
+        android:contentDescription="@string/prayer_widget_prayed"
+        android:src="@drawable/prayer_widget_check" />
+    </FrameLayout>
+  </LinearLayout>
+
+  <TextView
+    android:id="@+id/column_time"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:textSize="11sp"
+    android:textColor="@color/prayer_widget_ink_muted"
+    android:fontFeatureSettings="tnum"
+    android:maxLines="1"
+    android:text="05:12" />
+</LinearLayout>

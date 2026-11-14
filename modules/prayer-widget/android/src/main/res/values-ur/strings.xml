@@ -13,4 +13,8 @@
   <string name="prayer_hijri_widget_description">ہجری کیلنڈر میں آج کی تاریخ۔</string>
   <string name="prayer_timeline_widget_description">دن ایک ٹائم لائن کی صورت میں، اگلی نماز تک باقی وقت کے ساتھ۔</string>
   <string name="prayer_timeline_bar_description">آج کی نمازوں کی ٹائم لائن</string>
+  <string name="prayer_jamat_widget_label">جماعت کے اوقات</string>
+  <string name="prayer_jamat_widget_description">آپ کی مسجد میں اذان اور جماعت۔</string>
+  <string name="prayer_tracker_widget_label">نماز ٹریکر</string>
+  <string name="prayer_tracker_widget_description">آج کی نمازیں ادا شدہ درج کرنے کے لیے ٹیپ کریں۔</string>
 </resources>

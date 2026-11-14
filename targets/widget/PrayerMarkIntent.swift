@@ -22,11 +22,11 @@ enum PrayerLogStore {
     return marked
   }
 
-  static func mark(isoDate: String, prayer: String, status: String) {
+  static func mark(isoDate: String, prayer: String, status: String?) {
     guard let defaults = UserDefaults(suiteName: prayerLogSuiteName) else { return }
     var log = raw()
     log[key(isoDate, prayer)] = [
-      "status": status,
+      "status": status.map { $0 as Any } ?? NSNull(),
       "at": Int(Date().timeIntervalSince1970 * 1000),
     ]
     guard
@@ -83,6 +83,32 @@ struct MarkPrayerIntent: LiveActivityIntent {
   func perform() async throws -> some IntentResult {
     PrayerLogStore.mark(isoDate: isoDate, prayer: prayer, status: status)
     await PrayerActivityRegistry.endAll()
+    WidgetCenter.shared.reloadAllTimelines()
+    return .result()
+  }
+}
+
+struct TogglePrayerIntent: AppIntent {
+  static var title: LocalizedStringResource = "Marker bønn som bedt"
+  static var isDiscoverable: Bool = false
+  static var openAppWhenRun: Bool = false
+
+  @Parameter(title: "Dato")
+  var isoDate: String
+
+  @Parameter(title: "Bønn")
+  var prayer: String
+
+  init() {}
+
+  init(isoDate: String, prayer: String) {
+    self.isoDate = isoDate
+    self.prayer = prayer
+  }
+
+  func perform() async throws -> some IntentResult {
+    let current = PrayerLogStore.statuses()[PrayerLogStore.key(isoDate, prayer)]
+    PrayerLogStore.mark(isoDate: isoDate, prayer: prayer, status: current == "prayed" ? nil : "prayed")
     WidgetCenter.shared.reloadAllTimelines()
     return .result()
   }

@@ -7,6 +7,8 @@ struct BonnetidWidgetBundle: WidgetBundle {
     PrayerWidget()
     PrayerNowWidget()
     PrayerTimelineWidget()
+    JamatWidget()
+    PrayerTrackerWidget()
     HijriWidget()
     PrayerLiveActivity()
   }

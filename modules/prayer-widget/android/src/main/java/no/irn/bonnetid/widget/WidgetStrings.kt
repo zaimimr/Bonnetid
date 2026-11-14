@@ -46,6 +46,37 @@ class WidgetStrings(lang: String) {
     "$time پر ختم · کیا آپ نے $label ادا کی؟",
   )
 
+  val jamatTitle: String
+    get() = pick("Jamat", "Jamaat", "الجماعة", "جماعت")
+
+  val adhan: String
+    get() = pick("Adhan", "Adhan", "الأذان", "اذان")
+
+  val chooseMosque: String
+    get() = pick("Velg en moské", "Choose a mosque", "اختر مسجدًا", "مسجد منتخب کریں")
+
+  val chooseMosqueBody: String
+    get() = pick(
+      "Jamat-tidene vises her når du har valgt moské i appen.",
+      "Jamaat times appear here once you choose a mosque in the app.",
+      "تظهر أوقات الجماعة هنا بعد اختيار مسجد في التطبيق.",
+      "ایپ میں مسجد منتخب کرنے کے بعد جماعت کے اوقات یہاں نظر آئیں گے۔",
+    )
+
+  val noJamatToday: String
+    get() = pick(
+      "Moskeen har ingen jamat-tider for i dag.",
+      "The mosque has no jamaat times for today.",
+      "لا توجد أوقات جماعة للمسجد اليوم.",
+      "مسجد کے آج کے لیے جماعت کے اوقات نہیں ہیں۔",
+    )
+
+  val today: String
+    get() = pick("I dag", "Today", "اليوم", "آج")
+
+  fun prayedCount(done: Int, total: Int): String =
+    pick("$done av $total", "$done of $total", "$done من $total", "$total میں سے $done")
+
   companion object {
     private val SUPPORTED = setOf("nb", "en", "ar", "ur")
 

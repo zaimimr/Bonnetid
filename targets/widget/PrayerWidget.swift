@@ -13,6 +13,7 @@ struct PrayerTimelineEntry: TimelineEntry {
   let hasJamatTimes: Bool
   /// Log key to status, as marked from the app, a widget or the Live Activity.
   let statuses: [String: String]
+  var mosqueName: String? = nil
 }
 
 extension PrayerEntry {
@@ -38,21 +39,28 @@ struct PrayerTimelineProvider: AppIntentTimelineProvider {
     for configuration: PrayerWidgetConfiguration,
     in context: Context
   ) async -> PrayerTimelineEntry {
-    entry(
-      at: Date(),
-      snapshot: PrayerSnapshot.load(),
-      showJamat: configuration.showJamat,
-      statuses: PrayerLogStore.statuses()
-    )
+    Self.current(showJamat: configuration.showJamat)
   }
 
   func timeline(
     for configuration: PrayerWidgetConfiguration,
     in context: Context
   ) async -> Timeline<PrayerTimelineEntry> {
+    Timeline(entries: Self.entries(showJamat: configuration.showJamat), policy: .atEnd)
+  }
+
+  static func current(showJamat: Bool) -> PrayerTimelineEntry {
+    entry(
+      at: Date(),
+      snapshot: PrayerSnapshot.load(),
+      showJamat: showJamat,
+      statuses: PrayerLogStore.statuses()
+    )
+  }
+
+  static func entries(showJamat: Bool) -> [PrayerTimelineEntry] {
     let now = Date()
     let snapshot = PrayerSnapshot.load()
-    let showJamat = configuration.showJamat
     // The snapshot and the log are read once, not once per entry.
     let statuses = PrayerLogStore.statuses()
 
@@ -78,14 +86,12 @@ struct PrayerTimelineProvider: AppIntentTimelineProvider {
       }
     }
 
-    let entries = dates.sorted().map {
+    return dates.sorted().map {
       entry(at: $0, snapshot: snapshot, showJamat: showJamat, statuses: statuses)
     }
-
-    return Timeline(entries: entries, policy: .atEnd)
   }
 
-  private func entry(
+  private static func entry(
     at date: Date,
     snapshot: PrayerSnapshot?,
     showJamat: Bool,
@@ -111,7 +117,8 @@ struct PrayerTimelineProvider: AppIntentTimelineProvider {
       currentPrayerAt: snapshot.currentPrayer(at: date)?.at,
       showJamat: showJamat,
       hasJamatTimes: snapshot.hasJamatTimes,
-      statuses: statuses
+      statuses: statuses,
+      mosqueName: snapshot.mosqueName
     )
   }
 }

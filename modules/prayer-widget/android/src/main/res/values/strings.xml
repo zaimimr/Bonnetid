@@ -13,4 +13,8 @@
   <string name="prayer_hijri_widget_description">Dagens dato i hijri-kalenderen.</string>
   <string name="prayer_timeline_widget_description">Dagen som en tidslinje, med tiden igjen til neste bønn.</string>
   <string name="prayer_timeline_bar_description">Tidslinje for dagens bønner</string>
+  <string name="prayer_jamat_widget_label">Jamat-tider</string>
+  <string name="prayer_jamat_widget_description">Adhan og jamat i moskeen din.</string>
+  <string name="prayer_tracker_widget_label">Bønnesporing</string>
+  <string name="prayer_tracker_widget_description">Trykk for å markere dagens bønner som bedt.</string>
 </resources>

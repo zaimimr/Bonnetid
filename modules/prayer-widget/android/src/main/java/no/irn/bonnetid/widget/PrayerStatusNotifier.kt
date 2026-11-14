@@ -135,6 +135,7 @@ object PrayerStatusNotifier {
     clear(context)
     PrayerAppWidget.updateAll(context)
     PrayerDayWidget.updateAll(context)
+    PrayerTrackerWidget.updateAll(context)
   }
 
   private fun clear(context: Context) {

@@ -104,6 +104,48 @@ struct WidgetStrings {
     )
   }
 
+  var jamatWidgetName: String { pick("Jamat-tider", "Jamaat times", "أوقات الجماعة", "جماعت کے اوقات") }
+  var jamatWidgetDescription: String {
+    pick(
+      "Adhan og jamat i moskeen din.",
+      "Adhan and jamaat at your mosque.",
+      "الأذان والجماعة في مسجدك.",
+      "آپ کی مسجد میں اذان اور جماعت۔"
+    )
+  }
+  var jamatTitle: String { pick("Jamat", "Jamaat", "الجماعة", "جماعت") }
+  var adhan: String { pick("Adhan", "Adhan", "الأذان", "اذان") }
+  var chooseMosque: String { pick("Velg en moské", "Choose a mosque", "اختر مسجدًا", "مسجد منتخب کریں") }
+  var chooseMosqueBody: String {
+    pick(
+      "Jamat-tidene vises her når du har valgt moské i appen.",
+      "Jamaat times appear here once you choose a mosque in the app.",
+      "تظهر أوقات الجماعة هنا بعد اختيار مسجد في التطبيق.",
+      "ایپ میں مسجد منتخب کرنے کے بعد جماعت کے اوقات یہاں نظر آئیں گے۔"
+    )
+  }
+  var noJamatToday: String {
+    pick(
+      "Moskeen har ingen jamat-tider for i dag.",
+      "The mosque has no jamaat times for today.",
+      "لا توجد أوقات جماعة للمسجد اليوم.",
+      "مسجد کے آج کے لیے جماعت کے اوقات نہیں ہیں۔"
+    )
+  }
+  var trackerWidgetName: String { pick("Bønnesporing", "Prayer tracker", "متابعة الصلاة", "نماز ٹریکر") }
+  var trackerWidgetDescription: String {
+    pick(
+      "Trykk for å markere dagens bønner som bedt.",
+      "Tap to mark today's prayers as prayed.",
+      "اضغط لتسجيل صلوات اليوم.",
+      "آج کی نمازیں ادا شدہ درج کرنے کے لیے ٹیپ کریں۔"
+    )
+  }
+  var today: String { pick("I dag", "Today", "اليوم", "آج") }
+  func prayedCount(_ done: Int, of total: Int) -> String {
+    pick("\(done) av \(total)", "\(done) of \(total)", "\(done) من \(total)", "\(total) میں سے \(done)")
+  }
+
   func windowOver(_ label: String) -> String {
     pick("\(label)-tiden er over", "\(label) time is over", "انتهى وقت \(label)", "\(label) کا وقت ختم ہو گیا")
   }

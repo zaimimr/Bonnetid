@@ -13,4 +13,8 @@
   <string name="prayer_hijri_widget_description">تاريخ اليوم في التقويم الهجري.</string>
   <string name="prayer_timeline_widget_description">اليوم كخط زمني مع الوقت المتبقي للصلاة التالية.</string>
   <string name="prayer_timeline_bar_description">الخط الزمني لصلوات اليوم</string>
+  <string name="prayer_jamat_widget_label">أوقات الجماعة</string>
+  <string name="prayer_jamat_widget_description">الأذان والجماعة في مسجدك.</string>
+  <string name="prayer_tracker_widget_label">متابعة الصلاة</string>
+  <string name="prayer_tracker_widget_description">اضغط لتسجيل صلوات اليوم.</string>
 </resources>

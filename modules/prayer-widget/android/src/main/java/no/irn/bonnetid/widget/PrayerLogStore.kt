@@ -39,11 +39,11 @@ object PrayerLogStore {
     return statusOf(context, day.date, prayer.kind)
   }
 
-  fun mark(context: Context, date: String, prayer: String, status: String) {
+  fun mark(context: Context, date: String, prayer: String, status: String?) {
     val log = read(context)
     log.put(
       key(date, prayer),
-      JSONObject().put("status", status).put("at", System.currentTimeMillis()),
+      JSONObject().put("status", status ?: JSONObject.NULL).put("at", System.currentTimeMillis()),
     )
     context
       .getSharedPreferences(SNAPSHOT_PREFS, Context.MODE_PRIVATE)

@@ -73,8 +73,8 @@ object WidgetChrome {
     views.setProgressBar(viewId, 1000, value, false)
   }
 
-  fun openApp(context: Context, requestCode: Int): PendingIntent {
-    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("bonnetid://"))
+  fun openApp(context: Context, requestCode: Int, path: String = ""): PendingIntent {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("bonnetid://$path"))
       .setPackage(context.packageName)
       .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     return PendingIntent.getActivity(context, requestCode, intent, flags())

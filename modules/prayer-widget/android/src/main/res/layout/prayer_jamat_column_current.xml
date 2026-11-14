@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:layout_marginStart="2dp"
+  android:layout_marginEnd="2dp"
+  android:orientation="vertical"
+  android:gravity="center"
+  android:background="@drawable/prayer_jamat_plate"
+  android:paddingTop="8dp"
+  android:paddingBottom="8dp">
+
+  <TextView
+    android:id="@+id/column_label"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:textSize="11sp"
+    android:textColor="@color/prayer_widget_on_brand_plate"
+    android:maxLines="1"
+    android:ellipsize="end"
+    android:text="Fajr" />
+
+  <TextView
+    android:id="@+id/column_jamat"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="3dp"
+    android:gravity="center_horizontal"
+    android:textSize="17sp"
+    android:textStyle="bold"
+    android:textColor="@color/prayer_widget_on_brand_plate"
+    android:fontFeatureSettings="tnum"
+    android:maxLines="1"
+    android:autoSizeTextType="uniform"
+    android:autoSizeMinTextSize="12sp"
+    android:autoSizeMaxTextSize="17sp"
+    android:text="05:30" />
+
+  <TextView
+    android:id="@+id/column_time"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="3dp"
+    android:gravity="center_horizontal"
+    android:textSize="11sp"
+    android:textColor="@color/prayer_widget_on_brand_plate"
+    android:fontFeatureSettings="tnum"
+    android:maxLines="1"
+    android:text="05:12" />
+</LinearLayout>

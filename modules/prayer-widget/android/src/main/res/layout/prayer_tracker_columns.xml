@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/root"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  android:background="@drawable/prayer_widget_background"
+  android:padding="12dp">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <TextView
+      android:id="@+id/title"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textSize="14sp"
+      android:textStyle="bold"
+      android:textColor="@color/prayer_widget_brand"
+      android:maxLines="1"
+      android:text="I dag" />
+
+    <TextView
+      android:id="@+id/subtitle"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:layout_marginStart="8dp"
+      android:gravity="end"
+      android:textSize="12sp"
+      android:textColor="@color/prayer_widget_ink_muted"
+      android:fontFeatureSettings="tnum"
+      android:maxLines="1"
+      android:ellipsize="end"
+      android:text="2 av 5" />
+  </LinearLayout>
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_marginTop="6dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+    <FrameLayout android:id="@+id/column_0" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" />
+    <FrameLayout android:id="@+id/column_1" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" />
+    <FrameLayout android:id="@+id/column_2" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" />
+    <FrameLayout android:id="@+id/column_3" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" />
+    <FrameLayout android:id="@+id/column_4" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" />
+  </LinearLayout>
+</LinearLayout>
