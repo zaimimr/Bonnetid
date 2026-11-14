@@ -13,11 +13,9 @@ import Animated, {
 import { Icon } from '@/components/icons';
 import { t } from '@/lib/i18n';
 import { AppText } from '@/components/ui';
-import { BEADS_PER_ROUND, SEQUENCE, isClosing } from '@/lib/tasbih';
+import { BEADS_PER_ROUND, beadsFilled } from '@/lib/tasbih';
 import { useTheme } from '@/theme';
 import { counterType, radius, spacing } from '@/theme/tokens';
-import { PhraseBlock } from './PhraseBlock';
-import { StepPips } from './StepPips';
 import type { TasbihSession } from './useTasbih';
 
 const BEAD = 13;
@@ -149,35 +147,14 @@ function CompleteCheck({ size }: { size: number }) {
   );
 }
 
-export function RingVariant({ session }: { session: TasbihSession }) {
+export function TasbihRing({ session }: { session: TasbihSession }) {
   const { width } = useWindowDimensions();
-  const { state, phrase, target } = session;
+  const { state, target, total } = session;
   const [fit, setFit] = useState<number | null>(null);
   const size = Math.min(width - spacing.xxxl * 2, MAX_RING);
   const ringRadius = size / 2 - BEAD;
-  const sequence = state.mode === 'sequence';
-  const complete = sequence && state.done;
-  const closing = isClosing(state) && !state.done;
-  const filled = state.done || closing
-    ? BEADS_PER_ROUND
-    : sequence
-      ? state.count
-      : state.count % BEADS_PER_ROUND;
+  const filled = beadsFilled(state, target);
   const scale = useSharedValue(1);
-  const beads = useSharedValue(1);
-
-  useEffect(() => {
-    beads.value = withTiming(complete ? 0 : 1, {
-      duration: complete ? 260 : 0,
-      easing: Easing.out(Easing.cubic),
-      reduceMotion: ReduceMotion.System,
-    });
-  }, [complete, beads]);
-
-  const beadsStyle = useAnimatedStyle(() => ({
-    opacity: beads.value,
-    transform: [{ scale: 0.6 + beads.value * 0.4 }],
-  }));
 
   useEffect(() => {
     if (fit === null) return;
@@ -191,56 +168,45 @@ export function RingVariant({ session }: { session: TasbihSession }) {
   const ringStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', gap: spacing.md }}>
-      <PhraseBlock
-        phrase={phrase}
-        note={
-          complete || closing
-            ? t('tasbih.saidOnce')
-            : undefined
-        }
-        compact={complete || closing}
-      />
-      <View
-        onLayout={(event) => {
-          const { width: w, height: h } = event.nativeEvent.layout;
-          setFit(Math.min(w, h));
-        }}
-        style={{ flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center' }}>
-        <Animated.View
-          style={[{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }, ringStyle]}>
-          <Animated.View style={[{ position: 'absolute', width: size, height: size }, beadsStyle]}>
-            {Array.from({ length: BEADS_PER_ROUND }, (_, index) => {
-              const angle = (index / BEADS_PER_ROUND) * Math.PI * 2 - Math.PI / 2;
-              return (
-                <Bead
-                  key={index}
-                  index={index}
-                  filled={index < filled}
-                  current={!state.done && index === filled}
-                  x={size / 2 + Math.cos(angle) * ringRadius}
-                  y={size / 2 + Math.sin(angle) * ringRadius}
-                />
-              );
-            })}
-          </Animated.View>
-          {complete ? (
-            <CompleteCheck size={size * 0.6} />
-          ) : (
-            <>
-              <PulseCount count={state.count} />
-              {target ? (
-                <AppText size="sm" tone="textMuted" tabular>
-                  {t('tasbih.of', { target })}
-                </AppText>
-              ) : null}
-            </>
-          )}
-        </Animated.View>
-      </View>
-      <View style={{ height: 8 }}>
-        {sequence ? <StepPips step={state.step} total={SEQUENCE.length} complete={complete} /> : null}
-      </View>
+    <View
+      onLayout={(event) => {
+        const { width: w, height: h } = event.nativeEvent.layout;
+        setFit(Math.min(w, h));
+      }}
+      style={{ flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center', gap: spacing.sm }}>
+      <Animated.View
+        style={[{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }, ringStyle]}>
+        <View style={{ position: 'absolute', width: size, height: size }}>
+          {Array.from({ length: BEADS_PER_ROUND }, (_, index) => {
+            const angle = (index / BEADS_PER_ROUND) * Math.PI * 2 - Math.PI / 2;
+            return (
+              <Bead
+                key={index}
+                index={index}
+                filled={index < filled}
+                current={!state.done && index === filled}
+                x={size / 2 + Math.cos(angle) * ringRadius}
+                y={size / 2 + Math.sin(angle) * ringRadius}
+              />
+            );
+          })}
+        </View>
+        {state.done ? (
+          <CompleteCheck size={size * 0.6} />
+        ) : (
+          <>
+            <PulseCount count={state.count} />
+            {target ? (
+              <AppText size="sm" tone="textMuted" tabular>
+                {t('tasbih.of', { target })}
+              </AppText>
+            ) : null}
+          </>
+        )}
+      </Animated.View>
+      <AppText size="sm" tone="textMuted" tabular align="center">
+        {t('tasbih.total', { count: total })}
+      </AppText>
     </View>
   );
 }

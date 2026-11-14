@@ -198,6 +198,22 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="tasbih-count"
+          options={{
+            headerShown: true,
+            title: t('navigation.tasbih'),
+            headerBackTitle: BACK,
+          }}
+        />
+        <Stack.Screen
+          name="tasbih-series"
+          options={{
+            headerShown: true,
+            title: t('tasbih.newSeries'),
+            headerBackTitle: BACK,
+          }}
+        />
+        <Stack.Screen
           name="duas/index"
           options={{
             headerShown: true,

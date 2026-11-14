@@ -7,7 +7,7 @@ const HOUR = 60 * 60 * 1000;
 const now = Date.UTC(2026, 10, 8, 12);
 
 function state(partial: Partial<TasbihState>): TasbihState {
-  return { mode: 'sequence', step: 0, count: 0, goal: 33, done: false, ...partial };
+  return { series: 'after-prayer', step: 0, count: 0, goal: 33, done: false, ...partial };
 }
 
 test('only unfinished, started counts are saved', () => {
@@ -30,9 +30,14 @@ test('after-prayer count without prayer times expires after three hours', () => 
 });
 
 test('free count lasts until reset', () => {
-  const saved = savedTasbih(state({ mode: 'free', goal: null, count: 412 }), now, now + HOUR);
+  const saved = savedTasbih(state({ series: 'free', goal: null, count: 412 }), now, now + HOUR);
   assert.equal(saved.expiresAt, null);
   assert.deepEqual(resumable(saved, now + 400 * 24 * HOUR), saved.state);
+});
+
+test('custom series lasts until reset', () => {
+  const saved = savedTasbih(state({ series: 'morning', step: 2, count: 9 }), now, now + HOUR);
+  assert.equal(saved.expiresAt, null);
 });
 
 test('finished or empty saves are not offered', () => {
@@ -44,7 +49,7 @@ test('finished or empty saves are not offered', () => {
 test('parse rejects junk', () => {
   assert.equal(parseSavedTasbih(null), null);
   assert.equal(parseSavedTasbih('not json'), null);
-  assert.equal(parseSavedTasbih('{"state":{"mode":"x"}}'), null);
+  assert.equal(parseSavedTasbih('{"state":{"mode":"free","count":3,"step":0}}'), null);
   const saved = savedTasbih(state({ count: 7 }), now, null);
   assert.deepEqual(parseSavedTasbih(JSON.stringify(saved)), saved);
 });

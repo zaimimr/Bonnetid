@@ -7,6 +7,7 @@ import { categoryById, DUA_LINKS, duasIn, type DuaCategory } from '@/lib/duas';
 import { spacing } from '@/theme/tokens';
 import { useTasbihReturn } from '@/store/tasbihReturn';
 import { FeatureGate } from '@/components/FeatureGate';
+import { AFTER_PRAYER_ID } from '@/lib/tasbih';
 import { DuaHub, TasbihRow } from '@/components/duas/DuaHub';
 import { useFeature } from '@/hooks/useFeature';
 import { t } from '@/lib/i18n';
@@ -82,7 +83,7 @@ function CategoryReader({ category }: { category: DuaCategory }) {
                   <Button
                     label={t('duas.countWithTasbih')}
                     variant="secondary"
-                    onPress={() => router.push({ pathname: '/tasbih', params: { from: 'duas' } })}
+                    onPress={() => router.push({ pathname: '/tasbih-count', params: { series: AFTER_PRAYER_ID, from: 'duas' } })}
                   />
                 ) : undefined
               }

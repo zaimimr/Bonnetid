@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { AFTER_PRAYER_ID } from '@/lib/tasbih';
 import { t } from '@/lib/i18n';
 import { useMosque, useMosqueJamatPeriods } from '@/api/queries';
 import { Icon, type IconName } from '@/components/icons';
@@ -88,7 +89,11 @@ export function TasbihRow({ from }: { from?: string }) {
           </IconTile>
         }
         chevron
-        onPress={() => router.push({ pathname: '/tasbih', params: from ? { from } : {} })}
+        onPress={() =>
+          from
+            ? router.push({ pathname: '/tasbih-count', params: { series: AFTER_PRAYER_ID, from } })
+            : router.push('/tasbih')
+        }
         style={{ paddingHorizontal: spacing.md }}
       />
     </Card>

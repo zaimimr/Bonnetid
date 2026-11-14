@@ -1,24 +1,30 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { useKeepAwake } from 'expo-keep-awake';
+import { useFocusEffect } from 'expo-router';
 import { useNow } from '@/hooks/useNow';
 import { usePrayerDay } from '@/hooks/usePrayerDay';
+import { t } from '@/lib/i18n';
 import {
+  AFTER_PRAYER_ID,
+  AFTER_PRAYER_STEPS,
+  FREE_ID,
   advance,
   initialTasbih,
+  jumpTo,
   phraseOf,
-  progressOf,
   targetOf,
-  totalOf,
+  totalKey,
   type TasbihGoal,
-  type TasbihMode,
+  type TasbihSeries,
   type TasbihState,
   type TasbihTapResult,
 } from '@/lib/tasbih';
 import { isUntouched, parseSavedTasbih, resumable, savedTasbih, shouldSave } from '@/lib/tasbihResume';
+import { useTasbihStore } from '@/store/tasbih';
 
-const STORAGE_KEY = 'tasbih_v1';
+const STORAGE_KEY = 'tasbih_v2';
 
 function feel(result: TasbihTapResult) {
   if (result === 'done' || result === 'step') {
@@ -34,9 +40,41 @@ function forget() {
   AsyncStorage.removeItem(STORAGE_KEY).catch(() => {});
 }
 
-export function useTasbih() {
+export function useSeries(id: string): TasbihSeries | null {
+  const custom = useTasbihStore((store) => store.series.find((item) => item.id === id) ?? null);
+  return useMemo(() => {
+    if (id === AFTER_PRAYER_ID) return { id, name: t('tasbih.afterPrayer'), steps: AFTER_PRAYER_STEPS };
+    return custom;
+  }, [id, custom]);
+}
+
+export function useSavedTasbih(): TasbihState | null {
+  const [saved, setSaved] = useState<TasbihState | null>(null);
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      AsyncStorage.getItem(STORAGE_KEY)
+        .then((raw) => {
+          if (active) setSaved(resumable(parseSavedTasbih(raw), Date.now()));
+        })
+        .catch(() => {});
+      return () => {
+        active = false;
+      };
+    }, []),
+  );
+  return saved;
+}
+
+export function useTasbih(seriesId: string, resumeNow = false) {
   useKeepAwake();
-  const [state, setState] = useState(() => initialTasbih());
+  const series = useSeries(seriesId);
+  const steps = useMemo(() => series?.steps ?? [], [series]);
+  const freeGoal = useTasbihStore((store) => store.freeGoal);
+  const setFreeGoal = useTasbihStore((store) => store.setFreeGoal);
+  const addToTotal = useTasbihStore((store) => store.addToTotal);
+  const totals = useTasbihStore((store) => store.totals);
+  const [state, setState] = useState(() => initialTasbih(seriesId, seriesId === FREE_ID ? freeGoal : null));
   const [offer, setOffer] = useState<TasbihState | null>(null);
   const now = useNow(60_000);
   const nextAdhan = usePrayerDay(now).nextPrayer?.next.date.getTime() ?? null;
@@ -45,36 +83,39 @@ export function useTasbih() {
     let active = true;
     AsyncStorage.getItem(STORAGE_KEY)
       .then((raw) => {
-        if (active) setOffer(resumable(parseSavedTasbih(raw), Date.now()));
+        const saved = resumable(parseSavedTasbih(raw), Date.now());
+        if (!active || saved?.series !== seriesId) return;
+        if (resumeNow) setState(saved);
+        else setOffer(saved);
       })
       .catch(() => {});
     return () => {
       active = false;
     };
-  }, []);
+  }, [seriesId, resumeNow]);
 
   useEffect(() => {
     if (state.done) {
       forget();
     } else if (shouldSave(state)) {
-      const saved = savedTasbih(state, Date.now(), nextAdhan);
-      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(saved)).catch(() => {});
+      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(savedTasbih(state, Date.now(), nextAdhan))).catch(() => {});
     }
   }, [state, nextAdhan]);
 
   const tap = useCallback(() => {
     if (state.done) return;
-    const { next, result } = advance(state);
+    const { next, result } = advance(state, steps);
     feel(result);
+    addToTotal(totalKey(state, steps));
     setOffer(null);
     setState(next);
-  }, [state]);
+  }, [state, steps, addToTotal]);
 
   const reset = useCallback(() => {
     Haptics.selectionAsync().catch(() => {});
     forget();
     setOffer(null);
-    setState((current) => initialTasbih(current.mode, current.goal));
+    setState((current) => initialTasbih(current.series, current.goal));
   }, []);
 
   const resume = useCallback(() => {
@@ -84,27 +125,41 @@ export function useTasbih() {
     setOffer(null);
   }, [offer]);
 
-  const setMode = useCallback((mode: TasbihMode) => {
-    setState((current) => initialTasbih(mode, current.goal));
-  }, []);
+  const setGoal = useCallback(
+    (goal: TasbihGoal) => {
+      setFreeGoal(goal);
+      setState((current) =>
+        current.done || (goal !== null && current.count >= goal) ? initialTasbih(FREE_ID, goal) : { ...current, goal },
+      );
+    },
+    [setFreeGoal],
+  );
 
-  const setGoal = useCallback((goal: TasbihGoal) => {
-    setState(() => initialTasbih('free', goal));
-  }, []);
+  const jump = useCallback(
+    (step: number) => {
+      Haptics.selectionAsync().catch(() => {});
+      setOffer(null);
+      setState((current) => jumpTo(current, step, steps));
+    },
+    [steps],
+  );
 
-  const resumeOffer =
-    offer && isUntouched(state) ? { count: progressOf(offer), target: totalOf(offer) } : null;
+  const resumeOffer = offer && isUntouched(state) ? { count: offer.count, target: targetOf(offer, steps) } : null;
 
   return {
+    series,
+    steps,
     state,
-    phrase: phraseOf(state),
-    target: targetOf(state),
+    phrase: phraseOf(state, steps),
+    target: targetOf(state, steps),
+    total: totals[totalKey(state, steps)] ?? 0,
+    totals,
     resumeOffer,
     tap,
     reset,
     resume,
-    setMode,
     setGoal,
+    jump,
   };
 }
 

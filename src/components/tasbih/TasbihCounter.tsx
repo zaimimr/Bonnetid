@@ -1,66 +1,49 @@
-import type { ReactNode } from 'react';
+import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Icon } from '@/components/icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInDown, FadeOut, ReduceMotion } from 'react-native-reanimated';
+import { Icon, type IconName } from '@/components/icons';
+import { AppText, Button } from '@/components/ui';
 import { t } from '@/lib/i18n';
-import { AppText, Button, SegmentedControl } from '@/components/ui';
-import { COMPLETION, type TasbihGoal, type TasbihMode } from '@/lib/tasbih';
+import { AFTER_PRAYER_ID, COMPLETION_DUA_ID, isFree } from '@/lib/tasbih';
+import { useTasbihReturn } from '@/store/tasbihReturn';
 import { useTheme } from '@/theme';
 import { hitSlop, opacity, spacing } from '@/theme/tokens';
-import { useTasbihReturn } from '@/store/tasbihReturn';
+import { PhaseStrip } from './PhaseStrip';
+import { PhraseBlock } from './PhraseBlock';
+import { SettingsSheet } from './SettingsSheet';
+import { TasbihRing } from './TasbihRing';
 import type { TasbihSession } from './useTasbih';
-
-const MODES: { value: TasbihMode; label: string }[] = [
-  {
-    value: 'sequence',
-    label: t('tasbih.afterPrayer'),
-  },
-  { value: 'free', label: t('tasbih.freeCount') },
-];
-
-const GOALS: { value: string; label: string }[] = [
-  { value: '33', label: '33' },
-  { value: '100', label: '100' },
-  { value: 'none', label: t('tasbih.noGoal') },
-];
-
-function goalFrom(value: string): TasbihGoal {
-  if (value === '33') return 33;
-  if (value === '100') return 100;
-  return null;
-}
 
 const fade = FadeIn.duration(250).reduceMotion(ReduceMotion.System);
 const fadeOut = FadeOut.duration(150).reduceMotion(ReduceMotion.System);
 const rise = FadeInDown.duration(300).delay(250).reduceMotion(ReduceMotion.System);
 
-function ResetButton({ onPress }: { onPress: () => void }) {
+function HeaderIcon({ name, label, onPress }: { name: IconName; label: string; onPress: () => void }) {
   const theme = useTheme();
   return (
     <Pressable
       onPress={onPress}
       hitSlop={hitSlop}
       accessibilityRole="button"
-      accessibilityLabel={t('tasbih.reset')}
+      accessibilityLabel={label}
       style={({ pressed }) => ({ padding: 6, opacity: pressed ? opacity.pressed : 1 })}>
-      <Icon name="arrow-clockwise" size={24} color={theme.colors.primary} />
+      <Icon name={name} size={24} color={theme.colors.primary} />
     </Pressable>
   );
 }
 
 function FinishAction({ session, fromDuas }: { session: TasbihSession; fromDuas: boolean }) {
-  const { state, reset } = session;
   const router = useRouter();
   const setScrollPast = useTasbihReturn((store) => store.setScrollPast);
 
-  if (fromDuas && state.mode === 'sequence') {
+  if (fromDuas && session.state.series === AFTER_PRAYER_ID) {
     return (
       <Button
         label={t('tasbih.done')}
         onPress={() => {
-          setScrollPast(COMPLETION?.id ?? null);
+          setScrollPast(COMPLETION_DUA_ID);
           router.back();
         }}
         style={{ alignSelf: 'center', minWidth: 200 }}
@@ -71,57 +54,54 @@ function FinishAction({ session, fromDuas }: { session: TasbihSession; fromDuas:
     <Button
       label={t('tasbih.startOver')}
       variant="secondary"
-      onPress={reset}
+      onPress={session.reset}
       style={{ alignSelf: 'center', minWidth: 200 }}
     />
   );
 }
 
-export type TasbihShellProps = {
-  session: TasbihSession;
-  fromDuas?: boolean;
-  children: ReactNode;
-};
-
-export function TasbihShell({ session, fromDuas = false, children }: TasbihShellProps) {
+export function TasbihCounter({ session, fromDuas = false }: { session: TasbihSession; fromDuas?: boolean }) {
   const insets = useSafeAreaInsets();
-  const { state, target, resumeOffer, tap, reset, resume, setMode, setGoal } = session;
-  const untouched = state.count === 0 && state.step === 0;
-  const label = target
-    ? t('tasbih.countOf', { count: state.count, target })
-    : t('tasbih.count', { count: state.count });
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const { state, series, target, phrase, resumeOffer, tap, reset, resume } = session;
+  const free = isFree(state);
+  const label = target ? t('tasbih.countOf', { count: state.count, target }) : t('tasbih.count', { count: state.count });
 
   return (
     <>
-      <Stack.Screen options={{ headerRight: () => <ResetButton onPress={reset} /> }} />
+      <Stack.Screen
+        options={{
+          title: free ? t('tasbih.freeCount') : (series?.name ?? t('navigation.tasbih')),
+          headerRight: () => (
+            <View style={{ flexDirection: 'row', gap: spacing.xs }}>
+              <HeaderIcon name="sliders-horizontal" label={t('tasbih.settings')} onPress={() => setSettingsOpen(true)} />
+              <HeaderIcon name="arrow-clockwise" label={t('tasbih.reset')} onPress={reset} />
+            </View>
+          ),
+        }}
+      />
       <View
         style={{
           flex: 1,
           paddingHorizontal: spacing.lg,
           paddingTop: spacing.md,
           paddingBottom: insets.bottom + spacing.md,
-          gap: spacing.sm,
+          gap: spacing.md,
         }}>
-        <SegmentedControl value={state.mode} options={MODES} onChange={setMode} />
-        {state.mode === 'free' ? (
-          <Animated.View entering={fade} exiting={fadeOut}>
-            <SegmentedControl
-              value={state.goal === null ? 'none' : String(state.goal)}
-              options={GOALS}
-              onChange={(value) => setGoal(goalFrom(value))}
-            />
-          </Animated.View>
-        ) : null}
-
+        {!free ? <PhaseStrip session={session} /> : null}
         <Pressable
           onPress={tap}
           disabled={state.done}
           accessibilityRole="button"
           accessibilityLabel={label}
-          style={{ flex: 1 }}>
-          {children}
+          style={{ flex: 1, gap: spacing.md }}>
+          {phrase ? (
+            <View style={{ flexShrink: 1, justifyContent: 'center', minHeight: 120 }}>
+              <PhraseBlock phrase={phrase} note={target === 1 ? t('tasbih.saidOnce') : undefined} />
+            </View>
+          ) : null}
+          <TasbihRing session={session} />
         </Pressable>
-
         <View style={{ minHeight: 52, justifyContent: 'center' }}>
           {state.done ? (
             <Animated.View entering={rise} exiting={fadeOut}>
@@ -132,7 +112,7 @@ export function TasbihShell({ session, fromDuas = false, children }: TasbihShell
               <Button
                 label={
                   resumeOffer.target
-                    ? t('tasbih.resumeOf', resumeOffer)
+                    ? t('tasbih.resumeOf', { count: resumeOffer.count, target: resumeOffer.target })
                     : t('tasbih.resume', { count: resumeOffer.count })
                 }
                 variant="secondary"
@@ -140,15 +120,14 @@ export function TasbihShell({ session, fromDuas = false, children }: TasbihShell
                 style={{ alignSelf: 'center', minWidth: 200 }}
               />
             </Animated.View>
-          ) : untouched ? (
-            <Animated.View entering={fade} exiting={fadeOut}>
-              <AppText size="sm" tone="textMuted" align="center">
-                {t('tasbih.tapAnywhereToCount')}
-              </AppText>
-            </Animated.View>
-          ) : null}
+          ) : (
+            <AppText size="sm" tone="textMuted" align="center">
+              {t('tasbih.tapAnywhereToCount')}
+            </AppText>
+          )}
         </View>
       </View>
+      <SettingsSheet session={session} visible={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </>
   );
 }

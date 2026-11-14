@@ -1,4 +1,4 @@
-import type { TasbihState } from './tasbih.ts';
+import { AFTER_PRAYER_ID, type TasbihState } from './tasbih.ts';
 
 export type SavedTasbih = {
   state: TasbihState;
@@ -16,7 +16,7 @@ export function shouldSave(state: TasbihState): boolean {
 }
 
 export function savedTasbih(state: TasbihState, now: number, nextAdhan: number | null): SavedTasbih {
-  if (state.mode === 'free') return { state, expiresAt: null };
+  if (state.series !== AFTER_PRAYER_ID) return { state, expiresAt: null };
   return { state, expiresAt: nextAdhan ?? now + FALLBACK_SEQUENCE_MS };
 }
 
@@ -31,7 +31,7 @@ export function parseSavedTasbih(raw: string | null): SavedTasbih | null {
   try {
     const value = JSON.parse(raw) as SavedTasbih;
     const { state } = value;
-    if (state?.mode !== 'sequence' && state?.mode !== 'free') return null;
+    if (typeof state?.series !== 'string') return null;
     if (typeof state.count !== 'number' || typeof state.step !== 'number') return null;
     return value;
   } catch {

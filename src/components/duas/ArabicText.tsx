@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react';
 import { Platform, Text, useWindowDimensions } from 'react-native';
 import { useTheme } from '@/theme';
 import { arabicFonts, arabicSizes, arabicType, spacing, type ArabicFontKey } from '@/theme/tokens';
 import { useSettings } from '@/store/settings';
 
-export function ArabicText({ children, font }: { children: string; font?: ArabicFontKey }) {
+export function ArabicText({ children, font }: { children: ReactNode; font?: ArabicFontKey }) {
   const theme = useTheme();
   const { fontScale } = useWindowDimensions();
   const setting = useSettings((state) => state.duaArabicFont);
