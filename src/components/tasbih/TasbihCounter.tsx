@@ -34,6 +34,32 @@ function HeaderIcon({ name, label, onPress }: { name: IconName; label: string; o
   );
 }
 
+function WhyPill({ onPress }: { onPress: () => void }) {
+  const theme = useTheme();
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={hitSlop}
+      accessibilityRole="button"
+      style={({ pressed }) => ({
+        alignSelf: 'center',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: spacing.xs,
+        paddingVertical: spacing.xs,
+        paddingHorizontal: spacing.md,
+        borderRadius: radius.full,
+        backgroundColor: theme.colors.primarySoft,
+        opacity: pressed ? opacity.pressed : 1,
+      })}>
+      <Icon name="sparkle" size={16} color={theme.colors.primary} />
+      <AppText size="sm" weight="semibold" tone="primary">
+        {t('tasbih.about')}
+      </AppText>
+    </Pressable>
+  );
+}
+
 function ResumeBanner({ session }: { session: TasbihSession }) {
   const theme = useTheme();
   const offer = session.resumeOffer;
@@ -89,9 +115,6 @@ export function TasbihCounter({ session, fromDuas = false }: { session: TasbihSe
           title: free ? t('tasbih.freeCount') : (series?.name ?? t('navigation.tasbih')),
           headerRight: () => (
             <View style={{ flexDirection: 'row', gap: spacing.xs }}>
-              {dhikr && !state.done ? (
-                <HeaderIcon name="info" label={t('tasbih.about')} onPress={() => setInfoOpen(true)} />
-              ) : null}
               <HeaderIcon name="sliders-horizontal" label={t('tasbih.settings')} onPress={() => setSettingsOpen(true)} />
               <HeaderIcon name="arrow-clockwise" label={t('tasbih.reset')} onPress={confirmReset} />
             </View>
@@ -117,8 +140,9 @@ export function TasbihCounter({ session, fromDuas = false }: { session: TasbihSe
             accessibilityLabel={label}
             style={{ flex: 1, gap: spacing.md }}>
             {phrase ? (
-              <View style={{ flexShrink: 1, justifyContent: 'center', minHeight: 120 }}>
+              <View style={{ flexShrink: 1, justifyContent: 'center', minHeight: 120, gap: spacing.md }}>
                 <PhraseBlock phrase={phrase} />
+                {dhikr ? <WhyPill onPress={() => setInfoOpen(true)} /> : null}
               </View>
             ) : null}
             <TasbihRing session={session} />

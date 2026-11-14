@@ -1,16 +1,23 @@
 import { View } from 'react-native';
 import { AppText, Sheet } from '@/components/ui';
 import { t } from '@/lib/i18n';
-import { DHIKR_INFO, type DhikrId } from '@/lib/tasbih';
+import type { DhikrId } from '@/lib/tasbih';
 import { spacing } from '@/theme/tokens';
 
-function Section({ label, children }: { label: string; children: string }) {
+const isHeading = (text: string) => text.length < 40 && !/[.:!?)”»؟۔؀-ۿ]/.test(text);
+
+function Section({ label, text }: { label: string; text: string }) {
+  if (!text) return null;
   return (
-    <View style={{ gap: spacing.xs }}>
+    <View style={{ gap: spacing.sm }}>
       <AppText size="sm" weight="semibold" tone="primary">
         {label}
       </AppText>
-      <AppText>{children}</AppText>
+      {text.split('\n\n').map((paragraph, i) => (
+        <AppText key={i} weight={isHeading(paragraph) ? 'semibold' : undefined}>
+          {paragraph}
+        </AppText>
+      ))}
     </View>
   );
 }
@@ -20,11 +27,8 @@ export function DhikrInfoSheet({ dhikr, visible, onClose }: { dhikr: DhikrId | n
   return (
     <Sheet visible={visible} onClose={onClose} title={t(`tasbih.names.${dhikr}`)}>
       <View style={{ gap: spacing.lg }}>
-        <Section label={t('tasbih.virtue')}>{t(`tasbih.virtues.${dhikr}`)}</Section>
-        <Section label={t('tasbih.explanation')}>{t(`tasbih.explanations.${dhikr}`)}</Section>
-        <AppText size="sm" tone="textMuted">
-          {t('tasbih.source')}: {DHIKR_INFO[dhikr].source}
-        </AppText>
+        <Section label={t('tasbih.virtue')} text={t(`tasbih.virtues.${dhikr}`)} />
+        <Section label={t('tasbih.explanation')} text={t(`tasbih.explanations.${dhikr}`)} />
       </View>
     </Sheet>
   );
