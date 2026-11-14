@@ -11,22 +11,22 @@ export const ASR_METHOD_OPTIONS: AsrMethodOption[] = [
   {
     value: 'irn',
     label: t('prayer.irnStandard'),
-    description: t('prayer.theStandardMethodFrom'),
+    description: t('prayer.asrIrnDescription'),
   },
   {
     value: 'shadow_1x',
     label: t('prayer.n1xShadow'),
-    description: t('prayer.otherSchoolsOfLaw'),
+    description: t('prayer.asr1xDescription'),
   },
   {
     value: 'shadow_2x',
     label: t('prayer.n2xShadow'),
-    description: t('prayer.hanafi'),
+    description: t('prayer.asr2xDescription'),
   },
   {
     value: 'wusta',
     label: t('prayer.wusta'),
-    description: t('prayer.midpointBetweenSolarNoon'),
+    description: t('prayer.asrWustaDescription'),
   },
 ];
 
