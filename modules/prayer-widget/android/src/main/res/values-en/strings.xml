@@ -17,4 +17,8 @@
   <string name="prayer_jamat_widget_description">Adhan and jamaat at your mosque.</string>
   <string name="prayer_tracker_widget_label">Prayer tracker</string>
   <string name="prayer_tracker_widget_description">Tap to mark today\'s prayers as prayed.</string>
+  <string name="prayer_tracker_list_widget_label">Prayer checklist</string>
+  <string name="prayer_tracker_list_widget_description">Today\'s prayers as a list you tick off.</string>
+  <string name="prayer_mark_widget_label">Mark prayer</string>
+  <string name="prayer_mark_widget_description">One button for the prayer that is due now.</string>
 </resources>

@@ -11,10 +11,13 @@ data class TimelineMark(
   val isPrayer: Boolean,
 )
 
+data class TimelineJamat(val at: Long, val fraction: Double)
+
 data class DayTimeline(
   val dayStart: Long,
   val dayLength: Long,
   val marks: List<TimelineMark>,
+  val jamats: List<TimelineJamat> = emptyList(),
 ) {
   fun fraction(of: Long): Double {
     if (dayLength <= 0) return 0.0
@@ -62,7 +65,11 @@ data class DayTimeline(
 
       val day = snapshot.dayFor(at) ?: return null
       val marks = mutableListOf<TimelineMark>()
+      val jamats = mutableListOf<TimelineJamat>()
       for (prayer in day.prayers) {
+        prayer.resolveJummah(at).jamat?.let { jamat ->
+          fractionWithinDay(jamat, dayStart, length)?.let { jamats.add(TimelineJamat(jamat, it)) }
+        }
         val fraction = fractionWithinDay(prayer.at, dayStart, length) ?: continue
         marks.add(
           TimelineMark(
@@ -76,7 +83,7 @@ data class DayTimeline(
       }
 
       if (marks.isEmpty()) return null
-      return DayTimeline(dayStart, length, marks.sortedBy { it.at })
+      return DayTimeline(dayStart, length, marks.sortedBy { it.at }, jamats.sortedBy { it.at })
     }
 
     private fun fractionWithinDay(at: Long, dayStart: Long, length: Long): Double? {

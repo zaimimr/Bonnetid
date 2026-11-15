@@ -200,8 +200,25 @@ private struct ActivityContentView: View {
     if family == .small {
       SmallActivityView(phase: phase)
     } else {
-      LockScreenActivityView(locationName: locationName, phase: phase)
+      let snapshot = PrayerSnapshot.load()
+      LockScreenActivityView(
+        locationName: locationName,
+        mosqueName: snapshot?.showsJamat == true ? snapshot?.mosqueName : nil,
+        jamat: phase.jamat(in: snapshot),
+        phase: phase
+      )
     }
+  }
+}
+
+private extension ActivityPhase {
+  func jamat(in snapshot: PrayerSnapshot?) -> Date? {
+    guard let snapshot, snapshot.showsJamat else { return nil }
+    let now = Date()
+    return snapshot.allPrayers
+      .first { $0.kind == kind && $0.at == prayerAt }?
+      .jummahResolved(at: now)
+      .jamat
   }
 }
 
@@ -304,16 +321,25 @@ private struct MarkButtons: View {
 private struct LockScreenActivityView: View {
   @Environment(\.widgetRenderingMode) private var renderingMode
   let locationName: String
+  let mosqueName: String?
+  let jamat: Date?
   let phase: ActivityPhase
 
   var body: some View {
     let palette = ActivityPalette(renderingMode)
 
     VStack(alignment: .leading, spacing: 4) {
-      Text(locationName)
-        .font(.caption)
-        .foregroundStyle(palette.inkMuted)
-        .lineLimit(1)
+      HStack(spacing: 8) {
+        Text(locationName)
+          .lineLimit(1)
+        Spacer(minLength: 8)
+        if let mosqueName {
+          Text(mosqueName)
+            .lineLimit(1)
+        }
+      }
+      .font(.caption)
+      .foregroundStyle(palette.inkMuted)
 
       HStack(alignment: .firstTextBaseline, spacing: 8) {
         Text(phase.label)
@@ -338,6 +364,14 @@ private struct LockScreenActivityView: View {
             .prayerTime(.subheadline)
             .fontWeight(.semibold)
             .foregroundStyle(palette.ink)
+          Spacer(minLength: 8)
+          if let jamat {
+            Text("\(WidgetStrings.current.jamatTitle) \(PrayerFormat.time(jamat))")
+              .prayerTime(.subheadline)
+              .fontWeight(.semibold)
+              .foregroundStyle(palette.brand)
+              .lineLimit(1)
+          }
         }
       } else if let upcoming = phase.upcomingLine {
         Text(WidgetStrings.current.nextLine(upcoming))

@@ -53,12 +53,16 @@ object NextViews {
     val time = PrayerFormat.time(headline.printedAt(showJamat))
     views.setImageViewResource(R.id.headline_icon, PrayerIcons.drawable(headline.kind))
     views.setTextViewText(R.id.headline_label, headline.displayLabel)
-    views.setTextViewText(
-      R.id.headline_time,
-      if (size == WidgetSize.TALL) "${strings.stateLabel(moment)} · $time" else time,
-    )
+    val jamat = if (showJamat) headline.jamat else null
+    val tallTime = listOfNotNull(
+      strings.stateLabel(moment),
+      time,
+      jamat?.let { "${strings.jamat} ${PrayerFormat.time(it)}" },
+    ).joinToString(" · ")
+    views.setTextViewText(R.id.headline_time, if (size == WidgetSize.TALL) tallTime else time)
     if (size == WidgetSize.MEDIUM) {
       views.setTextViewText(R.id.location, snapshot.locationName)
+      WidgetChrome.jamat(views, R.id.headline_jamat, strings, jamat)
     }
 
     val status = PrayerLogStore.statusFor(context, snapshot, headline)

@@ -15,26 +15,26 @@
 
     <TextView
       android:id="@+id/title"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:textSize="14sp"
-      android:textStyle="bold"
-      android:textColor="@color/prayer_widget_brand"
-      android:maxLines="1"
-      android:text="I dag" />
-
-    <TextView
-      android:id="@+id/subtitle"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:layout_weight="1"
-      android:layout_marginStart="8dp"
-      android:gravity="end"
+      android:textSize="15sp"
+      android:textStyle="bold"
+      android:textColor="@color/prayer_widget_brand"
+      android:maxLines="1"
+      android:ellipsize="end"
+      android:text="Asr venter" />
+
+    <TextView
+      android:id="@+id/subtitle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="6dp"
       android:textSize="12sp"
+      android:textStyle="bold"
       android:textColor="@color/prayer_widget_ink_muted"
       android:fontFeatureSettings="tnum"
       android:maxLines="1"
-      android:ellipsize="end"
       android:text="2 av 5" />
   </LinearLayout>
 

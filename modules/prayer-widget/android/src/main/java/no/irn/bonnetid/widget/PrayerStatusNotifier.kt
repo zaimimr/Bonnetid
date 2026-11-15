@@ -165,8 +165,15 @@ object PrayerStatusNotifier {
 
     ensureChannel(context, manager)
 
-    val label = prayer.displayLabel
+    val resolved = prayer.resolveJummah(now)
+    val label = resolved.displayLabel
     val strings = WidgetStrings.of(snapshot)
+    val jamat = if (snapshot.showJamat) resolved.jamat else null
+    val title = listOfNotNull(
+      label,
+      PrayerFormat.time(prayer.at),
+      jamat?.let { strings.jamatLine(PrayerFormat.time(it)) },
+    ).joinToString(" · ")
     val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       Notification.Builder(context, CHANNEL_ID)
     } else {
@@ -178,7 +185,8 @@ object PrayerStatusNotifier {
 
     builder
       .setSmallIcon(R.drawable.prayer_widget_status_icon)
-      .setContentTitle("$label · ${PrayerFormat.time(prayer.at)}")
+      .setContentTitle(title)
+      .setSubText(if (jamat != null) snapshot.mosqueName else null)
       .setContentText(
         if (endsAt != null) strings.endsAtPrayedQuestion(PrayerFormat.time(endsAt), label)
         else strings.prayedQuestion(label),

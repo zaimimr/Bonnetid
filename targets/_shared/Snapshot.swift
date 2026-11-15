@@ -34,7 +34,7 @@ struct PrayerEntry: Codable, Hashable {
       at: at,
       isPrayer: isPrayer,
       jamat: isOpen ? jummahAt : jamat,
-      displayLabel: label,
+      displayLabel: isOpen ? displayLabel : label,
       isJummah: isOpen,
       end: end,
       jummahAt: jummahAt,
@@ -72,6 +72,9 @@ struct PrayerSnapshot: Codable, Hashable {
   var origin: SnapshotPoint?
   var mosques: [SnapshotMosque]?
   var lang: String?
+  var showJamat: Bool?
+
+  var showsJamat: Bool { (showJamat ?? true) && hasJamatTimes }
 
   var usesDeviceTimeZone: Bool { mode == "calculated" }
 

@@ -17,4 +17,8 @@
   <string name="prayer_jamat_widget_description">Adhan og jamat i moskeen din.</string>
   <string name="prayer_tracker_widget_label">Bønnesporing</string>
   <string name="prayer_tracker_widget_description">Trykk for å markere dagens bønner som bedt.</string>
+  <string name="prayer_tracker_list_widget_label">Bønneliste</string>
+  <string name="prayer_tracker_list_widget_description">Dagens bønner som en liste du krysser av.</string>
+  <string name="prayer_mark_widget_label">Merk bønn</string>
+  <string name="prayer_mark_widget_description">Én knapp for bønnen som venter nå.</string>
 </resources>

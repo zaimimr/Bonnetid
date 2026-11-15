@@ -5,6 +5,7 @@ struct TimelineWidgetEntry: TimelineEntry {
   let date: Date
   let moment: PrayerMoment?
   let timeline: DayTimeline?
+  var showJamat = false
 }
 
 struct DayTimelineProvider: TimelineProvider {
@@ -51,7 +52,8 @@ struct DayTimelineProvider: TimelineProvider {
     return TimelineWidgetEntry(
       date: date,
       moment: PrayerMoment.resolve(from: snapshot, at: date),
-      timeline: DayTimeline.build(snapshot: snapshot, at: date)
+      timeline: DayTimeline.build(snapshot: snapshot, at: date),
+      showJamat: snapshot.showsJamat
     )
   }
 }
@@ -62,7 +64,12 @@ struct TimelineWidgetView: View {
   var body: some View {
     Group {
       if let moment = entry.moment, let timeline = entry.timeline {
-        DayTimelineCard(moment: moment, timeline: timeline, now: entry.date)
+        DayTimelineCard(
+          moment: moment,
+          timeline: timeline,
+          now: entry.date,
+          jamat: entry.showJamat ? moment.headline.jamat : nil
+        )
       } else {
         TimelineMissingView()
       }
@@ -76,6 +83,7 @@ private struct DayTimelineCard: View {
   let moment: PrayerMoment
   let timeline: DayTimeline
   let now: Date
+  let jamat: Date?
 
   private var marker: TimelineMark? { timeline.mark(at: moment.next.at) }
 
@@ -102,14 +110,21 @@ private struct DayTimelineCard: View {
         .foregroundStyle(PrayerColor.brand)
         .lineLimit(1)
         .minimumScaleFactor(0.7)
-      Text(PrayerFormat.time(moment.headline.printedAt(showJamat: false)))
-        .prayerTime(.system(.title3, design: .default).weight(.semibold))
-        .foregroundStyle(PrayerColor.ink)
-        .lineLimit(1)
+      HStack(alignment: .firstTextBaseline, spacing: 10) {
+        Text(PrayerFormat.time(moment.headline.printedAt(showJamat: false)))
+          .prayerTime(.system(.title3, design: .default).weight(.semibold))
+          .foregroundStyle(PrayerColor.ink)
+        if let jamat {
+          Text("\(WidgetStrings.current.jamatTitle) \(PrayerFormat.time(jamat))")
+            .prayerTime(.system(size: 13, weight: .semibold))
+            .foregroundStyle(PrayerColor.brand)
+        }
+      }
+      .lineLimit(1)
 
       Spacer(minLength: 4)
 
-      TimelineBar(timeline: timeline, now: now, marker: marker)
+      TimelineBar(timeline: timeline, now: now, marker: marker, currentJamat: jamat)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     .containerBackground(PrayerColor.surface, for: .widget)
@@ -120,6 +135,7 @@ private struct TimelineBar: View {
   let timeline: DayTimeline
   let now: Date
   let marker: TimelineMark?
+  let currentJamat: Date?
 
   private let glyphSlot: CGFloat = 19
   private let glyphSize: CGFloat = 11
@@ -127,11 +143,13 @@ private struct TimelineBar: View {
   private let barHeight: CGFloat = 9
   private let markerOverhang: CGFloat = 3
   private let axisBand: CGFloat = 13
+  private var jamatBand: CGFloat { timeline.jamats.isEmpty ? 0 : 9 }
 
-  private var totalHeight: CGFloat { glyphBand + barHeight + axisBand + 6 }
+  private var totalHeight: CGFloat { glyphBand + barHeight + jamatBand + axisBand + 6 }
   private var barTop: CGFloat { glyphBand + 2 }
   private var barCentre: CGFloat { barTop + barHeight / 2 }
-  private var axisCentre: CGFloat { barTop + barHeight + 4 + axisBand / 2 }
+  private var jamatCentre: CGFloat { barTop + barHeight + 5 }
+  private var axisCentre: CGFloat { barTop + barHeight + jamatBand + 4 + axisBand / 2 }
 
   var body: some View {
     GeometryReader { geometry in
@@ -181,6 +199,14 @@ private struct TimelineBar: View {
             x: clamped(width * CGFloat(progress), width: width, slot: barHeight + 4),
             y: barCentre
           )
+
+        ForEach(timeline.jamats, id: \.at) { jamat in
+          let size: CGFloat = jamat.at == currentJamat ? 7 : 5
+          Circle()
+            .fill(PrayerColor.brand)
+            .frame(width: size, height: size)
+            .position(x: clamped(width * CGFloat(jamat.fraction), width: width, slot: size), y: jamatCentre)
+        }
 
         ForEach(glyphs, id: \.at) { mark in
           Image(mark.symbol)

@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
 import android.util.SizeF
+import android.view.View
 import android.widget.RemoteViews
 
 enum class WidgetSize { COMPACT, MEDIUM, TALL }
@@ -64,6 +65,15 @@ object WidgetChrome {
     val base = SystemClock.elapsedRealtime() + (target - now)
     views.setChronometer(viewId, base, format, true)
     views.setChronometerCountDown(viewId, true)
+  }
+
+  fun jamat(views: RemoteViews, viewId: Int, strings: WidgetStrings, jamat: Long?) {
+    if (jamat == null) {
+      views.setViewVisibility(viewId, View.GONE)
+      return
+    }
+    views.setTextViewText(viewId, strings.jamatLine(PrayerFormat.time(jamat)))
+    views.setViewVisibility(viewId, View.VISIBLE)
   }
 
   fun progress(views: RemoteViews, viewId: Int, moment: PrayerMoment, now: Long) {

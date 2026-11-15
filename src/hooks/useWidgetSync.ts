@@ -24,7 +24,7 @@ import {
   type PrayerEntry,
 } from '@/lib/prayerSchedule';
 import { isoDateKey, parseDayKey, todayKey } from '@/lib/time';
-import { buildSnapshot, snapshotIsEmpty } from '@/lib/widgetSnapshot';
+import { buildSnapshot, snapshotIsEmpty, widgetPrayerLabel } from '@/lib/widgetSnapshot';
 import { usePrayerLog } from '@/store/prayerLog';
 import { useActiveLocation, useActiveMosque, useSettings } from '@/store/settings';
 
@@ -243,13 +243,13 @@ function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now
       const state = {
         locationName,
         isoDate: window.isoDate,
-        prayerLabel: window.prayer.label,
+        prayerLabel: widgetPrayerLabel(window.isoDate, window.prayer.name, window.prayer.label),
         prayerKind: window.prayer.name,
         prayerAt: window.prayer.date.getTime() / 1000,
         windowEnd: window.windowEnd.getTime() / 1000,
         showMarkButtons: trackerEnabled,
         nextIsoDate: next?.isoDate ?? '',
-        nextLabel: next ? next.prayer.label : '',
+        nextLabel: next ? widgetPrayerLabel(next.isoDate, next.prayer.name, next.prayer.label) : '',
         nextKind: next?.prayer.name ?? '',
         nextAt: next ? next.prayer.date.getTime() / 1000 : 0,
         nextWindowEnd: next ? next.windowEnd.getTime() / 1000 : 0,

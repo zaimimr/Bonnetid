@@ -14,6 +14,10 @@ struct PrayerTimelineEntry: TimelineEntry {
   /// Log key to status, as marked from the app, a widget or the Live Activity.
   let statuses: [String: String]
   var mosqueName: String? = nil
+
+  func jamat(for prayer: PrayerEntry) -> Date? {
+    showJamat ? prayer.jamat : nil
+  }
 }
 
 extension PrayerEntry {
@@ -115,7 +119,7 @@ struct PrayerTimelineProvider: AppIntentTimelineProvider {
       // After the last prayer of the day the useful column set is tomorrow's, not today's.
       dailyPrayers: snapshot.dailyPrayers(for: moment?.headline.at ?? date, now: date),
       currentPrayerAt: snapshot.currentPrayer(at: date)?.at,
-      showJamat: showJamat,
+      showJamat: showJamat && snapshot.showJamat != false,
       hasJamatTimes: snapshot.hasJamatTimes,
       statuses: statuses,
       mosqueName: snapshot.mosqueName
@@ -137,7 +141,8 @@ struct PrayerWidgetView: View {
           RectangularPrayerView(
             moment: moment,
             now: entry.date,
-            status: moment.headline.status(in: entry.statuses)
+            status: moment.headline.status(in: entry.statuses),
+            jamat: entry.jamat(for: moment.headline)
           )
         case .accessoryCircular:
           CircularPrayerView(moment: moment, now: entry.date)
@@ -145,13 +150,15 @@ struct PrayerWidgetView: View {
           InlinePrayerView(
             moment: moment,
             now: entry.date,
-            status: moment.headline.status(in: entry.statuses)
+            status: moment.headline.status(in: entry.statuses),
+            jamat: entry.jamat(for: moment.headline)
           )
         default:
           SmallPrayerView(
             moment: moment,
             now: entry.date,
-            status: moment.headline.status(in: entry.statuses)
+            status: moment.headline.status(in: entry.statuses),
+            jamat: entry.jamat(for: moment.headline)
           )
         }
       } else {
@@ -169,6 +176,7 @@ private struct SmallPrayerView: View {
   let moment: PrayerMoment
   let now: Date
   let status: String?
+  let jamat: Date?
 
   private var shown: PrayerEntry { moment.headline }
 
@@ -197,6 +205,10 @@ private struct SmallPrayerView: View {
         .prayerTime(.system(.title3, design: .default).weight(.semibold))
         .foregroundStyle(PrayerColor.ink)
         .lineLimit(1)
+
+      if let jamat {
+        JamatLine(jamat: jamat)
+      }
 
       Spacer(minLength: 0)
 
@@ -239,6 +251,13 @@ private struct MediumPrayerView: View {
           .prayerTime(.system(.subheadline, design: .default).weight(.semibold))
           .foregroundStyle(PrayerColor.ink)
           .lineLimit(1)
+        if let jamat = entry.jamat(for: moment.headline) {
+          Text("· \(WidgetStrings.current.jamat) \(PrayerFormat.time(jamat))")
+            .prayerTime(.system(.subheadline, design: .default).weight(.semibold))
+            .foregroundStyle(PrayerColor.brand)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+        }
         PrayerStatusMark(status: status, tint: PrayerColor.brand)
         Spacer(minLength: 6)
         Text(moment.locationName)
@@ -263,18 +282,11 @@ private struct MediumPrayerView: View {
 
       Spacer(minLength: 8)
 
-      HStack(spacing: 5) {
-        Text(moment.countdownLine(from: entry.date))
-          .font(.caption)
-          .foregroundStyle(PrayerColor.inkSecondary)
-          .lineLimit(1)
-          .minimumScaleFactor(0.8)
-        if entry.showJamat, entry.hasJamatTimes {
-          Text("· \(WidgetStrings.current.jamat)")
-            .font(.caption2)
-            .foregroundStyle(PrayerColor.inkMuted)
-        }
-      }
+      Text(moment.countdownLine(from: entry.date))
+        .font(.caption)
+        .foregroundStyle(PrayerColor.inkSecondary)
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     .containerBackground(PrayerColor.surface, for: .widget)
@@ -314,6 +326,10 @@ private struct HeroListPrayerView: View {
           .foregroundStyle(PrayerColor.ink)
           .lineLimit(1)
 
+        if let jamat = entry.jamat(for: moment.headline) {
+          JamatLine(jamat: jamat)
+        }
+
         Spacer(minLength: 0)
 
         Text(moment.countdownLine(from: entry.date))
@@ -326,11 +342,14 @@ private struct HeroListPrayerView: View {
       .opacity(status == "skipped" ? 0.55 : 1)
 
       VStack(spacing: 1) {
+        if entry.showJamat, entry.hasJamatTimes {
+          PrayerListHeader()
+        }
         ForEach(entry.dailyPrayers, id: \.at) { prayer in
           PrayerListRow(
             prayer: prayer,
             isCurrent: prayer.at == entry.currentPrayerAt,
-            showJamat: entry.showJamat,
+            showJamatColumn: entry.showJamat && entry.hasJamatTimes,
             status: prayer.status(in: entry.statuses)
           )
         }
@@ -341,10 +360,39 @@ private struct HeroListPrayerView: View {
   }
 }
 
+private struct JamatLine: View {
+  let jamat: Date
+
+  var body: some View {
+    Text("\(WidgetStrings.current.jamatTitle) \(PrayerFormat.time(jamat))")
+      .prayerTime(.system(size: 13, weight: .semibold))
+      .foregroundStyle(PrayerColor.brand)
+      .lineLimit(1)
+      .minimumScaleFactor(0.8)
+  }
+}
+
+private struct PrayerListHeader: View {
+  var body: some View {
+    HStack(spacing: 4) {
+      Spacer(minLength: 4)
+      Text(WidgetStrings.current.adhan)
+        .frame(width: 36, alignment: .trailing)
+      Text(WidgetStrings.current.jamatTitle)
+        .frame(width: 36, alignment: .trailing)
+    }
+    .font(.system(size: 9, weight: .semibold))
+    .foregroundStyle(PrayerColor.inkMuted)
+    .lineLimit(1)
+    .minimumScaleFactor(0.7)
+    .padding(.horizontal, 8)
+  }
+}
+
 private struct PrayerListRow: View {
   let prayer: PrayerEntry
   let isCurrent: Bool
-  let showJamat: Bool
+  let showJamatColumn: Bool
   let status: String?
 
   var body: some View {
@@ -360,10 +408,23 @@ private struct PrayerListRow: View {
         tint: isCurrent ? PrayerColor.onBrandPlate : PrayerColor.brand
       )
       Spacer(minLength: 4)
-      Text(PrayerFormat.time(prayer.printedAt(showJamat: showJamat)))
-        .prayerTime(.system(.caption, design: .default).weight(isCurrent ? .bold : .medium))
-        .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.ink)
-        .lineLimit(1)
+      if showJamatColumn {
+        Text(PrayerFormat.time(prayer.at))
+          .prayerTime(.system(.caption, design: .default).weight(.regular))
+          .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.inkMuted)
+          .lineLimit(1)
+          .frame(width: 36, alignment: .trailing)
+        Text(prayer.jamat.map { PrayerFormat.time($0) } ?? "-")
+          .prayerTime(.system(.caption, design: .default).weight(.semibold))
+          .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.ink)
+          .lineLimit(1)
+          .frame(width: 36, alignment: .trailing)
+      } else {
+        Text(PrayerFormat.time(prayer.at))
+          .prayerTime(.system(.caption, design: .default).weight(isCurrent ? .bold : .medium))
+          .foregroundStyle(isCurrent ? PrayerColor.onBrandPlate : PrayerColor.ink)
+          .lineLimit(1)
+      }
     }
     .padding(.vertical, 3)
     .padding(.horizontal, 8)
@@ -437,6 +498,7 @@ private struct RectangularPrayerView: View {
   let moment: PrayerMoment
   let now: Date
   let status: String?
+  let jamat: Date?
 
   var body: some View {
     VStack(alignment: .leading, spacing: 1) {
@@ -455,9 +517,15 @@ private struct RectangularPrayerView: View {
       }
       .widgetAccentable()
 
+      if let jamat {
+        Text("\(WidgetStrings.current.jamatTitle) \(PrayerFormat.time(jamat))")
+          .prayerTime(.system(.caption, design: .default).weight(.semibold))
+          .lineLimit(1)
+      }
+
       Text(
         moment.isNow
-          ? "\(moment.next.label) \(WidgetStrings.current.countdown(to: moment.next.at, from: now))"
+          ? "\(moment.next.printedLabel) \(WidgetStrings.current.countdown(to: moment.next.at, from: now))"
           : WidgetStrings.current.countdown(to: moment.next.at, from: now)
       )
       .font(.caption)
@@ -496,6 +564,7 @@ private struct CircularPrayerView: View {
 
 private struct CircularNameTimeView: View {
   let moment: PrayerMoment
+  let jamat: Date?
 
   var body: some View {
     ZStack {
@@ -509,6 +578,12 @@ private struct CircularNameTimeView: View {
           .prayerTime(.system(size: 12, weight: .medium))
           .lineLimit(1)
           .minimumScaleFactor(0.7)
+        if let jamat {
+          Text("\(WidgetStrings.current.jamatShort) \(PrayerFormat.time(jamat))")
+            .prayerTime(.system(size: 10, weight: .semibold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+        }
       }
       .padding(.horizontal, 4)
       .widgetAccentable()
@@ -521,11 +596,15 @@ private struct InlinePrayerView: View {
   let moment: PrayerMoment
   let now: Date
   let status: String?
+  let jamat: Date?
 
   private var text: String {
     let strings = WidgetStrings.current
+    if moment.isNow, let jamat {
+      return "\(strings.nowLine(moment.headline.printedLabel)) · \(strings.jamat) \(PrayerFormat.time(jamat))"
+    }
     if moment.isNow {
-      return "\(strings.nowLine(moment.headline.printedLabel)) · \(moment.next.label) \(strings.countdown(to: moment.next.at, from: now))"
+      return "\(strings.nowLine(moment.headline.printedLabel)) · \(moment.next.printedLabel) \(strings.countdown(to: moment.next.at, from: now))"
     }
     return "\(moment.headline.printedLabel) \(strings.countdown(to: moment.headline.at, from: now))"
   }
@@ -607,7 +686,7 @@ struct PrayerNowWidgetView: View {
     Group {
       if let moment = entry.moment {
         if family == .accessoryCircular {
-          CircularNameTimeView(moment: moment)
+          CircularNameTimeView(moment: moment, jamat: entry.jamat(for: moment.headline))
         } else {
           HeroListPrayerView(entry: entry, moment: moment)
         }

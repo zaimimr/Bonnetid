@@ -44,6 +44,7 @@ struct WidgetStrings {
     pick("Neste: \(value)", "Next: \(value)", "التالية: \(value)", "اگلی: \(value)")
   }
   var jamat: String { pick("jamat", "jamaat", "جماعة", "جماعت") }
+  var jamatShort: String { pick("J", "J", "ج", "ج") }
 
   var appName: String { "Bønnetid" }
   var openApp: String { pick("Åpne Bønnetid", "Open Bønnetid", "افتح Bønnetid", "Bønnetid کھولیں") }
@@ -142,6 +143,39 @@ struct WidgetStrings {
     )
   }
   var today: String { pick("I dag", "Today", "اليوم", "آج") }
+  var trackerListWidgetName: String { pick("Bønneliste", "Prayer checklist", "قائمة الصلوات", "نماز کی فہرست") }
+  var trackerListWidgetDescription: String {
+    pick(
+      "Dagens bønner som en liste du krysser av.",
+      "Today's prayers as a list you tick off.",
+      "صلوات اليوم في قائمة تؤشر عليها.",
+      "آج کی نمازیں ایک فہرست میں جس پر نشان لگائیں۔"
+    )
+  }
+  var markPrayerWidgetName: String { pick("Merk bønn", "Mark prayer", "سجّل الصلاة", "نماز درج کریں") }
+  var markPrayerWidgetDescription: String {
+    pick(
+      "Én knapp for bønnen som venter nå.",
+      "One button for the prayer that is due now.",
+      "زر واحد للصلاة الحاضرة الآن.",
+      "ابھی کی نماز کے لیے ایک بٹن۔"
+    )
+  }
+  func waiting(_ label: String) -> String {
+    pick("\(label) venter", "\(label) is due", "\(label) لم تُصلَّ", "\(label) باقی ہے")
+  }
+  var notPrayedYet: String { pick("Ikke bedt ennå", "Not prayed yet", "لم تُصلَّ بعد", "ابھی ادا نہیں کی") }
+  var markPrayed: String { pick("Merk som bedt", "Mark as prayed", "سجّل كمؤداة", "ادا شدہ درج کریں") }
+  var skipped: String { pick("Hoppet over", "Skipped", "تم التخطي", "چھوڑ دی") }
+  var tap: String { pick("Trykk", "Tap", "اضغط", "ٹیپ") }
+  func prayedToday(_ done: Int, of total: Int) -> String {
+    pick(
+      "\(done) av \(total) i dag",
+      "\(done) of \(total) today",
+      "\(done) من \(total) اليوم",
+      "آج \(total) میں سے \(done)"
+    )
+  }
   func prayedCount(_ done: Int, of total: Int) -> String {
     pick("\(done) av \(total)", "\(done) of \(total)", "\(done) من \(total)", "\(total) میں سے \(done)")
   }

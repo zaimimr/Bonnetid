@@ -47,6 +47,7 @@ object TimelineViews {
         R.id.headline_time,
         PrayerFormat.time(moment.headline.printedAt(showJamat)),
       )
+      WidgetChrome.jamat(views, R.id.headline_jamat, strings, if (showJamat) moment.headline.jamat else null)
       if (moment.isNow) {
         views.setTextViewText(R.id.countdown_label, moment.next.displayLabel)
         views.setViewVisibility(R.id.countdown_label, View.VISIBLE)
@@ -61,8 +62,10 @@ object TimelineViews {
       timeline = timeline,
       now = now,
       markerAt = timeline.mark(moment.next.at)?.at,
+      jamats = if (showJamat) timeline.jamats else emptyList(),
+      currentJamat = if (showJamat) moment.headline.jamat else null,
       widthPx = barWidthPx(context, barWidthDp),
-      heightPx = TimelineBarRenderer.heightPx(context, compact),
+      heightPx = TimelineBarRenderer.heightPx(context, compact, showJamat && timeline.jamats.isNotEmpty()),
       compact = compact,
       rtl = strings.isRtl,
     )

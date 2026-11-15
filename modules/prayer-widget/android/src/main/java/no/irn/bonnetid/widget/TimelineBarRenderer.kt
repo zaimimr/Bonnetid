@@ -18,6 +18,7 @@ object TimelineBarRenderer {
   private const val GLYPH_SLOT_DP = 20f
   private const val BAR_HEIGHT_DP = 9f
   private const val AXIS_BAND_DP = 13f
+  private const val JAMAT_BAND_DP = 9f
   private const val MARKER_OVERHANG_DP = 3f
   private const val KNOB_RING_DP = 2f
 
@@ -32,6 +33,8 @@ object TimelineBarRenderer {
     timeline: DayTimeline,
     now: Long,
     markerAt: Long?,
+    jamats: List<TimelineJamat> = emptyList(),
+    currentJamat: Long? = null,
     widthPx: Int,
     heightPx: Int,
     compact: Boolean = false,
@@ -62,7 +65,9 @@ object TimelineBarRenderer {
     val barTop = if (compact) (heightPx - barHeight) / 2f else glyphBand + 2f * density
     val barBottom = barTop + barHeight
     val barCentre = barTop + barHeight / 2f
-    val axisCentre = barBottom + 4f * density + axisBand / 2f
+    val jamatBand = if (compact || jamats.isEmpty()) 0f else JAMAT_BAND_DP * density
+    val jamatCentre = barBottom + 3f * density + jamatBand / 2f
+    val axisCentre = barBottom + jamatBand + 4f * density + axisBand / 2f
     val radius = barHeight / 2f
     val progress = timeline.fraction(now).toFloat()
     val side = { x: Float -> if (rtl) width - x else x }
@@ -125,6 +130,13 @@ object TimelineBarRenderer {
       drawable.draw(canvas)
     }
 
+    paint.color = brand
+    for (jamat in jamats) {
+      val dot = (if (jamat.at == currentJamat) 3.5f else 2.5f) * density
+      val x = side(clamp(width * jamat.fraction.toFloat(), width, dot * 2f))
+      canvas.drawCircle(x, jamatCentre, dot, paint)
+    }
+
     val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     textPaint.color = inkMuted
     textPaint.textSize = 10f * density
@@ -137,10 +149,11 @@ object TimelineBarRenderer {
     return bitmap
   }
 
-  fun heightPx(context: Context, compact: Boolean = false): Int {
+  fun heightPx(context: Context, compact: Boolean = false, jamats: Boolean = false): Int {
     val density = context.resources.displayMetrics.density
     if (compact) return ((BAR_HEIGHT_DP + 8f) * density).toInt()
-    return ((GLYPH_BAND_DP + BAR_HEIGHT_DP + AXIS_BAND_DP + 8f) * density).toInt()
+    val jamatBand = if (jamats) JAMAT_BAND_DP else 0f
+    return ((GLYPH_BAND_DP + BAR_HEIGHT_DP + jamatBand + AXIS_BAND_DP + 8f) * density).toInt()
   }
 
   private fun clamp(value: Float, width: Float, slot: Float): Float {

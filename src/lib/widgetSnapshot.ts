@@ -1,8 +1,8 @@
-import { language, type Language } from './i18n.ts';
+import { language, t, type Language } from './i18n.ts';
 import type { JummahSlot } from './jummah';
 import { jummahSlotIsOpen } from './jummah';
 import type { PrayerEntry } from './prayerSchedule';
-import { isoDateKey, localClockNear } from './time';
+import { isoDateIsFriday, isoDateKey, localClockNear } from './time';
 
 export const SNAPSHOT_VERSION = 3;
 
@@ -41,6 +41,7 @@ export type SnapshotInput = {
 export type SnapshotPrayer = {
   kind: string;
   label: string;
+  displayLabel: string;
   /** When the prayer starts, used for "next" and "now". */
   at: string;
   isPrayer: boolean;
@@ -81,6 +82,10 @@ function jamatInstant(adhanAt: Date, time: string | undefined): string | null {
   return Number.isNaN(instant.getTime()) ? null : instant.toISOString();
 }
 
+export function widgetPrayerLabel(isoDate: string, name: string, label: string): string {
+  return name === 'duhr' && isoDateIsFriday(isoDate) ? t('prayer.jumuah') : label;
+}
+
 export function jummahSlotForCell(day: SnapshotDayInput, prayerName: string): JummahSlot | null {
   return prayerName === 'duhr' ? (day.jummah ?? null) : null;
 }
@@ -101,25 +106,29 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
     showJamat: input.showJamat ?? false,
     lockScreenEnabled: input.lockScreenEnabled ?? false,
     lang: language(),
-    days: input.days.map((day) => ({
-      date: isoDateKey(day.date),
-      hijriText: day.hijriText,
-      prayers: day.schedule.map((entry) => {
-        const slot = jummahSlotForCell(day, entry.name);
-        const jummahAt = slot ? jamatInstant(entry.date, slot.at) : null;
+    days: input.days.map((day) => {
+      const isoDate = isoDateKey(day.date);
+      return {
+        date: isoDate,
+        hijriText: day.hijriText,
+        prayers: day.schedule.map((entry) => {
+          const slot = jummahSlotForCell(day, entry.name);
+          const jummahAt = slot ? jamatInstant(entry.date, slot.at) : null;
 
-        return {
-          kind: entry.name,
-          label: entry.label,
-          at: entry.date.toISOString(),
-          isPrayer: entry.isPrayer,
-          jamat: jamatInstant(entry.date, day.jamatTimes?.[entry.name]),
-          jummahAt,
-          jummahEnd: slot && jummahAt ? slot.endsAt.toISOString() : null,
-          end: entry.end?.date.toISOString() ?? null,
-        };
-      }),
-    })),
+          return {
+            kind: entry.name,
+            label: entry.label,
+            displayLabel: widgetPrayerLabel(isoDate, entry.name, entry.label),
+            at: entry.date.toISOString(),
+            isPrayer: entry.isPrayer,
+            jamat: jamatInstant(entry.date, day.jamatTimes?.[entry.name]),
+            jummahAt,
+            jummahEnd: slot && jummahAt ? slot.endsAt.toISOString() : null,
+            end: entry.end?.date.toISOString() ?? null,
+          };
+        }),
+      };
+    }),
   };
 }
 

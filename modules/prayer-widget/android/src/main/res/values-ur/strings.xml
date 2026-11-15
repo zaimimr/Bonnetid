@@ -17,4 +17,8 @@
   <string name="prayer_jamat_widget_description">آپ کی مسجد میں اذان اور جماعت۔</string>
   <string name="prayer_tracker_widget_label">نماز ٹریکر</string>
   <string name="prayer_tracker_widget_description">آج کی نمازیں ادا شدہ درج کرنے کے لیے ٹیپ کریں۔</string>
+  <string name="prayer_tracker_list_widget_label">نماز کی فہرست</string>
+  <string name="prayer_tracker_list_widget_description">آج کی نمازیں ایک فہرست میں جس پر نشان لگائیں۔</string>
+  <string name="prayer_mark_widget_label">نماز درج کریں</string>
+  <string name="prayer_mark_widget_description">ابھی کی نماز کے لیے ایک بٹن۔</string>
 </resources>

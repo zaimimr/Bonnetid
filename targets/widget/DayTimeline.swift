@@ -9,10 +9,16 @@ struct TimelineMark: Hashable {
   let isPrayer: Bool
 }
 
+struct TimelineJamat: Hashable {
+  let at: Date
+  let fraction: Double
+}
+
 struct DayTimeline {
   let dayStart: Date
   let dayLength: TimeInterval
   let marks: [TimelineMark]
+  var jamats: [TimelineJamat] = []
 
   static func placeable(
     _ marks: [TimelineMark],
@@ -59,7 +65,19 @@ struct DayTimeline {
     guard let day = snapshot.days.first(where: { $0.date == key }) else { return nil }
 
     var marks: [TimelineMark] = []
+    var jamats: [TimelineJamat] = []
     for prayer in day.prayers {
+      if snapshot.showsJamat,
+        let jamat = prayer.jummahResolved(at: now).jamat,
+        let fraction = fractionWithinDay(
+          jamat,
+          dayStart: dayStart,
+          length: lengthOfThisDayIncludingClockChanges
+        )
+      {
+        jamats.append(TimelineJamat(at: jamat, fraction: fraction))
+      }
+
       guard
         let fraction = fractionWithinDay(
           prayer.at,
@@ -85,7 +103,8 @@ struct DayTimeline {
     return DayTimeline(
       dayStart: dayStart,
       dayLength: lengthOfThisDayIncludingClockChanges,
-      marks: marks.sorted { $0.at < $1.at }
+      marks: marks.sorted { $0.at < $1.at },
+      jamats: jamats
     )
   }
 

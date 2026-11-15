@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/tracker_item"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <FrameLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center">
+    <FrameLayout
+      android:id="@+id/tracker_mark"
+      android:layout_width="24dp"
+      android:layout_height="24dp"
+      android:background="@drawable/prayer_tracker_ring">
+
+      <ImageView
+        android:id="@+id/tracker_check"
+        android:layout_width="11dp"
+        android:layout_height="11dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:tint="@color/prayer_widget_surface"
+        android:contentDescription="@string/prayer_widget_prayed"
+        android:src="@drawable/prayer_widget_check" />
+    </FrameLayout>
+  </FrameLayout>
+</FrameLayout>

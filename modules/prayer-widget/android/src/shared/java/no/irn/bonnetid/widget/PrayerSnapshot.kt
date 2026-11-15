@@ -37,6 +37,7 @@ data class PrayerEntry(
     val isOpen = jummahEnd == null || at < jummahEnd
     return copy(
       isJummah = isOpen,
+      displayLabel = if (isOpen) displayLabel else label,
       jamat = if (isOpen) jummahAt else jamat,
     )
   }

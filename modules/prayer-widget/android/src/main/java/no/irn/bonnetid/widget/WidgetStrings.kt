@@ -77,6 +77,33 @@ class WidgetStrings(lang: String) {
   fun prayedCount(done: Int, total: Int): String =
     pick("$done av $total", "$done of $total", "$done من $total", "$total میں سے $done")
 
+  fun prayedToday(done: Int, total: Int): String = pick(
+    "$done av $total i dag",
+    "$done of $total today",
+    "$done من $total اليوم",
+    "آج $total میں سے $done",
+  )
+
+  fun jamatLine(time: String): String = "$jamatTitle $time"
+
+  val now: String
+    get() = pick("Nå", "Now", "الآن", "ابھی")
+
+  fun waiting(label: String): String =
+    pick("$label venter", "$label is due", "$label لم تُصلَّ", "$label باقی ہے")
+
+  val notPrayedYet: String
+    get() = pick("Ikke bedt ennå", "Not prayed yet", "لم تُصلَّ بعد", "ابھی ادا نہیں کی")
+
+  val markPrayed: String
+    get() = pick("Merk som bedt", "Mark as prayed", "سجّل كمؤداة", "ادا شدہ درج کریں")
+
+  val skipped: String
+    get() = pick("Hoppet over", "Skipped", "تم التخطي", "چھوڑ دی")
+
+  val tap: String
+    get() = pick("Trykk", "Tap", "اضغط", "ٹیپ")
+
   companion object {
     private val SUPPORTED = setOf("nb", "en", "ar", "ur")
 

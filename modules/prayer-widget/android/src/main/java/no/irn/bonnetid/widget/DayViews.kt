@@ -41,7 +41,7 @@ object DayViews {
       views.setTextViewText(R.id.location, moment.locationName)
     }
     when (size) {
-      WidgetSize.MEDIUM -> fillPane(context, views, snapshot, strings, moment, now)
+      WidgetSize.MEDIUM -> fillPane(context, views, snapshot, strings, moment, showJamat, now)
       WidgetSize.TALL -> {
         views.setTextViewText(R.id.hijri, moment.hijriText)
         fillHero(views, strings, moment, showJamat, now)
@@ -128,12 +128,14 @@ object DayViews {
     snapshot: PrayerSnapshot,
     strings: WidgetStrings,
     moment: PrayerMoment,
+    showJamat: Boolean,
     now: Long,
   ) {
     val headline = moment.headline
     views.setImageViewResource(R.id.headline_icon, PrayerIcons.drawable(headline.kind))
     views.setTextViewText(R.id.headline_label, headline.displayLabel)
     views.setTextViewText(R.id.headline_time, PrayerFormat.time(headline.printedAt(false)))
+    WidgetChrome.jamat(views, R.id.headline_jamat, strings, if (showJamat) headline.jamat else null)
     val status = PrayerLogStore.statusFor(context, snapshot, headline)
     views.setViewVisibility(
       R.id.headline_check,
@@ -164,6 +166,7 @@ object DayViews {
       R.id.headline_time,
       PrayerFormat.time(moment.headline.printedAt(showJamat)),
     )
+    WidgetChrome.jamat(views, R.id.headline_jamat, strings, if (showJamat) moment.headline.jamat else null)
     WidgetChrome.countdown(views, R.id.countdown, moment.next.at, now, "%s")
     views.setTextViewText(
       R.id.countdown_label,
