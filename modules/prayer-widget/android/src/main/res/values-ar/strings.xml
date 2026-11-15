@@ -20,5 +20,5 @@
   <string name="prayer_tracker_list_widget_label">قائمة الصلوات</string>
   <string name="prayer_tracker_list_widget_description">صلوات اليوم في قائمة تؤشر عليها.</string>
   <string name="prayer_mark_widget_label">سجّل الصلاة</string>
-  <string name="prayer_mark_widget_description">زر واحد للصلاة الحاضرة الآن.</string>
+  <string name="prayer_mark_widget_description">سجّل صلواتك بلمسة واحدة.</string>
 </resources>

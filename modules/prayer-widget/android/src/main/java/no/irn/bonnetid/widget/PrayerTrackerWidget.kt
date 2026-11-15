@@ -125,7 +125,7 @@ class PrayerTrackerWidget : TrackerProvider(TrackerStyle.DOTS) {
     private fun layoutFor(style: TrackerStyle, size: WidgetSize): Int = when (style) {
       TrackerStyle.DOTS -> if (size == WidgetSize.COMPACT) R.layout.prayer_tracker_dots else R.layout.prayer_tracker_capsule
       TrackerStyle.LIST -> if (size == WidgetSize.COMPACT) R.layout.prayer_tracker_rows else R.layout.prayer_tracker_split
-      TrackerStyle.BUTTON -> R.layout.prayer_tracker_button
+      TrackerStyle.BUTTON -> if (size == WidgetSize.COMPACT) R.layout.prayer_tracker_button else R.layout.prayer_tracker_icons
     }
 
     private class Tracker(
@@ -177,6 +177,11 @@ class PrayerTrackerWidget : TrackerProvider(TrackerStyle.DOTS) {
               context.getColor(if (due) R.color.prayer_widget_brand else R.color.prayer_widget_ink_secondary),
             )
           }
+        }
+        R.layout.prayer_tracker_icons -> {
+          views.setTextViewText(R.id.title, tracker.headline(strings))
+          views.setTextViewText(R.id.subtitle, strings.prayedCount(tracker.prayedCount, tracker.prayers.size))
+          fillSlots(context, views, tracker, R.layout.prayer_tracker_icon)
         }
         R.layout.prayer_tracker_rows -> {
           views.setTextViewText(R.id.title, tracker.headline(strings))
@@ -235,6 +240,7 @@ class PrayerTrackerWidget : TrackerProvider(TrackerStyle.DOTS) {
             )
             mark(context, item, state)
           }
+          R.layout.prayer_tracker_icon -> iconMark(context, item, prayer, state)
           R.layout.prayer_tracker_row -> {
             item.setTextViewText(R.id.column_label, prayer.displayLabel)
             mark(context, item, state)
@@ -264,6 +270,34 @@ class PrayerTrackerWidget : TrackerProvider(TrackerStyle.DOTS) {
         "setColorFilter",
         context.getColor(if (state == TrackerState.PRAYED) R.color.prayer_widget_surface else R.color.prayer_widget_brand),
       )
+    }
+
+    private fun iconMark(context: Context, views: RemoteViews, prayer: PrayerEntry, state: TrackerState) {
+      views.setTextViewText(R.id.column_label, prayer.displayLabel)
+      val due = state == TrackerState.DUE
+      views.setTextColor(
+        R.id.column_label,
+        context.getColor(if (due) R.color.prayer_widget_brand else R.color.prayer_widget_ink),
+      )
+      views.setInt(
+        R.id.tracker_mark,
+        "setBackgroundResource",
+        when (state) {
+          TrackerState.PRAYED -> R.drawable.prayer_tracker_done
+          TrackerState.DUE -> R.drawable.prayer_tracker_icon_due
+          else -> R.drawable.prayer_tracker_icon_ring
+        },
+      )
+      val prayed = state == TrackerState.PRAYED
+      views.setViewVisibility(R.id.tracker_check, if (prayed) View.VISIBLE else View.GONE)
+      views.setViewVisibility(R.id.tracker_icon, if (prayed) View.GONE else View.VISIBLE)
+      views.setImageViewResource(R.id.tracker_icon, PrayerIcons.drawable(prayer.kind))
+      views.setInt(
+        R.id.tracker_icon,
+        "setColorFilter",
+        context.getColor(if (due) R.color.prayer_widget_brand else R.color.prayer_widget_ink_muted),
+      )
+      views.setFloat(R.id.tracker_icon, "setAlpha", if (state == TrackerState.SKIPPED) SKIPPED_ALPHA else 1f)
     }
 
     private fun segment(context: Context, views: RemoteViews, state: TrackerState, strings: WidgetStrings?) {

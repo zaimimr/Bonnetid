@@ -20,5 +20,5 @@
   <string name="prayer_tracker_list_widget_label">نماز کی فہرست</string>
   <string name="prayer_tracker_list_widget_description">آج کی نمازیں ایک فہرست میں جس پر نشان لگائیں۔</string>
   <string name="prayer_mark_widget_label">نماز درج کریں</string>
-  <string name="prayer_mark_widget_description">ابھی کی نماز کے لیے ایک بٹن۔</string>
+  <string name="prayer_mark_widget_description">ایک ٹیپ سے اپنی نمازیں درج کریں۔</string>
 </resources>

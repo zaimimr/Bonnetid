@@ -83,7 +83,8 @@ struct PrayerTrackerWidgetView: View {
         case (.dots, _): TrackerCapsuleMedium(entry: entry, focus: focus)
         case (.list, .systemSmall): TrackerChecklistSmall(entry: entry, focus: focus)
         case (.list, _): TrackerRowsMedium(entry: entry, focus: focus)
-        case (.button, _): TrackerButtonSmall(entry: entry, focus: focus)
+        case (.button, .systemSmall): TrackerButtonSmall(entry: entry, focus: focus)
+        case (.button, _): TrackerIconsMedium(entry: entry, focus: focus)
         }
       }
     }
@@ -312,6 +313,82 @@ private struct TrackerCapsuleMedium: View {
   }
 }
 
+private struct TrackerIconsMedium: View {
+  let entry: TrackerEntry
+  let focus: PrayerEntry
+
+  var body: some View {
+    VStack(spacing: 0) {
+      HStack(alignment: .firstTextBaseline, spacing: 6) {
+        Text(entry.headline(for: focus))
+          .font(.system(size: 17, weight: .bold))
+          .foregroundStyle(PrayerColor.brand)
+          .lineLimit(1)
+          .minimumScaleFactor(0.7)
+        Spacer(minLength: 6)
+        Text(WidgetStrings.current.prayedCount(entry.prayedCount, of: entry.prayers.count))
+          .prayerTime(.caption.weight(.semibold))
+          .foregroundStyle(PrayerColor.inkMuted)
+          .lineLimit(1)
+      }
+      Spacer(minLength: 6)
+      HStack(spacing: 0) {
+        ForEach(entry.prayers, id: \.at) { prayer in
+          let state = entry.state(of: prayer)
+          TrackerButton(prayer: prayer, now: entry.date) {
+            VStack(spacing: 6) {
+              TrackerIconMark(kind: prayer.kind, state: state)
+              Text(prayer.printedLabel)
+                .font(.caption.weight(state == .due ? .semibold : .regular))
+                .foregroundStyle(state == .due ? PrayerColor.brand : PrayerColor.ink)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+          }
+        }
+      }
+      Spacer(minLength: 0)
+    }
+  }
+}
+
+private struct TrackerIconMark: View {
+  let kind: String
+  let state: TrackerState
+
+  var body: some View {
+    ZStack {
+      switch state {
+      case .prayed:
+        Circle().fill(PrayerColor.brand)
+        Image("bt.check")
+          .font(.system(size: 22, weight: .bold))
+          .foregroundStyle(PrayerColor.surface)
+      case .due:
+        Circle().fill(PrayerColor.brandPlate)
+        Circle().strokeBorder(PrayerColor.brand, lineWidth: 3)
+        icon(PrayerColor.brand)
+      case .skipped:
+        Circle().strokeBorder(PrayerColor.trackMarker, lineWidth: 2.5)
+        icon(PrayerColor.inkMuted)
+          .opacity(0.5)
+      case .future:
+        Circle().strokeBorder(PrayerColor.trackMarker, lineWidth: 2.5)
+        icon(PrayerColor.inkMuted)
+      }
+    }
+    .frame(width: 48, height: 48)
+  }
+
+  private func icon(_ color: Color) -> some View {
+    Image(PrayerFormat.symbol(for: kind))
+      .font(.system(size: 20, weight: .medium))
+      .foregroundStyle(color)
+  }
+}
+
 private struct CapsuleSegment: View {
   let state: TrackerState
 
@@ -416,6 +493,6 @@ struct MarkPrayerWidget: Widget {
     }
     .configurationDisplayName(WidgetStrings.current.markPrayerWidgetName)
     .description(WidgetStrings.current.markPrayerWidgetDescription)
-    .supportedFamilies([.systemSmall])
+    .supportedFamilies([.systemSmall, .systemMedium])
   }
 }

@@ -20,5 +20,5 @@
   <string name="prayer_tracker_list_widget_label">Bønneliste</string>
   <string name="prayer_tracker_list_widget_description">Dagens bønner som en liste du krysser av.</string>
   <string name="prayer_mark_widget_label">Merk bønn</string>
-  <string name="prayer_mark_widget_description">Én knapp for bønnen som venter nå.</string>
+  <string name="prayer_mark_widget_description">Merk bønnene dine med ett trykk.</string>
 </resources>

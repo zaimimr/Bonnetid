@@ -155,10 +155,10 @@ struct WidgetStrings {
   var markPrayerWidgetName: String { pick("Merk bønn", "Mark prayer", "سجّل الصلاة", "نماز درج کریں") }
   var markPrayerWidgetDescription: String {
     pick(
-      "Én knapp for bønnen som venter nå.",
-      "One button for the prayer that is due now.",
-      "زر واحد للصلاة الحاضرة الآن.",
-      "ابھی کی نماز کے لیے ایک بٹن۔"
+      "Merk bønnene dine med ett trykk.",
+      "Mark your prayers with one tap.",
+      "سجّل صلواتك بلمسة واحدة.",
+      "ایک ٹیپ سے اپنی نمازیں درج کریں۔"
     )
   }
   func waiting(_ label: String) -> String {
