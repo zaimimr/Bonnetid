@@ -1,0 +1,547 @@
+<title>Dua-kunst</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{
+  --bg:#F6F8F7;--surface:#FFFFFF;--fg:#182420;--muted:#5F6E67;--line:#DDE4E0;--accent:#0C6B52;--accent-soft:#E9F4EF;--on-soft:#095844;
+  --font:-apple-system,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1714;--surface:#17211D;--fg:#E6EEEA;--muted:#9AABA3;--line:#2A3732;--accent:#5CC29B;--accent-soft:#1C3229;--on-soft:#A9E3CB;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1714;--surface:#17211D;--fg:#E6EEEA;--muted:#9AABA3;--line:#2A3732;--accent:#5CC29B;--accent-soft:#1C3229;--on-soft:#A9E3CB;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+header{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+header h1{margin:0;font-size:32px;line-height:1.1;flex:1;min-width:0;text-wrap:balance}
+.toggle{height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 15px var(--font);cursor:pointer}
+.toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.layout{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:40px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}}
+.phone{position:sticky;top:16px;width:100%;max-width:380px;margin:0 auto;border-radius:44px;padding:10px;background:#111816;box-sizing:border-box}
+.screen{border-radius:36px;overflow:hidden;background:#F6F8F7;height:760px;max-height:82vh;overflow-y:auto;color:#182420;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.top{position:sticky;top:0;z-index:2;background:#FFFFFF;border-bottom:1px solid #DDE4E0;padding:44px 16px 12px;display:flex;flex-direction:column;gap:12px}
+.top h2{margin:0;font-size:28px;font-weight:700}
+.search{display:flex;align-items:center;gap:8px;height:42px;padding:0 14px;border-radius:12px;background:#F0F3F1;color:#5F6E67;font-size:16px}
+.feed{display:flex;flex-direction:column;gap:12px;padding:16px}
+.sec{font-size:15px;font-weight:600;color:#3E4C46;padding:10px 4px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:4/3;cursor:pointer;transition:transform .18s cubic-bezier(.22,1,.36,1)}
+.tile:active{transform:scale(.97)}
+.tile.wide{aspect-ratio:auto;height:140px}
+.tile.hero{aspect-ratio:auto;height:184px}
+.tile svg.art{position:absolute;inset:0;width:100%;height:100%;display:block}
+.tile .lbl{position:absolute;left:14px;top:12px;display:flex;flex-direction:column;gap:2px;max-width:58%;z-index:1}
+.tile .lbl b{font-size:16px;font-weight:600;line-height:1.2}
+.tile .lbl small{font-size:13px;opacity:.8}
+.tile.hero .lbl b{font-size:22px;font-weight:700}
+.tile.night .lbl{color:#FFFFFF}
+.lib{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px}
+.item{display:flex;flex-direction:column;gap:8px;min-width:0}
+.item .tile{aspect-ratio:16/10;cursor:default}
+.item .tile:active{transform:none}
+.meta{display:flex;flex-direction:column;gap:2px}
+.meta b{font-size:15px}
+.meta span{font-size:13px;color:var(--muted)}
+.meta code{font-size:12px;color:var(--on-soft);background:var(--accent-soft);padding:2px 6px;border-radius:6px;align-self:flex-start}
+h3{margin:0 0 4px;font-size:20px}
+.art [class*="a-"]{transform-box:fill-box;transform-origin:center}
+.art .a-rise{animation:rise 7s ease-in-out infinite alternate}
+.art .a-sink{animation:sink 9s ease-in-out infinite alternate}
+.art .a-drift{animation:drift 11s ease-in-out infinite alternate}
+.art .a-drift-slow{animation:drift 18s ease-in-out infinite alternate}
+.art .a-drift-wide{animation:driftw 12s ease-in-out infinite alternate}
+.art .a-twinkle{animation:twinkle 3.2s ease-in-out infinite}
+.art .a-wave{animation:wave 2.6s ease-in-out infinite}
+.art .a-fall{animation:fall 1.8s ease-in infinite}
+.art .a-stream{animation:stream 1.2s ease-in-out infinite alternate}
+.art .a-ripple{animation:ripple 2s ease-out infinite}
+.art .a-fly{animation:fly 5s ease-in-out infinite alternate}
+.art .a-fly-slow{animation:fly 7s ease-in-out infinite alternate}
+.art .a-spin-slow{animation:spin 60s linear infinite}
+.art .a-tawaf{animation:spin 40s linear infinite reverse}
+.art .a-sway{transform-origin:50% 0;animation:sway 3.8s ease-in-out infinite alternate}
+.art .a-sway-base{transform-origin:50% 100%;animation:swaybase 5s ease-in-out infinite alternate}
+.art .a-aurora{transform-origin:50% 0;animation:aurora 10s ease-in-out infinite alternate}
+.art .a-glow{animation:glow 3s ease-in-out infinite alternate}
+.art .a-win{animation:win 4s ease-in-out infinite alternate}
+.art .a-breathe{animation:breathe 6s ease-in-out infinite alternate}
+.art .a-leaf{animation:leaf 7s ease-in-out infinite}
+.art .a-smoke{animation:smoke 4s ease-out infinite}
+.art .a-shimmer{animation:shimmer 3.4s ease-in-out infinite alternate}
+.art .a-rain{animation:rain 1.1s linear infinite}
+.art .a-snow{animation:snow 8s linear infinite}
+.art .a-mote{animation:mote 7s ease-in-out infinite}
+.art .a-flame{transform-origin:50% 100%;animation:flame 1.4s ease-in-out infinite alternate}
+.art .a-bob{animation:bob 4s ease-in-out infinite alternate}
+@keyframes rise{from{transform:translateY(4px)}to{transform:translateY(-4px)}}
+@keyframes sink{from{transform:translateY(-3px)}to{transform:translateY(5px)}}
+@keyframes drift{from{transform:translateX(-8px)}to{transform:translateX(8px)}}
+@keyframes driftw{from{transform:translateX(-24px)}to{transform:translateX(10px)}}
+@keyframes twinkle{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes wave{0%,100%{opacity:.15}45%{opacity:1}}
+@keyframes fall{0%{transform:translateY(0);opacity:0}15%{opacity:1}85%{transform:translateY(32px);opacity:1}100%{transform:translateY(36px);opacity:0}}
+@keyframes stream{from{transform:scaleX(.8)}to{transform:scaleX(1.15)}}
+@keyframes ripple{0%{transform:scale(.4);opacity:1}100%{transform:scale(2.4);opacity:0}}
+@keyframes fly{from{transform:translate(-8px,4px)}to{transform:translate(8px,-4px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes sway{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+@keyframes swaybase{from{transform:rotate(-1.6deg)}to{transform:rotate(1.6deg)}}
+@keyframes aurora{from{transform:skewX(-6deg) scaleY(.9);opacity:.75}to{transform:skewX(6deg) scaleY(1.08);opacity:1}}
+@keyframes glow{from{opacity:.55}to{opacity:1}}
+@keyframes win{0%,60%{opacity:1}80%{opacity:.7}100%{opacity:1}}
+@keyframes breathe{from{opacity:.4}to{opacity:.7}}
+@keyframes leaf{0%{transform:translate(0,0) rotate(0);opacity:0}10%{opacity:1}85%{opacity:1}100%{transform:translate(-22px,56px) rotate(200deg);opacity:0}}
+@keyframes smoke{0%{transform:translate(0,0) scale(.6);opacity:0}15%{opacity:.85}100%{transform:translate(10px,-34px) scale(2.2);opacity:0}}
+@keyframes shimmer{from{transform:scaleX(.82);opacity:.7}to{transform:scaleX(1.08);opacity:1}}
+@keyframes rain{from{transform:translate(0,-8px);opacity:0}30%{opacity:1}to{transform:translate(-4px,14px);opacity:0}}
+@keyframes snow{from{transform:translate(0,-40px)}to{transform:translate(-14px,240px)}}
+@keyframes mote{0%,100%{transform:translate(0,0);opacity:.2}50%{transform:translate(6px,-10px);opacity:.9}}
+@keyframes flame{from{transform:scale(.92,1) skewX(-4deg)}to{transform:scale(1.06,1.12) skewX(4deg)}}
+@keyframes bob{from{transform:translateY(-1.5px) rotate(-2deg)}to{transform:translateY(1.5px) rotate(2deg)}}
+.art .a-cross{animation:cross 36s linear infinite}
+.art .a-glide{animation:glide 3s ease-in-out infinite alternate}
+.art .a-wingL{transform-origin:100% 100%;animation:flap .5s ease-in-out infinite alternate}
+.art .a-wingR{transform-origin:0% 100%;animation:flap .5s ease-in-out infinite alternate}
+@keyframes cross{from{transform:translateX(var(--x0))}to{transform:translateX(var(--x1))}}
+@keyframes glide{from{transform:translateY(-3px)}to{transform:translateY(3px)}}
+@keyframes flap{0%{transform:scaleY(1)}100%{transform:scaleY(-.7)}}
+.paused .art *{animation-play-state:paused!important}
+@media (prefers-reduced-motion:reduce){.art *{animation:none!important}.tile{transition:none}}
+</style>
+
+<div class="wrap" id="root">
+  <header>
+    <h1>Dua-kunst</h1>
+    <button class="toggle" id="toggle" type="button" aria-pressed="false">Pause animasjon</button>
+  </header>
+  <div class="layout">
+    <div class="phone" aria-label="Dua-siden med illustrasjoner">
+      <div class="screen">
+        <div class="top">
+          <h2>Dua og dhikr</h2>
+          <div class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5F6E67" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>Søk i 180 duaer</div>
+        </div>
+        <div class="feed" id="feed"></div>
+      </div>
+    </div>
+    <section>
+      <h3>Biblioteket</h3>
+      <div class="lib" id="lib"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+const f=n=>+(+n).toFixed(1);
+const rng=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};
+const grain=()=>`<rect width="400" height="240" fill="url(#grain)"/>`;
+const stars=(seed,n,x0,x1,y0,y1,c='#FFFFFF')=>{const r=rng(seed);let o='';for(let i=0;i<n;i++){const x=x0+r()*(x1-x0),y=y0+r()*(y1-y0),s=.5+r()*1.2;o+=`<circle class="a-twinkle" style="animation-delay:${f(-r()*4)}s;animation-duration:${f(2.6+r()*2.4)}s" cx="${f(x)}" cy="${f(y)}" r="${f(s)}" fill="${c}"/>`;}return o;};
+const spark=(x,y,s,c,d=0)=>`<path class="a-twinkle" style="animation-delay:${d}s" d="M${x} ${y-s}Q${x} ${y} ${x+s} ${y}Q${x} ${y} ${x} ${y+s}Q${x} ${y} ${x-s} ${y}Q${x} ${y} ${x} ${y-s}Z" fill="${c}"/>`;
+const spruce=(x,y,h,c,snow,lit)=>{const w=h*.56,P=(a,b)=>`${f(x+a*w)} ${f(y-b*h)}`;const p=`M${P(0,1)}L${P(.24,.66)}L${P(.14,.66)}L${P(.4,.34)}L${P(.25,.34)}L${P(.5,0)}L${P(-.5,0)}L${P(-.25,.34)}L${P(-.4,.34)}L${P(-.14,.66)}L${P(-.24,.66)}Z`;const r=`M${P(0,1)}L${P(.24,.66)}L${P(.14,.66)}L${P(.4,.34)}L${P(.25,.34)}L${P(.5,0)}L${P(0,0)}Z`;let o=`<rect x="${f(x-h*.035)}" y="${f(y-2)}" width="${f(h*.07)}" height="${f(h*.1)}" fill="#4A3426"/><path d="${p}" fill="${c}"/><path d="${r}" fill="${lit||'#000'}" opacity="${lit?.35:.14}"/>`;if(snow)o+=`<path d="M${P(0,1)}L${P(.13,.82)}L${P(.04,.85)}L${P(-.05,.81)}L${P(-.13,.82)}Z" fill="${snow}"/><path d="M${P(-.4,.34)}L${P(-.2,.4)}L${P(-.06,.36)}L${P(-.25,.32)}Z" fill="${snow}"/><path d="M${P(-.5,0)}L${P(-.26,.06)}L${P(-.08,.02)}L${P(-.3,-.01)}Z" fill="${snow}"/>`;return o;};
+const cabin=(x,y,s,o)=>{const W=40*s,H=22*s,R=15*s,l=x-W/2;const win=(wx)=>`<rect x="${f(wx)}" y="${f(y-H*.74)}" width="${f(W*.18)}" height="${f(H*.36)}" fill="${o.win}" ${o.glow?'class="a-win"':''}/><path d="M${f(wx+W*.09)} ${f(y-H*.74)}V${f(y-H*.38)}" stroke="${o.trim}" stroke-width="${f(1*s)}"/><rect x="${f(wx)}" y="${f(y-H*.74)}" width="${f(W*.18)}" height="${f(H*.36)}" fill="none" stroke="${o.trim}" stroke-width="${f(1.4*s)}"/>`;
+  return `${o.glow?`<ellipse class="a-glow" cx="${f(x)}" cy="${f(y-H*.5)}" rx="${f(W*1.1)}" ry="${f(H*1.2)}" fill="${o.win}" fill-opacity=".18"/>`:''}
+  <rect x="${f(l+W*.66)}" y="${f(y-H-R*.95)}" width="${f(5*s)}" height="${f(R*.75)}" fill="${o.chim||o.roof}"/>
+  <rect x="${f(l)}" y="${f(y-H)}" width="${f(W)}" height="${f(H)}" fill="${o.wall}"/>
+  <path d="M${f(l)} ${f(y-H+3*s)}H${f(l+W)}M${f(l)} ${f(y-H+8*s)}H${f(l+W)}M${f(l)} ${f(y-H+13*s)}H${f(l+W)}M${f(l)} ${f(y-H+18*s)}H${f(l+W)}" stroke="#000" stroke-opacity=".08" stroke-width="${f(.8*s)}"/>
+  <rect x="${f(x+W*.12)}" y="${f(y-H)}" width="${f(W*.38)}" height="${f(H)}" fill="#000" opacity=".13"/>
+  <path d="M${f(l-4*s)} ${f(y-H+1.5*s)}L${f(x)} ${f(y-H-R)}L${f(l+W+4*s)} ${f(y-H+1.5*s)}Z" fill="${o.roof}"/>
+  <path d="M${f(x)} ${f(y-H-R)}L${f(l+W+4*s)} ${f(y-H+1.5*s)}H${f(x)}Z" fill="#000" opacity=".15"/>
+  ${o.snow?`<path d="M${f(l-5*s)} ${f(y-H+2*s)}L${f(x)} ${f(y-H-R-2*s)}L${f(l+W+5*s)} ${f(y-H+2*s)}L${f(l+W+1*s)} ${f(y-H+3.5*s)}L${f(x+W*.25)} ${f(y-H-R*.45)}L${f(x)} ${f(y-H-R+2.5*s)}L${f(l+W*.2)} ${f(y-H-R*.4)}L${f(l-1*s)} ${f(y-H+3.5*s)}Z" fill="${o.snow}"/>`:''}
+  <path d="M${f(l-4*s)} ${f(y-H+1.5*s)}L${f(x)} ${f(y-H-R)}L${f(l+W+4*s)} ${f(y-H+1.5*s)}" fill="none" stroke="${o.trim}" stroke-width="${f(1.5*s)}" stroke-linejoin="round" stroke-linecap="round"/>
+  ${win(l+W*.1)}${win(l+W*.72)}
+  <rect x="${f(l+W*.42)}" y="${f(y-H*.66)}" width="${f(W*.17)}" height="${f(H*.66)}" fill="${o.door}"/>
+  <path d="M${f(l)} ${f(y-H)}V${f(y)}M${f(l+W)} ${f(y-H)}V${f(y)}" stroke="${o.trim}" stroke-width="${f(1.4*s)}"/>`;};
+const smoke=(x,y,c='#FFFFFF',op=.85)=>[0,1,2].map(i=>`<circle class="a-smoke" style="animation-delay:${-i*1.3}s" cx="${x}" cy="${y}" r="${3+i*.4}" fill="${c}" opacity="${op}"/>`).join('');
+const cloud=(x,y,s,c='#FFFFFF',sh='#E7EEF1',cls='a-drift',d=0)=>`<g class="${cls}" style="animation-delay:${d}s"><g transform="translate(${x} ${y}) scale(${s})"><path d="M0 26C-1 18 6 12 14 14C16 5 26 0 35 3C42-3 55 1 56 11C63 9 70 15 69 26Z" fill="${c}"/><path d="M3 26C10 22 20 22 27 25C35 21 47 21 54 25C59 22 65 22 69 26Z" fill="${sh}"/></g></g>`;
+const birds=(x,y,c,n=3,s=1)=>{const r=rng(x*7+y);let o='';for(let i=0;i<n;i++){const bx=x+i*14*s+r()*6,by=y+(i%2?-8:2)*s+r()*4,w=(5+r()*2)*s,fd=f(.42+r()*.22),dl=f(-r());o+=`<g transform="translate(${f(bx)} ${f(by)})"><g class="a-glide" style="animation-delay:${f(-r()*3)}s"><path class="a-wingL" style="animation-duration:${fd}s;animation-delay:${dl}s" d="M${f(-w)} ${f(-w*.5)}Q${f(-w*.4)} ${f(-w*.7)} 0 0" stroke="${c}" stroke-width="${f(1.5*s)}" fill="none" stroke-linecap="round"/><path class="a-wingR" style="animation-duration:${fd}s;animation-delay:${dl}s" d="M${f(w)} ${f(-w*.5)}Q${f(w*.4)} ${f(-w*.7)} 0 0" stroke="${c}" stroke-width="${f(1.5*s)}" fill="none" stroke-linecap="round"/><circle r="${f(.9*s)}" fill="${c}"/></g></g>`;}const dur=f(30+r()*14),x0=-(x+70),x1=440-x,del=f(-(x+70)/(x1-x0)*dur);return `<g class="a-cross" style="--x0:${x0}px;--x1:${x1}px;animation-duration:${dur}s;animation-delay:${del}s">${o}</g>`;};
+const crescent=(cx,cy,r,c,id)=>`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${c}" mask="url(#${id})"/>`;
+const shimmer=(rows,c,d=0)=>`<g class="a-shimmer" style="animation-delay:${d}s">${rows.map(([x,y,w])=>`<rect x="${f(x-w/2)}" y="${y}" width="${w}" height="2.6" rx="1.3" fill="${c}"/>`).join('')}</g>`;
+const lantern=(x,chain,s,c,glass,delay)=>{const L=`<path d="M0 0V${chain}" stroke="${c}" stroke-width="${1.6/s}"/><circle class="a-glow" cx="0" cy="${chain+38}" r="28" fill="${glass}" fill-opacity=".3"/><path d="M-4 ${chain}h8v4h-8Z" fill="${c}"/><path d="M-13 ${chain+14}L0 ${chain+3}L13 ${chain+14}Z" fill="${c}"/><rect x="-15" y="${chain+13}" width="30" height="5" rx="1.5" fill="${c}"/><path d="M-11 ${chain+18}H11L13 ${chain+50}H-13Z" fill="${c}"/><path d="M-7 ${chain+48}V${chain+30}Q0 ${chain+19} 7 ${chain+30}V${chain+48}Z" fill="${glass}"/><path d="M-3 ${chain+44}Q0 ${chain+32} 3 ${chain+44}Z" fill="#FFF6D6"/><rect x="-16" y="${chain+50}" width="32" height="5" rx="1.5" fill="${c}"/><path d="M-6 ${chain+55}L0 ${chain+64}L6 ${chain+55}Z" fill="${c}"/><circle cx="0" cy="${chain+66}" r="1.8" fill="${c}"/>`;return `<g transform="translate(${x} 0) scale(${s})"><g class="a-sway" style="animation-delay:${delay}s">${L}</g></g>`;};
+const palm=(x,y,h,c1,c2,trunk,lean=6,d=0)=>{const tx=x+lean,ty=y-h;let rings='';for(let i=1;i<7;i++){const t=i/7,px=x+lean*t*t,py=y-h*t;rings+=`<path d="M${f(px-3)} ${f(py)}h6" stroke="#000" stroke-opacity=".18" stroke-width="1.2"/>`;}
+  const fr=(a,len,col)=>{const rad=a*Math.PI/180,ex=tx+Math.cos(rad)*len,ey=ty+Math.sin(rad)*len,mx=tx+Math.cos(rad)*len*.5,my=ty+Math.sin(rad)*len*.5-len*.28,nx=-Math.sin(rad)*5,ny=Math.cos(rad)*5;return `<path d="M${f(tx)} ${f(ty)}Q${f(mx-nx)} ${f(my-ny)} ${f(ex)} ${f(ey)}Q${f(mx+nx*.4)} ${f(my+ny*.4+3)} ${f(tx)} ${f(ty)}Z" fill="${col}"/>`;};
+  return `<g class="a-sway-base" style="animation-delay:${d}s"><path d="M${x-3.5} ${y}Q${f(x+lean*.3)} ${f(y-h*.5)} ${f(tx-2)} ${f(ty)}H${f(tx+2)}Q${f(x+lean*.3+4)} ${f(y-h*.5)} ${x+3.5} ${y}Z" fill="${trunk}"/>${rings}${fr(200,h*.42,c1)}${fr(-20,h*.42,c1)}${fr(150,h*.38,c2)}${fr(30,h*.38,c2)}${fr(235,h*.32,c1)}${fr(-55,h*.32,c1)}${fr(105,h*.26,c2)}${fr(75,h*.26,c2)}<circle cx="${f(tx-2)}" cy="${f(ty+4)}" r="2.4" fill="#9A5A2E"/><circle cx="${f(tx+2.5)}" cy="${f(ty+5)}" r="2.4" fill="#9A5A2E"/><circle cx="${f(tx)}" cy="${f(ty+8)}" r="2.4" fill="#86491F"/></g>`;};
+const tree=(x,y,s,cs)=>`<rect x="${f(x-1.6*s)}" y="${f(y-12*s)}" width="${f(3.2*s)}" height="${f(12*s)}" fill="#6B4A36"/><circle cx="${f(x)}" cy="${f(y-18*s)}" r="${f(10*s)}" fill="${cs[0]}"/><path d="M${f(x)} ${f(y-28*s)}A${f(10*s)} ${f(10*s)} 0 0 1 ${f(x)} ${f(y-8*s)}Z" fill="${cs[1]}"/>`;
+
+const S={};
+
+S.morgen=()=>`<rect width="400" height="240" fill="#E3EEEC"/>
+<g class="a-rise"><circle cx="300" cy="122" r="66" fill="#F2E6C2" opacity=".55"/><circle cx="300" cy="122" r="46" fill="#F3DBA0" opacity=".6"/><circle cx="300" cy="122" r="26" fill="#F2BE4E"/></g>
+${cloud(186,40,.9,'#FFFFFF','#E4EDEB','a-drift')}${cloud(352,28,.55,'#FFFFFF','#E4EDEB','a-drift',-4)}
+${birds(214,84,'#587470',3,.9)}
+<path d="M0 156L36 136L64 146L112 108L150 134L186 122L222 98L262 126L300 112L340 128L372 116L400 124V174H0Z" fill="#C2D9D4"/>
+<path d="M112 108L122 116L116 115L111 119L106 115L101 117ZM222 98L233 107L227 106L222 111L216 106L211 108Z" fill="#EEF5F3"/>
+<path d="M0 174L28 150L52 160L92 136L132 164L160 174Z" fill="#A3C8BC"/><path d="M92 136L132 164L160 174H104Z" fill="#000" opacity=".06"/>
+<path d="M170 174L214 134L236 146L268 114L300 150L326 140L364 160L400 150V176H170Z" fill="#8FBBAE"/>
+<path d="M268 114L300 150L326 140L340 176H282ZM214 134L236 146L240 176H226Z" fill="#000" opacity=".08"/>
+<path d="M268 114L279 125L273 124L268 131L262 124L257 127ZM214 134L222 141L217 140L213 144L209 140Z" fill="#FFFFFF"/>
+<rect y="174" width="400" height="66" fill="#D3E7E5"/>
+<path d="M170 174L214 198L236 190L268 212L300 182L326 188L364 178L400 182V174Z" fill="#BCD7D1" opacity=".8"/>
+<path d="M0 174L28 190L52 184L92 198L132 180L160 174Z" fill="#C3DCD6" opacity=".8"/>
+${shimmer([[300,180,48],[300,187,34],[300,194,20],[300,201,9]],'#F2CF78')}
+${shimmer([[60,206,28],[150,198,18],[96,218,36]],'#FFFFFF',-1.5)}
+<g class="a-bob"><path d="M104 196h32l-6 6h-21Z" fill="#B5452F"/><path d="M121 195V170" stroke="#5B463A" stroke-width="1.2"/><path d="M122.5 194V172L135 192Z" fill="#FFFFFF"/><path d="M119.5 194V176L110 192Z" fill="#F4EFE6"/></g>
+<path d="M0 240V208Q40 200 84 212Q120 222 138 240Z" fill="#59A384"/>
+<path d="M14 214l2-7 2 7M30 211l2-6 2 6" stroke="#3E8A6A" stroke-width="1.4" fill="none"/>
+<path d="M168 240Q208 210 280 204Q350 198 400 206V240Z" fill="#418F70"/>
+<path d="M196 228Q236 210 288 206Q246 214 214 236Z" fill="#5CA886"/>
+<path d="M224 240Q300 222 400 226V240Z" fill="#2E765A"/>
+<path d="M318 206Q314 222 298 240" stroke="#E9DFC8" stroke-width="5" fill="none" stroke-linecap="round"/>
+${cabin(318,206,.95,{wall:'#B5452F',roof:'#3E322C',trim:'#F6F1E8',win:'#F6D37A',door:'#6B2A1E'})}
+${smoke(325,162)}
+${spruce(352,214,40,'#1F5D47')}${spruce(370,218,30,'#1F5D47')}${spruce(286,214,26,'#2A6A52')}${spruce(390,224,24,'#1F5D47')}
+${grain()}`;
+
+S.kveld=()=>`<rect width="400" height="240" fill="#F5D8C5"/><rect width="400" height="66" fill="#F0C8B4"/><rect width="400" height="28" fill="#EAB9A5"/>
+${stars(11,4,190,400,10,60,'#FFF6EE')}
+<g class="a-sink"><circle cx="290" cy="166" r="50" fill="#F3B994" opacity=".5"/><circle cx="290" cy="166" r="30" fill="#EC8A5A"/></g>
+${birds(176,74,'#8C4F45',3,.9)}
+<path d="M0 168L38 138L76 150L124 110L170 146L206 132L246 168Z" fill="#DBA08C"/>
+<path d="M124 110L170 146L206 132L246 168H150Z" fill="#000" opacity=".06"/>
+<path d="M124 110L134 119L128 118L123 123L117 118L113 120Z" fill="#F6DCCD"/>
+<path d="M336 168L362 140L382 150L400 140V168Z" fill="#D29482"/>
+<path d="M0 168L24 152L62 162L96 132L138 168Z" fill="#B97468"/>
+<rect y="168" width="400" height="72" fill="#E8B6A2"/>
+<path d="M0 168L38 190L76 182L124 210L170 186L206 194L246 168Z" fill="#DDA796" opacity=".9"/>
+<path d="M0 168L24 180L62 175L96 192L138 168Z" fill="#D29B8C" opacity=".8"/>
+${shimmer([[290,172,58],[290,180,44],[290,188,32],[290,196,22],[290,204,12],[290,212,6]],'#F4A47A')}
+<g class="a-bob"><path d="M110 202h26l-5 5h-17Z" fill="#7A4442"/><path d="M123 201V182L133 199Z" fill="#F8E6DC"/></g>
+<path d="M176 240Q236 212 320 208Q372 204 400 210V240Z" fill="#6E3E3E"/>
+<path d="M260 240Q330 226 400 230V240Z" fill="#5A3134"/>
+${cabin(336,210,.9,{wall:'#5B3236',roof:'#462528',trim:'#6E3E3E',win:'#F6C46B',door:'#3E2124',chim:'#462528',glow:1})}
+${spruce(372,214,36,'#4C2A2E')}${spruce(388,218,26,'#4C2A2E')}${spruce(232,224,24,'#4C2A2E')}
+<g stroke="#8A5450" stroke-width="1.8" stroke-linecap="round" fill="none"><path d="M18 240Q16 222 12 204M26 240Q26 220 28 198M34 240Q36 226 42 212M8 240Q6 230 2 222"/></g>
+<rect x="9.5" y="200" width="5" height="12" rx="2.5" fill="#6E3E3E" transform="rotate(-12 12 206)"/><rect x="25.5" y="194" width="5" height="12" rx="2.5" fill="#6E3E3E"/>
+${grain()}`;
+
+S.sovn=()=>{let cur='';for(let x=150;x<=396;x+=8){const y=96-(x-40)*.2;cur+=`<path d="M${x} ${f(y)}v${f(26+((x*7)%13))}" />`;}
+return `<rect width="400" height="240" fill="#2C4470"/><rect width="400" height="62" fill="#263D66"/>
+${stars(5,34,0,400,4,150)}
+<g class="a-aurora">
+<path d="M-10 122C50 72 110 120 180 80C240 46 320 66 410 42V70C330 86 260 74 190 110C120 142 50 106-10 148Z" fill="#5CD3A1" opacity=".42"/>
+<path d="M40 102C110 62 160 102 230 66C290 36 350 46 410 26V42C350 60 290 54 236 84C170 118 110 86 40 120Z" fill="#A4EBCB" opacity=".3"/>
+<path d="M120 72C180 42 240 62 300 32C340 16 380 20 410 10V24C370 32 340 36 304 52C250 78 190 62 120 92Z" fill="#7FA8E6" opacity=".24"/>
+<g stroke="#B6F2D8" stroke-width="2" opacity=".2">${cur}</g></g>
+${crescent(350,52,14,'#F3E2A6','moonM')}
+<path d="M0 174L44 146L74 156L122 116L164 152L204 140L254 102L298 144L336 130L400 156V182H0Z" fill="#2A4364"/>
+<path d="M122 116L164 152L174 182H140ZM254 102L298 144L336 130L350 182H276Z" fill="#203854"/>
+<path d="M122 116L133 126L127 125L121 131L115 125L110 128ZM254 102L266 113L260 112L254 119L247 113L242 115Z" fill="#C6D3E4"/>
+<rect y="174" width="400" height="66" fill="#22385E"/>
+<path d="M0 188C80 202 160 184 240 198C300 208 350 194 400 202V210C340 204 300 216 240 208C160 196 80 212 0 198Z" fill="#5CD3A1" opacity=".14"/>
+${shimmer([[350,180,22],[350,186,14],[350,192,8]],'#F3E2A6')}
+<path d="M0 240V214Q50 206 100 216Q124 224 130 240Z" fill="#B6C4D8"/>
+<path d="M148 240Q210 206 290 202Q350 198 400 204V240Z" fill="#C9D5E5"/>
+<path d="M148 240Q200 224 262 226Q330 228 400 222V240Z" fill="#AAB9CF"/>
+<ellipse cx="320" cy="214" rx="26" ry="5" fill="#F6C860" opacity=".22"/>
+${cabin(320,204,.95,{wall:'#7E3A32',roof:'#2A2326',trim:'#E9E1D6',win:'#F6C860',door:'#4A221E',snow:'#EEF3FA',glow:1})}
+${smoke(328,160,'#8FA0B8',.5)}
+${spruce(358,210,42,'#10233A','#C6D3E4')}${spruce(376,214,30,'#10233A','#C6D3E4')}${spruce(270,212,28,'#13283F','#C6D3E4')}${spruce(392,220,24,'#10233A','#C6D3E4')}
+${grain()}`;};
+
+S.etterBonnen=()=>{const beads=[];for(let i=0;i<16;i++){const a=i/16*Math.PI*2;beads.push(`<circle cx="${f(322+Math.cos(a)*22)}" cy="${f(220+Math.sin(a)*7)}" r="2.6" fill="${i%5?'#8E5A3A':'#D9B84F'}"/>`);}
+let motes='';const r=rng(3);for(let i=0;i<9;i++){motes+=`<circle class="a-mote" style="animation-delay:${f(-r()*6)}s" cx="${f(200+r()*100)}" cy="${f(150+r()*60)}" r="${f(.8+r()*.8)}" fill="#FFFFFF"/>`;}
+return `<rect width="400" height="240" fill="#EDF4F0"/>
+<rect y="170" width="400" height="6" fill="#DCE7E1"/>
+<rect y="176" width="400" height="64" fill="#E6D8C3"/>
+<path d="M0 192H400M0 210H400M0 230H400" stroke="#D6C5AC" stroke-width="1.2"/>
+<path d="M60 176V192M180 192V210M90 210V230M320 176V192M260 210V230M360 192V210" stroke="#D6C5AC" stroke-width="1.2"/>
+<path d="M240 152V74A50 50 0 0 1 340 74V152Z" fill="#DCE8E2"/>
+<path d="M244 150V74A46 46 0 0 1 336 74V150Z" fill="#FFFFFF"/>
+<path d="M252 146V76A38 38 0 0 1 328 76V146Z" fill="#CFE6EC"/>
+<circle cx="276" cy="98" r="9" fill="#F6E3A6"/>
+${cloud(296,82,.38,'#FFFFFF','#E6F1F4','a-drift')}
+<path d="M258 146V132H270V146ZM306 146V96H312V146Z" fill="#A9CFC0"/><path d="M306 96L309 84L312 96Z" fill="#A9CFC0"/><path d="M266 146V130A14 14 0 0 1 294 130V146Z" fill="#A9CFC0"/>
+<path d="M252 128Q290 120 328 130V146H252Z" fill="#BFDCCF"/>
+<path d="M290 40V146M252 112H328" stroke="#FFFFFF" stroke-width="3"/>
+<rect x="236" y="148" width="108" height="7" rx="2" fill="#FAFBFA"/><rect x="238" y="155" width="104" height="3" fill="#D3E1DA"/>
+<path d="M200 182L296 182L272 238L130 238Z" fill="#FFF3D2" opacity=".55" class="a-breathe"/>
+<path d="M150 236L330 236L304 188L192 188Z" fill="#0C6B52"/>
+<path d="M150 236L330 236L304 188L292 188L316 236Z" fill="#000" opacity=".08"/>
+<path d="M162 230L318 230L298 194L198 194Z" fill="none" stroke="#D9B84F" stroke-width="1.6"/>
+<path d="M222 222V208Q247 192 272 208V222Z" fill="#095844" stroke="#D9B84F" stroke-width="1.2"/>
+<path d="M247 197V201" stroke="#D9B84F" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M176 226H200M294 226H306M182 214H204M290 214H300" stroke="#38A07C" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M156 236v4M164 236v4M172 236v4M180 236v4M188 236v4M196 236v4M204 236v4M212 236v4M220 236v4M228 236v4M236 236v4M244 236v4M252 236v4M260 236v4M268 236v4M276 236v4M284 236v4M292 236v4M300 236v4M308 236v4M316 236v4M324 236v4" stroke="#E9DDB8" stroke-width="1.4"/>
+<path d="M200 182L296 182L272 238L130 238Z" fill="#FFF6DD" opacity=".18"/>
+${beads.join('')}<path d="M340 223Q348 230 350 236" stroke="#8E5A3A" stroke-width="1.4" fill="none"/><path d="M347 234L353 234L351 240H349Z" fill="#D9B84F"/>
+${motes}
+<g class="a-sway-base"><path d="M66 178C56 160 50 140 58 124C64 138 68 156 70 176Z" fill="#2B8664"/><path d="M74 178C76 156 86 136 102 130C96 148 86 164 78 178Z" fill="#38A07C"/><path d="M70 176C66 152 70 132 80 118C82 136 78 158 74 176Z" fill="#4BAE88"/></g>
+<path d="M56 178H92L88 208H60Z" fill="#C97B5A"/><path d="M74 178H92L88 208H74Z" fill="#000" opacity=".1"/><rect x="54" y="176" width="40" height="5" rx="2" fill="#B86B4C"/>
+${grain()}`;};
+
+S.adhan=()=>{const r=rng(9);let sky='';let x=-4;while(x<400){const w=14+r()*20,h=14+r()*28;sky+=`<rect x="${f(x)}" y="${f(190-h)}" width="${f(w)}" height="${f(h)}"/>`;if(r()>.6)sky+=`<path d="M${f(x)} ${f(190-h)}L${f(x+w/2)} ${f(180-h)}L${f(x+w)} ${f(190-h)}Z"/>`;x+=w+1;}
+const arcs=[12,20,28].map((rr,i)=>`<path class="a-wave" style="animation-delay:${-i*.5}s" d="M${306-rr*.7} ${f(78-rr*.7)}A${rr} ${rr} 0 0 0 ${306-rr*.7} ${f(78+rr*.7)}M${306+rr*.7} ${f(78-rr*.7)}A${rr} ${rr} 0 0 1 ${306+rr*.7} ${f(78+rr*.7)}" stroke="#0C6B52" stroke-width="2.4" fill="none" stroke-linecap="round"/>`).join('');
+return `<rect width="400" height="240" fill="#DCE7F5"/>
+<circle cx="372" cy="40" r="28" fill="#EEF0EC" opacity=".7"/><circle cx="372" cy="40" r="15" fill="#F8EFCF"/>
+${cloud(176,52,.8,'#FFFFFF','#E4EBF6')}${cloud(354,108,.5,'#FFFFFF','#E4EBF6','a-drift',-3)}
+${birds(332,30,'#50667F',3,.9)}
+<g fill="#C7D5EB">${sky}</g>
+<rect x="214" y="158" width="80" height="44" fill="#FFFFFF"/><rect x="266" y="158" width="28" height="44" fill="#E3E9F3"/>
+<path d="M222 200V182A6 6 0 0 1 234 182V200ZM240 200V182A6 6 0 0 1 252 182V200ZM258 200V182A6 6 0 0 1 270 182V200ZM276 200V182A6 6 0 0 1 288 182V200Z" fill="#B9CBE6"/>
+<rect x="212" y="156" width="84" height="4" fill="#0C6B52"/>
+<path d="M222 156C222 136 234 124 248 120C262 124 274 136 274 156Z" fill="#FFFFFF"/><path d="M248 120C262 124 274 136 274 156H248Z" fill="#E3E9F3"/>
+<path d="M248 120V108" stroke="#D9B84F" stroke-width="1.6"/>${crescent(248,104,4,'#D9B84F','smallM')}
+<rect x="300" y="64" width="12" height="138" fill="#FFFFFF"/><rect x="307" y="64" width="5" height="138" fill="#E3E9F3"/>
+<rect x="296" y="86" width="20" height="5" rx="1.5" fill="#0C6B52"/><rect x="297" y="132" width="18" height="4" rx="1.5" fill="#0C6B52"/>
+<rect x="302" y="70" width="8" height="10" rx="4" fill="#B9CBE6"/>
+<path d="M299 64L306 38L313 64Z" fill="#0C6B52"/><path d="M306 38L313 64H306Z" fill="#095844"/><path d="M306 38V30" stroke="#D9B84F" stroke-width="1.6"/><circle cx="306" cy="28" r="2" fill="#D9B84F"/>
+${arcs}
+<path d="M0 240V198Q100 188 200 196Q300 204 400 194V240Z" fill="#A9D3BE"/>
+<path d="M254 202Q250 222 230 240H262Q262 220 262 202Z" fill="#EEF2EA"/>
+${tree(196,204,1.3,['#45A07D','#2E8463'])}${tree(214,206,1,['#5AAE8C','#3E9373'])}${tree(338,204,1.4,['#45A07D','#2E8463'])}${tree(364,208,1.1,['#5AAE8C','#3E9373'])}
+<path d="M0 240V222Q120 212 230 226Q300 234 400 222V240Z" fill="#7FBF9F"/>
+${grain()}`;};
+
+S.wudu=()=>{const tap=(x,on)=>`<circle cx="${x}" cy="124" r="5" fill="#B08D45"/><path d="M${x} 124H${x+10}Q${x+16} 124 ${x+16} 130V133" stroke="#C9A55A" stroke-width="4.2" fill="none" stroke-linecap="round"/><path d="M${x+6} 118V112M${x+2} 112H${x+10}" stroke="#B08D45" stroke-width="2.4" stroke-linecap="round"/>${on?'':''}`;
+return `<rect width="400" height="240" fill="#EEF4F2"/>
+${[200,266,332].map(x=>`<path d="M${x} 104V54A26 26 0 0 1 ${x+52} 54V104Z" fill="#DEEAE5"/><path d="M${x} 104V54A26 26 0 0 1 ${x+8} 35V104Z" fill="#CFDED8"/><circle cx="${x+26}" cy="58" r="7" fill="none" stroke="#B9D3CB" stroke-width="1.4"/>`).join('')}
+<rect x="0" y="104" width="400" height="7" fill="#F9FBFA"/><rect y="111" width="400" height="3" fill="#D3DFDA"/>
+<rect y="114" width="400" height="58" fill="url(#tile)"/>
+${tap(212,1)}${tap(278,1)}${tap(344,0)}
+<rect class="a-stream" x="292.6" y="134" width="3.2" height="42" rx="1.6" fill="#8FD0E6"/>
+${[0,1,2].map(i=>`<path class="a-fall" style="animation-delay:${-i*.6}s" d="M228 136q3.4 5 0 7.6q-3.4-2.6 0-7.6Z" fill="#5FB3D3"/>`).join('')}
+<rect y="172" width="400" height="12" fill="#E0E6E3"/><rect y="176" width="400" height="5" fill="#9AD3E6"/>
+<ellipse class="a-ripple" cx="294" cy="178.5" rx="6" ry="1.4" fill="none" stroke="#FFFFFF" stroke-width="1"/>
+<ellipse class="a-ripple" style="animation-delay:-.9s" cx="228" cy="178.5" rx="6" ry="1.4" fill="none" stroke="#FFFFFF" stroke-width="1"/>
+<rect y="184" width="400" height="22" fill="#CBD5D1"/><path d="M0 184H400" stroke="#B9C5C0" stroke-width="1.4"/>
+<rect y="206" width="400" height="34" fill="#E8E2D8"/><path d="M0 222H400M40 206V240M120 206V240M200 206V240M280 206V240M360 206V240" stroke="#DAD2C5" stroke-width="1.2"/>
+${[228,294,360].map(x=>`<rect x="${x-3}" y="218" width="6" height="16" fill="#8E6A45"/><ellipse cx="${x}" cy="234" rx="10" ry="2.6" fill="#000" opacity=".08"/><ellipse cx="${x}" cy="218" rx="14" ry="4.4" fill="#B99A74"/><ellipse cx="${x}" cy="216.6" rx="14" ry="3.6" fill="#C9AC86"/>`).join('')}
+<path d="M138 114V108" stroke="#B08D45" stroke-width="2" stroke-linecap="round"/><path d="M128 116H148V158L143 154L138 158L133 154L128 158Z" fill="#F4F1EA"/><path d="M128 146H148M128 150H148" stroke="#38A07C" stroke-width="1.6"/><path d="M138 116H148V158L143 154L138 158Z" fill="#000" opacity=".06"/>
+${grain()}`;};
+
+S.reise=()=>{const bumps=(y,r,ofs,c)=>{let d=`M-20 240V${y}`;for(let x=-20+ofs;x<440;x+=r*1.6){d+=`A${r} ${r*.8} 0 0 1 ${f(x+r*1.6)} ${y}`;}return `<path d="${d}V240Z" fill="${c}"/>`;};
+return `<rect width="400" height="240" fill="#D8E8F5"/><rect width="400" height="64" fill="#CDE1F2"/>
+<circle cx="236" cy="44" r="30" fill="#F4EDD6" opacity=".7"/><circle cx="236" cy="44" r="17" fill="#F8E4A6"/>
+<path d="M150 178L196 120L214 134L238 110L282 178Z" fill="#9DB6C8"/><path d="M238 110L282 178H250L232 140ZM196 120L214 134L208 178H196Z" fill="#000" opacity=".08"/>
+<path d="M238 110L249 124L242 122L237 130L230 122L225 125ZM196 120L205 131L199 130L195 135L190 130Z" fill="#FFFFFF"/>
+<path d="M300 178L338 136L380 178Z" fill="#B3C7D6"/><path d="M338 136L346 145L340 144L336 149L331 144Z" fill="#FFFFFF"/>
+<g class="a-drift-slow">${bumps(168,16,0,'#EDF3F9')}</g>
+<g class="a-drift" style="animation-duration:14s">${bumps(190,20,8,'#FFFFFF')}<rect x="-20" y="206" width="440" height="34" fill="#F3F7FB"/></g>
+${bumps(220,22,-6,'#E6EEF6')}
+<g class="a-fly-slow">
+<path d="M18 116H238" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".35"/><path d="M120 115H240" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+<path d="M248 88L240 66H252L272 88Z" fill="#0C6B52"/><path d="M248 88L240 66H246L264 88Z" fill="#095844"/>
+<path d="M300 98L286 80H294L320 96Z" fill="#095844"/>
+<path d="M238 96C238 90 248 87 262 87H334C348 87 358 92 358 97C358 102 348 106 334 106H262C248 106 238 102 238 96Z" fill="#FFFFFF"/>
+<path d="M242 100C252 104 300 106 340 105C350 104 356 101 357 99C356 103 348 106 334 106H262C252 106 244 104 242 100Z" fill="#DCE5EF"/>
+<path d="M246 99H336" stroke="#0C6B52" stroke-width="1.6" opacity=".9"/>
+${Array.from({length:10},(_,i)=>`<rect x="${264+i*7}" y="91" width="3" height="4" rx="1.2" fill="#8FA9BF"/>`).join('')}
+<path d="M343 90Q352 91 355 95H343Z" fill="#2E4A63"/>
+<path d="M296 99L274 128H290L326 100Z" fill="#0C6B52"/><path d="M296 99L282 118H288L316 100Z" fill="#2F8A68"/>
+<ellipse cx="300" cy="111" rx="9" ry="4" fill="#C6D3E1"/><ellipse cx="292" cy="111" rx="2" ry="3.4" fill="#8FA9BF"/>
+</g>
+${grain()}`;};
+
+S.bekymring=()=>{let rain='';const r=rng(4);for(let i=0;i<18;i++){const x=56+r()*120,y=134+r()*40;rain+=`<path d="M${f(x)} ${f(y)}l-2 7" />`;}
+return `<rect width="400" height="240" fill="#E8E4F4"/>
+${[[132,'#F0B4A6'],[124,'#F3D38E'],[116,'#B5DCB8'],[108,'#A8C9EA'],[100,'#C6B6E8']].map(([rr,c])=>`<path d="M${300-rr} 214A${rr} ${rr} 0 0 1 ${300+rr} 214" stroke="${c}" stroke-width="8" fill="none"/>`).join('')}
+<g class="a-spin-slow">${Array.from({length:10},(_,i)=>{const a=i/10*Math.PI*2;return `<path d="M${f(330+Math.cos(a)*26)} ${f(70+Math.sin(a)*26)}L${f(330+Math.cos(a)*34)} ${f(70+Math.sin(a)*34)}" stroke="#F4C55A" stroke-width="3" stroke-linecap="round"/>`;}).join('')}</g>
+<circle cx="330" cy="70" r="20" fill="#F4C55A"/>
+${cloud(276,64,.8,'#FFFFFF','#E9E5F4','a-drift-wide')}
+<g class="a-rain" stroke="#A39BCB" stroke-width="2" stroke-linecap="round">${rain}</g>
+<g class="a-rain" style="animation-delay:-.6s" stroke="#A39BCB" stroke-width="2" stroke-linecap="round" opacity=".7">${rain}</g>
+<g transform="translate(40 92) scale(1.9)"><path d="M0 26C-1 18 6 12 14 14C16 5 26 0 35 3C42-3 55 1 56 11C63 9 70 15 69 26Z" fill="#BCB4D8"/><path d="M14 14C16 5 26 0 35 3C30 4 24 8 22 14Z" fill="#D2CCE8"/><path d="M3 26C10 22 20 22 27 25C35 21 47 21 54 25C59 22 65 22 69 26Z" fill="#A9A1CC"/></g>
+<path d="M0 240V198Q90 178 190 196Q300 214 400 188V240Z" fill="#BCD9C5"/>
+<ellipse cx="114" cy="214" rx="34" ry="4.5" fill="#C9C3E5"/>
+<ellipse class="a-ripple" cx="104" cy="214" rx="6" ry="1.2" fill="none" stroke="#FFFFFF" stroke-width="1"/><ellipse class="a-ripple" style="animation-delay:-.8s" cx="128" cy="214" rx="6" ry="1.2" fill="none" stroke="#FFFFFF" stroke-width="1"/>
+<path d="M0 240V222Q120 206 250 224Q330 234 400 220V240Z" fill="#86C2A0"/>
+<g class="a-sway-base"><path d="M232 232Q228 214 234 200" stroke="#2F8A68" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M230 220Q218 214 216 206Q228 208 231 218Z" fill="#38A07C"/><path d="M232 214Q244 208 248 200Q236 202 232 212Z" fill="#4BAE88"/>
+${[0,72,144,216,288].map(a=>{const rad=a*Math.PI/180;return `<circle cx="${f(234+Math.cos(rad)*4.6)}" cy="${f(198+Math.sin(rad)*4.6)}" r="3.6" fill="#F6C453"/>`;}).join('')}<circle cx="234" cy="198" r="2.8" fill="#E08A3C"/></g>
+${grain()}`;};
+
+S.tilgivelse=()=>`<rect width="400" height="240" fill="#E3F1E9"/>
+<circle cx="348" cy="46" r="26" fill="#F2EDD6" opacity=".7"/><circle cx="348" cy="46" r="14" fill="#F6E7B6"/>
+<path d="M0 152Q60 122 120 142Q190 112 260 138Q330 120 400 134V172H0Z" fill="#C3DFD0"/>
+<path d="M0 166Q80 146 160 160Q240 148 320 160Q370 154 400 158V172H0Z" fill="#A8D2BE"/>
+<g class="a-drift-slow"><rect x="20" y="146" width="150" height="7" rx="3.5" fill="#FFFFFF" opacity=".6"/><rect x="200" y="156" width="150" height="6" rx="3" fill="#FFFFFF" opacity=".55"/></g>
+<path d="M0 166H400V202Q300 214 200 206Q100 200 0 212Z" fill="#CEE7DD"/>
+${shimmer([[90,180,40],[160,192,24],[60,198,30]],'#FFFFFF')}
+<ellipse class="a-ripple" cx="226" cy="186" rx="8" ry="1.8" fill="none" stroke="#FFFFFF" stroke-width="1.1"/>
+<path d="M0 240V210Q100 198 200 207Q300 214 400 200V240Z" fill="#6CB18E"/>
+<path d="M0 240V228Q140 216 260 230Q340 238 400 230V240Z" fill="#4E9C7A"/>
+<path d="M292 208C295 186 290 168 297 146H305C309 168 304 186 310 208Z" fill="#6B4A36"/><path d="M301 146C304 168 302 186 310 208H303C300 186 302 168 301 146Z" fill="#000" opacity=".15"/>
+<path d="M298 168L282 150M304 160L320 146" stroke="#6B4A36" stroke-width="4" stroke-linecap="round"/>
+<circle cx="274" cy="128" r="24" fill="#3E9A73"/><circle cx="328" cy="126" r="24" fill="#3E9A73"/><circle cx="300" cy="108" r="30" fill="#4FAA82"/><circle cx="300" cy="138" r="24" fill="#2F8463"/>
+<circle cx="288" cy="100" r="15" fill="#6ABD95"/><circle cx="268" cy="120" r="10" fill="#6ABD95"/><circle cx="314" cy="96" r="9" fill="#82C9A6"/>
+<circle cx="340" cy="132" r="12" fill="#2F8463"/>
+${['#D9B84F','#82C9A6','#D9B84F'].map((c,i)=>`<ellipse class="a-leaf" style="animation-delay:${-i*2}s" cx="${270+i*26}" cy="${150-i*4}" rx="3.4" ry="1.7" fill="${c}"/>`).join('')}
+<rect x="340" y="194" width="32" height="3.4" rx="1" fill="#8E6A45"/><rect x="340" y="184" width="32" height="3" rx="1" fill="#8E6A45"/><rect x="340" y="189" width="32" height="3" rx="1" fill="#8E6A45"/><path d="M343 197V206M369 197V206M343 184V197M369 184V197" stroke="#6B4A36" stroke-width="2"/>
+<g fill="#FFFFFF"><circle cx="60" cy="228" r="1.8"/><circle cx="96" cy="232" r="1.8"/><circle cx="160" cy="226" r="1.8"/></g><g fill="#F2C94C"><circle cx="78" cy="234" r="1.8"/><circle cx="130" cy="230" r="1.8"/><circle cx="210" cy="232" r="1.8"/></g>
+${grain()}`;
+
+S.lovprisning=()=>{let flowers='';const r=rng(21);const cols=['#FFFFFF','#F2C94C','#F2A7A0','#FFFFFF'];for(let i=0;i<26;i++){const x=r()*400,y=218+r()*20,c=cols[i%4];flowers+=`<path d="M${f(x)} ${f(y+6)}V${f(y)}" stroke="#3A8A69" stroke-width="1.2"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(1.6+r()*1.2)}" fill="${c}"/>`;}
+return `<rect width="400" height="240" fill="#F7EFD8"/>
+<g class="a-spin-slow" style="animation-duration:90s">${Array.from({length:14},(_,i)=>{const a=i/14*Math.PI*2,b=a+Math.PI/28;return `<path d="M300 172L${f(300+Math.cos(a)*170)} ${f(172+Math.sin(a)*170)}L${f(300+Math.cos(b)*170)} ${f(172+Math.sin(b)*170)}Z" fill="#F5E2AE" opacity=".55"/>`;}).join('')}</g>
+<circle cx="300" cy="172" r="50" fill="#F5DDA0" opacity=".7"/><circle cx="300" cy="172" r="34" fill="#F2B84B"/>
+${birds(170,70,'#7C6A3E',3,1)}${birds(212,58,'#7C6A3E',2,.8)}
+${spark(250,40,6,'#D9A520',0)}${spark(364,64,4,'#D9A520',-1.4)}
+<path d="M0 178Q80 152 160 168Q240 152 300 170Q360 158 400 164V200H0Z" fill="#D6E3B8"/>
+<path d="M0 204Q100 178 210 194Q320 208 400 188V240H0Z" fill="#9FCDA4"/>
+<path d="M210 194Q320 208 400 188V200Q320 214 230 202Z" fill="#000" opacity=".05"/>
+<path d="M0 240V214Q120 200 240 216Q320 226 400 210V240Z" fill="#4E9F7C"/>
+<g stroke="#3A8A69" stroke-width="1.3" stroke-linecap="round" fill="none">${Array.from({length:30},(_,i)=>`<path d="M${i*14} 240q1-8 4-12"/>`).join('')}</g>
+${flowers}
+${grain()}`;};
+
+S.koranen=()=>`<rect width="400" height="240" fill="#DDEDE6"/>
+<path d="M286 124V58A38 38 0 0 1 362 58V124Z" fill="#FFFFFF"/>
+<path d="M292 120V60A32 32 0 0 1 356 60V120Z" fill="#22385A"/>
+${stars(7,9,296,352,34,112,'#F3E2A6')}
+${crescent(334,56,8,'#F3E2A6','moonS')}
+<path d="M324 26V120M292 88H356" stroke="#FFFFFF" stroke-width="3"/>
+<rect x="280" y="122" width="88" height="6" rx="2" fill="#FAFCFB"/>
+<g class="a-glow"><circle cx="318" cy="150" r="70" fill="#FFF6D8" opacity=".35"/><circle cx="318" cy="156" r="40" fill="#FFF0C2" opacity=".5"/></g>
+<rect y="206" width="400" height="34" fill="#E7DAC5"/><path d="M0 220H400" stroke="#D9C9B0" stroke-width="1.2"/>
+<path d="M90 240L120 214H400V240Z" fill="#0C6B52"/><path d="M104 236L126 218H400" stroke="#D9B84F" stroke-width="1.4" fill="none"/>
+<path d="M120 182H350L342 190H128Z" fill="#B57B52"/><rect x="128" y="190" width="214" height="7" fill="#8E5C3B"/>
+<rect x="140" y="196" width="8" height="26" fill="#8E5C3B"/><rect x="322" y="196" width="8" height="26" fill="#7A4D30"/>
+<path d="M186 182L246 132L254 138L196 182ZM262 182L202 132L194 138L252 182Z" fill="#8E5A3A"/><path d="M262 182L202 132L194 138L252 182Z" fill="#7A4B30"/>
+<path d="M170 140Q198 128 224 144L224 164Q198 150 170 158Z" fill="#0C6B52"/><path d="M224 144Q250 128 278 140L278 158Q250 150 224 164Z" fill="#095844"/>
+<path d="M174 136Q200 124 224 140L224 160Q200 146 174 154Z" fill="#FFFDF7"/><path d="M224 140Q248 124 274 136L274 154Q248 146 224 160Z" fill="#F6F1E4"/>
+<g stroke="#A7B9B1" stroke-width="1.1" stroke-linecap="round" fill="none"><path d="M180 140Q198 133 216 142M180 145Q198 138 216 147M180 150Q198 143 216 152M232 142Q250 133 268 140M232 147Q250 138 268 145M232 152Q250 143 268 150"/></g>
+<circle cx="198" cy="135" r="2.2" fill="#D9B84F"/>
+<ellipse cx="318" cy="182" rx="16" ry="3.6" fill="#B08D45"/><path d="M306 180Q318 168 330 180Z" fill="#C9A55A"/><path d="M330 176Q340 172 342 176" stroke="#C9A55A" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+<path class="a-flame" d="M318 160Q324 168 318 172Q312 168 318 160Z" fill="#F6B73C"/><path d="M318 165Q320 169 318 171Q316 169 318 165Z" fill="#FFF3C8"/>
+<g fill="#8E5A3A">${Array.from({length:11},(_,i)=>`<circle cx="${f(150+i*5.2)}" cy="${f(181-Math.sin(i/10*Math.PI)*3)}" r="2.2"/>`).join('')}</g><circle cx="176" cy="178" r="2.6" fill="#D9B84F"/>
+${grain()}`;
+
+S.salawat=()=>{const minaret=(x,h,base)=>`<rect x="${x-5}" y="${base-h}" width="10" height="${h}" fill="#FBF7F3"/><rect x="${x+1}" y="${base-h}" width="4" height="${h}" fill="#EADFDA"/>${[.25,.55].map(t=>`<rect x="${x-8}" y="${f(base-h+h*t)}" width="16" height="4" rx="1.5" fill="#E2D2CD"/>`).join('')}<path d="M${x-5} ${base-h}L${x} ${base-h-16}L${x+5} ${base-h}Z" fill="#2E9C6A"/><path d="M${x} ${base-h-16}V${base-h-22}" stroke="#D9B84F" stroke-width="1.4"/><circle cx="${x}" cy="${base-h-23}" r="1.6" fill="#D9B84F"/>`;
+const umb=(x,y)=>`<path d="M${x} ${y}V${y+18}" stroke="#D9CFCA" stroke-width="1.6"/><path d="M${x-20} ${y+4}Q${x-15} ${y-6} ${x-10} ${y+4}Q${x-5} ${y-8} ${x} ${y+3}Q${x+5} ${y-8} ${x+10} ${y+4}Q${x+15} ${y-6} ${x+20} ${y+4}L${x} ${y-4}Z" fill="#FFFFFF"/>`;
+return `<rect width="400" height="240" fill="#F4E0E3"/><rect width="400" height="60" fill="#F0D3D9"/>
+${spark(196,40,5,'#D9B84F',0)}${spark(372,30,4,'#D9B84F',-1.2)}${spark(150,84,3,'#D9B84F',-2.2)}
+${birds(320,52,'#FFFFFF',3,.9)}
+<path d="M0 168H400V150H360V142H300V150H120V158H0Z" fill="#EAD0D5"/>
+${minaret(200,110,170)}${minaret(372,96,170)}
+<rect x="140" y="150" width="260" height="56" fill="#FBF7F3"/><rect x="140" y="146" width="260" height="6" fill="#EADFDA"/>
+${Array.from({length:12},(_,i)=>`<path d="M${150+i*21} 196V180A6 6 0 0 1 ${162+i*21} 180V196Z" fill="#EDDCD9"/>`).join('')}
+<rect x="234" y="128" width="56" height="20" fill="#FBF7F3"/><rect x="262" y="128" width="28" height="20" fill="#EADFDA"/>
+<path d="M230 130C230 102 248 86 262 78C276 86 294 102 294 130Z" fill="#2E9C6A"/><path d="M262 78C276 86 294 102 294 130H262Z" fill="#23845A"/><path d="M240 120C240 104 248 94 256 88C250 98 246 108 246 120Z" fill="#4DB887"/>
+<path d="M262 78V66" stroke="#D9B84F" stroke-width="1.8"/>${crescent(262,61,5,'#D9B84F','smallM')}
+${palm(170,214,60,'#2E8C5E','#3FA06E','#8E6A45',4,0)}${palm(352,218,52,'#2E8C5E','#3FA06E','#8E6A45',-5,-1.6)}
+<rect y="206" width="400" height="34" fill="#F2E7E3"/><path d="M0 216H400M0 228H400" stroke="#E6D6D2" stroke-width="1.1"/>
+${umb(220,206)}${umb(268,208)}${umb(316,206)}
+${grain()}`;};
+
+S.sunnah=()=>`<rect width="400" height="240" fill="#DDEBF3"/>
+<circle cx="350" cy="46" r="30" fill="#F2EDD6" opacity=".7"/><circle cx="350" cy="46" r="17" fill="#F4CE6A"/>
+${birds(200,62,'#7C8C94',2,.8)}
+<path d="M0 168Q60 140 130 156Q210 128 290 150Q350 136 400 146V196H0Z" fill="#EFD9AF"/>
+<path d="M130 156Q210 128 290 150Q240 148 200 160Z" fill="#000" opacity=".05"/>
+<path d="M0 202Q90 170 170 188Q260 172 330 192Q370 184 400 188V240H0Z" fill="#E6C48C"/>
+<path d="M170 188Q260 172 330 192Q280 190 240 200Q200 196 170 188Z" fill="#D3A96C"/>
+<path d="M60 206L102 164L144 206Z" fill="#B5452F"/><path d="M102 164L144 206H118Z" fill="#000" opacity=".15"/><path d="M75 206L102 178L106 206ZM88 192H116" fill="none" stroke="#F1E2C8" stroke-width="1.6"/><path d="M96 206L102 186L108 206Z" fill="#3E2A22"/><path d="M102 164V156" stroke="#5B463A" stroke-width="1.4"/>
+<ellipse cx="262" cy="208" rx="66" ry="12" fill="#6FB27F"/><ellipse cx="262" cy="208" rx="56" ry="8.4" fill="#8FCFD8"/>
+${shimmer([[250,206,28],[276,210,16]],'#FFFFFF')}
+${palm(232,206,72,'#2E8C5E','#3FA06E','#8E6A45',-6,0)}${palm(268,204,88,'#2E8C5E','#46A774','#8E6A45',5,-1.5)}${palm(300,208,58,'#2E8C5E','#3FA06E','#8E6A45',8,-.8)}
+<path d="M0 240V226Q140 212 280 230Q350 238 400 232V240Z" fill="#D9B57C"/>
+${grain()}`;
+
+S.beskyttelse=()=>{const r=rng(17);let snow='';for(let i=0;i<34;i++){snow+=`<circle class="a-snow" style="animation-delay:${f(-r()*8)}s;animation-duration:${f(6+r()*5)}s" cx="${f(r()*400)}" cy="${f(r()*200)}" r="${f(.8+r()*1.4)}" fill="#FFFFFF"/>`;}
+return `<rect width="400" height="240" fill="#D7DFF2"/><rect width="400" height="56" fill="#CCD5EE"/>
+<circle cx="360" cy="40" r="22" fill="#E8EAF1" opacity=".8"/><circle cx="360" cy="40" r="12" fill="#F4EDD6"/>
+<path d="M0 176Q80 150 160 166Q240 146 320 164Q370 154 400 160V190H0Z" fill="#E6ECF7"/>
+${[30,56,84,112,140,176].map((x,i)=>spruce(x,176+(i%2)*4,22+(i%3)*6,'#A5B6D2')).join('')}
+<path d="M0 240V196Q120 184 240 194Q330 200 400 190V240Z" fill="#F5F8FD"/>
+<path d="M0 240V222Q120 212 240 220Q330 226 400 214V240Z" fill="#DCE4F2"/>
+<path d="M290 200Q284 220 262 240H300Q300 220 296 200Z" fill="#E3EAF5"/>
+${cabin(296,200,1.5,{wall:'#B5452F',roof:'#3E322C',trim:'#F6F1E8',win:'#F6C860',door:'#6B2A1E',snow:'#FFFFFF',glow:1})}
+<g transform="translate(316 166)"><g class="a-glow"><circle cx="0" cy="6" r="12" fill="#F6C860" opacity=".35"/></g><path d="M-4 0H4L5 12H-5Z" fill="#2F2A28"/><rect x="-2.6" y="2.4" width="5.2" height="7.4" fill="#F6C860"/><path d="M-4 0L0-4L4 0Z" fill="#2F2A28"/></g>
+<g stroke="#8E6A45" stroke-width="3">${[150,176,202,228,364,390].map(x=>`<path d="M${x} 222V198"/>`).join('')}<path d="M146 206H232M146 214H232M360 206H400M360 214H400" stroke-width="2"/></g>
+<g fill="#FFFFFF">${[150,176,202,228,364,390].map(x=>`<ellipse cx="${x}" cy="198" rx="3.6" ry="2"/>`).join('')}</g>
+${spruce(352,202,48,'#2D5C4C','#FFFFFF')}${spruce(232,200,38,'#2D5C4C','#FFFFFF')}${spruce(386,208,36,'#2D5C4C','#FFFFFF')}
+${snow}
+${grain()}`;};
+
+S.ramadan=()=>{const sky=(c,base,items)=>`<g fill="${c}">${items}</g>`;
+const dome=(x,w,h,b)=>`<rect x="${x-w/2}" y="${b-h}" width="${w}" height="${h}"/><path d="M${x-w*.36} ${b-h}A${w*.36} ${w*.4} 0 0 1 ${x+w*.36} ${b-h}Z"/>`;
+const mina=(x,h,b)=>`<rect x="${x-3}" y="${b-h}" width="6" height="${h}"/><path d="M${x-3} ${b-h}L${x} ${b-h-10}L${x+3} ${b-h}Z"/><rect x="${x-5}" y="${b-h*.7}" width="10" height="3"/>`;
+let wins='';[[168,196],[180,196],[256,184],[268,184],[280,184],[340,198]].forEach(([x,y],i)=>{wins+=`<path class="a-win" style="animation-delay:${-i*.7}s" d="M${x} ${y+8}V${y+3}A3 3 0 0 1 ${x+6} ${y+3}V${y+8}Z" fill="#F6D27A"/>`;});
+return `<rect width="400" height="240" fill="#E3DCF1"/><rect width="400" height="70" fill="#D9D0EC"/>
+${stars(31,14,170,400,6,120,'#FFFFFF')}
+${crescent(296,118,13,'#F2CB62','moonR')}
+<path d="M150 0Q270 70 410 30" stroke="#7D6BA8" stroke-width="1.4" fill="none"/>
+${lantern(206,22,.62,'#4B3F7A','#F2CB62',0)}${lantern(262,36,.72,'#0C6B52','#F2CB62',-1.2)}${lantern(318,30,.6,'#4B3F7A','#F2CB62',-2.1)}${lantern(374,14,.55,'#0C6B52','#F2CB62',-.7)}
+${sky('#CBC1E3',0,dome(60,40,24,190)+mina(30,60,190)+dome(120,30,18,190)+dome(214,50,30,190)+mina(250,74,190)+dome(350,40,22,190)+`<rect x="0" y="176" width="400" height="20"/>`)}
+${sky('#A99BD0',0,dome(180,56,30,214)+mina(146,80,214)+mina(214,80,214)+dome(270,64,40,214)+mina(316,96,214)+dome(352,40,26,214)+`<rect x="100" y="200" width="300" height="20"/>`)}
+${wins}
+<rect y="212" width="400" height="28" fill="#8E7FC0"/><path d="M0 222H400" stroke="#8172B6" stroke-width="1.2"/>
+${grain()}`;};
+
+S.eid=()=>{const bunt=(x0,y0,x1,y1,sag,n,cols,d)=>{let o='';for(let i=1;i<n;i++){const t=i/n,cx=(x0+x1)/2,cy=(y0+y1)/2+sag,x=(1-t)*(1-t)*x0+2*(1-t)*t*cx+t*t*x1,y=(1-t)*(1-t)*y0+2*(1-t)*t*cy+t*t*y1;o+=`<path d="M${f(x-6)} ${f(y)}H${f(x+6)}L${f(x)} ${f(y+13)}Z" fill="${cols[i%cols.length]}"/>`;}return `<g class="a-sway" style="animation-duration:5s;animation-delay:${d}s"><path d="M${x0} ${y0}Q${(x0+x1)/2} ${(y0+y1)/2+sag} ${x1} ${y1}" stroke="#8C4F45" stroke-width="1.2" fill="none"/>${o}</g>`;};
+const conf=[[150,96,'#C8553D'],[232,70,'#38A07C'],[372,92,'#D9B84F'],[200,120,'#D9B84F'],[310,112,'#0C6B52']].map(([x,y,c],i)=>`<rect class="a-twinkle" style="animation-delay:${-i*.8}s" x="${x}" y="${y}" width="4" height="4" rx="1" fill="${c}"/>`).join('');
+return `<rect width="400" height="240" fill="#F8E4D9"/>
+<circle cx="362" cy="48" r="28" fill="#F8EDE0" opacity=".8"/><circle cx="362" cy="48" r="16" fill="#F6C77E"/>
+<g fill="#EDCDBE"><rect x="190" y="130" width="120" height="50"/><path d="M220 130A30 30 0 0 1 280 130Z"/><rect x="176" y="80" width="8" height="100"/><path d="M176 80L180 66L184 80Z"/><rect x="316" y="90" width="8" height="90"/><path d="M316 90L320 76L324 90Z"/></g>
+${bunt(160,6,400,24,30,12,['#0C6B52','#D9B84F','#C8553D','#38A07C'],0)}${bunt(230,40,400,58,18,8,['#D9B84F','#C8553D','#0C6B52'],-1.5)}
+${conf}
+<path d="M100 178H400V196H90Z" fill="#FFFFFF"/><rect x="90" y="196" width="310" height="44" fill="#F6EEE8"/>
+<path d="M90 196${Array.from({length:26},(_,i)=>`a6 6 0 0 0 12 0`).join('')}" fill="#EDB9A2"/>
+<path d="M90 228H400" stroke="#EAD8CB" stroke-width="1.4"/>
+<g transform="translate(152 0)"><path d="M-14 182Q-18 160 0 156Q18 160 14 182Z" fill="#C9A55A"/><path d="M0 156Q18 160 14 182H0Z" fill="#000" opacity=".1"/><path d="M14 166Q26 160 28 152" stroke="#C9A55A" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M-14 164Q-24 166 -22 176" stroke="#B08D45" stroke-width="2.4" fill="none"/><path d="M-6 156Q0 148 6 156Z" fill="#B08D45"/><circle cx="0" cy="147" r="2" fill="#B08D45"/>${smoke(29,146,'#FFFFFF',.8)}</g>
+${[192,210].map(x=>`<path d="M${x-5} 168L${x-4} 182H${x+4}L${x+5} 168Z" fill="#FFFFFF" opacity=".7"/><path d="M${x-4.6} 172L${x-4} 182H${x+4}L${x+4.6} 172Z" fill="#C96E3A"/><ellipse cx="${x}" cy="183" rx="7" ry="1.8" fill="#E4D2C6"/>`).join('')}
+<ellipse cx="268" cy="184" rx="34" ry="7" fill="#FFFFFF"/><ellipse cx="268" cy="183" rx="34" ry="6" fill="#F1E9E3"/><ellipse cx="268" cy="182" rx="26" ry="4" fill="#FFFFFF"/>
+${[[252,178],[262,176],[272,177],[284,179],[258,182],[276,182]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="5.4" ry="3" fill="#7A3E24"/><ellipse cx="${x-1}" cy="${y-1}" rx="2" ry=".8" fill="#9C5A3A"/>`).join('')}
+<rect x="318" y="150" width="44" height="34" fill="#0C6B52"/><rect x="340" y="150" width="22" height="34" fill="#095844"/><rect x="314" y="144" width="52" height="9" fill="#2F8A68"/><rect x="336" y="144" width="8" height="40" fill="#D9B84F"/>
+<path d="M340 144Q326 130 330 140Q332 146 340 144Q354 130 350 140Q348 146 340 144Z" fill="#D9B84F"/>
+${grain()}`;};
+
+S.hajj=()=>{const arcade=(y,h,w,n,x0,c1,c2)=>`<rect x="${x0}" y="${y}" width="${n*w}" height="${h}" fill="${c1}"/>`+Array.from({length:n},(_,i)=>`<path d="M${x0+i*w+w*.18} ${y+h}V${f(y+h*.5)}A${f(w*.32)} ${f(w*.32)} 0 0 1 ${f(x0+i*w+w*.82)} ${f(y+h*.5)}V${y+h}Z" fill="${c2}"/>`).join('');
+let dots='';const r=rng(13);for(let i=0;i<40;i++){const a=r()*Math.PI*2,rr=56+r()*44;dots+=`<circle cx="${f(Math.cos(a)*rr)}" cy="${f(Math.sin(a)*rr)}" r="3.4" fill="${r()>.45?'#B9A47C':'#8A7656'}"/>`;}
+return `<rect width="400" height="240" fill="#F4E8D4"/>
+<circle cx="358" cy="44" r="26" fill="#F8F0E2" opacity=".8"/><circle cx="358" cy="44" r="14" fill="#F4D58A"/>
+${birds(240,40,'#9C8A70',3,.9)}${birds(300,70,'#9C8A70',2,.7)}
+<path d="M0 150L40 120L70 134L110 104L150 140L180 130V160H0Z" fill="#E6D2B2"/>
+${[196,384].map(x=>`<rect x="${x-4}" y="70" width="8" height="90" fill="#FBF7EF"/><rect x="${x}" y="70" width="4" height="90" fill="#E9DDC8"/><rect x="${x-6}" y="96" width="12" height="3" fill="#E1D2BA"/><rect x="${x-6}" y="122" width="12" height="3" fill="#E1D2BA"/><path d="M${x-4} 70L${x} 54L${x+4} 70Z" fill="#E1D2BA"/><path d="M${x} 54V48" stroke="#D9B84F" stroke-width="1.4"/>`).join('')}
+${arcade(132,20,20,14,120,'#FBF7EF','#EAD9BF')}${arcade(152,22,20,14,120,'#F7F0E3','#E3D0B2')}
+<rect x="120" y="128" width="280" height="4" fill="#E9DDC8"/>
+<ellipse cx="290" cy="208" rx="190" ry="40" fill="#FFFFFF"/>
+<ellipse cx="290" cy="208" rx="150" ry="30" fill="none" stroke="#EFE5D3" stroke-width="1.4"/><ellipse cx="290" cy="208" rx="110" ry="22" fill="none" stroke="#EFE5D3" stroke-width="1.4"/>
+<g transform="translate(290 206) scale(1 .3)"><g class="a-tawaf">${dots}</g></g>
+<path d="M268 150L284 144H320L304 150Z" fill="#3A4240"/>
+<rect x="268" y="150" width="36" height="54" fill="#1E2422"/>
+<path d="M304 150L320 144V196L304 204Z" fill="#2B3230"/>
+<rect x="268" y="160" width="36" height="5" fill="#D9B84F"/><path d="M304 160L320 154V159L304 165Z" fill="#C4A243"/>
+<path d="M272 162h2M278 162h2M284 162h2M290 162h2M296 162h2" stroke="#1E2422" stroke-width=".8"/>
+<rect x="288" y="178" width="9" height="16" rx="1" fill="#D9B84F"/><path d="M290 181h5v10h-5Z" fill="#C4A243"/>
+<ellipse cx="294" cy="205" rx="30" ry="3" fill="#000" opacity=".07"/>
+<path d="M248 202V196A4 4 0 0 1 256 196V202Z" fill="#D9B84F"/>
+${grain()}`;};
+
+const ART={
+  morgen:{name:'Morgen',bg:'#E3EEEC',anim:'Sola stiger, røyk fra pipa, båten vugger'},
+  kveld:{name:'Kveld',bg:'#F5D8C5',anim:'Sola synker, vinduet lyser'},
+  sovn:{name:'Før søvn',bg:'#2C4470',night:true,anim:'Nordlyset bølger, stjerner blinker'},
+  etterBonnen:{name:'Etter bønnen',bg:'#EDF4F0',anim:'Støv svever i lyset, planten vugger'},
+  adhan:{name:'Etter adhan',bg:'#DCE7F5',anim:'Lydbølger fra minareten'},
+  wudu:{name:'Wudu og moské',bg:'#EEF4F2',anim:'Vannet renner, dråper faller'},
+  reise:{name:'Reise',bg:'#D8E8F5',anim:'Flyet svever over skyene'},
+  bekymring:{name:'Bekymring og lettelse',bg:'#E8E4F4',anim:'Regnet faller, sola kommer fram'},
+  tilgivelse:{name:'Tilgivelse',bg:'#E3F1E9',anim:'Blader faller, tåka driver'},
+  lovprisning:{name:'Lovprisning',bg:'#F7EFD8',anim:'Solstråler dreier, fugler flyr'},
+  koranen:{name:'Fra Koranen',bg:'#DDEDE6',anim:'Lampa flakker, lyset puster'},
+  salawat:{name:'Salawat',bg:'#F4E0E3',anim:'Palmene vugger, gnister'},
+  sunnah:{name:'Sunnah',bg:'#DDEBF3',anim:'Palmene vugger i oasen'},
+  beskyttelse:{name:'Beskyttelse',bg:'#D7DFF2',anim:'Snøen faller, lykta gløder'},
+  ramadan:{name:'Ramadan',bg:'#E3DCF1',anim:'Lyktene svinger, vinduer tennes'},
+  eid:{name:'Eid',bg:'#F8E4D9',anim:'Vimpler vaier, teen damper'},
+  hajj:{name:'Hajj',bg:'#F4E8D4',anim:'Tawaf rundt Kaba'}
+};
+const DEFS=(()=>{const r=rng(99);let g='';for(let i=0;i<14;i++)g+=`<circle cx="${f(r()*24)}" cy="${f(r()*24)}" r="${f(.4+r()*.5)}" fill="${i%3?'#FFFFFF':'#000000'}" opacity="${i%3?.28:.06}"/>`;
+const m=(id,cx,cy,r,dx,dy,rr)=>`<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="400" height="240"><rect width="400" height="240" fill="#fff"/><circle cx="${cx+dx}" cy="${cy+dy}" r="${rr}" fill="#000"/></mask>`;
+return `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><pattern id="grain" width="24" height="24" patternUnits="userSpaceOnUse">${g}</pattern><pattern id="tile" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#D6ECE7"/><path d="M9 2L16 9L9 16L2 9Z" fill="#A5D4CA"/><path d="M9 5.5L12.5 9L9 12.5L5.5 9Z" fill="#F4FAF8"/><circle cx="0" cy="0" r="2" fill="#5FAF9E"/><circle cx="18" cy="0" r="2" fill="#5FAF9E"/><circle cx="0" cy="18" r="2" fill="#5FAF9E"/><circle cx="18" cy="18" r="2" fill="#5FAF9E"/></pattern>${m('moonM',350,52,14,6,-5,12)}${m('smallM',248,104,4,1.8,-1.4,3.4)}${m('moonS',334,56,8,3.4,-3,7)}${m('moonR',296,118,13,5,-4,11)}</defs></svg>`;})();
+const sceneSVG=(k,par='xMaxYMid slice')=>`<svg class="art" viewBox="0 0 400 240" preserveAspectRatio="${par}" aria-hidden="true">${S[k]()}</svg>`;
+
+document.body.insertAdjacentHTML('afterbegin',DEFS);
+const svgOf=k=>sceneSVG(k);
+const tile=(k,opt={})=>{const a=ART[k];return `<div class="tile${opt.cls?' '+opt.cls:''}${a.night?' night':''}" style="background:${a.bg}" role="button" tabindex="0"><div class="lbl">${opt.kicker?`<small>${opt.kicker}</small>`:''}<b>${opt.name||a.name}</b>${opt.count?`<small>${opt.count}</small>`:''}</div>${svgOf(k)}</div>`;};
+const counts={morgen:'14',kveld:'14',sovn:'7',etterBonnen:'15',adhan:'3',wudu:'3',reise:'9',bekymring:'17',tilgivelse:'14',lovprisning:'20',koranen:'34',salawat:'4',sunnah:'48',beskyttelse:'6',ramadan:'4',eid:'2',hajj:'5'};
+const c=k=>counts[k]+' duaer';
+document.getElementById('feed').innerHTML=
+  tile('etterBonnen',{cls:'hero',kicker:'Nå, etter Dhuhr',count:c('etterBonnen')})+
+  `<div class="sec">Dagen</div>`+tile('morgen',{cls:'wide',count:c('morgen')})+tile('kveld',{cls:'wide',count:c('kveld')})+tile('sovn',{cls:'wide',count:c('sovn')})+
+  `<div class="sec">Rundt bønnen</div><div class="grid2">${tile('adhan',{count:c('adhan')})}${tile('wudu',{count:c('wudu')})}</div>`+
+  `<div class="sec">Hverdag</div><div class="grid2">${['reise','bekymring','tilgivelse','beskyttelse'].map(k=>tile(k,{count:c(k)})).join('')}</div>`+
+  `<div class="sec">Lovprisning og Koranen</div><div class="grid2">${['lovprisning','koranen','salawat','sunnah'].map(k=>tile(k,{count:c(k),name:k==='sunnah'?'Sunnah':undefined})).join('')}</div>`+
+  `<div class="sec">Høytider</div><div class="grid2">${tile('ramadan',{count:c('ramadan')})}${tile('eid',{count:c('eid')})}</div>`+tile('hajj',{cls:'wide',count:c('hajj')});
+document.getElementById('lib').innerHTML=Object.keys(ART).map(k=>`<div class="item">${tile(k)}<div class="meta"><b>${ART[k].name}</b><span>${ART[k].anim}</span><code>${k}</code></div></div>`).join('');
+const btn=document.getElementById('toggle'),root=document.getElementById('root');
+btn.addEventListener('click',()=>{const p=root.classList.toggle('paused');btn.setAttribute('aria-pressed',String(p));btn.textContent=p?'Spill animasjon':'Pause animasjon';});
+</script>
