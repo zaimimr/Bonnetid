@@ -1,6 +1,5 @@
 import { language, t, type Language } from './i18n.ts';
 import type { JummahSlot } from './jummah';
-import { jummahSlotIsOpen } from './jummah';
 import type { PrayerEntry } from './prayerSchedule';
 import { isoDateIsFriday, isoDateKey, localClockNear } from './time';
 

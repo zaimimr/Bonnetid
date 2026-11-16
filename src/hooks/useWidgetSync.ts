@@ -21,7 +21,6 @@ import {
   jamatTimesForDate,
   mosqueJamatForDate,
   nextPrayerDay,
-  type PrayerEntry,
 } from '@/lib/prayerSchedule';
 import { isoDateKey, parseDayKey, todayKey } from '@/lib/time';
 import { buildSnapshot, snapshotIsEmpty, widgetPrayerLabel } from '@/lib/widgetSnapshot';
@@ -257,5 +256,5 @@ function useLiveActivitySync(locationName: string, days: SnapshotDayInput[], now
 
       apply(JSON.stringify(state), () => void startOrUpdatePrayerActivity(state));
     };
-  }, [window, locationName, days, trackerEnabled, now]);
+  }, [window, locationName, days, trackerEnabled]);
 }
