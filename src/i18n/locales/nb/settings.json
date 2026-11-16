@@ -1,5 +1,8 @@
 {
-  "setsTheAsrMethod": "{{name}} bestemmer asr-metoden",
+  "asrToday": "Asr i dag",
+  "asrIrnWinterNow": "IRN standard bruker 2x skygge nå i vintertid",
+  "asrIrnSummerNow": "IRN standard bruker 1x skygge nå i sommertid",
+  "mosqueChoseAsrMethod": "Har valgt Asr-metoden din",
   "commonIn": "{{autoLabel}}, vanlig i {{country}}",
   "automatic": "Automatisk",
   "theAppPicksThe": "Appen velger metoden som brukes i landet du er i. Du kan overstyre den under.",

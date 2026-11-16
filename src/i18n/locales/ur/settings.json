@@ -1,5 +1,8 @@
 {
-  "setsTheAsrMethod": "{{name}} عصر کا طریقہ طے کرتی ہے",
+  "asrToday": "آج عصر",
+  "asrIrnWinterNow": "IRN معیاری طریقہ اب سردیوں کے وقت میں دو مثل استعمال کرتا ہے",
+  "asrIrnSummerNow": "IRN معیاری طریقہ اب گرمیوں کے وقت میں ایک مثل استعمال کرتا ہے",
+  "mosqueChoseAsrMethod": "نے آپ کا عصر کا طریقہ منتخب کیا ہے",
   "commonIn": "{{autoLabel}}، {{country}} میں عام",
   "automatic": "خودکار",
   "theAppPicksThe": "ایپ وہ طریقہ منتخب کرتی ہے جو آپ کے موجودہ ملک میں رائج ہے۔ آپ اسے نیچے تبدیل کر سکتے ہیں۔",

@@ -1,5 +1,8 @@
 {
-  "setsTheAsrMethod": "{{name}} sets the Asr method",
+  "asrToday": "Asr today",
+  "asrIrnWinterNow": "IRN standard uses 2x shadow now in winter time",
+  "asrIrnSummerNow": "IRN standard uses 1x shadow now in summer time",
+  "mosqueChoseAsrMethod": "Has chosen your Asr method",
   "commonIn": "{{autoLabel}}, common in {{country}}",
   "automatic": "Automatic",
   "theAppPicksThe": "The app picks the method used in the country you are in. You can override it below.",
