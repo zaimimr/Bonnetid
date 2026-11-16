@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { KEEP_DAYS, addDaily, allTimeCount, dayKey, rankedTotals, todayCount, weekCount } from './tasbihStats.ts';
+import { KEEP_DAYS, addDaily, allTimeCount, dayCounts, dayKey, rankedTotals, todayCount, weekCount } from './tasbihStats.ts';
 
 test('counts today, the last seven days and all time', () => {
   const now = new Date(2026, 10, 14, 12);
@@ -29,4 +29,14 @@ test('ranks totals by count and hides zeros', () => {
     ['c', 9],
     ['a', 2],
   ]);
+});
+
+test('lists daily totals oldest first, ending today', () => {
+  const now = new Date(2026, 10, 14, 12);
+  let daily = {};
+  daily = addDaily(daily, 'subhanallah', new Date(2026, 10, 8, 9));
+  daily = addDaily(daily, 'subhanallah', new Date(2026, 10, 12, 9));
+  daily = addDaily(daily, 'alhamdulillah', now);
+  daily = addDaily(daily, 'alhamdulillah', now);
+  assert.deepEqual(dayCounts(daily, now, 7), [1, 0, 0, 0, 1, 0, 2]);
 });

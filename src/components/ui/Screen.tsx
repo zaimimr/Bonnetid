@@ -86,7 +86,7 @@ export function Screen({
             />
           ) : undefined
         }>
-        <View style={inner}>{content}</View>
+        <View style={[inner, { gap: contentStyle?.gap }]}>{content}</View>
       </Animated.ScrollView>
     ) : (
       <View style={[base, padding, style, contentStyle]}>

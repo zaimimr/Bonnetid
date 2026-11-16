@@ -33,10 +33,12 @@ export function todayCount(daily: DailyTotals, now: Date, key?: string): number 
   return key ? (counts?.[key] ?? 0) : sum(counts);
 }
 
+export function dayCounts(daily: DailyTotals, now: Date, days: number): number[] {
+  return Array.from({ length: days }, (_, index) => sum(daily[dayKey(daysBefore(now, days - 1 - index))]));
+}
+
 export function weekCount(daily: DailyTotals, now: Date): number {
-  let total = 0;
-  for (let offset = 0; offset < 7; offset++) total += sum(daily[dayKey(daysBefore(now, offset))]);
-  return total;
+  return dayCounts(daily, now, 7).reduce((total, value) => total + value, 0);
 }
 
 export function allTimeCount(totals: Record<string, number>): number {

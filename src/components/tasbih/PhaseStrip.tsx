@@ -8,21 +8,44 @@ import { useTheme } from '@/theme';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import type { TasbihSession } from './useTasbih';
 
-export function PhaseStrip({ session }: { session: TasbihSession }) {
+export function InfoButton({ onPress }: { onPress: () => void }) {
+  const theme = useTheme();
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={t('tasbih.about')}
+      style={({ pressed }) => ({
+        width: 44,
+        height: 44,
+        borderRadius: radius.full,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: theme.colors.seriesLight,
+        backgroundColor: theme.colors.primarySoft,
+        opacity: pressed ? opacity.pressed : 1,
+      })}>
+      <AppText size="lg" weight="bold" color={theme.colors.onPrimarySoft}>
+        ?
+      </AppText>
+    </Pressable>
+  );
+}
+
+export function PhaseStrip({ session, onInfo }: { session: TasbihSession; onInfo?: () => void }) {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const { state, steps, jump } = session;
   const fractions = stepFractions(state, steps);
-  const next = steps[state.step + 1];
 
   return (
     <>
-      <Pressable
-        onPress={() => setOpen(true)}
-        accessibilityRole="button"
-        accessibilityLabel={t('tasbih.allSteps')}
-        style={({ pressed }) => ({ gap: spacing.sm, opacity: pressed ? opacity.pressed : 1 })}>
-        <View style={{ flexDirection: 'row', gap: 3, paddingHorizontal: 2 }}>
+      <View style={{ gap: spacing.xs }}>
+        <Pressable
+          onPress={() => setOpen(true)}
+          accessible={false}
+          style={({ pressed }) => ({ flexDirection: 'row', gap: 3, paddingHorizontal: 2, paddingVertical: spacing.xs, opacity: pressed ? opacity.pressed : 1 })}>
           {fractions.map((fraction, index) => (
             <View
               key={index}
@@ -39,19 +62,22 @@ export function PhaseStrip({ session }: { session: TasbihSession }) {
               <View style={{ width: `${fraction * 100}%`, height: 6, backgroundColor: theme.colors.primary }} />
             </View>
           ))}
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md }}>
-          <AppText size="sm" weight="semibold" tabular>
-            {t('tasbih.stepOf', { step: Math.min(state.step + 1, steps.length), total: steps.length })}
-          </AppText>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xxs, flexShrink: 1 }}>
-            <AppText size="sm" tone="textMuted" numberOfLines={1}>
-              {next ? t('tasbih.next', { name: t(`tasbih.names.${next.dhikr}`) }) : t('tasbih.last')}
+        </Pressable>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
+          <Pressable
+            onPress={() => setOpen(true)}
+            accessibilityRole="button"
+            accessibilityHint={t('tasbih.allSteps')}
+            style={({ pressed }) => ({ flex: 1, minHeight: 44, justifyContent: 'center', opacity: pressed ? opacity.pressed : 1 })}>
+            <AppText size="sm" tone="textMuted" tabular>
+              {t('tasbih.stepLabel', { step: Math.min(state.step + 1, steps.length), total: steps.length })}
             </AppText>
-            <Icon name="caret-down" size={14} color={theme.colors.textMuted} />
-          </View>
+          </Pressable>
+          {onInfo ? (
+            <InfoButton onPress={onInfo} />
+          ) : null}
         </View>
-      </Pressable>
+      </View>
       <Sheet visible={open} onClose={() => setOpen(false)} title={session.series?.name ?? t('tasbih.allSteps')}>
         <View style={{ gap: spacing.xs }}>
           {steps.map((step, index) => {

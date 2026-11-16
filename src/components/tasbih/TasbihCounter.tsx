@@ -11,7 +11,7 @@ import { useTheme } from '@/theme';
 import { hitSlop, opacity, radius, spacing } from '@/theme/tokens';
 import { Completion } from './Completion';
 import { DhikrInfoSheet } from './DhikrInfoSheet';
-import { PhaseStrip } from './PhaseStrip';
+import { InfoButton, PhaseStrip } from './PhaseStrip';
 import { PhraseBlock } from './PhraseBlock';
 import { SettingsSheet } from './SettingsSheet';
 import { TasbihRing } from './TasbihRing';
@@ -30,32 +30,6 @@ function HeaderIcon({ name, label, onPress }: { name: IconName; label: string; o
       accessibilityLabel={label}
       style={({ pressed }) => ({ padding: 6, opacity: pressed ? opacity.pressed : 1 })}>
       <Icon name={name} size={24} color={theme.colors.primary} />
-    </Pressable>
-  );
-}
-
-function WhyPill({ onPress }: { onPress: () => void }) {
-  const theme = useTheme();
-  return (
-    <Pressable
-      onPress={onPress}
-      hitSlop={hitSlop}
-      accessibilityRole="button"
-      style={({ pressed }) => ({
-        alignSelf: 'center',
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing.xs,
-        paddingVertical: spacing.xs,
-        paddingHorizontal: spacing.md,
-        borderRadius: radius.full,
-        backgroundColor: theme.colors.primarySoft,
-        opacity: pressed ? opacity.pressed : 1,
-      })}>
-      <Icon name="sparkle" size={16} color={theme.colors.primary} />
-      <AppText size="sm" weight="semibold" tone="primary">
-        {t('tasbih.about')}
-      </AppText>
     </Pressable>
   );
 }
@@ -133,7 +107,13 @@ export function TasbihCounter({ session, fromDuas = false }: { session: TasbihSe
             gap: spacing.md,
           }}>
           <ResumeBanner session={session} />
-          {!free ? <PhaseStrip session={session} /> : null}
+          {!free ? (
+            <PhaseStrip session={session} onInfo={dhikr ? () => setInfoOpen(true) : undefined} />
+          ) : dhikr ? (
+            <View style={{ alignItems: 'flex-end' }}>
+              <InfoButton onPress={() => setInfoOpen(true)} />
+            </View>
+          ) : null}
           <Pressable
             onPress={tap}
             accessibilityRole="button"
@@ -142,7 +122,6 @@ export function TasbihCounter({ session, fromDuas = false }: { session: TasbihSe
             {phrase ? (
               <View style={{ flexShrink: 1, justifyContent: 'center', minHeight: 120, gap: spacing.md }}>
                 <PhraseBlock phrase={phrase} />
-                {dhikr ? <WhyPill onPress={() => setInfoOpen(true)} /> : null}
               </View>
             ) : null}
             <TasbihRing session={session} />
