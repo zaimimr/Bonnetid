@@ -51,6 +51,10 @@ export type ThemeColors = {
   seriesMid: string;
   seriesLight: string;
   seriesGold: string;
+  artInk: string;
+  artGold: string;
+  artGoldSoft: string;
+  artGreenSoft: string;
 };
 
 export type Theme = {
@@ -111,6 +115,10 @@ export const lightTheme: Theme = {
     seriesMid: palette.emerald400,
     seriesLight: palette.emerald200,
     seriesGold: palette.gold400,
+    artInk: palette.artInk,
+    artGold: palette.artGold,
+    artGoldSoft: palette.artGoldSoft,
+    artGreenSoft: palette.artGreenSoft,
   },
 };
 
@@ -167,6 +175,10 @@ export const darkTheme: Theme = {
     seriesMid: palette.emerald500,
     seriesLight: palette.emerald800,
     seriesGold: palette.gold400,
+    artInk: palette.emerald200,
+    artGold: palette.gold400,
+    artGoldSoft: palette.artGoldSoftNight,
+    artGreenSoft: palette.night600,
   },
 };
 

@@ -21,6 +21,12 @@ export const palette = {
   gold800: '#4F3F0A',
   gold900: '#2E2507',
 
+  artInk: '#0E5A46',
+  artGold: '#BF9C55',
+  artGoldSoft: '#E6D8AC',
+  artGoldSoftNight: '#3E3622',
+  artGreenSoft: '#D3E4DA',
+
   neutral0: '#FFFFFF',
   neutral50: '#F6F8F7',
   neutral100: '#EDF1EF',

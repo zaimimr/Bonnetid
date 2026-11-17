@@ -1,12 +1,12 @@
-import { Fragment } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AFTER_PRAYER_ID } from '@/lib/tasbih';
 import { t } from '@/lib/i18n';
 import { useMosque, useMosqueJamatPeriods } from '@/api/queries';
-import { Icon, type IconName } from '@/components/icons';
+import { Icon } from '@/components/icons';
+import { DuaArt } from '@/components/duas/DuaArt';
 import { ArabicText } from '@/components/duas/ArabicText';
-import { AppText, Card, Divider, IconTile, ListRow, mirrored } from '@/components/ui';
+import { AppText, Card, IconTile, ListRow } from '@/components/ui';
 import { useActiveDayKeys } from '@/hooks/useActiveDay';
 import { useEidMode } from '@/hooks/useEidMode';
 import { useFeature } from '@/hooks/useFeature';
@@ -27,51 +27,45 @@ import { useActiveLocation } from '@/store/settings';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/tokens';
 
-const ICONS: Record<DuaCategoryId, IconName> = {
-  'after-adhan': 'speaker-high',
-  'wudu-mosque': 'drop',
-  'after-salah': 'heart',
-  ramadan: 'moon',
-  eid: 'star',
-  hajj: 'kaaba',
-};
-
-function CategoryIcon({ category }: { category: DuaCategory }) {
-  const theme = useTheme();
-  return (
-    <IconTile>
-      <Icon
-        name={ICONS[category.id]}
-        size={20}
-        color={category.season ? theme.colors.seasonHighlight : theme.colors.primary}
-      />
-    </IconTile>
-  );
-}
-
 export function FeaturedCategoryCard({ category }: { category: DuaCategory }) {
   const router = useRouter();
-  const theme = useTheme();
   const preview = duasIn(category.id)[0];
   return (
     <Card
       rounded="xl"
-      padding="lg"
       elevated
+      style={{ padding: 0, overflow: 'hidden' }}
       onPress={() => router.push({ pathname: '/duas', params: { category: category.id } })}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-        <CategoryIcon category={category} />
-        <View style={{ flex: 1, gap: spacing.xxs }}>
-          <AppText size="sm" tone="textMuted">
-            {t('duas.now')}
-          </AppText>
-          <AppText size="lg" weight="semibold">
-            {category.title}
-          </AppText>
-        </View>
-        <Icon name="caret-right" size={18} color={theme.colors.textMuted} style={mirrored} />
+      <View style={{ height: 132, padding: spacing.lg, gap: spacing.xxs }}>
+        <DuaArt id={category.id} height={132} />
+        <AppText size="sm" tone="textMuted">
+          {t('duas.now')}
+        </AppText>
+        <AppText size="lg" weight="semibold">
+          {category.title}
+        </AppText>
       </View>
-      {preview && <ArabicText>{preview.arabic}</ArabicText>}
+      {preview && (
+        <View style={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.lg }}>
+          <ArabicText>{preview.arabic}</ArabicText>
+        </View>
+      )}
+    </Card>
+  );
+}
+
+function CategoryTile({ category, onPress }: { category: DuaCategory; onPress: () => void }) {
+  return (
+    <Card
+      rounded="xl"
+      padding="md"
+      onPress={onPress}
+      style={{ flex: 1, height: 150, overflow: 'hidden', gap: spacing.xxs }}>
+      <DuaArt id={category.id} height={110} />
+      <AppText weight="semibold">{category.title}</AppText>
+      <AppText size="sm" tone="textMuted" tabular>
+        {duasIn(category.id).length}
+      </AppText>
     </Card>
   );
 }
@@ -98,6 +92,10 @@ export function TasbihRow({ from }: { from?: string }) {
       />
     </Card>
   );
+}
+
+function pairs<T>(items: T[]): T[][] {
+  return items.flatMap((item, index) => (index % 2 === 0 ? [items.slice(index, index + 2)] : []));
 }
 
 function useHubCategories() {
@@ -153,25 +151,13 @@ export function DuaHub() {
 
       {tasbihEnabled && <TasbihRow />}
 
-      <Card padding="sm" rounded="xl">
-        {others.map((entry, index) => (
-          <Fragment key={entry.id}>
-            {index > 0 && <Divider />}
-            <ListRow
-              title={entry.title}
-              leading={<CategoryIcon category={entry} />}
-              trailing={
-                <AppText size="sm" tone="textMuted" tabular>
-                  {duasIn(entry.id).length}
-                </AppText>
-              }
-              chevron
-              onPress={() => open(entry.id)}
-              style={{ paddingHorizontal: spacing.md }}
-            />
-          </Fragment>
-        ))}
-      </Card>
+      {pairs(others).map((row) => (
+        <View key={row[0].id} style={{ flexDirection: 'row', gap: spacing.md }}>
+          {row.map((entry) => (
+            <CategoryTile key={entry.id} category={entry} onPress={() => open(entry.id)} />
+          ))}
+        </View>
+      ))}
     </View>
   );
 }
