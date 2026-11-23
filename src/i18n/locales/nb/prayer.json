@@ -77,7 +77,7 @@
   "tehran": "Teheran",
   "iranFajr177": "Iran. Fajr 17,7°, isha 14°",
   "duha": "Duha",
-  "fromMinAfterSunrise": "Fra {{DUHA_AFTER_SUNRISE_MINUTES}} min etter soloppgang til like før middag",
+  "fromMinAfterSunrise": "Fra {{DUHA_AFTER_SUNRISE_MINUTES}} min etter at Fajr slutter til like før middag",
   "midnight": "Midnatt",
   "n12HoursAfterMidday": "12 timer etter middag",
   "tahajjud": "Tahajjud",
@@ -89,7 +89,7 @@
   "endsAt": "{{label}} går ut kl. {{endClock}} ({{endLabel}})",
   "prayerLabels": {
     "fajr": "Fajr",
-    "fajr_endtime": "Soloppgang",
+    "fajr_endtime": "Fajr slutter",
     "duhr": "Dhuhr",
     "asr": "Asr",
     "maghrib": "Maghrib",

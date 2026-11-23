@@ -10,7 +10,7 @@ import WidgetKit
 /// That re-render is the only one the activity gets for free, so it is spent on the closing
 /// line, and the successor lets a later render carry the card one prayer further than the app
 /// managed to push. The successor only takes over once it has actually begun: Fajr's window
-/// closes at soloppgang and Dhuhr is hours away, so hopping at soloppgang would announce a
+/// closes at sunrise and Dhuhr is hours away, so hopping at sunrise would announce a
 /// prayer that has not started. Until then the card stays on the prayer still left unanswered
 /// and names the next one as a time, not as the one running now.
 private struct ActivityPhase {

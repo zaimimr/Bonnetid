@@ -138,7 +138,7 @@ class WidgetPreviewActivity : Activity() {
 
     val prayers = listOf(
       prayer("fajr", "Fajr", 4 to 12, 6 to 3, 4 to 45),
-      prayer("sunrise", "Soloppgang", 6 to 3, null, null, isPrayer = false),
+      prayer("sunrise", "Fajr slutter", 6 to 3, null, null, isPrayer = false),
       prayer("duhr", "Dhuhr", 13 to 20, 16 to 48, 13 to 45),
       prayer("asr", "Asr", 16 to 48, 20 to 12, 17 to 15),
       prayer("maghrib", "Maghrib", 20 to 12, 22 to 30, 20 to 25),

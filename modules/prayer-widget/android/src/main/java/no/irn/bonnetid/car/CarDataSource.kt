@@ -275,7 +275,7 @@ object CarDataSource {
 
   private val LABELS = mapOf(
     "fajr" to "Fajr",
-    "fajr_endtime" to "Soloppgang",
+    "fajr_endtime" to "Fajr slutter",
     "duhr" to "Dhuhr",
     "asr" to "Asr",
     "maghrib" to "Maghrib",
