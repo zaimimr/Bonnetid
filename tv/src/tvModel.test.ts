@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { Mosque, MosqueJamat, PrayerDay } from '../../src/api/types.ts';
 import { osloWallClockToDate } from '../../src/lib/time.ts';
-import { buildTvDay, jummahInstants, nowAndNext, pickScreen, type TvState } from './tvModel.ts';
+import { buildTvDay, jummahInstants, nowAndNext, pickScreen, rotationScreen, type BaseScreen, type TvState } from './tvModel.ts';
+
+const only = (screen: BaseScreen) => ({ screens: [screen], seconds: 20 });
 
 function day(date: string): PrayerDay {
   return {
@@ -77,27 +79,27 @@ test('jamat follows the fixed column, then adhan plus offset', () => {
 });
 
 test('ordinary daytime shows the base screen', () => {
-  assert.equal(pickScreen(state('10:00'), 'main'), 'main');
-  assert.equal(pickScreen(state('10:00'), 'rad'), 'rad');
-  assert.equal(pickScreen(state('10:00'), 'lobby'), 'lobby');
+  assert.equal(pickScreen(state('10:00'), only('main')), 'main');
+  assert.equal(pickScreen(state('10:00'), only('rad')), 'rad');
+  assert.equal(pickScreen(state('10:00'), only('lobby')), 'lobby');
 });
 
 test('iqamah countdown starts ten minutes before iqamah', () => {
-  assert.equal(pickScreen(state('13:49'), 'main'), 'main');
-  assert.equal(pickScreen(state('13:51'), 'main'), 'iqamah');
-  assert.equal(pickScreen(state('14:00'), 'main'), 'main');
+  assert.equal(pickScreen(state('13:49'), only('main')), 'main');
+  assert.equal(pickScreen(state('13:51'), only('main')), 'iqamah');
+  assert.equal(pickScreen(state('14:00'), only('main')), 'main');
 });
 
 test('plakat never switches away by itself', () => {
-  assert.equal(pickScreen(state('13:55'), 'plakat'), 'plakat');
-  assert.equal(pickScreen(state('23:00'), 'plakat'), 'plakat');
+  assert.equal(pickScreen(state('13:55'), only('plakat')), 'plakat');
+  assert.equal(pickScreen(state('23:00'), only('plakat')), 'plakat');
 });
 
 test('Isha lasts until Fajr: night screen from after Isha iqamah until Fajr azan', () => {
-  assert.equal(pickScreen(state('18:45'), 'main'), 'main');
-  assert.equal(pickScreen(state('19:05'), 'main'), 'hvile');
-  assert.equal(pickScreen(state('03:00'), 'main'), 'hvile');
-  assert.equal(pickScreen(state('06:10'), 'main'), 'main');
+  assert.equal(pickScreen(state('18:45'), only('main')), 'main');
+  assert.equal(pickScreen(state('19:05'), only('main')), 'hvile');
+  assert.equal(pickScreen(state('03:00'), only('main')), 'hvile');
+  assert.equal(pickScreen(state('06:10'), only('main')), 'main');
   const late = nowAndNext(state('23:40'));
   assert.equal(late.current?.name, 'isha');
   assert.equal(late.next?.name, 'fajr');
@@ -115,33 +117,54 @@ test('Fajr stops being current when Fajr ends', () => {
 
 test('Friday shows Jumuah from sunrise until half an hour after the last Jumuah', () => {
   const friday = '2026-11-27';
-  assert.equal(pickScreen(state('06:25', friday), 'main'), 'iqamah');
-  assert.equal(pickScreen(state('07:00', friday), 'main'), 'main');
-  assert.equal(pickScreen(state('09:00', friday), 'main'), 'jumuah');
-  assert.equal(pickScreen(state('12:40', friday), 'main'), 'jumuah');
-  assert.equal(pickScreen(state('13:55', friday), 'main'), 'iqamah');
-  assert.equal(pickScreen(state('14:40', friday), 'main'), 'jumuah');
-  assert.equal(pickScreen(state('14:50', friday), 'main'), 'main');
+  assert.equal(pickScreen(state('06:25', friday), only('main')), 'iqamah');
+  assert.equal(pickScreen(state('07:00', friday), only('main')), 'main');
+  assert.equal(pickScreen(state('09:00', friday), only('main')), 'jumuah');
+  assert.equal(pickScreen(state('12:40', friday), only('main')), 'jumuah');
+  assert.equal(pickScreen(state('13:55', friday), only('main')), 'iqamah');
+  assert.equal(pickScreen(state('14:40', friday), only('main')), 'jumuah');
+  assert.equal(pickScreen(state('14:50', friday), only('main')), 'main');
 });
 
 test('Ramadan: iftar screen from Asr, taraweeh after Maghrib, night after taraweeh', () => {
   const ramadan = { ramadanDay: 10 };
-  assert.equal(pickScreen(state('12:00', '2026-11-23', ramadan), 'main'), 'main');
-  assert.equal(pickScreen(state('14:30', '2026-11-23', ramadan), 'main'), 'ramadan');
-  assert.equal(pickScreen(state('15:30', '2026-11-23', ramadan), 'main'), 'taraweeh');
-  assert.equal(pickScreen(state('20:00', '2026-11-23', ramadan), 'main'), 'taraweeh');
-  assert.equal(pickScreen(state('20:20', '2026-11-23', ramadan), 'main'), 'hvile');
+  assert.equal(pickScreen(state('12:00', '2026-11-23', ramadan), only('main')), 'main');
+  assert.equal(pickScreen(state('14:30', '2026-11-23', ramadan), only('main')), 'ramadan');
+  assert.equal(pickScreen(state('15:30', '2026-11-23', ramadan), only('main')), 'taraweeh');
+  assert.equal(pickScreen(state('20:00', '2026-11-23', ramadan), only('main')), 'taraweeh');
+  assert.equal(pickScreen(state('20:20', '2026-11-23', ramadan), only('main')), 'hvile');
 });
 
 test('a pressed taraweeh pause shows the dua until it times out', () => {
   const until = osloWallClockToDate('2026-11-23', '19:30');
-  assert.equal(pickScreen(state('19:28', '2026-11-23', { ramadanDay: 10, duaUntil: until }), 'main'), 'dua');
-  assert.equal(pickScreen(state('19:31', '2026-11-23', { ramadanDay: 10, duaUntil: until }), 'main'), 'taraweeh');
+  assert.equal(pickScreen(state('19:28', '2026-11-23', { ramadanDay: 10, duaUntil: until }), only('main')), 'dua');
+  assert.equal(pickScreen(state('19:31', '2026-11-23', { ramadanDay: 10, duaUntil: until }), only('main')), 'taraweeh');
 });
 
 test('Eid morning wins until half an hour after the last Eid prayer', () => {
   const eidPrayers = ['08:00', '09:00'].map((time) => osloWallClockToDate('2026-11-23', time));
-  assert.equal(pickScreen(state('07:12', '2026-11-23', { eidPrayers }), 'main'), 'eid');
-  assert.equal(pickScreen(state('09:25', '2026-11-23', { eidPrayers }), 'main'), 'eid');
-  assert.equal(pickScreen(state('09:35', '2026-11-23', { eidPrayers }), 'main'), 'main');
+  assert.equal(pickScreen(state('07:12', '2026-11-23', { eidPrayers }), only('main')), 'eid');
+  assert.equal(pickScreen(state('09:25', '2026-11-23', { eidPrayers }), only('main')), 'eid');
+  assert.equal(pickScreen(state('09:35', '2026-11-23', { eidPrayers }), only('main')), 'main');
+});
+
+test('rotation steps through the chosen screens every n seconds', () => {
+  const rotation = { screens: ['lobby', 'plakat'] as BaseScreen[], seconds: 20 };
+  const at = (ms: number) => rotationScreen(rotation, new Date(ms));
+  assert.equal(at(0), 'lobby');
+  assert.equal(at(19_999), 'lobby');
+  assert.equal(at(20_000), 'plakat');
+  assert.equal(at(40_000), 'lobby');
+});
+
+test('auto screens take over a rotation, plakat included', () => {
+  const rotation = { screens: ['lobby', 'plakat'] as BaseScreen[], seconds: 20 };
+  assert.equal(pickScreen(state('13:55'), rotation), 'iqamah');
+  assert.equal(pickScreen(state('23:00'), rotation), 'hvile');
+});
+
+test('iqamah lead follows the mosque setting', () => {
+  const rotation = { screens: ['main'] as BaseScreen[], seconds: 20, iqamahLead: 5 };
+  assert.equal(pickScreen(state('13:51'), rotation), 'main');
+  assert.equal(pickScreen(state('13:56'), rotation), 'iqamah');
 });

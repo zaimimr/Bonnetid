@@ -1,296 +1,220 @@
-import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, useTVEventHandler, View } from 'react-native';
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
+import { BackHandler, Pressable, ScrollView, StyleSheet, Text, TVEventControl, useTVEventHandler, View } from 'react-native';
 import { T } from './kit';
 import { SCREEN_NAMES, SCREENS } from './screens';
-import { ART_OPTIONS, DUA_FONTS, HALL_OPTIONS, useTaraweeh, useTvSettings } from './settings';
+import {
+  ART_OPTIONS,
+  DUA_FONTS,
+  HALL_OPTIONS,
+  IQAMAH_LEADS,
+  rotationOf,
+  screenOptionsOf,
+  useTaraweeh,
+  useTvSettings,
+  type HideKey,
+} from './settings';
 import { BRAND_OPTIONS, brandColors, ink } from './theme';
-import { pickScreen, type BaseScreen, type ScreenId } from './tvModel';
+import { ROTATION_SECONDS, rotationScreen, rotationSlot, type BaseScreen, type ScreenId } from './tvModel';
 import { useMosqueList, useTvData } from './useTvData';
 
 type Choice = { name: string; help?: string; swatch?: string; font?: string };
 
-type Setting = {
+type Item = {
   key: string;
   label: string;
   help: string;
-  screen: ScreenId;
-  value: string;
+  screen?: ScreenId;
+  value?: string;
+  checked?: boolean;
+  swatch?: string;
+  preferred?: boolean;
   choices?: Choice[];
   index?: number;
   pick?: (index: number) => void;
   press?: () => void;
+  move?: (dir: -1 | 1) => void;
+  focus?: () => void;
+  play?: boolean;
 };
 
-const BASES: { id: BaseScreen; help: string }[] = [
-  { id: 'main', help: 'Alle dagens bønnetider i stort format. Passer i bønnesalen.' },
-  { id: 'lobby', help: 'Neste bønn, dagens tider og kunngjøringer. Passer ved inngangen.' },
-  { id: 'plakat', help: 'Kunngjøringer og Vipps-kode i stort format.' },
-  { id: 'rad', help: 'Dagens tider med en tegning og navnet på rommet.' },
+type PageSpec = {
+  title: string;
+  lead?: string;
+  items: Item[];
+  play?: boolean;
+  orgNr?: string | null;
+  hint?: string;
+};
+
+const BASES: BaseScreen[] = ['main', 'lobby', 'plakat', 'rad'];
+const BASE_HELP: Record<BaseScreen, string> = {
+  main: 'Alle dagens bønnetider i stort format. Passer i bønnesalen.',
+  lobby: 'Neste bønn, dagens tider og kunngjøringer. Passer ved inngangen.',
+  plakat: 'Kunngjøringer og Vipps-kode i stort format.',
+  rad: 'Dagens tider med en tegning og navnet på rommet.',
+};
+const AUTO_HELP = 'Kommer av seg selv når det er tid: Iqamah, Jumuah, Ramadan, natt og Eid.';
+const PLACES: { name: string; help: string; rotation: BaseScreen[]; seconds?: number; hall?: string }[] = [
+  { name: 'Bønnesal', help: 'Viser alle dagens bønnetider i stort format.', rotation: ['main'] },
+  { name: 'Inngang', help: 'Bytter mellom neste bønn og kunngjøringer hvert 20. sekund.', rotation: ['lobby', 'plakat'], seconds: 20 },
+  { name: 'Kvinneavdeling', help: 'Dagens tider med navnet på rommet øverst.', rotation: ['rad'], hall: 'Kvinneavdelingen' },
+  {
+    name: 'Kafé eller annet rom',
+    help: 'Bytter mellom kunngjøringer, neste bønn og alle dagens tider.',
+    rotation: ['plakat', 'lobby', 'main'],
+    seconds: 20,
+  },
 ];
+const SECONDS_SUB: Record<number, string> = { 10: 'Raskt', 20: 'Anbefalt', 30: 'Rolig', 60: 'Svært rolig' };
 const BRAND_NAMES = ['Grønn', 'Blå', 'Vinrød', 'Lilla'];
 const ART_NAMES = ['Moské', 'Kaaba', 'Lykt', 'Måne og stjerner', 'Ingen tegning'];
 const FONT_NAMES = ['Amiri', 'Scheherazade', 'Naskh', 'Kufi', 'Ruqaa', 'Nastaliq'];
-const SHOW_HIDE: Choice[] = [{ name: 'Vis' }, { name: 'Skjul' }];
-const PREVIEWS = Object.keys(SCREENS) as ScreenId[];
+const CUSTOMIZABLE: ScreenId[] = ['main', 'lobby', 'plakat', 'rad', 'iqamah', 'jumuah', 'dua', 'hvile'];
+const ALL_SCREENS = Object.keys(SCREENS) as ScreenId[];
+const WIZARD_STEP: Record<string, number> = {
+  'w-city': 1,
+  'w-mosque': 1,
+  'w-place': 2,
+  'w-rotation': 3,
+  'w-seconds': 4,
+  'w-color': 5,
+  'w-done': 6,
+};
 const SCALE = 0.5;
+const HINT = '▲ ▼ flytter. OK velger. Tilbake-knappen går ett steg tilbake. Alt lagres med en gang.';
 
-function Row({
-  setting,
-  focused,
-  first,
-  onFocus,
-}: {
-  setting: Setting;
-  focused: boolean;
-  first: boolean;
-  onFocus: () => void;
-}) {
-  const onPress = setting.press ?? (() => setting.pick?.(((setting.index ?? 0) + 1) % (setting.choices?.length ?? 1)));
-  const arrows = focused && setting.choices && setting.choices.length > 1;
+function joinNames(names: string[]): string {
+  if (names.length < 2) return names.join('');
+  return `${names.slice(0, -1).join(', ')} og ${names[names.length - 1]}`;
+}
+
+function placeName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/(^|[\s-])(\p{L})/gu, (match, gap: string, letter: string) => gap + letter.toUpperCase())
+    .replace(/ (I|Og|På) /g, (word) => word.toLowerCase());
+}
+
+function countMosques(count: number): string {
+  return `${count} ${count === 1 ? 'moské' : 'moskeer'}`;
+}
+
+function Row({ item, focused, onFocus }: { item: Item; focused: boolean; onFocus: () => void }) {
+  const onPress = item.press ?? (() => item.pick?.(((item.index ?? 0) + 1) % (item.choices?.length ?? 1)));
+  const arrows = focused && item.choices && item.choices.length > 1;
   return (
-    <Pressable onPress={onPress} onFocus={onFocus} hasTVPreferredFocus={first} style={[s.row, focused && s.rowFocused]}>
+    <Pressable onPress={onPress} onFocus={onFocus} hasTVPreferredFocus={item.preferred} style={[s.row, focused && s.rowFocused]}>
+      {item.checked != null ? (
+        <View style={[s.box, item.checked && s.boxOn, focused && s.boxFocused]}>
+          {item.checked ? <T style={s.check}>✓</T> : null}
+        </View>
+      ) : null}
+      {item.swatch ? <View style={[s.swatch, { backgroundColor: item.swatch }]} /> : null}
       <T style={[s.rowLabel, focused && s.onDark]} lines={1}>
-        {setting.label}
+        {item.label}
       </T>
       <T style={[s.rowValue, focused && s.onDark]} lines={1}>
-        {arrows ? `‹  ${setting.value}  ›` : setting.value}
+        {arrows ? `‹  ${item.value ?? ''}  ›` : (item.value ?? '')}
       </T>
     </Pressable>
   );
 }
 
-function Preview({ screen, now }: { screen: ScreenId; now: Date }) {
+function Preview({ screen, play, orgNr, now }: { screen: ScreenId; play: boolean; orgNr: string | null; now: Date }) {
   const settings = useTvSettings();
   const pauses = useTaraweeh((state) => state.pauses);
-  const { data } = useTvData(settings.orgNr, now);
+  const { data } = useTvData(orgNr, now);
   const brand = useMemo(() => brandColors(settings.brand), [settings.brand]);
-  if (!data) {
-    return (
-      <View style={[s.frame, s.frameEmpty]}>
-        <T style={s.help}>Henter bønnetider</T>
-      </View>
-    );
-  }
-  const Screen = SCREENS[screen];
+  const rotation = rotationOf(settings);
+  const playing = play && rotation.screens.length > 1;
+  const shown = playing ? rotationScreen(rotation, now) : screen;
+  const slot = rotationSlot(rotation, now);
+  const period = rotation.seconds * 1000;
+  const progress = ((now.getTime() % period) + 1000) / period;
+  const Screen = SCREENS[shown];
   return (
-    <View style={s.frame}>
-      <View style={s.stage}>
-        <Screen
-          now={now}
-          mosque={data.mosque}
-          state={{ ...data.state, now, duaUntil: null }}
-          brand={brand}
-          art={settings.art}
-          duaFont={settings.duaFont}
-          translation={settings.translation}
-          texture={settings.texture}
-          hall={settings.hall}
-          pauses={Math.max(1, pauses)}
-        />
-      </View>
-    </View>
-  );
-}
-
-export function MosquePicker({ onDone }: { onDone: () => void }) {
-  const list = useMosqueList();
-  const orgNr = useTvSettings((state) => state.orgNr);
-  const set = useTvSettings((state) => state.set);
-  const mosques = useMemo(
-    () => [...(list.data ?? [])].sort((a, b) => a.name.localeCompare(b.name, 'nb')),
-    [list.data],
-  );
-  return (
-    <View style={s.page}>
-      <View style={s.pickerHead}>
-        <T style={s.title}>Velg moské</T>
-        <T style={s.help}>Bønnetidene på skjermen hentes fra moskeen du velger. Bla med ▲ ▼ og trykk OK.</T>
-      </View>
-      {list.data ? (
-        <ScrollView style={s.pickerList}>
-          {mosques.map((item, index) => (
-            <Pressable
-              key={item.org_nr}
-              hasTVPreferredFocus={orgNr ? item.org_nr === orgNr : index === 0}
-              onPress={() => {
-                set({ orgNr: item.org_nr });
-                onDone();
-              }}
-              style={({ focused }) => [s.row, s.pickerRow, focused && s.rowFocused]}
-            >
-              {({ focused }) => (
-                <>
-                  <T style={[s.rowLabel, focused && s.onDark]} lines={1}>
-                    {item.name}
-                  </T>
-                  <T style={[s.rowValue, focused && s.onDark]} lines={1}>
-                    {item.address ?? ''}
-                  </T>
-                </>
-              )}
-            </Pressable>
-          ))}
-        </ScrollView>
+    <View style={s.previewBox}>
+      {data ? (
+        <View style={s.frame}>
+          <View style={s.stage}>
+            <Screen
+              now={now}
+              mosque={data.mosque}
+              state={{ ...data.state, now, duaUntil: null }}
+              brand={brand}
+              {...screenOptionsOf(settings)}
+              pauses={Math.max(1, pauses)}
+            />
+          </View>
+        </View>
       ) : (
-        <T style={s.help}>{list.isError ? 'Fikk ikke hentet moskeene. Prøver igjen snart.' : 'Henter moskeer'}</T>
+        <View style={[s.frame, s.frameEmpty]}>
+          <T style={s.help}>{orgNr ? 'Henter bønnetider' : 'Velg en moské for å se skjermen'}</T>
+        </View>
       )}
+      {playing ? (
+        <View style={s.segments}>
+          {rotation.screens.map((id, index) => (
+            <View key={id} style={s.segment}>
+              <View style={s.track}>
+                <View style={[s.fill, { width: `${index === slot ? Math.min(1, progress) * 100 : index < slot ? 100 : 0}%` }]} />
+              </View>
+              <T style={[s.segmentLabel, index === slot && s.segmentOn]} lines={1}>
+                {SCREEN_NAMES[id]}
+              </T>
+            </View>
+          ))}
+        </View>
+      ) : null}
     </View>
   );
 }
 
-export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
-  const settings = useTvSettings();
-  const list = useMosqueList();
-  const { data } = useTvData(settings.orgNr, now);
-  const [picking, setPicking] = useState(settings.orgNr == null);
-  const [focusKey, setFocusKey] = useState('mosque');
-  const { set } = settings;
-  const auto = data ? pickScreen({ ...data.state, now, duaUntil: null }, settings.base) : settings.base;
-  const close = () => {
-    set({ preview: null });
-    onClose();
-  };
-
-  const baseIndex = Math.max(0, BASES.findIndex((base) => base.id === settings.base));
-  const brandIndex = Math.max(0, BRAND_OPTIONS.indexOf(settings.brand as (typeof BRAND_OPTIONS)[number]));
-  const artIndex = ART_OPTIONS.indexOf(settings.art);
-  const hallIndex = Math.max(0, HALL_OPTIONS.indexOf(settings.hall as (typeof HALL_OPTIONS)[number]));
-  const fontIndex = DUA_FONTS.indexOf(settings.duaFont);
-  const previewIndex = settings.preview ? PREVIEWS.indexOf(settings.preview) + 1 : 0;
-  const mosque = list.data?.find((item) => item.org_nr === settings.orgNr);
-
-  const all: (Setting | false)[] = [
-    {
-      key: 'mosque',
-      label: 'Moské',
-      help: 'Bønnetidene på skjermen hentes fra denne moskeen. Trykk OK for å velge en annen.',
-      screen: settings.base,
-      value: mosque?.name ?? '',
-      press: () => setPicking(true),
-    },
-    {
-      key: 'base',
-      label: 'Skjermtype',
-      help: 'Hva skjermen viser til vanlig. Ved iqamah, Jumuah, Ramadan og om natten bytter den selv.',
-      screen: settings.base,
-      value: SCREEN_NAMES[settings.base],
-      choices: BASES.map((base) => ({ name: SCREEN_NAMES[base.id], help: base.help })),
-      index: baseIndex,
-      pick: (index) => set({ base: BASES[index].id }),
-    },
-    {
-      key: 'brand',
-      label: 'Farge',
-      help: 'Hovedfargen på skjermen.',
-      screen: settings.base,
-      value: BRAND_NAMES[brandIndex],
-      choices: BRAND_OPTIONS.map((hex, index) => ({ name: BRAND_NAMES[index], swatch: hex })),
-      index: brandIndex,
-      pick: (index) => set({ brand: BRAND_OPTIONS[index] }),
-    },
-    settings.base === 'rad' && {
-      key: 'art',
-      label: 'Tegning',
-      help: 'Tegningen som vises på skjermen.',
-      screen: 'rad',
-      value: ART_NAMES[artIndex],
-      choices: ART_NAMES.map((name) => ({ name })),
-      index: artIndex,
-      pick: (index) => set({ art: ART_OPTIONS[index] }),
-    },
-    settings.base === 'rad' && {
-      key: 'hall',
-      label: 'Navn på rommet',
-      help: 'Vises øverst på skjermen, under navnet på moskeen.',
-      screen: 'rad',
-      value: settings.hall,
-      choices: HALL_OPTIONS.map((name) => ({ name })),
-      index: hallIndex,
-      pick: (index) => set({ hall: HALL_OPTIONS[index] }),
-    },
-    {
-      key: 'texture',
-      label: 'Mønster i bakgrunnen',
-      help: 'Et svakt islamsk stjernemønster bak innholdet.',
-      screen: settings.base,
-      value: settings.texture ? 'Vis' : 'Skjul',
-      choices: SHOW_HIDE,
-      index: settings.texture ? 0 : 1,
-      pick: (index) => set({ texture: index === 0 }),
-    },
-    {
-      key: 'font',
-      label: 'Skrift for duaen',
-      help: 'Under Ramadan vises duaen mellom hver fjerde rakat i taraweeh. Velg skriften den vises med.',
-      screen: 'dua',
-      value: FONT_NAMES[fontIndex],
-      choices: DUA_FONTS.map((font, index) => ({ name: FONT_NAMES[index], font: `${font}_400Regular` })),
-      index: fontIndex,
-      pick: (index) => set({ duaFont: DUA_FONTS[index] }),
-    },
-    {
-      key: 'translation',
-      label: 'Norsk oversettelse av duaen',
-      help: 'Viser norsk tekst under den arabiske duaen.',
-      screen: 'dua',
-      value: settings.translation ? 'Vis' : 'Skjul',
-      choices: SHOW_HIDE,
-      index: settings.translation ? 0 : 1,
-      pick: (index) => set({ translation: index === 0 }),
-    },
-    {
-      key: 'preview',
-      label: 'Se de andre skjermene',
-      help: 'Skjermen bytter selv gjennom dagen. Her kan du se hvordan hver av dem ser ut. Det endrer ingenting.',
-      screen: settings.preview ?? auto,
-      value: settings.preview ? SCREEN_NAMES[settings.preview] : 'Akkurat nå',
-      choices: [{ name: 'Akkurat nå' }, ...PREVIEWS.map((id) => ({ name: SCREEN_NAMES[id] }))],
-      index: previewIndex,
-      pick: (index) => set({ preview: index === 0 ? null : PREVIEWS[index - 1] }),
-    },
-    {
-      key: 'done',
-      label: 'Ferdig',
-      help: 'Alt er lagret. Trykk OK for å gå tilbake til skjermen.',
-      screen: auto,
-      value: '',
-      press: close,
-    },
-  ];
-  const rows = all.filter((row): row is Setting => row !== false);
-  const focused = rows.find((row) => row.key === focusKey) ?? rows[0];
+function Page({ spec, step, note, now }: { spec: PageSpec; step?: number; note?: string; now: Date }) {
+  const initial = spec.items.find((item) => item.preferred) ?? spec.items[0];
+  const [focusKey, setFocusKey] = useState(initial?.key ?? '');
+  const orgNr = useTvSettings((state) => state.orgNr);
+  const focused = spec.items.find((item) => item.key === focusKey) ?? initial;
+  const items = spec.items.map((item) => (item.key === initial?.key ? { ...item, preferred: true } : { ...item, preferred: false }));
 
   useTVEventHandler((event) => {
-    if (picking || !focused.choices || !focused.pick) return;
-    const length = focused.choices.length;
-    const index = focused.index ?? 0;
-    if (event.eventType === 'right') focused.pick((index + 1) % length);
-    if (event.eventType === 'left') focused.pick((index - 1 + length) % length);
+    if (!focused || (event.eventType !== 'left' && event.eventType !== 'right')) return;
+    const dir = event.eventType === 'right' ? 1 : -1;
+    if (focused.choices && focused.pick) {
+      const length = focused.choices.length;
+      focused.pick(((focused.index ?? 0) + dir + length) % length);
+      return;
+    }
+    focused.move?.(dir);
   });
 
-  if (picking) return <MosquePicker onDone={() => setPicking(false)} />;
-
+  const helpText = focused?.choices?.[focused.index ?? 0]?.help ?? focused?.help ?? '';
   return (
     <View style={[s.page, s.split]}>
       <View style={s.left}>
-        <T style={s.title}>Innstillinger</T>
-        <View style={s.rows}>
-          {rows.map((row, index) => (
+        {step ? <T style={s.step}>{`Steg ${step} av 6`}</T> : null}
+        <T style={s.title}>{spec.title}</T>
+        {spec.lead ? <T style={s.lead}>{spec.lead}</T> : null}
+        <ScrollView style={s.list} contentContainerStyle={s.rows}>
+          {items.map((item) => (
             <Row
-              key={row.key}
-              setting={row}
-              first={index === 0}
-              focused={row.key === focused.key}
-              onFocus={() => setFocusKey(row.key)}
+              key={item.key}
+              item={item}
+              focused={item.key === focused?.key}
+              onFocus={() => {
+                setFocusKey(item.key);
+                item.focus?.();
+              }}
             />
           ))}
-        </View>
+        </ScrollView>
       </View>
       <View style={s.right}>
-        <Preview screen={focused.screen} now={now} />
-        <T style={s.focusLabel}>{focused.label}</T>
-        <T style={s.help}>{focused.choices?.[focused.index ?? 0]?.help ?? focused.help}</T>
-        {focused.choices ? (
+        <Preview screen={focused?.screen ?? 'main'} play={focused?.play ?? spec.play ?? false} orgNr={spec.orgNr ?? orgNr} now={now} />
+        {focused ? <T style={s.focusLabel}>{focused.label}</T> : null}
+        <T style={s.help}>{helpText}</T>
+        {note ? <T style={s.note}>{note}</T> : null}
+        {focused?.choices ? (
           <View style={s.chips}>
             {focused.choices.map((choice, index) => {
               const on = index === focused.index;
@@ -305,24 +229,520 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
           </View>
         ) : null}
         <View style={s.hintBox}>
-          <T style={s.hint}>▲ ▼ flytter mellom innstillingene. OK eller ◀ ▶ bytter valg. Alt lagres med en gang.</T>
+          <T style={s.hint}>{spec.hint ?? HINT}</T>
         </View>
       </View>
     </View>
   );
 }
 
+export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
+  const settings = useTvSettings();
+  const list = useMosqueList();
+  const [route, setRoute] = useState<string[]>(() => [settings.configured && settings.orgNr ? 'menu' : 'w-city']);
+  const [city, setCity] = useState<string | null>(null);
+  const [candidate, setCandidate] = useState<string | null>(null);
+  const [note, setNote] = useState<string | undefined>(undefined);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { set } = settings;
+  const top = route[route.length - 1];
+  const wizard = top.startsWith('w-');
+
+  const go = (next: string) => {
+    setNote(undefined);
+    setRoute([...route, next]);
+  };
+  const back = () => {
+    setNote(undefined);
+    if (route.length > 1) {
+      setRoute(route.slice(0, -1));
+      return;
+    }
+    if (settings.configured && settings.orgNr) close();
+  };
+  const close = () => {
+    set({ preview: null });
+    onClose();
+  };
+  const onBack = useEffectEvent(back);
+
+  useEffect(() => {
+    TVEventControl.enableTVMenuKey();
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      onBack();
+      return true;
+    });
+    return () => {
+      sub.remove();
+      TVEventControl.disableTVMenuKey();
+    };
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
+
+  const cities = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const mosque of list.data ?? []) {
+      const name = mosque.post?.city ?? 'Andre steder';
+      counts.set(name, (counts.get(name) ?? 0) + 1);
+    }
+    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'nb'));
+  }, [list.data]);
+  const current = list.data?.find((mosque) => mosque.org_nr === settings.orgNr);
+  const rotationNames = settings.rotation.map((id) => SCREEN_NAMES[id]);
+  const brandIndex = Math.max(0, BRAND_OPTIONS.indexOf(settings.brand as (typeof BRAND_OPTIONS)[number]));
+  const secondsIndex = Math.max(0, ROTATION_SECONDS.indexOf(settings.seconds as (typeof ROTATION_SECONDS)[number]));
+
+  const preview = (orgNr: string) => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => setCandidate(orgNr), 700);
+  };
+
+  const toggle = (key: HideKey): Item => {
+    const shown = !settings.hide.includes(key);
+    return {
+      key,
+      label: '',
+      help: '',
+      checked: shown,
+      value: shown ? 'Vises' : 'Skjult',
+      press: () => set({ hide: shown ? [...settings.hide, key] : settings.hide.filter((item) => item !== key) }),
+    };
+  };
+  const shown = (key: HideKey, label: string, help: string, screen: ScreenId): Item => ({ ...toggle(key), label, help, screen });
+  const choice = <V,>(
+    key: string,
+    label: string,
+    help: string,
+    screen: ScreenId,
+    options: readonly V[],
+    names: string[],
+    value: V,
+    apply: (value: V) => void,
+    extra?: (index: number) => Partial<Choice>,
+  ): Item => {
+    const index = Math.max(0, options.indexOf(value));
+    return {
+      key,
+      label,
+      help,
+      screen,
+      value: names[index],
+      choices: names.map((name, i) => ({ name, ...extra?.(i) })),
+      index,
+      pick: (i) => apply(options[i]),
+    };
+  };
+  const visibility = (key: string, label: string, help: string, screen: ScreenId, value: boolean, apply: (value: boolean) => void): Item => ({
+    key,
+    label,
+    help,
+    screen,
+    checked: value,
+    value: value ? 'Vises' : 'Skjult',
+    press: () => apply(!value),
+  });
+
+  const rotationItems = (): Item[] => {
+    const order = [...settings.rotation, ...BASES.filter((id) => !settings.rotation.includes(id))];
+    return order.map((id) => {
+      const position = settings.rotation.indexOf(id);
+      const on = position >= 0;
+      return {
+        key: id,
+        label: SCREEN_NAMES[id],
+        help: BASE_HELP[id],
+        screen: id,
+        checked: on,
+        value: on ? `Nr. ${position + 1}` : 'Av',
+        press: () => {
+          if (on && settings.rotation.length === 1) {
+            setNote('Minst én skjerm må være på.');
+            return;
+          }
+          setNote(undefined);
+          set({ rotation: on ? settings.rotation.filter((item) => item !== id) : [...settings.rotation, id] });
+        },
+        move: (dir) => {
+          const target = position + dir;
+          if (!on || target < 0 || target >= settings.rotation.length) return;
+          const next = [...settings.rotation];
+          next[position] = next[target];
+          next[target] = id;
+          set({ rotation: next });
+        },
+      };
+    });
+  };
+  const rotationHint = 'OK slår skjermen av eller på. ◀ ▶ flytter den frem eller bak i rekkefølgen. Tilbake-knappen går ett steg tilbake.';
+
+  const cityPage = (title: string, step: string): PageSpec => ({
+    title,
+    lead: 'Velg stedet moskeen ligger.',
+    orgNr: settings.orgNr,
+    items: list.data
+      ? cities.map(([name, count]) => ({
+          key: name,
+          label: placeName(name),
+          help: `${countMosques(count)} i ${placeName(name)}.`,
+          value: countMosques(count),
+          preferred: current?.post?.city === name,
+          press: () => {
+            setCity(name);
+            setCandidate(null);
+            go(step);
+          },
+        }))
+      : [
+          {
+            key: 'loading',
+            label: list.isError ? 'Fikk ikke hentet moskeene' : 'Henter moskeer',
+            help: list.isError ? 'Prøver igjen snart.' : '',
+          },
+        ],
+  });
+  const mosquePage = (after: () => void): PageSpec => ({
+    title: city ? placeName(city) : 'Moské',
+    lead: 'Velg moskeen. Skjermen til høyre viser bønnetidene dens.',
+    orgNr: candidate ?? settings.orgNr,
+    items: (list.data ?? [])
+      .filter((mosque) => (mosque.post?.city ?? 'Andre steder') === city)
+      .sort((a, b) => a.name.localeCompare(b.name, 'nb'))
+      .map((mosque) => ({
+        key: mosque.org_nr,
+        label: mosque.name,
+        value: mosque.address ?? '',
+        help: [mosque.address, mosque.post ? `${mosque.post.code} ${placeName(mosque.post.city)}` : null].filter(Boolean).join(', '),
+        preferred: mosque.org_nr === settings.orgNr,
+        focus: () => preview(mosque.org_nr),
+        press: () => {
+          set({ orgNr: mosque.org_nr });
+          setCandidate(null);
+          after();
+        },
+      })),
+  });
+
+  const screenPage = (id: ScreenId): PageSpec => {
+    const pages: Record<ScreenId, Item[]> = {
+      main: [
+        shown('main.fajrEnd', 'Fajr slutter', 'Viser når tiden for Fajr er ute.', 'main'),
+        shown('main.timeline', 'Tidslinje', 'En linje nederst som viser hvor langt dagen har kommet.', 'main'),
+        shown('main.note', 'Kunngjøring og Vipps', 'Moskeens kunngjøring og Vipps-nummer.', 'main'),
+        shown('main.hijri', 'Hijri-dato', 'Den islamske datoen ved siden av vanlig dato.', 'main'),
+      ],
+      lobby: [
+        shown('lobby.times', 'Dagens tider', 'Alle dagens bønnetider i en liste.', 'lobby'),
+        shown('lobby.note', 'Kunngjøring', 'Moskeens kunngjøring.', 'lobby'),
+        shown('lobby.vipps', 'Vipps-kode', 'Vipps-nummeret for gaver.', 'lobby'),
+      ],
+      plakat: [
+        shown('plakat.note', 'Kunngjøring', 'Moskeens kunngjøring.', 'plakat'),
+        shown('plakat.vipps', 'Vipps-kode', 'Vipps-nummeret for gaver.', 'plakat'),
+      ],
+      rad: [
+        choice('art', 'Tegning', 'Tegningen som vises på skjermen.', 'rad', ART_OPTIONS, ART_NAMES, settings.art, (art) => set({ art })),
+        choice(
+          'hall',
+          'Navn på rommet',
+          'Vises øverst, under navnet på moskeen.',
+          'rad',
+          HALL_OPTIONS,
+          [...HALL_OPTIONS],
+          settings.hall as (typeof HALL_OPTIONS)[number],
+          (hall) => set({ hall }),
+        ),
+        shown('rad.fajrEnd', 'Fajr slutter', 'Viser når tiden for Fajr er ute.', 'rad'),
+        shown('rad.timeline', 'Tidslinje', 'En linje som viser hvor langt dagen har kommet.', 'rad'),
+      ],
+      iqamah: [
+        choice(
+          'lead',
+          'Start nedtellingen',
+          'Hvor lenge før iqamah skjermen begynner å telle ned.',
+          'iqamah',
+          IQAMAH_LEADS,
+          IQAMAH_LEADS.map((minutes) => `${minutes} min før`),
+          settings.iqamahLead as (typeof IQAMAH_LEADS)[number],
+          (iqamahLead) => set({ iqamahLead }),
+        ),
+        shown('iqamah.tips', 'Påminnelser', 'Korte påminnelser under nedtellingen, som å slå av mobilen.', 'iqamah'),
+      ],
+      jumuah: [shown('jumuah.vipps', 'Fredagsinnsamling', 'Vipps-nummeret for fredagsinnsamlingen.', 'jumuah')],
+      dua: [
+        choice(
+          'font',
+          'Skrift',
+          'Skriften den arabiske duaen vises med.',
+          'dua',
+          DUA_FONTS,
+          FONT_NAMES,
+          settings.duaFont,
+          (duaFont) => set({ duaFont }),
+          (i) => ({ font: `${DUA_FONTS[i]}_400Regular` }),
+        ),
+        visibility('translation', 'Norsk oversettelse', 'Norsk tekst under den arabiske duaen.', 'dua', settings.translation, (translation) =>
+          set({ translation }),
+        ),
+      ],
+      hvile: [
+        {
+          key: 'dim',
+          label: 'Demp skjermen',
+          help: 'Gjør skjermen mørkere om natten, fra Isha til Fajr.',
+          screen: 'hvile' as const,
+          checked: settings.dim,
+          value: settings.dim ? 'På' : 'Av',
+          press: () => set({ dim: !settings.dim }),
+        },
+      ],
+      ramadan: [],
+      taraweeh: [],
+      eid: [],
+    };
+    const items = pages[id];
+    return { title: SCREEN_NAMES[id], lead: 'Velg hva som vises. Skjermen til høyre endrer seg med en gang.', items };
+  };
+
+  const secondsItems = (after?: () => void): Item[] =>
+    ROTATION_SECONDS.map((seconds) => ({
+      key: `${seconds}`,
+      label: `${seconds} sekunder`,
+      value: SECONDS_SUB[seconds],
+      help: `Hver skjerm vises i ${seconds} sekunder før neste kommer.`,
+      checked: settings.seconds === seconds,
+      preferred: settings.seconds === seconds,
+      focus: () => set({ seconds }),
+      press: after ?? (() => set({ seconds })),
+    }));
+
+  const specFor = (key: string): PageSpec => {
+    switch (key) {
+      case 'w-city':
+        return cityPage('Hvilken moské er skjermen i?', 'w-mosque');
+      case 'w-mosque':
+        return mosquePage(() => go('w-place'));
+      case 'w-place':
+        return {
+          title: 'Hvor henger skjermen?',
+          lead: 'Vi velger skjermene for deg. Du kan endre alt etterpå.',
+          items: PLACES.map((place) => ({
+            key: place.name,
+            label: place.name,
+            help: place.help,
+            screen: place.rotation[0],
+            value: place.rotation.length > 1 || SCREEN_NAMES[place.rotation[0]] !== place.name ? joinNames(place.rotation.map((id) => SCREEN_NAMES[id])) : '',
+            press: () => {
+              set({
+                rotation: place.rotation,
+                ...(place.seconds ? { seconds: place.seconds } : {}),
+                ...(place.hall ? { hall: place.hall } : {}),
+              });
+              go('w-rotation');
+            },
+          })),
+        };
+      case 'w-rotation':
+        return {
+          title: 'Hvilke skjermer skal vises?',
+          lead: AUTO_HELP,
+          hint: rotationHint,
+          items: [
+            ...rotationItems(),
+            {
+              key: 'next',
+              label: 'Neste',
+              help: `Skjermen viser ${joinNames(rotationNames)}.`,
+              play: true,
+              press: () => go(settings.rotation.length > 1 ? 'w-seconds' : 'w-color'),
+            },
+          ],
+        };
+      case 'w-seconds':
+        return {
+          title: 'Hvor lenge skal hver skjerm vises?',
+          lead: 'Se til høyre hvordan skjermene bytter.',
+          play: true,
+          items: secondsItems(() => go('w-color')),
+        };
+      case 'w-color':
+        return {
+          title: 'Hvilken farge?',
+          lead: 'Velg fargen som passer moskeen.',
+          play: true,
+          items: BRAND_OPTIONS.map((hex, index) => ({
+            key: hex,
+            label: BRAND_NAMES[index],
+            help: 'Fargen brukes på tidene og overskriftene.',
+            swatch: hex,
+            preferred: index === brandIndex,
+            focus: () => set({ brand: hex }),
+            press: () => go('w-done'),
+          })),
+        };
+      case 'w-done':
+        return {
+          title: 'Alt er klart',
+          lead: `Skjermen viser ${joinNames(rotationNames)}${settings.rotation.length > 1 ? ` og bytter hvert ${settings.seconds}. sekund` : ''}. ${AUTO_HELP} Hold inne OK på fjernkontrollen når du vil endre noe.`,
+          play: true,
+          items: [
+            {
+              key: 'start',
+              label: 'Start skjermen',
+              help: 'Alt er lagret.',
+              press: () => {
+                set({ configured: true });
+                close();
+              },
+            },
+          ],
+        };
+      case 'menu':
+        return {
+          title: 'Innstillinger',
+          play: true,
+          items: [
+            {
+              key: 'rotation',
+              label: 'Skjermrunden',
+              value: settings.rotation.length > 1 ? `${settings.rotation.length} skjermer, ${settings.seconds} s` : rotationNames[0],
+              help: 'Hvilke skjermer som vises, i hvilken rekkefølge og hvor lenge.',
+              press: () => go('rotation'),
+            },
+            {
+              key: 'screens',
+              label: 'Tilpass en skjerm',
+              value: '',
+              help: 'Velg hva som vises på hver skjerm.',
+              press: () => go('screens'),
+            },
+            {
+              key: 'look',
+              label: 'Utseende',
+              value: BRAND_NAMES[brandIndex],
+              help: 'Farge og mønster.',
+              press: () => go('look'),
+            },
+            {
+              key: 'mosque',
+              label: 'Moské',
+              value: current?.name ?? '',
+              help: 'Bønnetidene hentes fra denne moskeen.',
+              press: () => go('city'),
+            },
+            {
+              key: 'all',
+              label: 'Se alle skjermene',
+              value: '',
+              help: 'Se hvordan hver skjerm ser ut. Det endrer ingenting.',
+              press: () => go('all'),
+            },
+            {
+              key: 'restart',
+              label: 'Start oppsettet på nytt',
+              value: '',
+              help: 'Går gjennom alle stegene fra starten. Det du har valgt blir stående til du endrer det.',
+              press: () => {
+                set({ configured: false });
+                setRoute(['w-city']);
+              },
+            },
+            { key: 'done', label: 'Ferdig', value: '', help: 'Alt er lagret. Trykk OK for å gå tilbake til skjermen.', press: close },
+          ],
+        };
+      case 'rotation':
+        return {
+          title: 'Skjermrunden',
+          lead: AUTO_HELP,
+          hint: rotationHint,
+          items: [
+            ...rotationItems(),
+            {
+              key: 'seconds',
+              label: 'Tid per skjerm',
+              help: 'Hvor lenge hver skjerm vises før neste kommer.',
+              value: `${settings.seconds} sekunder`,
+              choices: ROTATION_SECONDS.map((seconds) => ({ name: `${seconds} s`, help: SECONDS_SUB[seconds] })),
+              index: secondsIndex,
+              play: true,
+              pick: (index) => set({ seconds: ROTATION_SECONDS[index] }),
+            },
+          ],
+        };
+      case 'screens':
+        return {
+          title: 'Tilpass en skjerm',
+          items: CUSTOMIZABLE.map((id) => ({
+            key: id,
+            label: SCREEN_NAMES[id],
+            help: settings.rotation.includes(id as BaseScreen) ? 'Med i skjermrunden.' : BASES.includes(id as BaseScreen) ? 'Ikke med i skjermrunden.' : 'Kommer av seg selv når det er tid.',
+            screen: id,
+            value: '›',
+            press: () => go(`screen:${id}`),
+          })),
+        };
+      case 'look':
+        return {
+          title: 'Utseende',
+          items: [
+            choice('brand', 'Farge', 'Hovedfargen på skjermen.', settings.rotation[0], BRAND_OPTIONS, BRAND_NAMES, settings.brand as (typeof BRAND_OPTIONS)[number], (brand) => set({ brand }), (i) => ({
+              swatch: BRAND_OPTIONS[i],
+            })),
+            visibility('texture', 'Mønster i bakgrunnen', 'Et svakt islamsk stjernemønster bak innholdet.', settings.rotation[0], settings.texture, (texture) =>
+              set({ texture }),
+            ),
+          ],
+        };
+      case 'city':
+        return cityPage('Moské', 'mosque');
+      case 'mosque':
+        return mosquePage(() => setRoute(['menu']));
+      case 'all':
+        return {
+          title: 'Se alle skjermene',
+          lead: 'Bla for å se hver skjerm. Det endrer ingenting.',
+          items: ALL_SCREENS.map((id) => ({
+            key: id,
+            label: SCREEN_NAMES[id],
+            help: BASES.includes(id as BaseScreen) ? BASE_HELP[id as BaseScreen] : 'Kommer av seg selv når det er tid.',
+            screen: id,
+          })),
+        };
+      default:
+        return screenPage(key.slice('screen:'.length) as ScreenId);
+    }
+  };
+
+  return (
+    <Page
+      key={`${top}-${list.data ? 'ready' : 'loading'}`}
+      spec={specFor(top)}
+      step={wizard ? WIZARD_STEP[top] : undefined}
+      note={note}
+      now={now}
+    />
+  );
+}
+
 const s = StyleSheet.create({
   page: { width: 1920, height: 1080, backgroundColor: ink.page, paddingHorizontal: 56, paddingVertical: 48 },
   split: { flexDirection: 'row', gap: 48 },
-  left: { width: 800, gap: 24 },
-  right: { flex: 1, gap: 20 },
-  title: { fontSize: 56, fontWeight: '800', color: ink.text },
-  rows: { gap: 8 },
+  left: { width: 800, gap: 16 },
+  right: { flex: 1, gap: 16 },
+  step: { fontSize: 28, fontWeight: '700', color: ink.muted },
+  title: { fontSize: 52, fontWeight: '800', color: ink.text },
+  lead: { fontSize: 30, lineHeight: 42, color: ink.body },
+  list: { flex: 1, marginTop: 8 },
+  rows: { gap: 8, paddingBottom: 24 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 24,
+    gap: 20,
     height: 80,
     paddingHorizontal: 28,
     borderRadius: 20,
@@ -331,11 +751,24 @@ const s = StyleSheet.create({
     borderColor: ink.line,
   },
   rowFocused: { backgroundColor: ink.text, borderColor: ink.text },
-  rowLabel: { fontSize: 34, fontWeight: '700', color: ink.text, flexShrink: 0 },
-  rowValue: { fontSize: 32, color: ink.body, flex: 1, textAlign: 'right' },
+  rowLabel: { fontSize: 34, fontWeight: '700', color: ink.text, flexShrink: 0, maxWidth: 520 },
+  rowValue: { fontSize: 30, color: ink.body, flex: 1, textAlign: 'right' },
   onDark: { color: ink.white },
+  box: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    borderWidth: 3,
+    borderColor: ink.mark,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  boxOn: { backgroundColor: ink.text, borderColor: ink.text },
+  boxFocused: { borderColor: ink.white },
+  check: { fontSize: 26, fontWeight: '800', color: ink.white },
   hintBox: { flex: 1, justifyContent: 'flex-end' },
   hint: { fontSize: 28, lineHeight: 38, color: ink.body },
+  previewBox: { gap: 12 },
   frame: {
     width: 1920 * SCALE,
     height: 1080 * SCALE,
@@ -354,8 +787,15 @@ const s = StyleSheet.create({
     top: (1080 * (SCALE - 1)) / 2,
     transform: [{ scale: SCALE }],
   },
-  focusLabel: { fontSize: 44, fontWeight: '800', color: ink.text, marginTop: 8 },
-  help: { fontSize: 32, lineHeight: 44, color: ink.body },
+  segments: { flexDirection: 'row', gap: 12, width: 1920 * SCALE },
+  segment: { flex: 1, gap: 6 },
+  track: { height: 8, borderRadius: 4, backgroundColor: ink.track, overflow: 'hidden' },
+  fill: { height: 8, backgroundColor: ink.text },
+  segmentLabel: { fontSize: 22, color: ink.muted },
+  segmentOn: { color: ink.text, fontWeight: '700' },
+  focusLabel: { fontSize: 40, fontWeight: '800', color: ink.text, marginTop: 4 },
+  help: { fontSize: 30, lineHeight: 42, color: ink.body },
+  note: { fontSize: 30, fontWeight: '700', color: ink.gold800 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   chip: {
     flexDirection: 'row',
@@ -372,7 +812,4 @@ const s = StyleSheet.create({
   chipText: { fontSize: 28, fontWeight: '600', color: ink.text },
   sample: { fontSize: 30, color: ink.text },
   swatch: { width: 32, height: 32, borderRadius: 16, borderWidth: 2, borderColor: ink.white },
-  pickerHead: { gap: 12, marginBottom: 24, maxWidth: 1400 },
-  pickerList: { flex: 1 },
-  pickerRow: { marginBottom: 8 },
 });

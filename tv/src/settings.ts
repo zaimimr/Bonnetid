@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { BRAND_OPTIONS } from './theme';
-import type { BaseScreen, ScreenId } from './tvModel';
+import type { BaseScreen, Rotation, ScreenId } from './tvModel';
 
 export const ART_OPTIONS = ['mosque', 'kaaba', 'lantern', 'moon', 'none'] as const;
 export type ArtChoice = (typeof ART_OPTIONS)[number];
@@ -10,11 +10,35 @@ export type ArtChoice = (typeof ART_OPTIONS)[number];
 export const DUA_FONTS = ['Amiri', 'ScheherazadeNew', 'NotoNaskhArabic', 'ReemKufi', 'ArefRuqaa', 'NotoNastaliqUrdu'] as const;
 export type DuaFont = (typeof DUA_FONTS)[number];
 
+export const HIDE_KEYS = [
+  'main.fajrEnd',
+  'main.timeline',
+  'main.note',
+  'main.hijri',
+  'lobby.times',
+  'lobby.note',
+  'lobby.vipps',
+  'plakat.note',
+  'plakat.vipps',
+  'rad.fajrEnd',
+  'rad.timeline',
+  'iqamah.tips',
+  'jumuah.vipps',
+] as const;
+export type HideKey = (typeof HIDE_KEYS)[number];
+
+export const IQAMAH_LEADS = [5, 10, 15] as const;
+
 export const HALL_OPTIONS = ['Hovedsalen', 'Kvinneavdelingen', 'Sal 2', 'Ungdomssalen', 'Kafeen'] as const;
 
-type TvSettings = {
+export type TvSettings = {
   orgNr: string | null;
-  base: BaseScreen;
+  configured: boolean;
+  rotation: BaseScreen[];
+  seconds: number;
+  iqamahLead: number;
+  hide: HideKey[];
+  dim: boolean;
   brand: string;
   art: ArtChoice;
   duaFont: DuaFont;
@@ -29,7 +53,12 @@ export const useTvSettings = create<TvSettings>()(
   persist(
     (set) => ({
       orgNr: null,
-      base: 'main',
+      configured: false,
+      rotation: ['main'],
+      seconds: 20,
+      iqamahLead: 10,
+      hide: [],
+      dim: false,
       brand: BRAND_OPTIONS[0],
       art: 'mosque',
       duaFont: 'Amiri',
@@ -41,11 +70,35 @@ export const useTvSettings = create<TvSettings>()(
     }),
     {
       name: 'tv-settings-v1',
+      version: 1,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: ({ set: _set, preview: _preview, ...rest }) => rest,
+      migrate: (persisted, version) => {
+        const old = persisted as Record<string, unknown>;
+        if (version >= 1) return old as never;
+        const { base, ...rest } = old;
+        return { ...rest, rotation: [base ?? 'main'], configured: old.orgNr != null } as never;
+      },
     },
   ),
 );
+
+export function rotationOf(settings: TvSettings): Rotation {
+  return { screens: settings.rotation, seconds: settings.seconds, iqamahLead: settings.iqamahLead };
+}
+
+export function screenOptionsOf(settings: TvSettings) {
+  return {
+    art: settings.art,
+    duaFont: settings.duaFont,
+    translation: settings.translation,
+    texture: settings.texture,
+    hall: settings.hall,
+    hide: settings.hide,
+    iqamahLead: settings.iqamahLead,
+    dim: settings.dim,
+  };
+}
 
 type Taraweeh = {
   night: string | null;

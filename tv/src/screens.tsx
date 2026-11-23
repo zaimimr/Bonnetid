@@ -22,10 +22,9 @@ import {
   Timeline,
   type StripItem,
 } from './kit';
-import type { ArtChoice, DuaFont } from './settings';
+import type { ArtChoice, DuaFont, HideKey } from './settings';
 import { ink, type Brand } from './theme';
 import {
-  IQAMAH_LEAD_MINUTES,
   nowAndNext,
   pauseInfo,
   taraweehStart,
@@ -47,7 +46,13 @@ export type Ctx = {
   texture: boolean;
   hall: string;
   pauses: number;
+  hide: readonly HideKey[];
+  iqamahLead: number;
+  dim: boolean;
 };
+
+const shows = (ctx: Ctx, key: HideKey) => !ctx.hide.includes(key);
+const withoutFajrEnd = (prayers: TvPrayer[]) => prayers.filter((p) => p.name !== 'fajr_endtime');
 
 const MINUTE = 60_000;
 
@@ -64,8 +69,8 @@ function vippsOf(mosque: Mosque) {
   return { number, url: vippsUrlFrom(mosque.vipps_url) };
 }
 
-function dateLine(ctx: Ctx, dark = false) {
-  const hijri = hijriOf(ctx.state.today);
+function dateLine(ctx: Ctx, dark = false, withHijri = true) {
+  const hijri = withHijri ? hijriOf(ctx.state.today) : null;
   return (
     <>
       {dateOf(ctx.now)}
@@ -136,14 +141,18 @@ function Main(ctx: Ctx) {
   const hero = heroOf(ctx);
   const current = nowAndNext(state).current;
   const vipps = vippsOf(mosque);
-  const note = mosque.announcement?.trim()
-    ? { title: mosque.announcement.trim(), sub: vipps.number ? `Vipps ${vipps.number}` : null }
-    : vipps.number
-      ? { title: 'Støtt moskeen', sub: `Vipps ${vipps.number}` }
-      : null;
+  const note = !shows(ctx, 'main.note')
+    ? null
+    : mosque.announcement?.trim()
+      ? { title: mosque.announcement.trim(), sub: vipps.number ? `Vipps ${vipps.number}` : null }
+      : vipps.number
+        ? { title: 'Støtt moskeen', sub: `Vipps ${vipps.number}` }
+        : null;
+  const timeline = shows(ctx, 'main.timeline');
+  const prayers = shows(ctx, 'main.fajrEnd') ? state.today.prayers : withoutFajrEnd(state.today.prayers);
   return (
     <Root pattern={ctx.texture ? <Pattern id="ma" color={ink.mark} opacity={0.45} size={120} /> : null}>
-      <Header brand={brand} name={mosque.name} line={dateLine(ctx)} clock={clockOf(now)} />
+      <Header brand={brand} name={mosque.name} line={dateLine(ctx, false, shows(ctx, 'main.hijri'))} clock={clockOf(now)} />
       <View style={s.row}>
         <Card style={s.hero}>
           <Label icon={hero.icon} text={hero.label} brand={brand} />
@@ -152,15 +161,17 @@ function Main(ctx: Ctx) {
           {hero.pill ? <Pill text={hero.pill} brand={brand} style={s.autoTop} /> : null}
         </Card>
         <Card style={s.rowsCard}>
-          <PrayerRows prayers={state.today.prayers} current={current?.name ?? null} brand={brand} />
+          <PrayerRows prayers={prayers} current={current?.name ?? null} brand={brand} />
         </Card>
       </View>
       <View style={s.bottom}>
-        <Card style={s.tlCard}>
-          <Timeline prayers={prayersOf(state.today)} now={now} brand={brand} />
-        </Card>
+        {timeline ? (
+          <Card style={s.tlCard}>
+            <Timeline prayers={prayersOf(state.today)} now={now} brand={brand} />
+          </Card>
+        ) : null}
         {note ? (
-          <View style={s.ann}>
+          <View style={[s.ann, !timeline && kit.grow]}>
             <Glyph name="megaphone" size={60} color={ink.gold600} />
             <View style={kit.flexShrink}>
               <T style={s.annTitle} lines={3}>
@@ -193,7 +204,7 @@ function Lobby(ctx: Ctx) {
   const { brand, now, state, mosque } = ctx;
   const hero = heroOf(ctx);
   const current = nowAndNext(state).current;
-  const announcement = mosque.announcement?.trim();
+  const announcement = shows(ctx, 'lobby.note') ? mosque.announcement?.trim() : undefined;
   return (
     <Root>
       <Header brand={brand} name={mosque.name} line={dateLine(ctx)} clock={clockOf(now)} />
@@ -206,18 +217,20 @@ function Lobby(ctx: Ctx) {
             </T>
             {hero.pill ? <Pill text={hero.pill} brand={brand} textStyle={s.smallPill} iconSize={36} /> : null}
           </Card>
-          <Card style={s.mini}>
-            {prayersOf(state.today).map((prayer) => {
-              const on = prayer.name === current?.name;
-              return (
-                <View key={prayer.name} style={[s.mr, on && { backgroundColor: brand.s }]}>
-                  <Glyph name={PRAYER_GLYPH[prayer.name]} size={38} color={on ? brand.b : ink.muted} />
-                  <T style={[s.mrText, on && { fontWeight: '800', color: brand.d }]}>{prayer.label}</T>
-                  <T style={[s.mrText, s.mrTime, on && { color: brand.d }]}>{clockOf(shown(prayer))}</T>
-                </View>
-              );
-            })}
-          </Card>
+          {shows(ctx, 'lobby.times') ? (
+            <Card style={s.mini}>
+              {prayersOf(state.today).map((prayer) => {
+                const on = prayer.name === current?.name;
+                return (
+                  <View key={prayer.name} style={[s.mr, on && { backgroundColor: brand.s }]}>
+                    <Glyph name={PRAYER_GLYPH[prayer.name]} size={38} color={on ? brand.b : ink.muted} />
+                    <T style={[s.mrText, on && { fontWeight: '800', color: brand.d }]}>{prayer.label}</T>
+                    <T style={[s.mrText, s.mrTime, on && { color: brand.d }]}>{clockOf(shown(prayer))}</T>
+                  </View>
+                );
+              })}
+            </Card>
+          ) : null}
         </View>
         <View style={[s.post, { backgroundColor: brand.d }]}>
           {ctx.texture ? <Pattern id="la" color={ink.white} opacity={0.1} size={120} /> : null}
@@ -230,7 +243,7 @@ function Lobby(ctx: Ctx) {
           </T>
           {!announcement && mosque.address ? <T style={[s.postSub, { color: brand.t }]}>{mosque.address}</T> : null}
           <View style={s.postFoot}>
-            <VippsBox mosque={mosque} brand={brand} size={160} label="Støtt med Vipps" />
+            {shows(ctx, 'lobby.vipps') ? <VippsBox mosque={mosque} brand={brand} size={160} label="Støtt med Vipps" /> : null}
           </View>
         </View>
       </View>
@@ -257,8 +270,8 @@ function stripOf(ctx: Ctx, jumuah = false): StripItem[] {
 
 function Plakat(ctx: Ctx) {
   const { brand, now, mosque } = ctx;
-  const vipps = vippsOf(mosque);
-  const announcement = mosque.announcement?.trim();
+  const vipps = shows(ctx, 'plakat.vipps') ? vippsOf(mosque) : { number: null, url: null };
+  const announcement = shows(ctx, 'plakat.note') ? mosque.announcement?.trim() : undefined;
   const poster = announcement
     ? { kick: 'Kunngjøring', icon: 'megaphone' as const, title: announcement, sub: null }
     : vipps.number
@@ -332,7 +345,7 @@ function Rad(ctx: Ctx) {
         </View>
       </View>
       <View style={s.cards}>
-        {state.today.prayers.map((prayer) => {
+        {(shows(ctx, 'rad.fajrEnd') ? state.today.prayers : withoutFajrEnd(state.today.prayers)).map((prayer) => {
           const on = prayer.name === current?.name;
           const fg = on ? brand.s : ink.muted;
           return (
@@ -347,9 +360,11 @@ function Rad(ctx: Ctx) {
           );
         })}
       </View>
-      <Card style={s.radTl}>
-        <Timeline prayers={prayersOf(state.today)} now={now} brand={brand} />
-      </Card>
+      {shows(ctx, 'rad.timeline') ? (
+        <Card style={s.radTl}>
+          <Timeline prayers={prayersOf(state.today)} now={now} brand={brand} />
+        </Card>
+      ) : null}
     </Root>
   );
 }
@@ -361,7 +376,7 @@ function Iqamah(ctx: Ctx) {
   const left = target?.iqamah ? Math.max(0, target.iqamah.getTime() - now.getTime()) : 0;
   const seconds = Math.ceil(left / 1000);
   const countdown = `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
-  const progress = 1 - Math.min(left / (IQAMAH_LEAD_MINUTES * MINUTE), 1);
+  const progress = 1 - Math.min(left / (ctx.iqamahLead * MINUTE), 1);
   const tips = [
     { icon: 'device-mobile' as const, title: 'Skru av lyden på mobilen', sub: 'Takk for at du tar hensyn' },
     { icon: 'users-three' as const, title: 'Rett radene', sub: 'Skulder mot skulder, fot mot fot' },
@@ -392,19 +407,21 @@ function Iqamah(ctx: Ctx) {
           <View style={[s.bar2Fill, { width: `${progress * 100}%` }]} />
         </View>
       </View>
-      <View style={s.tips}>
-        {tips.map((tip) => (
-          <View key={tip.title} style={[s.tip, { backgroundColor: brand.d }]}>
-            <View style={s.tipIcon}>
-              <Glyph name={tip.icon} size={54} color={brand.b} />
+      {shows(ctx, 'iqamah.tips') ? (
+        <View style={s.tips}>
+          {tips.map((tip) => (
+            <View key={tip.title} style={[s.tip, { backgroundColor: brand.d }]}>
+              <View style={s.tipIcon}>
+                <Glyph name={tip.icon} size={54} color={brand.b} />
+              </View>
+              <View style={kit.flexShrink}>
+                <T style={s.tipTitle}>{tip.title}</T>
+                <T style={[s.tipSub, { color: brand.t }]}>{tip.sub}</T>
+              </View>
             </View>
-            <View style={kit.flexShrink}>
-              <T style={s.tipTitle}>{tip.title}</T>
-              <T style={[s.tipSub, { color: brand.t }]}>{tip.sub}</T>
-            </View>
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
+      ) : null}
     </Root>
   );
 }
@@ -413,7 +430,7 @@ function Jumuah(ctx: Ctx) {
   const { brand, now, state, mosque } = ctx;
   const sessions = state.jummah;
   const upcoming = sessions.find((time) => time > now) ?? null;
-  const vipps = vippsOf(mosque);
+  const vipps = shows(ctx, 'jumuah.vipps') ? vippsOf(mosque) : { number: null, url: null };
   return (
     <Root style={{ backgroundColor: brand.s }}>
       <Header brand={brand} name={mosque.name} line={dateLine(ctx)} clock={clockOf(now)} />
@@ -745,6 +762,7 @@ function Hvile(ctx: Ctx) {
           })}
         </Card>
       </View>
+      {ctx.dim ? <View style={s.dim} pointerEvents="none" /> : null}
     </Root>
   );
 }
@@ -1053,6 +1071,7 @@ const s = StyleSheet.create({
   hvileTv: { paddingTop: 64, paddingHorizontal: 104, paddingBottom: 56 },
   hvilePattern: { position: 'absolute', top: 0, left: 0, width: 1000, height: '100%' },
   hvileLogo: { backgroundColor: ink.night800, borderWidth: 2, borderColor: ink.night700 },
+  dim: { ...StyleSheet.absoluteFill, backgroundColor: ink.night950, opacity: 0.5 },
   hvileBody: { flex: 1, flexDirection: 'row', gap: 64, alignItems: 'center', minHeight: 0 },
   lft: { flex: 1 },
   hvileClock: { fontSize: 260, fontWeight: '200', lineHeight: 250, letterSpacing: -10.4, color: ink.mist300 },

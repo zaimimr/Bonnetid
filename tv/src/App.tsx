@@ -15,7 +15,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { StyleSheet, useTVEventHandler, useWindowDimensions, View } from 'react-native';
 import { T } from './kit';
 import { SCREENS } from './screens';
-import { useTaraweeh, useTvSettings } from './settings';
+import { rotationOf, screenOptionsOf, useTaraweeh, useTvSettings } from './settings';
 import { Setup } from './Setup';
 import { brandColors, ink } from './theme';
 import { DUA_SHOW_MINUTES, pickScreen } from './tvModel';
@@ -77,7 +77,7 @@ function Board({ orgNr, now }: { orgNr: string; now: Date }) {
   const brand = useMemo(() => brandColors(settings.brand), [settings.brand]);
   if (!data) return <Message title={error ? 'Fikk ikke hentet bønnetidene' : 'Henter bønnetider'} sub={error ? 'Prøver igjen snart' : undefined} />;
   const duaUntil = taraweeh.duaUntil ? new Date(taraweeh.duaUntil) : null;
-  const screen = settings.preview ?? pickScreen({ ...data.state, now, duaUntil }, settings.base);
+  const screen = settings.preview ?? pickScreen({ ...data.state, now, duaUntil }, rotationOf(settings));
   const Screen = SCREENS[screen];
   return (
     <Screen
@@ -85,11 +85,7 @@ function Board({ orgNr, now }: { orgNr: string; now: Date }) {
       mosque={data.mosque}
       state={{ ...data.state, now, duaUntil }}
       brand={brand}
-      art={settings.art}
-      duaFont={settings.duaFont}
-      translation={settings.translation}
-      texture={settings.texture}
-      hall={settings.hall}
+      {...screenOptionsOf(settings)}
       pauses={taraweeh.night === data.nightKey ? taraweeh.pauses : 1}
     />
   );
@@ -100,10 +96,11 @@ function Root() {
   const now = useClock();
   const hydrated = useHydrated();
   const orgNr = useTvSettings((state) => state.orgNr);
+  const configured = useTvSettings((state) => state.configured);
   const [setup, setSetup] = useState(false);
   const { data } = useTvData(orgNr, now);
   const screen = data
-    ? pickScreen({ ...data.state, now, duaUntil: useTaraweeh.getState().duaUntil ? new Date(useTaraweeh.getState().duaUntil as number) : null }, useTvSettings.getState().base)
+    ? pickScreen({ ...data.state, now, duaUntil: useTaraweeh.getState().duaUntil ? new Date(useTaraweeh.getState().duaUntil as number) : null }, rotationOf(useTvSettings.getState()))
     : null;
 
   useTVEventHandler((event) => {
@@ -118,7 +115,7 @@ function Root() {
   });
 
   if (!hydrated) return <Message title="Bønnetid" />;
-  if (setup || !orgNr) return <Setup now={now} onClose={() => setSetup(false)} />;
+  if (setup || !configured || !orgNr) return <Setup now={now} onClose={() => setSetup(false)} />;
   return <Board orgNr={orgNr} now={now} />;
 }
 

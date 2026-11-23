@@ -144,13 +144,13 @@ export function taraweehStart(day: TvDay): Date | null {
   return isha ? plus(isha, TARAWEEH_AFTER_ISHA_MINUTES) : null;
 }
 
-export function upcomingIqamah(state: TvState): TvPrayer | null {
+export function upcomingIqamah(state: TvState, lead = IQAMAH_LEAD_MINUTES): TvPrayer | null {
   const now = state.now.getTime();
   return (
     state.today.prayers.find((entry) => {
       if (!entry.iqamah || entry.azan.getTime() > now) return false;
       const left = entry.iqamah.getTime() - now;
-      return left > 0 && left <= IQAMAH_LEAD_MINUTES * MINUTE;
+      return left > 0 && left <= lead * MINUTE;
     }) ?? null
   );
 }
@@ -175,10 +175,28 @@ export function isNight(state: TvState): boolean {
   return now >= start.getTime();
 }
 
-export function pickScreen(state: TvState, base: BaseScreen): ScreenId {
+export const ROTATION_SECONDS = [10, 20, 30, 60] as const;
+
+export type Rotation = {
+  screens: BaseScreen[];
+  seconds: number;
+  iqamahLead?: number;
+};
+
+export function rotationSlot(rotation: Rotation, now: Date): number {
+  const count = Math.max(1, rotation.screens.length);
+  return Math.floor(now.getTime() / (rotation.seconds * 1000)) % count;
+}
+
+export function rotationScreen(rotation: Rotation, now: Date): BaseScreen {
+  return rotation.screens[rotationSlot(rotation, now)] ?? 'main';
+}
+
+export function pickScreen(state: TvState, rotation: Rotation): ScreenId {
   const now = state.now.getTime();
   if (state.duaUntil && now < state.duaUntil.getTime()) return 'dua';
-  if (base === 'plakat') return 'plakat';
+  const base = rotationScreen(rotation, state.now);
+  if (rotation.screens.length === 1 && base === 'plakat') return 'plakat';
 
   const lastEid = state.eidPrayers[state.eidPrayers.length - 1];
   const fajr = prayer(state.today, 'fajr');
@@ -194,7 +212,7 @@ export function pickScreen(state: TvState, base: BaseScreen): ScreenId {
     now >= sunrise.azan.getTime() &&
     now < plus(lastJummah, JUMUAH_GRACE_MINUTES).getTime();
 
-  const iqamah = upcomingIqamah(state);
+  const iqamah = upcomingIqamah(state, rotation.iqamahLead);
   if (iqamah && !(jumuahOpen && iqamah.name === 'duhr')) return 'iqamah';
   if (jumuahOpen) return 'jumuah';
 
