@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Bønnetid TV",
+    "slug": "bonnetid",
+    "owner": "zaim",
+    "version": "1.0.0",
+    "orientation": "landscape",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "bundleIdentifier": "no.irn.bonnetid",
+      "appleTeamId": "9L246T935B"
+    },
+    "android": {
+      "package": "no.irn.bonnetid"
+    },
+    "plugins": [
+      [
+        "@react-native-tvos/config-tv",
+        {
+          "isTV": true
+        }
+      ],
+      "expo-font",
+      "../plugins/withSceneLifecycle.js"
+    ]
+  }
+}

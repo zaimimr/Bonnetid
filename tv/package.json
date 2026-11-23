@@ -1,0 +1,52 @@
+{
+  "name": "bonnetid-tv",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "prebuild": "EXPO_TV=1 expo prebuild --clean",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
+    "test": "node --test src/tvModel.test.ts"
+  },
+  "dependencies": {
+    "@expo-google-fonts/amiri": "^0.4.1",
+    "@expo-google-fonts/aref-ruqaa": "^0.4.1",
+    "@expo-google-fonts/noto-naskh-arabic": "^0.4.5",
+    "@expo-google-fonts/noto-nastaliq-urdu": "^0.4.2",
+    "@expo-google-fonts/reem-kufi": "^0.4.2",
+    "@expo-google-fonts/scheherazade-new": "^0.4.3",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-tvos/config-tv": "0.1.7",
+    "@supabase/supabase-js": "^2.110.7",
+    "@tanstack/query-async-storage-persister": "^5.108.4",
+    "@tanstack/react-query": "^5.101.2",
+    "@tanstack/react-query-persist-client": "^5.108.4",
+    "adhan": "4.4.6",
+    "expo": "~57.0.26",
+    "expo-constants": "~57.0.25",
+    "expo-font": "~57.0.4",
+    "expo-keep-awake": "~57.0.2",
+    "expo-status-bar": "~57.0.1",
+    "i18next": "^26.4.2",
+    "qrcode": "^1.5.4",
+    "react": "19.2.3",
+    "react-native": "npm:react-native-tvos@0.86.3-0",
+    "react-native-svg": "15.15.4",
+    "tz-lookup": "^6.1.25",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "~19.2.4",
+    "typescript": "~6.0.3"
+  },
+  "expo": {
+    "install": {
+      "exclude": [
+        "react-native"
+      ]
+    }
+  }
+}
