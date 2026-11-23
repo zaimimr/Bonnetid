@@ -14,6 +14,7 @@ import { useKeepAwake } from 'expo-keep-awake';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { StyleSheet, useTVEventHandler, useWindowDimensions, View } from 'react-native';
 import { T } from './kit';
+import { useRemoteSync } from './remote';
 import { SCREENS } from './screens';
 import { rotationOf, screenOptionsOf, useTaraweeh, useTvSettings } from './settings';
 import { Setup } from './Setup';
@@ -98,6 +99,7 @@ function Root() {
   const orgNr = useTvSettings((state) => state.orgNr);
   const configured = useTvSettings((state) => state.configured);
   const [setup, setSetup] = useState(false);
+  const synced = useRemoteSync();
   const { data } = useTvData(orgNr, now);
   const screen = data
     ? pickScreen({ ...data.state, now, duaUntil: useTaraweeh.getState().duaUntil ? new Date(useTaraweeh.getState().duaUntil as number) : null }, rotationOf(useTvSettings.getState()))
@@ -115,8 +117,16 @@ function Root() {
   });
 
   if (!hydrated) return <Message title="Bønnetid" />;
-  if (setup || !configured || !orgNr) return <Setup now={now} onClose={() => setSetup(false)} />;
-  return <Board orgNr={orgNr} now={now} />;
+  return (
+    <View style={s.root}>
+      {setup || !configured || !orgNr ? <Setup now={now} onClose={() => setSetup(false)} /> : <Board orgNr={orgNr} now={now} />}
+      {synced ? (
+        <View style={s.toast}>
+          <T style={s.toastText}>Oppdatert fra mobilen</T>
+        </View>
+      ) : null}
+    </View>
+  );
 }
 
 export default function App() {
@@ -140,4 +150,7 @@ const s = StyleSheet.create({
   message: { width: 1920, height: 1080, backgroundColor: ink.page, alignItems: 'center', justifyContent: 'center', gap: 16 },
   messageTitle: { fontSize: 72, fontWeight: '800', color: ink.text },
   messageSub: { fontSize: 36, color: ink.muted },
+  root: { width: 1920, height: 1080 },
+  toast: { position: 'absolute', bottom: 48, alignSelf: 'center', backgroundColor: ink.white, borderWidth: 2, borderColor: ink.line, borderRadius: 40, paddingHorizontal: 40, paddingVertical: 20 },
+  toastText: { fontSize: 34, fontWeight: '700', color: ink.text },
 });

@@ -46,6 +46,9 @@ export type TvSettings = {
   texture: boolean;
   hall: string;
   preview: ScreenId | null;
+  pairId: string | null;
+  pairSecret: string | null;
+  pairUpdated: number;
   set: (patch: Partial<Omit<TvSettings, 'set'>>) => void;
 };
 
@@ -66,6 +69,9 @@ export const useTvSettings = create<TvSettings>()(
       texture: true,
       hall: HALL_OPTIONS[1],
       preview: null,
+      pairId: null,
+      pairSecret: null,
+      pairUpdated: 0,
       set: (patch) => set(patch),
     }),
     {

@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import { BackHandler, Pressable, ScrollView, StyleSheet, Text, TVEventControl, useTVEventHandler, View } from 'react-native';
-import { T } from './kit';
+import { Qr, T } from './kit';
+import { newPair, pairUrl } from './remote';
 import { SCREEN_NAMES, SCREENS } from './screens';
 import {
   ART_OPTIONS,
@@ -44,6 +45,7 @@ type PageSpec = {
   play?: boolean;
   orgNr?: string | null;
   hint?: string;
+  qr?: string | null;
 };
 
 const BASES: BaseScreen[] = ['main', 'lobby', 'plakat', 'rad'];
@@ -210,7 +212,11 @@ function Page({ spec, step, note, now }: { spec: PageSpec; step?: number; note?:
         </ScrollView>
       </View>
       <View style={s.right}>
-        <Preview screen={focused?.screen ?? 'main'} play={focused?.play ?? spec.play ?? false} orgNr={spec.orgNr ?? orgNr} now={now} />
+        {spec.qr !== undefined ? (
+          <View style={[s.frame, s.frameEmpty]}>{spec.qr ? <Qr value={spec.qr} size={480} /> : <T style={s.help}>Lager kode</T>}</View>
+        ) : (
+          <Preview screen={focused?.screen ?? 'main'} play={focused?.play ?? spec.play ?? false} orgNr={spec.orgNr ?? orgNr} now={now} />
+        )}
         {focused ? <T style={s.focusLabel}>{focused.label}</T> : null}
         <T style={s.help}>{helpText}</T>
         {note ? <T style={s.note}>{note}</T> : null}
@@ -239,7 +245,7 @@ function Page({ spec, step, note, now }: { spec: PageSpec; step?: number; note?:
 export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
   const settings = useTvSettings();
   const list = useMosqueList();
-  const [route, setRoute] = useState<string[]>(() => [settings.configured && settings.orgNr ? 'menu' : 'w-city']);
+  const [route, setRoute] = useState<string[]>(() => [settings.configured && settings.orgNr ? 'menu' : 'w-start']);
   const [city, setCity] = useState<string | null>(null);
   const [candidate, setCandidate] = useState<string | null>(null);
   const [note, setNote] = useState<string | undefined>(undefined);
@@ -522,7 +528,55 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
     }));
 
   const specFor = (key: string): PageSpec => {
+    const qr = settings.pairId && settings.pairSecret ? pairUrl(settings.pairId, settings.pairSecret) : null;
+    const openPhone = (next: string) => {
+      if (!settings.pairId) newPair();
+      go(next);
+    };
     switch (key) {
+      case 'w-start':
+        return {
+          title: 'Velkommen',
+          lead: 'Skjermen viser bønnetidene til moskeen. Hvordan vil du sette den opp?',
+          items: [
+            {
+              key: 'phone',
+              label: 'Med mobilen',
+              help: 'Skann en kode med mobilen og velg alt der. Enklest hvis du har mobilen for hånden.',
+              press: () => openPhone('w-phone'),
+            },
+            {
+              key: 'remote',
+              label: 'Med fjernkontrollen',
+              help: 'Velg alt her på skjermen, steg for steg.',
+              press: () => go('w-city'),
+            },
+          ],
+        };
+      case 'w-phone':
+        return {
+          title: 'Skann koden med mobilen',
+          lead: 'Åpne kameraet på mobilen og pek det mot koden. Velg moské på mobilen, så starter skjermen av seg selv innen et halvt minutt.',
+          qr,
+          items: [{ key: 'remote', label: 'Bruk fjernkontrollen i stedet', help: 'Velg alt her på skjermen, steg for steg.', press: () => go('w-city') }],
+        };
+      case 'phone':
+        return {
+          title: 'Bruk mobilen',
+          lead: 'Åpne kameraet på mobilen og pek det mot koden. Det du endrer på mobilen vises her innen et halvt minutt.',
+          qr,
+          items: [
+            { key: 'back', label: 'Tilbake', help: 'Koden virker til du lager en ny.', press: back },
+            {
+              key: 'new',
+              label: 'Lag ny kode',
+              help: 'Den gamle koden slutter å virke. Gjør dette hvis noen som ikke skal endre skjermen har koden.',
+              press: () => {
+                newPair();
+              },
+            },
+          ],
+        };
       case 'w-city':
         return cityPage('Hvilken moské er skjermen i?', 'w-mosque');
       case 'w-mosque':
@@ -636,6 +690,13 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
               press: () => go('city'),
             },
             {
+              key: 'phone',
+              label: 'Bruk mobilen',
+              value: '',
+              help: 'Endre alt fra mobilen ved å skanne en kode.',
+              press: () => openPhone('phone'),
+            },
+            {
               key: 'all',
               label: 'Se alle skjermene',
               value: '',
@@ -649,7 +710,7 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
               help: 'Går gjennom alle stegene fra starten. Det du har valgt blir stående til du endrer det.',
               press: () => {
                 set({ configured: false });
-                setRoute(['w-city']);
+                setRoute(['w-start']);
               },
             },
             { key: 'done', label: 'Ferdig', value: '', help: 'Alt er lagret. Trykk OK for å gå tilbake til skjermen.', press: close },

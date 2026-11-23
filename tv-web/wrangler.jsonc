@@ -1,0 +1,9 @@
+{
+  "name": "bonnetid-tv",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+  "assets": { "directory": "public", "binding": "ASSETS" },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "bonnetid-tv", "database_id": "5c203630-47d7-4549-b71f-aced0ecf39dc" }
+  ]
+}
