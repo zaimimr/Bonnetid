@@ -64,18 +64,95 @@ async function authorize(env, body) {
   return { row };
 }
 
+function osloDate(date = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Oslo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+}
+
+function hhmm(value) {
+  return typeof value === 'string' && /^\d{2}:\d{2}/.test(value) && !value.startsWith('00:00') ? value.slice(0, 5) : null;
+}
+
+function plusMinutes(time, minutes) {
+  const [h, m] = time.split(':').map(Number);
+  const total = (((h * 60 + m + minutes) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+}
+
+async function irn(env, query) {
+  const res = await fetch(`${env.IRN_URL}/rest/v1/${query}`, { headers: { apikey: env.IRN_KEY, authorization: `Bearer ${env.IRN_KEY}` } });
+  if (!res.ok) throw new Error(`upstream ${res.status}`);
+  return res.json();
+}
+
+async function preview(env, orgNr) {
+  const date = osloDate();
+  const [mosque] = await irn(
+    env,
+    `mosque_t?select=reg_navn,org_name2,announcement,vipps_nr,location_postnumber(location_iso),mosque_jamatperiode(start_date,end_date,fajr,dhuhr,asr,maghrib,isha,fajr_offset,dhuhr_offset,asr_offset,maghrib_offset,isha_offset,mosque_jummah(jummah)),mosque_jummah(jummah)&organisasjonsnummer=eq.${orgNr}`,
+  );
+  if (!mosque) return null;
+  const iso = mosque.location_postnumber?.location_iso;
+  const [times, hijri] = await Promise.all([
+    iso ? irn(env, `prayertime?select=fajr,fajr_endtime,duhr,asr,maghrib,isha&location_iso=eq.${iso}&date=eq.${date}&order=prayer_method&limit=1`) : [],
+    irn(env, `hijri_dates?select=hijri_date_day,hijri_date_month,hijri_date_year&gregorian_date=eq.${date}`),
+  ]);
+  const period = (mosque.mosque_jamatperiode ?? []).find((p) => p.start_date <= date && date <= p.end_date) ?? null;
+  const row = times[0];
+  const jamatOf = (azan, column) => {
+    if (!period || !azan) return null;
+    const fixed = hhmm(period[column]);
+    if (fixed) return fixed;
+    const offset = period[`${column}_offset`];
+    return typeof offset === 'number' ? plusMinutes(azan, offset) : null;
+  };
+  const columns = { fajr: 'fajr', duhr: 'dhuhr', asr: 'asr', maghrib: 'maghrib', isha: 'isha' };
+  const prayers = row
+    ? ['fajr', 'fajr_endtime', 'duhr', 'asr', 'maghrib', 'isha']
+        .map((name) => ({ name, azan: hhmm(row[name]), iqamah: columns[name] ? jamatOf(hhmm(row[name]), columns[name]) : null }))
+        .filter((p) => p.azan)
+    : null;
+  const jumuah = hhmm((period?.mosque_jummah?.[0] ?? mosque.mosque_jummah?.[0])?.jummah);
+  const h = hijri[0];
+  return {
+    mosque: { name: mosque.org_name2?.trim() || mosque.reg_navn, announcement: mosque.announcement?.trim() || null, vippsNumber: mosque.vipps_nr?.trim() || null },
+    day: prayers?.length
+      ? { prayers, jumuah, hijri: h ? { day: h.hijri_date_day, month: h.hijri_date_month, year: h.hijri_date_year } : null }
+      : null,
+  };
+}
+
 async function api(request, env, path) {
+  if (path === '/api/preview' && request.method === 'GET') {
+    const orgNr = new URL(request.url).searchParams.get('org');
+    if (!/^\d{6,15}$/.test(orgNr ?? '')) return json({ error: 'bad-request' }, 400);
+    const cache = caches.default;
+    const key = new Request(`${new URL(request.url).origin}/api/preview?org=${orgNr}&d=${osloDate()}`);
+    const hit = await cache.match(key);
+    if (hit) return hit;
+    let body;
+    try {
+      body = await preview(env, orgNr);
+    } catch {
+      return json({ error: 'upstream' }, 502);
+    }
+    if (!body) return json({ error: 'not-found' }, 404);
+    const response = new Response(JSON.stringify(body), {
+      headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=900' },
+    });
+    await cache.put(key, response.clone());
+    return response;
+  }
   if (path === '/api/mosques' && request.method === 'GET') {
     const cache = caches.default;
     const hit = await cache.match(request);
     if (hit) return hit;
-    const url = `${env.IRN_URL}/rest/v1/mosque_t?select=organisasjonsnummer,reg_navn,address,location_postnumber(post_no,post_name)&order=reg_navn`;
+    const url = `${env.IRN_URL}/rest/v1/mosque_t?select=organisasjonsnummer,reg_navn,org_name2,address,location_postnumber(post_no,post_name)&order=reg_navn`;
     const upstream = await fetch(url, { headers: { apikey: env.IRN_KEY, authorization: `Bearer ${env.IRN_KEY}` } });
     if (!upstream.ok) return json({ error: 'upstream' }, 502);
     const rows = await upstream.json();
     const mosques = rows.map((row) => ({
       orgNr: row.organisasjonsnummer,
-      name: row.reg_navn,
+      name: row.org_name2?.trim() || row.reg_navn,
       address: row.address,
       city: row.location_postnumber?.post_name ?? null,
     }));
