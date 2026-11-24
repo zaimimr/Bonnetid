@@ -15,7 +15,8 @@
       }
     },
     "android": {
-      "package": "no.irn.bonnetid"
+      "package": "no.irn.bonnetid",
+      "versionCode": 2010000
     },
     "plugins": [
       [
@@ -40,7 +41,10 @@
             "topShelf2x": "./assets/tvos/topShelf2x.png",
             "topShelfWide": "./assets/tvos/topShelfWide.png",
             "topShelfWide2x": "./assets/tvos/topShelfWide2x.png"
-          }
+          },
+          "androidTVRequired": true,
+          "androidTVBanner": "./assets/tvos/banner.png",
+          "androidTVIcon": "./assets/tvos/android-icon.png"
         }
       ],
       "expo-font",
