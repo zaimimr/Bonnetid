@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { Icon } from '@/components/icons';
 import { isRTL, t } from '@/lib/i18n';
-import { AppText, Badge, Card, mirrored } from '@/components/ui';
+import { AppText, Badge, Card, Sheet, mirrored } from '@/components/ui';
 import { useFontScale, scaleWidth } from '@/hooks/useFontScale';
 import { useResponsive } from '@/hooks/useResponsive';
 import { usePrayerMark } from '@/hooks/usePrayerMark';
@@ -10,6 +10,7 @@ import { useTheme } from '@/theme';
 import { osloTimeToLocalClock } from '@/lib/time';
 import { opacity, radius, spacing } from '@/theme/tokens';
 import { statusOf } from '@/lib/prayerLog';
+import { lowSunPrayers, type NightKind } from '@/lib/lowSun';
 import type { JamatTimes, PrayerEntry, PrayerName } from '@/lib/prayerSchedule';
 import type { MosqueJummah } from '@/api/types';
 import { usePrayerLog } from '@/store/prayerLog';
@@ -33,6 +34,7 @@ export type PrayerTimesCardProps = {
   jummah?: MosqueJummah[];
   statusDate?: string;
   now?: Date;
+  nightKind?: NightKind;
   onPressMosque?: () => void;
   onSelectMosque?: () => void;
   onFindJumuah?: () => void;
@@ -47,6 +49,7 @@ export function PrayerTimesCard({
   jummah = [],
   statusDate,
   now,
+  nightKind = 'normal',
   onPressMosque,
   onSelectMosque,
   onFindJumuah,
@@ -55,6 +58,8 @@ export function PrayerTimesCard({
   const log = usePrayerLog((state) => state.log);
   const markPrayer = usePrayerMark();
   const [openKey, setOpenKey] = useState<string | null>(null);
+  const [whyOpen, setWhyOpen] = useState(false);
+  const explained = lowSunPrayers(nightKind);
   const { scale, isStacked } = useFontScale();
   const { isWide } = useResponsive();
   const stacked = isStacked && !isWide;
@@ -187,6 +192,17 @@ export function PrayerTimesCard({
                       {entry.label}
                     </AppText>
                   )}
+                  {explained.includes(entry.name) && (
+                    <Pressable
+                      onPress={() => setWhyOpen(true)}
+                      accessibilityRole="button"
+                      hitSlop={spacing.sm}
+                      style={({ pressed }) => pressed && { opacity: opacity.pressed }}>
+                      <AppText size="xs" weight="medium" tone="primary">
+                        {t('prayer.lowSun.why')}
+                      </AppText>
+                    </Pressable>
+                  )}
                   {isHighlighted && <Badge label={t('prayer.now')} variant="primary" />}
                   {markable && status === 'prayed' && <PrayerStatusMark label={entry.label} />}
                 </View>
@@ -314,6 +330,23 @@ export function PrayerTimesCard({
           <Icon name="caret-right" size={16} color={theme.colors.primary} style={mirrored} />
         </Pressable>
       )}
+      <Sheet
+        visible={whyOpen}
+        onClose={() => setWhyOpen(false)}
+        title={
+          nightKind === 'midnightSun'
+            ? t('prayer.lowSun.midnightSunTitle')
+            : t('prayer.lowSun.twilightTitle')
+        }>
+        <View style={{ gap: spacing.md }}>
+          <AppText>
+            {nightKind === 'midnightSun'
+              ? t('prayer.lowSun.midnightSunBody')
+              : t('prayer.lowSun.twilightBody')}
+          </AppText>
+          <AppText tone="textMuted">{t('prayer.lowSun.rule')}</AppText>
+        </View>
+      </Sheet>
     </Card>
   );
 }

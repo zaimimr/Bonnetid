@@ -95,5 +95,13 @@
     "maghrib": "Maghrib",
     "isha": "Isha"
   },
-  "jumuahNearby": "Jumuah i nærheten"
+  "jumuahNearby": "Jumuah i nærheten",
+  "lowSun": {
+    "why": "Hvorfor?",
+    "twilightTitle": "Lyse netter",
+    "twilightBody": "Om sommeren blir det ikke helt mørkt her om natten. Da vises ikke de vanlige tegnene for Fajr og Isha på himmelen.",
+    "midnightSunTitle": "Midnattssol",
+    "midnightSunBody": "Solen går ikke ned her nå. Da vises ikke de vanlige tegnene for Fajr, Maghrib og Isha på himmelen.",
+    "rule": "Tidene du ser er satt etter en fast regel fra IRN. Derfor kan de avvike fra andre apper og kalendere."
+  }
 }

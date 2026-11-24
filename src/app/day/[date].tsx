@@ -4,6 +4,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useHijriMonth, useMosque, useMosqueJamatPeriods } from '@/api/queries';
 import { ExtraTimesCard } from '@/components/prayer/ExtraTimesCard';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
+import { nightKind } from '@/lib/lowSun';
 import {
   AppText,
   EmptyState,
@@ -196,6 +197,7 @@ export default function DayScreen() {
             jamatTimes={jamatTimes}
             jummah={isFriday ? jummahTimes : []}
             statusDate={isoDate}
+            nightKind={calculated || !valid ? 'normal' : nightKind(location.lat, isoDate)}
             now={now}
             onPressMosque={() =>
               mosque &&

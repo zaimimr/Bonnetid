@@ -95,5 +95,13 @@
     "maghrib": "Maghrib",
     "isha": "Isha"
   },
-  "jumuahNearby": "Jumuah nearby"
+  "jumuahNearby": "Jumuah nearby",
+  "lowSun": {
+    "why": "Why?",
+    "twilightTitle": "Light nights",
+    "twilightBody": "In summer it never gets fully dark here at night. The usual signs in the sky for Fajr and Isha do not appear.",
+    "midnightSunTitle": "Midnight sun",
+    "midnightSunBody": "The sun does not set here right now. The usual signs in the sky for Fajr, Maghrib and Isha do not appear.",
+    "rule": "The times you see follow a fixed rule from IRN. That is why they can differ from other apps and calendars."
+  }
 }

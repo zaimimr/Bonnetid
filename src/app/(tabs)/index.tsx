@@ -8,6 +8,7 @@ import { useHijriMonth, useMosque, useMosqueJamatPeriods, useSpecialDates } from
 import { AfterPrayerCard } from '@/components/duas/AfterPrayerCard';
 import { NextPrayerHero } from '@/components/prayer/NextPrayerHero';
 import { PrayerTimesCard } from '@/components/prayer/PrayerTimesCard';
+import { nightKind } from '@/lib/lowSun';
 import { EventCard } from '@/components/calendar/EventCard';
 import { MosqueAnnouncement } from '@/components/mosque/MosqueAnnouncement';
 import { MosquePresenceCard } from '@/components/mosque/MosquePresenceCard';
@@ -222,6 +223,7 @@ export default function HomeScreen() {
                 }
           }
           statusDate={todayIso}
+          nightKind={calculated ? 'normal' : nightKind(location.lat, todayIso)}
           now={now}
         />
       </View>
