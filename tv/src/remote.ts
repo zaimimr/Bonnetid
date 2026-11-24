@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useTvSettings, type TvSettings } from './settings';
 
 export const REMOTE_URL = 'https://bonnetid-tv.zaim-imran.workers.dev';
-const POLL_MS = 30_000;
+const POLL_MS = 10_000;
 const SAVE_DELAY_MS = 3_000;
-const TOAST_MS = 10_000;
+const TOAST_MS = 6_000;
 const SYNCED = ['orgNr', 'configured', 'rotation', 'seconds', 'iqamahLead', 'hide', 'dim', 'brand', 'art', 'duaFont', 'translation', 'texture', 'hall'] as const;
 
 type Synced = Pick<TvSettings, (typeof SYNCED)[number]>;

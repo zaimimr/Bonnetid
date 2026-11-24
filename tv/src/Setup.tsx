@@ -33,7 +33,7 @@ type Item = {
   index?: number;
   pick?: (index: number) => void;
   press?: () => void;
-  move?: (dir: -1 | 1) => void;
+  heading?: string;
   focus?: () => void;
   play?: boolean;
 };
@@ -56,6 +56,8 @@ const BASE_HELP: Record<BaseScreen, string> = {
   rad: 'Dagens tider med en tegning og navnet på rommet.',
 };
 const AUTO_HELP = 'Kommer av seg selv når det er tid: Iqamah, Jumuah, Ramadan, natt og Eid.';
+const AUTO: ScreenId[] = ['iqamah', 'jumuah', 'dua', 'hvile'];
+const WHEN: Partial<Record<ScreenId, string>> = { iqamah: 'Før iqamah', jumuah: 'Fredag', dua: 'Ramadan', hvile: 'Isha til Fajr' };
 const PLACES: { name: string; help: string; rotation: BaseScreen[]; seconds?: number; hall?: string }[] = [
   { name: 'Bønnesal', help: 'Viser alle dagens bønnetider i stort format.', rotation: ['main'] },
   { name: 'Inngang', help: 'Bytter mellom neste bønn og kunngjøringer hvert 20. sekund.', rotation: ['lobby', 'plakat'], seconds: 20 },
@@ -71,7 +73,6 @@ const SECONDS_SUB: Record<number, string> = { 10: 'Raskt', 20: 'Anbefalt', 30: '
 const BRAND_NAMES = ['Grønn', 'Blå', 'Vinrød', 'Lilla'];
 const ART_NAMES = ['Moské', 'Kaaba', 'Lykt', 'Måne og stjerner', 'Ingen tegning'];
 const FONT_NAMES = ['Amiri', 'Scheherazade', 'Naskh', 'Kufi', 'Ruqaa', 'Nastaliq'];
-const CUSTOMIZABLE: ScreenId[] = ['main', 'lobby', 'plakat', 'rad', 'iqamah', 'jumuah', 'dua', 'hvile'];
 const WIZARD_STEP: Record<string, number> = {
   'w-city': 1,
   'w-mosque': 1,
@@ -121,31 +122,52 @@ function Row({ item, focused, onFocus }: { item: Item; focused: boolean; onFocus
   );
 }
 
-function Preview({ screen, play, orgNr, now }: { screen: ScreenId; play: boolean; orgNr: string | null; now: Date }) {
+function ScreenView({ screen, orgNr, now }: { screen: ScreenId; orgNr: string | null; now: Date }) {
   const settings = useTvSettings();
   const pauses = useTaraweeh((state) => state.pauses);
   const { data } = useTvData(orgNr, now);
   const brand = useMemo(() => brandColors(settings.brand), [settings.brand]);
+  if (!data) return null;
+  const Screen = SCREENS[screen];
+  return (
+    <Screen
+      now={now}
+      mosque={data.mosque}
+      state={{ ...data.state, now, duaUntil: null }}
+      brand={brand}
+      {...screenOptionsOf(settings)}
+      pauses={Math.max(1, pauses)}
+    />
+  );
+}
+
+function FullPreview({ screen, now, onClose }: { screen: ScreenId; now: Date; onClose: () => void }) {
+  const orgNr = useTvSettings((state) => state.orgNr);
+  return (
+    <Pressable hasTVPreferredFocus onPress={onClose} style={s.full}>
+      <ScreenView screen={screen} orgNr={orgNr} now={now} />
+      <View style={s.fullBadge}>
+        <T style={s.fullBadgeText}>Forhåndsvisning. OK lukker</T>
+      </View>
+    </Pressable>
+  );
+}
+
+function Preview({ screen, play, orgNr, now }: { screen: ScreenId; play: boolean; orgNr: string | null; now: Date }) {
+  const settings = useTvSettings();
+  const { data } = useTvData(orgNr, now);
   const rotation = rotationOf(settings);
   const playing = play && rotation.screens.length > 1;
   const shown = playing ? rotationScreen(rotation, now) : screen;
   const slot = rotationSlot(rotation, now);
   const period = rotation.seconds * 1000;
   const progress = ((now.getTime() % period) + 1000) / period;
-  const Screen = SCREENS[shown];
   return (
     <View style={s.previewBox}>
       {data ? (
         <View style={s.frame}>
           <View style={s.stage}>
-            <Screen
-              now={now}
-              mosque={data.mosque}
-              state={{ ...data.state, now, duaUntil: null }}
-              brand={brand}
-              {...screenOptionsOf(settings)}
-              pauses={Math.max(1, pauses)}
-            />
+            <ScreenView screen={shown} orgNr={orgNr} now={now} />
           </View>
         </View>
       ) : (
@@ -179,14 +201,9 @@ function Page({ spec, step, note, now }: { spec: PageSpec; step?: number; note?:
   const items = spec.items.map((item) => (item.key === initial?.key ? { ...item, preferred: true } : { ...item, preferred: false }));
 
   useTVEventHandler((event) => {
-    if (!focused || (event.eventType !== 'left' && event.eventType !== 'right')) return;
-    const dir = event.eventType === 'right' ? 1 : -1;
-    if (focused.choices && focused.pick) {
-      const length = focused.choices.length;
-      focused.pick(((focused.index ?? 0) + dir + length) % length);
-      return;
-    }
-    focused.move?.(dir);
+    if (!focused?.choices || !focused.pick || (event.eventType !== 'left' && event.eventType !== 'right')) return;
+    const length = focused.choices.length;
+    focused.pick(((focused.index ?? 0) + (event.eventType === 'right' ? 1 : -1) + length) % length);
   });
 
   const helpText = focused?.choices?.[focused.index ?? 0]?.help ?? focused?.help ?? '';
@@ -198,15 +215,17 @@ function Page({ spec, step, note, now }: { spec: PageSpec; step?: number; note?:
         {spec.lead ? <T style={s.lead}>{spec.lead}</T> : null}
         <ScrollView style={s.list} contentContainerStyle={s.rows}>
           {items.map((item) => (
-            <Row
-              key={item.key}
-              item={item}
-              focused={item.key === focused?.key}
-              onFocus={() => {
-                setFocusKey(item.key);
-                item.focus?.();
-              }}
-            />
+            <View key={item.key} style={s.rowWrap}>
+              {item.heading ? <T style={s.group}>{item.heading}</T> : null}
+              <Row
+                item={item}
+                focused={item.key === focused?.key}
+                onFocus={() => {
+                  setFocusKey(item.key);
+                  item.focus?.();
+                }}
+              />
+            </View>
           ))}
         </ScrollView>
       </View>
@@ -295,6 +314,7 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
   const [city, setCity] = useState<string | null>(null);
   const [candidate, setCandidate] = useState<string | null>(null);
   const [note, setNote] = useState<string | undefined>(undefined);
+  const [full, setFull] = useState<ScreenId | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { set } = settings;
   const top = route[route.length - 1];
@@ -305,6 +325,10 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
     setRoute([...route, next]);
   };
   const back = () => {
+    if (full) {
+      setFull(null);
+      return;
+    }
     setNote(undefined);
     if (route.length > 1) {
       setRoute(route.slice(0, -1));
@@ -404,38 +428,28 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
     press: () => apply(!value),
   });
 
-  const rotationItems = (): Item[] => {
-    const order = [...settings.rotation, ...BASES.filter((id) => !settings.rotation.includes(id))];
-    return order.map((id) => {
-      const position = settings.rotation.indexOf(id);
-      const on = position >= 0;
-      return {
-        key: id,
-        label: SCREEN_NAMES[id],
-        help: BASE_HELP[id],
-        screen: id,
-        checked: on,
-        value: on ? `Nr. ${position + 1}` : 'Av',
-        press: () => {
-          if (on && settings.rotation.length === 1) {
-            setNote('Minst én skjerm må være på.');
-            return;
-          }
-          setNote(undefined);
-          set({ rotation: on ? settings.rotation.filter((item) => item !== id) : [...settings.rotation, id] });
-        },
-        move: (dir) => {
-          const target = position + dir;
-          if (!on || target < 0 || target >= settings.rotation.length) return;
-          const next = [...settings.rotation];
-          next[position] = next[target];
-          next[target] = id;
-          set({ rotation: next });
-        },
-      };
-    });
+  const flip = (id: BaseScreen) => {
+    const on = settings.rotation.includes(id);
+    if (on && settings.rotation.length === 1) {
+      setNote('Minst én skjerm må være på.');
+      return;
+    }
+    setNote(undefined);
+    set({ rotation: BASES.filter((base) => (base === id ? !on : settings.rotation.includes(base))) });
   };
-  const rotationHint = 'OK slår skjermen av eller på. ◀ ▶ flytter den frem eller bak i rekkefølgen. Tilbake-knappen går ett steg tilbake.';
+  const rotationItems = (): Item[] =>
+    BASES.map((id) => {
+      const on = settings.rotation.includes(id);
+      return { key: id, label: SCREEN_NAMES[id], help: BASE_HELP[id], screen: id, checked: on, value: on ? 'På' : 'Av', press: () => flip(id) };
+    });
+  const previewItem = (id: ScreenId): Item => ({
+    key: 'preview',
+    label: 'Forhåndsvis',
+    help: 'Viser skjermen i fullskjerm.',
+    screen: id,
+    value: '›',
+    press: () => setFull(id),
+  });
 
   const cityPage = (title: string, step: string): PageSpec => ({
     title,
@@ -561,8 +575,13 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
       taraweeh: [],
       eid: [],
     };
-    const items = pages[id];
-    return { title: SCREEN_NAMES[id], lead: 'Velg hva som vises. Skjermen til høyre endrer seg med en gang.', items };
+    const base = BASES.includes(id as BaseScreen);
+    const on = base && settings.rotation.includes(id as BaseScreen);
+    const head: Item[] = base
+      ? [{ key: 'on', label: 'Vis denne skjermen', help: BASE_HELP[id as BaseScreen], screen: id, checked: on, value: on ? 'På' : 'Av', press: () => flip(id as BaseScreen) }]
+      : [];
+    const options = base && !on ? [] : pages[id].map((item, index) => (index === 0 ? { ...item, heading: 'Vises på skjermen' } : item));
+    return { title: SCREEN_NAMES[id], lead: base ? undefined : WHEN[id], items: [...head, ...options, previewItem(id)] };
   };
 
   const secondsItems = (after?: () => void): Item[] =>
@@ -606,7 +625,7 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
       case 'w-phone':
         return {
           title: 'Skann koden med mobilen',
-          lead: 'Åpne kameraet på mobilen og pek det mot koden. Velg moské på mobilen, så starter skjermen av seg selv innen et halvt minutt.',
+          lead: 'Åpne kameraet på mobilen og pek det mot koden. Velg moské på mobilen, så starter skjermen av seg selv.',
           qr,
           items: [{ key: 'remote', label: 'Bruk fjernkontrollen i stedet', help: 'Velg alt her på skjermen, steg for steg.', press: () => go('w-city') }],
         };
@@ -638,7 +657,6 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
         return {
           title: 'Hvilke skjermer skal vises?',
           lead: AUTO_HELP,
-          hint: rotationHint,
           items: [
             ...rotationItems(),
             {
@@ -692,40 +710,44 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
       case 'rotation':
         return {
           title: 'Skjermer',
-          lead: AUTO_HELP,
-          hint: rotationHint,
           items: [
-            ...rotationItems(),
-            {
-              key: 'seconds',
-              label: 'Tid per skjerm',
-              help: 'Hvor lenge hver skjerm vises før neste kommer.',
-              value: `${settings.seconds} sekunder`,
-              choices: ROTATION_SECONDS.map((seconds) => ({ name: `${seconds} s`, help: SECONDS_SUB[seconds] })),
-              index: secondsIndex,
-              play: true,
-              pick: (index) => set({ seconds: ROTATION_SECONDS[index] }),
-            },
-            {
-              key: 'details',
-              label: 'Velg hva hver skjerm viser',
-              value: '›',
-              help: 'Slå av og på ting som tider, kunngjøringer og Vipps-kode.',
-              press: () => go('screens'),
-            },
+            ...BASES.map(
+              (id, index): Item => ({
+                key: id,
+                heading: index === 0 ? 'Skjermrunden' : undefined,
+                label: SCREEN_NAMES[id],
+                help: BASE_HELP[id],
+                screen: id,
+                value: `${settings.rotation.includes(id) ? 'På' : 'Av'}  ›`,
+                press: () => go(`screen:${id}`),
+              }),
+            ),
+            ...(settings.rotation.length > 1
+              ? [
+                  {
+                    key: 'seconds',
+                    label: 'Tid per skjerm',
+                    help: 'Hvor lenge hver skjerm vises før neste kommer.',
+                    value: `${settings.seconds} sekunder`,
+                    choices: ROTATION_SECONDS.map((seconds) => ({ name: `${seconds} s`, help: SECONDS_SUB[seconds] })),
+                    index: secondsIndex,
+                    play: true,
+                    pick: (index: number) => set({ seconds: ROTATION_SECONDS[index] }),
+                  },
+                ]
+              : []),
+            ...AUTO.map(
+              (id, index): Item => ({
+                key: id,
+                heading: index === 0 ? 'Kommer av seg selv' : undefined,
+                label: SCREEN_NAMES[id],
+                help: AUTO_HELP,
+                screen: id,
+                value: `${WHEN[id]}  ›`,
+                press: () => go(`screen:${id}`),
+              }),
+            ),
           ],
-        };
-      case 'screens':
-        return {
-          title: 'Tilpass en skjerm',
-          items: CUSTOMIZABLE.map((id) => ({
-            key: id,
-            label: SCREEN_NAMES[id],
-            help: settings.rotation.includes(id as BaseScreen) ? 'Med i skjermrunden.' : BASES.includes(id as BaseScreen) ? 'Ikke med i skjermrunden.' : 'Kommer av seg selv når det er tid.',
-            screen: id,
-            value: '›',
-            press: () => go(`screen:${id}`),
-          })),
         };
       case 'look':
         return {
@@ -747,6 +769,8 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
         return screenPage(key.slice('screen:'.length) as ScreenId);
     }
   };
+
+  if (full) return <FullPreview screen={full} now={now} onClose={() => setFull(null)} />;
 
   if (top === 'menu') {
     const qr = settings.pairId && settings.pairSecret ? pairUrl(settings.pairId, settings.pairSecret) : null;
@@ -797,6 +821,11 @@ const s = StyleSheet.create({
   title: { fontSize: 52, fontWeight: '800', color: ink.text },
   lead: { fontSize: 30, lineHeight: 42, color: ink.body },
   list: { flex: 1, marginTop: 8 },
+  rowWrap: { gap: 8 },
+  group: { fontSize: 28, fontWeight: '700', color: ink.muted, marginTop: 20, marginLeft: 8 },
+  full: { width: 1920, height: 1080, backgroundColor: ink.page },
+  fullBadge: { position: 'absolute', top: 32, right: 32, backgroundColor: ink.text, borderRadius: 32, paddingHorizontal: 32, paddingVertical: 16 },
+  fullBadgeText: { fontSize: 30, fontWeight: '700', color: ink.white },
   rows: { gap: 8, paddingBottom: 24 },
   row: {
     flexDirection: 'row',
