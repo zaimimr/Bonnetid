@@ -8,7 +8,11 @@
     "userInterfaceStyle": "light",
     "ios": {
       "bundleIdentifier": "no.irn.bonnetid",
-      "appleTeamId": "9L246T935B"
+      "appleTeamId": "9L246T935B",
+      "buildNumber": "1",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "no.irn.bonnetid"
@@ -17,7 +21,26 @@
       [
         "@react-native-tvos/config-tv",
         {
-          "isTV": true
+          "isTV": true,
+          "tvosDeploymentTarget": "16.4",
+          "appleTVImages": {
+            "iconLayers": {
+              "front": "./assets/tvos/icon-front.png",
+              "back": "./assets/tvos/icon-back.png"
+            },
+            "iconSmallLayers": {
+              "front": "./assets/tvos/iconSmall-front.png",
+              "back": "./assets/tvos/iconSmall-back.png"
+            },
+            "iconSmall2xLayers": {
+              "front": "./assets/tvos/iconSmall2x-front.png",
+              "back": "./assets/tvos/iconSmall2x-back.png"
+            },
+            "topShelf": "./assets/tvos/topShelf.png",
+            "topShelf2x": "./assets/tvos/topShelf2x.png",
+            "topShelfWide": "./assets/tvos/topShelfWide.png",
+            "topShelfWide2x": "./assets/tvos/topShelfWide2x.png"
+          }
         }
       ],
       "expo-font",
