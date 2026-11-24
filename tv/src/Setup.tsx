@@ -243,7 +243,7 @@ function Page({ spec, step, note, now }: { spec: PageSpec; step?: number; note?:
 
 type Tile = { key: string; label: string; value: string; swatch?: string; press: () => void };
 
-function Menu({ tiles, onDone, onNewCode, qr, now }: { tiles: Tile[]; onDone: () => void; onNewCode: () => void; qr: string | null; now: Date }) {
+function Menu({ tiles, onDone, qr, now }: { tiles: Tile[]; onDone: () => void; qr: string | null; now: Date }) {
   const orgNr = useTvSettings((state) => state.orgNr);
   const [focus, setFocus] = useState('');
   return (
@@ -281,9 +281,6 @@ function Menu({ tiles, onDone, onNewCode, qr, now }: { tiles: Tile[]; onDone: ()
           <View style={s.phoneText}>
             <T style={s.phoneTitle}>Eller bruk mobilen</T>
             <T style={s.help}>Pek kameraet på mobilen mot koden.</T>
-            <Pressable onPress={onNewCode} onFocus={() => setFocus('code')} style={[s.codeButton, focus === 'code' && s.tileFocused]}>
-              <T style={[s.codeText, focus === 'code' && s.onDark]}>Lag ny kode</T>
-            </Pressable>
           </View>
         </View>
       </View>
@@ -758,9 +755,6 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
         now={now}
         qr={qr}
         onDone={close}
-        onNewCode={() => {
-          newPair();
-        }}
         tiles={[
           { key: 'mosque', label: 'Moské', value: current ? placeName(current.name) : 'Velg moské', press: () => go('city') },
           {
@@ -770,6 +764,14 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
             press: () => go('rotation'),
           },
           { key: 'look', label: 'Farge', value: BRAND_NAMES[brandIndex], swatch: settings.brand, press: () => go('look') },
+          {
+            key: 'code',
+            label: 'Mobilkode',
+            value: 'Lag ny kode',
+            press: () => {
+              newPair();
+            },
+          },
         ]}
       />
     );
@@ -828,8 +830,6 @@ const s = StyleSheet.create({
   qrBox: { width: 220, height: 220 },
   phoneText: { flex: 1, gap: 12, alignItems: 'flex-start' },
   phoneTitle: { fontSize: 40, fontWeight: '800', color: ink.text },
-  codeButton: { marginTop: 8, height: 64, paddingHorizontal: 28, borderRadius: 32, justifyContent: 'center', borderWidth: 2, borderColor: ink.line },
-  codeText: { fontSize: 28, fontWeight: '700', color: ink.text },
   box: {
     width: 40,
     height: 40,
