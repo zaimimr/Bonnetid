@@ -20,9 +20,12 @@ export type ScreenId =
   | 'taraweeh'
   | 'dua'
   | 'hvile'
-  | 'eid';
+  | 'eid'
+  | 'app';
 
-export type BaseScreen = 'main' | 'lobby' | 'plakat' | 'rad';
+export type BaseScreen = 'main' | 'lobby' | 'plakat' | 'rad' | 'app';
+
+export const APP_URL = 'https://bonnetid-tv.zaim-imran.workers.dev/app';
 
 export type TvPrayer = {
   name: PrayerName;

@@ -48,12 +48,13 @@ type PageSpec = {
   qr?: string | null;
 };
 
-const BASES: BaseScreen[] = ['main', 'lobby', 'plakat', 'rad'];
+const BASES: BaseScreen[] = ['main', 'lobby', 'plakat', 'rad', 'app'];
 const BASE_HELP: Record<BaseScreen, string> = {
   main: 'Alle dagens bønnetider i stort format. Passer i bønnesalen.',
   lobby: 'Neste bønn, dagens tider og kunngjøringer. Passer ved inngangen.',
   plakat: 'Kunngjøringer og Vipps-kode i stort format.',
   rad: 'Dagens tider med en tegning og navnet på rommet.',
+  app: 'QR-kode som laster ned Bønnetid på mobilen.',
 };
 const AUTO_HELP = 'Kommer av seg selv når det er tid: Iqamah, Jumuah, Ramadan, natt og Eid.';
 const AUTO: ScreenId[] = ['iqamah', 'jumuah', 'dua', 'hvile'];
@@ -505,6 +506,7 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
         shown('main.timeline', 'Tidslinje', 'En linje nederst som viser hvor langt dagen har kommet.', 'main'),
         shown('main.note', 'Kunngjøring og Vipps', 'Moskeens kunngjøring og Vipps-nummer.', 'main'),
         shown('main.hijri', 'Hijri-dato', 'Den islamske datoen ved siden av vanlig dato.', 'main'),
+        shown('main.app', 'QR-kode for appen', 'En liten kode nederst som laster ned Bønnetid på mobilen.', 'main'),
       ],
       lobby: [
         shown('lobby.times', 'Dagens tider', 'Alle dagens bønnetider i en liste.', 'lobby'),
@@ -574,6 +576,7 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
       ramadan: [],
       taraweeh: [],
       eid: [],
+      app: [],
     };
     const base = BASES.includes(id as BaseScreen);
     const on = base && settings.rotation.includes(id as BaseScreen);

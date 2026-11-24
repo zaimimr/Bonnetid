@@ -1,9 +1,10 @@
-const BASES = ['main', 'lobby', 'plakat', 'rad'];
+const BASES = ['main', 'lobby', 'plakat', 'rad', 'app'];
 const HIDE_KEYS = [
   'main.fajrEnd',
   'main.timeline',
   'main.note',
   'main.hijri',
+  'main.app',
   'lobby.times',
   'lobby.note',
   'lobby.vipps',
@@ -205,9 +206,21 @@ async function api(request, env, path) {
   return json({ error: 'not-found' }, 404);
 }
 
+const APP_STORE = 'https://apps.apple.com/no/app/id6792056685';
+const PLAY_STORE = 'https://play.google.com/store/apps/details?id=no.irn.bonnetid';
+
+function appLink(request) {
+  const agent = request.headers.get('user-agent') ?? '';
+  if (/iPhone|iPad|iPod/i.test(agent)) return Response.redirect(APP_STORE, 302);
+  if (/Android/i.test(agent)) return Response.redirect(PLAY_STORE, 302);
+  const html = `<!doctype html><html lang="nb"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bønnetid</title><body style="font-family:system-ui;margin:0;padding:48px 16px;text-align:center;background:#F6F8F7;color:#14201B"><h1>Bønnetid</h1><p><a href="${APP_STORE}">App Store</a></p><p><a href="${PLAY_STORE}">Google Play</a></p></body></html>`;
+  return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
+}
+
 export default {
   async fetch(request, env) {
     const path = new URL(request.url).pathname;
+    if (path === '/app') return appLink(request);
     if (path.startsWith('/api/')) return api(request, env, path);
     return env.ASSETS.fetch(request);
   },

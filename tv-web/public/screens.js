@@ -1,4 +1,5 @@
-export const SCREENS = ['main', 'lobby', 'plakat', 'rad', 'iqamah', 'jumuah', 'dua', 'hvile'];
+export const SCREENS = ['main', 'lobby', 'plakat', 'rad', 'app', 'iqamah', 'jumuah', 'dua', 'hvile'];
+const APP_URL = 'https://bonnetid-tv.zaim-imran.workers.dev/app';
 
 const INK = {
   page: '#F6F8F7',
@@ -521,7 +522,8 @@ function renderMain(c) {
   const ann = note
     ? `<div class="ann${showTimeline ? '' : ' grow'}">${glyph('megaphone', 60, INK.gold600)}<div class="shrink">${t('ann-title', esc(note.title), fitted({ text: note.title, size: 28, line: 36, weight: 700, avail: annAvail, lines: 3 }))}${note.sub ? t('ann-sub', esc(note.sub)) : ''}</div></div>`
     : '';
-  const bottom = tl || ann ? `<div class="bottom">${tl}${ann}</div>` : '';
+  const appBox = c.shows('main.app') ? `<div class="app-box">${qr(APP_URL, 136)}${t('app-box-t', 'Bønnetid<br>på mobilen')}</div>` : '';
+  const bottom = tl || ann || appBox ? `<div class="bottom">${tl}${ann}${appBox}</div>` : '';
   return root(
     'main',
     `${header(c, { line: dateLine(c, m, false, c.shows('main.hijri')), clock: clockOf(m.now) })}<div class="row">${heroCard}${rows}</div>${bottom}`,
@@ -565,6 +567,17 @@ function renderPlakat(c) {
   const po = `<div class="po" style="background:${brand.b}">${c.texture ? pattern(INK.white, 0.14, 140, 'po-pat') : ''}${left}${qb}</div>`;
   const bar = `<div class="bar"><div class="grow">${strip(stripOf(m), brand)}</div>${t('bar-clock', clockOf(m.now))}</div>`;
   return `<div class="tv tv-plakat full">${po}${bar}</div>`;
+}
+
+function renderApp(c) {
+  const m = buildModel(c, c.now);
+  const brand = c.brand;
+  const plWidth = 1920 - 192 - 520 - 72;
+  const left = `<div class="pl"><div class="br"><div class="br-logo">${t('br-logo-t', esc(initialsOf(c.name)), `color:${brand.b}`)}</div>${t('br-name', esc(c.name), fitted({ text: c.name, size: 34, weight: 700, avail: plWidth - 92, lines: 1 }))}</div><div class="kick">${glyph('star-and-crescent', 44, brand.s)}${t('kick-t', 'Gratis app', `color:${brand.s}`)}</div>${t('pt1', 'Bønnetid på mobilen', fitted({ text: 'Bønnetid på mobilen', size: 136, line: 134, weight: 800, spacing: -4.8, avail: plWidth, lines: 3 }))}${t('pl-sub', 'Uten reklame og uten innlogging', `color:${brand.s}`)}</div>`;
+  const qb = `<div class="qb">${qr(APP_URL, 360)}${t('qb-title', 'Skann med kameraet')}</div>`;
+  const po = `<div class="po" style="background:${brand.b}">${c.texture ? pattern(INK.white, 0.14, 140, 'po-pat') : ''}${left}${qb}</div>`;
+  const bar = `<div class="bar"><div class="grow">${strip(stripOf(m), brand)}</div>${t('bar-clock', clockOf(m.now))}</div>`;
+  return `<div class="tv tv-app full">${po}${bar}</div>`;
 }
 
 function renderRad(c) {
@@ -760,6 +773,7 @@ const RENDER = {
   lobby: renderLobby,
   plakat: renderPlakat,
   rad: renderRad,
+  app: renderApp,
   iqamah: renderIqamah,
   jumuah: renderJumuah,
   dua: renderDua,

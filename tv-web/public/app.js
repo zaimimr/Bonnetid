@@ -1,8 +1,8 @@
 import { renderScreen } from './screens.js';
 
-const BASES = ['main', 'lobby', 'plakat', 'rad'];
+const BASES = ['main', 'lobby', 'plakat', 'rad', 'app'];
 const AUTO = ['iqamah', 'jumuah', 'dua', 'hvile'];
-const NAMES = { main: 'Bønnesal', lobby: 'Inngang', plakat: 'Reklameskjerm', rad: 'Sal 2', iqamah: 'Iqamah', jumuah: 'Jumuah', dua: 'Taraweeh-dua', hvile: 'Natt' };
+const NAMES = { main: 'Bønnesal', lobby: 'Inngang', plakat: 'Reklameskjerm', rad: 'Sal 2', app: 'Last ned appen', iqamah: 'Iqamah', jumuah: 'Jumuah', dua: 'Taraweeh-dua', hvile: 'Natt' };
 const WHEN = { iqamah: 'Før hver iqamah', jumuah: 'Fredager', dua: 'I ramadan', hvile: 'Fra Isha til Fajr' };
 const DEFAULTS = {
   rotation: ['main'],
@@ -31,7 +31,7 @@ const FONTS = [
 ];
 const LEADS = [[5, '5 min'], [10, '10 min'], [15, '15 min']];
 const OPTIONS = {
-  main: [['hide', 'main.fajrEnd', 'Fajr slutter'], ['hide', 'main.timeline', 'Tidslinje'], ['hide', 'main.note', 'Kunngjøring og Vipps'], ['hide', 'main.hijri', 'Hijri-dato']],
+  main: [['hide', 'main.fajrEnd', 'Fajr slutter'], ['hide', 'main.timeline', 'Tidslinje'], ['hide', 'main.note', 'Kunngjøring og Vipps'], ['hide', 'main.hijri', 'Hijri-dato'], ['hide', 'main.app', 'QR-kode for appen']],
   lobby: [['hide', 'lobby.times', 'Dagens tider'], ['hide', 'lobby.note', 'Kunngjøring'], ['hide', 'lobby.vipps', 'Vipps-kode']],
   plakat: [['hide', 'plakat.note', 'Kunngjøring'], ['hide', 'plakat.vipps', 'Vipps-kode']],
   rad: [['chips', 'hall', 'Rom', HALLS], ['chips', 'art', 'Tegning', ARTS], ['hide', 'rad.fajrEnd', 'Fajr slutter'], ['hide', 'rad.timeline', 'Tidslinje']],

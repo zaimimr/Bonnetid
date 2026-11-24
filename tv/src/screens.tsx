@@ -25,6 +25,7 @@ import {
 import type { ArtChoice, DuaFont, HideKey } from './settings';
 import { ink, type Brand } from './theme';
 import {
+  APP_URL,
   nowAndNext,
   pauseInfo,
   taraweehStart,
@@ -181,6 +182,12 @@ function Main(ctx: Ctx) {
             </View>
           </View>
         ) : null}
+        {shows(ctx, 'main.app') ? (
+          <View style={s.appBox}>
+            <Qr value={APP_URL} size={136} />
+            <T style={s.appBoxText}>{'Bønnetid\npå mobilen'}</T>
+          </View>
+        ) : null}
       </View>
     </Root>
   );
@@ -308,6 +315,45 @@ function Plakat(ctx: Ctx) {
             <T style={[s.qbNumber, { color: brand.b }]}>{vipps.number}</T>
           </View>
         ) : null}
+      </View>
+      <View style={s.bar}>
+        <View style={kit.grow}>
+          <Strip items={stripOf(ctx)} brand={brand} />
+        </View>
+        <T style={s.barClock}>{clockOf(now)}</T>
+      </View>
+    </View>
+  );
+}
+
+function AppPoster(ctx: Ctx) {
+  const { brand, now, mosque } = ctx;
+  return (
+    <View style={s.full}>
+      <View style={[s.po, { backgroundColor: brand.b }]}>
+        {ctx.texture ? <Pattern id="ap" color={ink.white} opacity={0.14} size={140} frame={s.poPattern} /> : null}
+        <View style={s.pl}>
+          <View style={s.br}>
+            <View style={s.brLogo}>
+              <T style={[s.brLogoText, { color: brand.b }]}>{mosque.name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase()}</T>
+            </View>
+            <T style={s.brName} lines={1}>
+              {mosque.name}
+            </T>
+          </View>
+          <View style={s.kick}>
+            <Glyph name="star-and-crescent" size={44} color={brand.s} />
+            <T style={[s.kickText, { color: brand.s }]}>Gratis app</T>
+          </View>
+          <T style={s.pt1} lines={3}>
+            Bønnetid på mobilen
+          </T>
+          <T style={[s.plSub, { color: brand.s }]}>Uten reklame og uten innlogging</T>
+        </View>
+        <View style={s.qb}>
+          <Qr value={APP_URL} size={360} />
+          <T style={s.qbTitle}>Skann med kameraet</T>
+        </View>
       </View>
       <View style={s.bar}>
         <View style={kit.grow}>
@@ -835,6 +881,7 @@ export const SCREENS: Record<ScreenId, (ctx: Ctx) => React.ReactElement> = {
   dua: Dua,
   hvile: Hvile,
   eid: Eid,
+  app: AppPoster,
 };
 
 export const SCREEN_NAMES: Record<ScreenId, string> = {
@@ -849,6 +896,7 @@ export const SCREEN_NAMES: Record<ScreenId, string> = {
   dua: 'Taraweeh-dua',
   hvile: 'Natt og hvile',
   eid: 'Eid-morgen',
+  app: 'Last ned appen',
 };
 
 const s = StyleSheet.create({
@@ -876,9 +924,10 @@ const s = StyleSheet.create({
   mainLine: { fontSize: 52, fontWeight: '600', color: ink.body },
   rowsCard: { width: 700, padding: 20, justifyContent: 'center' },
   bottom: { flexDirection: 'row', gap: 32 },
-  tlCard: { flex: 1, paddingTop: 20, paddingHorizontal: 56, paddingBottom: 4 },
+  tlCard: { flex: 1, minWidth: 960, paddingTop: 20, paddingHorizontal: 56, paddingBottom: 4 },
   ann: {
     width: 600,
+    flexShrink: 1,
     backgroundColor: ink.gold50,
     borderWidth: 2,
     borderColor: ink.gold100,
@@ -891,6 +940,8 @@ const s = StyleSheet.create({
   },
   annTitle: { fontSize: 28, fontWeight: '700', color: ink.gold800, lineHeight: 36 },
   annSub: { fontSize: 26, color: ink.gold700, marginTop: 6 },
+  appBox: { flexDirection: 'row', alignItems: 'center', gap: 24, backgroundColor: ink.white, borderRadius: 32, paddingVertical: 20, paddingLeft: 20, paddingRight: 36 },
+  appBoxText: { fontSize: 30, fontWeight: '700', lineHeight: 38, color: ink.text },
   side: { width: 600, gap: 24 },
   nx: { paddingVertical: 36, paddingHorizontal: 40 },
   lobbyName: { fontSize: 132, fontWeight: '800', letterSpacing: -5, lineHeight: 140, marginTop: 14, marginBottom: 22 },

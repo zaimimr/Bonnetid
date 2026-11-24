@@ -15,6 +15,7 @@ export const HIDE_KEYS = [
   'main.timeline',
   'main.note',
   'main.hijri',
+  'main.app',
   'lobby.times',
   'lobby.note',
   'lobby.vipps',
