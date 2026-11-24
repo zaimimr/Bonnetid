@@ -72,7 +72,6 @@ const BRAND_NAMES = ['Grønn', 'Blå', 'Vinrød', 'Lilla'];
 const ART_NAMES = ['Moské', 'Kaaba', 'Lykt', 'Måne og stjerner', 'Ingen tegning'];
 const FONT_NAMES = ['Amiri', 'Scheherazade', 'Naskh', 'Kufi', 'Ruqaa', 'Nastaliq'];
 const CUSTOMIZABLE: ScreenId[] = ['main', 'lobby', 'plakat', 'rad', 'iqamah', 'jumuah', 'dua', 'hvile'];
-const ALL_SCREENS = Object.keys(SCREENS) as ScreenId[];
 const WIZARD_STEP: Record<string, number> = {
   'w-city': 1,
   'w-mosque': 1,
@@ -242,6 +241,56 @@ function Page({ spec, step, note, now }: { spec: PageSpec; step?: number; note?:
   );
 }
 
+type Tile = { key: string; label: string; value: string; swatch?: string; press: () => void };
+
+function Menu({ tiles, onDone, onNewCode, qr, now }: { tiles: Tile[]; onDone: () => void; onNewCode: () => void; qr: string | null; now: Date }) {
+  const orgNr = useTvSettings((state) => state.orgNr);
+  const [focus, setFocus] = useState('');
+  return (
+    <View style={[s.page, s.split]}>
+      <View style={s.left}>
+        <T style={s.menuTitle}>Innstillinger</T>
+        <View style={s.tiles}>
+          {tiles.map((tile, index) => (
+            <Pressable
+              key={tile.key}
+              onPress={tile.press}
+              onFocus={() => setFocus(tile.key)}
+              hasTVPreferredFocus={index === 0}
+              style={[s.tile, focus === tile.key && s.tileFocused]}
+            >
+              <T style={[s.tileLabel, focus === tile.key && s.onDarkMuted]}>{tile.label}</T>
+              <View style={s.tileValueRow}>
+                {tile.swatch ? <View style={[s.bigSwatch, { backgroundColor: tile.swatch }]} /> : null}
+                <T style={[s.tileValue, focus === tile.key && s.onDark]} lines={1}>
+                  {tile.value}
+                </T>
+                <T style={[s.chevron, focus === tile.key && s.onDark]}>›</T>
+              </View>
+            </Pressable>
+          ))}
+        </View>
+        <Pressable onPress={onDone} onFocus={() => setFocus('done')} style={[s.done, focus === 'done' && s.doneFocused]}>
+          <T style={s.doneText}>Ferdig</T>
+        </Pressable>
+      </View>
+      <View style={s.right}>
+        <Preview screen="main" play orgNr={orgNr} now={now} />
+        <View style={s.phoneCard}>
+          <View style={s.qrBox}>{qr ? <Qr value={qr} size={220} /> : null}</View>
+          <View style={s.phoneText}>
+            <T style={s.phoneTitle}>Eller bruk mobilen</T>
+            <T style={s.help}>Pek kameraet på mobilen mot koden.</T>
+            <Pressable onPress={onNewCode} onFocus={() => setFocus('code')} style={[s.codeButton, focus === 'code' && s.tileFocused]}>
+              <T style={[s.codeText, focus === 'code' && s.onDark]}>Lag ny kode</T>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
 export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
   const settings = useTvSettings();
   const list = useMosqueList();
@@ -290,6 +339,10 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
     },
     [],
   );
+
+  useEffect(() => {
+    if (top === 'menu' && !useTvSettings.getState().pairId) newPair();
+  }, [top]);
 
   const cities = useMemo(() => {
     const counts = new Map<string, number>();
@@ -560,23 +613,6 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
           qr,
           items: [{ key: 'remote', label: 'Bruk fjernkontrollen i stedet', help: 'Velg alt her på skjermen, steg for steg.', press: () => go('w-city') }],
         };
-      case 'phone':
-        return {
-          title: 'Bruk mobilen',
-          lead: 'Åpne kameraet på mobilen og pek det mot koden. Det du endrer på mobilen vises her innen et halvt minutt.',
-          qr,
-          items: [
-            { key: 'back', label: 'Tilbake', help: 'Koden virker til du lager en ny.', press: back },
-            {
-              key: 'new',
-              label: 'Lag ny kode',
-              help: 'Den gamle koden slutter å virke. Gjør dette hvis noen som ikke skal endre skjermen har koden.',
-              press: () => {
-                newPair();
-              },
-            },
-          ],
-        };
       case 'w-city':
         return cityPage('Hvilken moské er skjermen i?', 'w-mosque');
       case 'w-mosque':
@@ -656,69 +692,9 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
             },
           ],
         };
-      case 'menu':
-        return {
-          title: 'Innstillinger',
-          play: true,
-          items: [
-            {
-              key: 'rotation',
-              label: 'Skjermrunden',
-              value: settings.rotation.length > 1 ? `${settings.rotation.length} skjermer, ${settings.seconds} s` : rotationNames[0],
-              help: 'Hvilke skjermer som vises, i hvilken rekkefølge og hvor lenge.',
-              press: () => go('rotation'),
-            },
-            {
-              key: 'screens',
-              label: 'Tilpass en skjerm',
-              value: '',
-              help: 'Velg hva som vises på hver skjerm.',
-              press: () => go('screens'),
-            },
-            {
-              key: 'look',
-              label: 'Utseende',
-              value: BRAND_NAMES[brandIndex],
-              help: 'Farge og mønster.',
-              press: () => go('look'),
-            },
-            {
-              key: 'mosque',
-              label: 'Moské',
-              value: current?.name ?? '',
-              help: 'Bønnetidene hentes fra denne moskeen.',
-              press: () => go('city'),
-            },
-            {
-              key: 'phone',
-              label: 'Bruk mobilen',
-              value: '',
-              help: 'Endre alt fra mobilen ved å skanne en kode.',
-              press: () => openPhone('phone'),
-            },
-            {
-              key: 'all',
-              label: 'Se alle skjermene',
-              value: '',
-              help: 'Se hvordan hver skjerm ser ut. Det endrer ingenting.',
-              press: () => go('all'),
-            },
-            {
-              key: 'restart',
-              label: 'Start oppsettet på nytt',
-              value: '',
-              help: 'Går gjennom alle stegene fra starten. Det du har valgt blir stående til du endrer det.',
-              press: () => {
-                set({ configured: false });
-                setRoute(['w-start']);
-              },
-            },
-            { key: 'done', label: 'Ferdig', value: '', help: 'Alt er lagret. Trykk OK for å gå tilbake til skjermen.', press: close },
-          ],
-        };
       case 'rotation':
         return {
-          title: 'Skjermrunden',
+          title: 'Skjermer',
           lead: AUTO_HELP,
           hint: rotationHint,
           items: [
@@ -732,6 +708,13 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
               index: secondsIndex,
               play: true,
               pick: (index) => set({ seconds: ROTATION_SECONDS[index] }),
+            },
+            {
+              key: 'details',
+              label: 'Velg hva hver skjerm viser',
+              value: '›',
+              help: 'Slå av og på ting som tider, kunngjøringer og Vipps-kode.',
+              press: () => go('screens'),
             },
           ],
         };
@@ -749,7 +732,7 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
         };
       case 'look':
         return {
-          title: 'Utseende',
+          title: 'Farge',
           items: [
             choice('brand', 'Farge', 'Hovedfargen på skjermen.', settings.rotation[0], BRAND_OPTIONS, BRAND_NAMES, settings.brand as (typeof BRAND_OPTIONS)[number], (brand) => set({ brand }), (i) => ({
               swatch: BRAND_OPTIONS[i],
@@ -763,21 +746,34 @@ export function Setup({ now, onClose }: { now: Date; onClose: () => void }) {
         return cityPage('Moské', 'mosque');
       case 'mosque':
         return mosquePage(() => setRoute(['menu']));
-      case 'all':
-        return {
-          title: 'Se alle skjermene',
-          lead: 'Bla for å se hver skjerm. Det endrer ingenting.',
-          items: ALL_SCREENS.map((id) => ({
-            key: id,
-            label: SCREEN_NAMES[id],
-            help: BASES.includes(id as BaseScreen) ? BASE_HELP[id as BaseScreen] : 'Kommer av seg selv når det er tid.',
-            screen: id,
-          })),
-        };
       default:
         return screenPage(key.slice('screen:'.length) as ScreenId);
     }
   };
+
+  if (top === 'menu') {
+    const qr = settings.pairId && settings.pairSecret ? pairUrl(settings.pairId, settings.pairSecret) : null;
+    return (
+      <Menu
+        now={now}
+        qr={qr}
+        onDone={close}
+        onNewCode={() => {
+          newPair();
+        }}
+        tiles={[
+          { key: 'mosque', label: 'Moské', value: current ? placeName(current.name) : 'Velg moské', press: () => go('city') },
+          {
+            key: 'rotation',
+            label: 'Skjermer',
+            value: settings.rotation.length > 1 ? `${joinNames(rotationNames)}, ${settings.seconds} sek hver` : rotationNames[0],
+            press: () => go('rotation'),
+          },
+          { key: 'look', label: 'Farge', value: BRAND_NAMES[brandIndex], swatch: settings.brand, press: () => go('look') },
+        ]}
+      />
+    );
+  }
 
   return (
     <Page
@@ -815,6 +811,25 @@ const s = StyleSheet.create({
   rowLabel: { fontSize: 34, fontWeight: '700', color: ink.text, flexShrink: 0, maxWidth: 520 },
   rowValue: { fontSize: 30, color: ink.body, flex: 1, textAlign: 'right' },
   onDark: { color: ink.white },
+  onDarkMuted: { color: ink.track },
+  menuTitle: { fontSize: 64, fontWeight: '800', color: ink.text, marginBottom: 16 },
+  tiles: { gap: 16 },
+  tile: { height: 150, paddingHorizontal: 36, justifyContent: 'center', gap: 6, borderRadius: 24, backgroundColor: ink.card, borderWidth: 2, borderColor: ink.line },
+  tileFocused: { backgroundColor: ink.text, borderColor: ink.text },
+  tileLabel: { fontSize: 28, fontWeight: '600', color: ink.muted },
+  tileValueRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  tileValue: { flex: 1, fontSize: 44, fontWeight: '800', color: ink.text },
+  chevron: { fontSize: 56, color: ink.muted },
+  bigSwatch: { width: 44, height: 44, borderRadius: 22, borderWidth: 3, borderColor: ink.white },
+  done: { marginTop: 'auto', height: 110, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: ink.accent, borderWidth: 4, borderColor: ink.accent },
+  doneFocused: { backgroundColor: ink.text, borderColor: ink.text },
+  doneText: { fontSize: 44, fontWeight: '800', color: ink.white },
+  phoneCard: { flexDirection: 'row', gap: 32, alignItems: 'center', padding: 28, borderRadius: 24, backgroundColor: ink.card, borderWidth: 2, borderColor: ink.line },
+  qrBox: { width: 220, height: 220 },
+  phoneText: { flex: 1, gap: 12, alignItems: 'flex-start' },
+  phoneTitle: { fontSize: 40, fontWeight: '800', color: ink.text },
+  codeButton: { marginTop: 8, height: 64, paddingHorizontal: 28, borderRadius: 32, justifyContent: 'center', borderWidth: 2, borderColor: ink.line },
+  codeText: { fontSize: 28, fontWeight: '700', color: ink.text },
   box: {
     width: 40,
     height: 40,

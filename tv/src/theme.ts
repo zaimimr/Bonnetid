@@ -6,6 +6,7 @@ export const ink = {
   line: palette.neutral200,
   track: '#E4EAE7',
   mark: palette.neutral300,
+  accent: palette.emerald600,
   text: palette.neutral900,
   body: palette.neutral700,
   muted: palette.neutral500,
