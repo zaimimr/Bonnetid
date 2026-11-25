@@ -2,7 +2,7 @@
   "expo": {
     "name": "Bønnetid",
     "slug": "bonnetid",
-    "version": "1.12.0",
+    "version": "1.13.0",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "bonnetid",
@@ -128,7 +128,12 @@
         "expo-localization",
         {
           "supportsRTL": true,
-          "supportedLocales": ["nb", "en", "ar", "ur"]
+          "supportedLocales": [
+            "nb",
+            "en",
+            "ar",
+            "ur"
+          ]
         }
       ],
       [

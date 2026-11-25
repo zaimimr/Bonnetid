@@ -46,5 +46,13 @@
   "clearerCalendar": "Tydeligere kalender",
   "clearerCalendarBody": "Større tider i månedstabellen, og i dag, fredager og spesielle dager er markert.",
   "followsLocation": "Følger med når du reiser",
-  "followsLocationBody": "Bønnetidene bytter til riktig kommune når du flytter deg."
+  "followsLocationBody": "Bønnetidene bytter til riktig kommune når du flytter deg.",
+  "widgetMarking": "Jamat og bønnelogg i widgets",
+  "widgetMarkingBody": "Widgets viser jamat-tiden, og du kan markere bønn rett fra hjemskjermen.",
+  "moreDhikr": "Mange flere dhikr",
+  "moreDhikrBody": "Over hundre nye dhikr med fordeler og forklaring, og egne serier i tasbih.",
+  "asrExplained": "Asr forklart",
+  "asrExplainedBody": "Se hva hver Asr-metode betyr og hvilken tid den gir i dag.",
+  "lightNights": "Lyse sommernetter",
+  "lightNightsBody": "Trykk Hvorfor? ved Fajr og Isha for å se hvordan tidene settes når det ikke blir mørkt."
 }

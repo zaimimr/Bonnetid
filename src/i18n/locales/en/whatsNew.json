@@ -46,5 +46,13 @@
   "clearerCalendar": "Clearer calendar",
   "clearerCalendarBody": "Bigger times in the monthly table, with today, Fridays and special days marked.",
   "followsLocation": "Follows you when you travel",
-  "followsLocationBody": "Prayer times switch to the right municipality when you move."
+  "followsLocationBody": "Prayer times switch to the right municipality when you move.",
+  "widgetMarking": "Jamat and prayer log in widgets",
+  "widgetMarkingBody": "Widgets show the jamat time, and you can mark a prayer right from the home screen.",
+  "moreDhikr": "Many more dhikr",
+  "moreDhikrBody": "Over a hundred new dhikr with virtues and explanations, plus your own series in tasbih.",
+  "asrExplained": "Asr explained",
+  "asrExplainedBody": "See what each Asr method means and which time it gives today.",
+  "lightNights": "Light summer nights",
+  "lightNightsBody": "Tap Why? next to Fajr and Isha to see how the times are set when it never gets dark."
 }
